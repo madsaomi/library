@@ -21,4 +21,4 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE $PORT
 
-CMD gunicorn core.wsgi:application --bind 0.0.0.0:$PORT --preload --timeout 120 --workers 4
+CMD python manage.py migrate --noinput && python manage.py ensure_admin && gunicorn core.wsgi:application --bind 0.0.0.0:$PORT --preload --timeout 120 --workers 4
