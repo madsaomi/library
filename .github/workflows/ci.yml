@@ -56,7 +56,7 @@ jobs:
 
       - name: Link and Deploy to Railway
         run: |
-          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway link --project 5cc4da5e
           railway up
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
