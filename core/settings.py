@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
 
     # Local apps
+    'core',
     'accounts',
     'schools',
     'books',
