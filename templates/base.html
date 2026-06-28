@@ -1,0 +1,394 @@
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% trans "Online Kutibxona" %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.3">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>window.VAPID_PUBLIC_KEY = '{{ vapid_public_key|escapejs }}';</script>
+    {% block extra_head %}{% endblock %}
+    <style>
+        /* Force Sidebar Footer Styling */
+        .sidebar-footer {
+            margin-top: auto !important;
+            padding-top: 25px !important;
+            border-top: 1px solid var(--border) !important;
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 12px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .footer-btn {
+            aspect-ratio: 1 / 1 !important;
+            width: 100% !important;
+            border-radius: 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--hover-bg) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text-muted) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            text-decoration: none !important;
+            position: relative !important;
+            cursor: pointer !important;
+        }
+
+        .footer-btn:hover {
+            background: var(--glass) !important;
+            border-color: var(--primary) !important;
+            color: var(--hover-text) !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .footer-btn i {
+            font-size: 1.2rem !important;
+        }
+
+        .footer-btn.logout {
+            color: rgba(239, 68, 68, 0.7) !important;
+        }
+
+        .footer-btn.logout:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-color: #ef4444 !important;
+            color: #ef4444 !important;
+        }
+
+        .language-selector form {
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+        }
+
+        .language-selector {
+            position: relative !important;
+        }
+
+        .language-dropdown {
+            position: absolute !important;
+            bottom: 100% !important;
+            left: 50% !important;
+            transform: translateX(-50%) translateY(-10px) scale(0.9) !important;
+            background: var(--dropdown-bg) !important;
+            backdrop-filter: blur(15px) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 12px !important;
+            padding: 8px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 4px !important;
+            min-width: 120px !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            z-index: 100 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .language-selector:hover .language-dropdown {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateX(-50%) translateY(-15px) scale(1) !important;
+        }
+
+        .lang-option {
+            background: transparent !important;
+            border: none !important;
+            color: var(--text-muted) !important;
+            padding: 10px 15px !important;
+            text-align: left !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            font-size: 0.9rem !important;
+            font-family: inherit !important;
+            transition: 0.2s !important;
+            white-space: nowrap !important;
+            width: 100% !important;
+        }
+
+        .lang-option:hover {
+            background: var(--glass) !important;
+            color: var(--hover-text) !important;
+        }
+
+        .language-selector i {
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            margin: 0 !important;
+        }
+
+        .language-selector:hover i {
+            transform: translate(-50%, -50%) scale(1.1) !important;
+            filter: drop-shadow(0 0 8px var(--primary-glow)) !important;
+        }
+
+        /* Global Search Input Fix */
+        #search-input {
+            color: var(--input-text) !important;
+        }
+        #search-input::placeholder {
+            color: var(--input-placeholder) !important;
+        }
+
+        /* Hide ALL native browser password reveal buttons */
+        input::-ms-reveal,
+        input::-ms-clear,
+        input::-webkit-reveal,
+        input::-webkit-clear,
+        input::-webkit-password-toggle-button {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <div class="layout-wrapper">
+        <aside class="sidebar glass-panel" id="sidebar">
+            <div class="sidebar-header" style="margin-bottom: 40px; text-align: center;">
+                <h2 class="gradient-text" style="font-size: 1.5rem; white-space: nowrap;">
+                    <i class="fas fa-book-open"></i> {% trans "Online Kutibxona" %}
+                </h2>
+            </div>
+            <nav class="sidebar-nav custom-scrollbar">
+                {% block sidebar_nav %}{% endblock %}
+                <div class="sidebar-footer">
+                    <a href="{% url 'frontend_user:profile' %}" class="footer-btn" title="{{ user.username }}">
+                        <i class="fas fa-user"></i>
+                    </a>
+
+                    <button class="footer-btn" id="themeToggle" title="{% trans 'Mavzuni almashtirish' %}" onclick="toggleTheme()">
+                        <i id="themeIcon" class="fas fa-moon"></i>
+                    </button>
+
+                    <div class="footer-btn language-selector" title="{% trans 'Tilni tanlash' %}">
+                        <i class="fas fa-globe"></i>
+                        <div class="language-dropdown">
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% for lang_code, lang_name in LANGUAGES %}
+                                <button type="button" 
+                                        class="lang-option {% if lang_code == LANGUAGE_CODE %}active{% endif %}"
+                                        onclick="changeLanguage('{{ lang_code }}')">
+                                    {{ lang_name }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                        <form id="lang-form" action="{% url 'set_language' %}" method="post" style="display: none;">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                            <input name="language" id="lang-input" type="hidden" value="">
+                        </form>
+                    </div>
+
+                    <a href="{% url 'logout' %}" class="footer-btn logout" title="{% trans 'Chiqish' %}">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-header-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="gradient-text" style="margin: 0;">{% block page_title %}{% endblock %}</h1>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <a href="{% url 'notifications:list' %}" id="notificationBell" style="position: relative; color: var(--text-muted); text-decoration: none; font-size: 1.3rem; transition: 0.3s;" onclick="event.preventDefault(); toggleNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span id="unreadBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #ef4444; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: 700;"></span>
+                    </a>
+                </div>
+            </header>
+
+            <div class="animate-fade">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script src="{% static 'js/push-notifications.js' %}"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        // Real-time Word/Char Counter
+        function initCounters() {
+            const inputs = document.querySelectorAll('[data-limit-chars], [data-limit-words]');
+            inputs.forEach(input => {
+                const charLimit = input.getAttribute('data-limit-chars');
+                const wordLimit = input.getAttribute('data-limit-words');
+                
+                // Create counter element
+                const counterDiv = document.createElement('div');
+                counterDiv.className = 'field-counter';
+                counterDiv.style.cssText = 'font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; text-align: right; transition: 0.3s;';
+                
+                // Append after input
+                input.parentNode.appendChild(counterDiv);
+                
+                const update = () => {
+                    const text = input.value.trim();
+                    const chars = text.length;
+                    const words = text ? text.split(/\s+/).length : 0;
+                    
+                    let status = '';
+                    if (charLimit) {
+                        status += `${chars}/${charLimit} {% trans 'belgi' %}`;
+                    }
+                    if (wordLimit) {
+                        if (status) status += ' | ';
+                        status += `${words}/${wordLimit} {% trans 'so\'z' %}`;
+                    }
+                    counterDiv.innerText = status;
+                    
+                    if ((charLimit && chars > charLimit) || (wordLimit && words > wordLimit)) {
+                        counterDiv.style.color = '#ef4444';
+                        counterDiv.style.fontWeight = '700';
+                    } else {
+                        counterDiv.style.color = 'var(--text-muted)';
+                        counterDiv.style.fontWeight = '400';
+                    }
+                };
+                
+                input.addEventListener('input', update);
+                update(); // Initial check
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initCounters);
+
+        // Password Visibility Toggle
+        function initPasswordToggles() {
+            const passFields = document.querySelectorAll('input[type="password"]');
+            passFields.forEach(field => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'password-wrapper';
+                wrapper.style.position = 'relative';
+                field.parentNode.insertBefore(wrapper, field);
+                wrapper.appendChild(field);
+                
+                const toggle = document.createElement('i');
+                toggle.className = 'fas fa-eye';
+                toggle.style.cssText = 'position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); transition: 0.3s; z-index: 10;';
+                
+                toggle.onclick = () => {
+                    if (field.type === 'password') {
+                        field.type = 'text';
+                        toggle.className = 'fas fa-eye-slash';
+                        toggle.style.color = 'var(--primary)';
+                    } else {
+                        field.type = 'password';
+                        toggle.className = 'fas fa-eye';
+                        toggle.style.color = 'var(--text-muted)';
+                    }
+                };
+                
+                wrapper.appendChild(toggle);
+                field.style.paddingRight = '45px';
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initPasswordToggles);
+
+        // Language Switcher Function
+        function changeLanguage(code) {
+            document.getElementById('lang-input').value = code;
+            document.getElementById('lang-form').submit();
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isLight = html.getAttribute('data-theme') === 'light';
+            html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+            localStorage.setItem('theme', isLight ? 'dark' : 'light');
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('themeIcon');
+            if (!icon) return;
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Apply saved theme on load
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+            updateThemeIcon();
+        })();
+
+        // Notification bell badge
+        function updateUnreadBadge() {
+            fetch('/api/notifications/unread-count/')
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('unreadBadge');
+                    if (badge) {
+                        if (data.unread_count > 0) {
+                            badge.style.display = 'inline';
+                            badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+        function toggleNotifications() {
+            fetch('/api/notifications/')
+                .then(r => r.json())
+                .then(data => {
+                    // Mark all as read
+                    fetch('/api/notifications/read-all/', { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } });
+                    updateUnreadBadge();
+                    // Simple alert for now
+                    const list = data.notifications.slice(0, 5).map(n => `• ${n.title}: ${n.body}`).join('\n');
+                    if (list) alert(list || '{% filter escapejs %}{% trans "Bildirishnomalar yo\'q" %}{% endfilter %}');
+                })
+                .catch(() => {});
+        }
+
+        // Poll for new notifications every 60 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUnreadBadge();
+            setInterval(updateUnreadBadge, 60000);
+        });
+
+        // Global Search Enter Fix
+        document.addEventListener('keydown', function(e) {
+            if (e.target && e.target.id === 'search-input' && e.key === 'Enter') {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

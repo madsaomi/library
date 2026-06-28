@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "O'chirishni tasdiqlash" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "O'chirishni tasdiqlash" %}{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto;">
+    <div class="glass-panel animate-fade" style="padding: 40px; text-align: center;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #ef4444; margin-bottom: 25px;"></i>
+        <h2 style="margin-bottom: 15px;">{% trans "Haqiqatdan ham ushbu" %} {{ type }} {% trans "o'chirmoqchimisiz?" %}</h2>
+        <p style="color: var(--text-muted); margin-bottom: 35px;">"{{ object }}" {% trans "o'chirilgandan so'ng uni qayta tiklab bo'lmaydi." %}</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; gap: 20px;">
+                <button type="submit" class="btn-primary" style="flex-grow: 1; padding: 15px; background: #ef4444;">{% trans "O'chirish" %}</button>
+                <a href="javascript:history.back()" class="btn-primary" style="flex-grow: 1; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; text-align: center; text-decoration: none;">{% trans "Bekor qilish" %}</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

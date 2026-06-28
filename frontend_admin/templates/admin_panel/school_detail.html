@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ school.name }} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Maktab ma'lumotlari" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'admin_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="responsive-grid-1-2" style="align-items: start;">
+    <div class="glass-panel animate-fade">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 80px; height: 80px; background: var(--primary); border-radius: 15px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <i class="fas fa-school" style="font-size: 2.5rem; color: white;"></i>
+            </div>
+            <h3>{{ school.name }}</h3>
+            <p style="color: var(--text-muted);">{{ school.address }}</p>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="glass-card" style="padding: 15px;">
+                <p style="font-size: 0.8rem; color: var(--text-muted);">{% trans "Kontakt" %}</p>
+                <p style="font-weight: 600;">{{ school.contact|default:"+998..." }}</p>
+            </div>
+            <div class="glass-card" style="padding: 15px;">
+                <p style="font-size: 0.8rem; color: var(--text-muted);">{% trans "Maktab Admini" %}</p>
+                {% if school_admin %}
+                    <p style="font-weight: 600; margin-bottom: 5px;">{{ school_admin.get_full_name|default:school_admin.username }}</p>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--primary);">
+                        <i class="fas fa-user-shield"></i>
+                        <span>{% trans "Login" %}: <strong>{{ school_admin.username }}</strong></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">
+                        <i class="fas fa-key"></i>
+                        <span>{% trans "Parol" %}: <span id="admin-pass-text" style="color: var(--text-main);">{{ school_admin.raw_password|default:'---' }}</span></span>
+                        <i class="fas fa-eye-slash" id="toggle-pass" style="cursor: pointer; color: var(--primary); font-size: 0.8rem; margin-left: 5px;"></i>
+                    </div>
+                    <script>
+                        document.getElementById('toggle-pass').addEventListener('click', function() {
+                            const passText = document.getElementById('admin-pass-text');
+                            if (this.classList.contains('fa-eye')) {
+                                passText.innerText = "{{ school_admin.raw_password|default:'---' }}";
+                                passText.style.letterSpacing = 'normal';
+                                this.classList.remove('fa-eye');
+                                this.classList.add('fa-eye-slash');
+                            } else {
+                                passText.innerText = "********";
+                                passText.style.letterSpacing = '2px';
+                                this.classList.remove('fa-eye-slash');
+                                this.classList.add('fa-eye');
+                            }
+                        });
+                    </script>
+                {% else %}
+                    <p style="font-weight: 600;">---</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; display: flex; gap: 10px; align-items: stretch;">
+            <a href="{% url 'frontend_admin:school_edit' school.pk %}" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none; padding: 14px 20px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem;"><i class="fas fa-edit"></i> {% trans "Tahrirlash" %}</a>
+            <form action="{% url 'frontend_admin:school_delete' school.pk %}" method="get" style="flex: 1; display: flex;">
+                <button type="submit" class="btn-primary" style="width: 100%; background: #ef4444; box-shadow: 0 4px 15px rgba(239,68,68,0.3); padding: 14px 20px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem;"><i class="fas fa-trash"></i> {% trans "O'chirish" %}</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="glass-panel animate-fade" style="animation-delay: 0.2s;">
+        <h3 style="margin-bottom: 25px;"><i class="fas fa-users" style="color: var(--secondary);"></i> {% trans "Maktab statistikasi" %}</h3>
+        
+        <div class="responsive-grid-2">
+            <div class="glass-card" style="padding: 25px; text-align: center;">
+                <h4 style="font-size: 2rem;">{{ student_count }}</h4>
+                <p style="color: var(--text-muted);">{% trans "O'quvchilar" %}</p>
+            </div>
+            <div class="glass-card" style="padding: 25px; text-align: center;">
+                <h4 style="font-size: 2rem;">{{ book_count }}</h4>
+                <p style="color: var(--text-muted);">{% trans "Kitoblar" %}</p>
+            </div>
+        </div>
+
+        <div class="responsive-grid-2" style="margin-top: 30px;">
+            <div class="glass-card" style="padding: 20px; background: var(--glass);">
+                <h4 style="margin-bottom: 20px; font-size: 1rem; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-users"></i> {% trans "O'quvchilar" %}
+                </h4>
+                <div style="max-height: 300px; overflow-y: auto; padding-right: 10px;" class="custom-scrollbar">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        {% for student in students %}
+                        <div style="padding: 12px 15px; background: var(--hover-bg); border-radius: 10px; border: 1px solid var(--border); font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 500;">{{ student.get_full_name|default:student.username }}</span>
+                            <span style="color: var(--text-muted); font-size: 0.75rem; background: var(--glass); padding: 2px 8px; border-radius: 6px;">{{ student.grade|default:"" }}</span>
+                        </div>
+                        {% empty %}
+                        <p style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 20px;">{% trans "O'quvchilar yo'q" %}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card" style="padding: 20px; background: var(--glass);">
+                <h4 style="margin-bottom: 20px; font-size: 1rem; color: var(--secondary); display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-book"></i> {% trans "Kitoblar" %}
+                </h4>
+                <div style="max-height: 300px; overflow-y: auto; padding-right: 10px;" class="custom-scrollbar">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        {% for book in books %}
+                        <div style="padding: 12px 15px; background: var(--hover-bg); border-radius: 10px; border: 1px solid var(--border); font-size: 0.85rem;">
+                            <span style="font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ book.title }}</span>
+                            <span style="color: var(--text-muted); font-size: 0.7rem;">{{ book.category.name|default:"---" }}</span>
+                        </div>
+                        {% empty %}
+                        <p style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 20px;">{% trans "Kitoblar yo'q" %}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

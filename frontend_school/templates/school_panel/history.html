@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Kitoblar tarixi" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Kitobxonlik tarixi" %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .returned-row {
+        opacity: 0.85;
+    }
+</style>
+{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel animate-fade">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px;">
+        <h3><i class="fas fa-history" style="color: var(--primary);"></i> {% trans "Barcha amallar tarixi" %}</h3>
+        
+        <form method="get" id="search-form" onsubmit="return false;" style="display: flex; gap: 10px; flex: 1; max-width: 400px;">
+            <input type="text" name="q" id="search-input" value="{{ query|default:'' }}" class="glass-card" placeholder="{% trans 'Kitob, o\'quvchi yoki ID...' %}" style="flex: 1; padding: 10px 15px; border: 1px solid var(--border); outline: none; color: white;">
+            <button type="submit" class="btn-primary" style="padding: 10px 20px;"><i class="fas fa-search"></i></button>
+            {% if query %}
+                <a href="{% url 'frontend_school:history_list' %}" class="glass-card" style="padding: 10px; display: flex; align-items: center; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);"><i class="fas fa-times"></i></a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0 10px;">
+            <thead>
+                <tr style="color: var(--text-muted); font-size: 0.9rem; text-align: left;">
+                    <th style="padding: 10px 20px;">{% trans "Kitob nomi" %}</th>
+                    <th style="padding: 10px 20px;">{% trans "Kim olgan" %}</th>
+                    <th style="padding: 10px 20px;">{% trans "Sinf / Lavozim" %}</th>
+                    <th style="padding: 10px 20px;">{% trans "Berilgan vaqt" %}</th>
+                    <th style="padding: 10px 20px;">{% trans "Qaytarilgan vaqt" %}</th>
+                    <th style="padding: 10px 20px;">{% trans "Holati" %}</th>
+                </tr>
+            </thead>
+            <tbody id="history-table-body">
+                {% for issue in history %}
+                <tr class="history-row glass-card {% if issue.is_returned %}returned-row{% endif %}" data-search="{{ issue.book.title|lower }} {{ issue.user.first_name|lower }} {{ issue.user.last_name|lower }} {{ issue.user.username|lower }} {{ issue.user.grade|default:''|lower }}" style="transition: 0.3s;">
+                    <td style="padding: 15px 20px; border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 40px; height: 55px; background: rgba(255,255,255,0.05); border-radius: 5px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                {% if issue.book.cover %}
+                                    <img src="{{ issue.book.cover.url }}" alt="cover" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-book" style="color: var(--secondary); opacity: 0.5;"></i>
+                                {% endif %}
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <span style="font-weight: 600;">{{ issue.book.title }}</span>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">{{ issue.book.category.name }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 15px 20px;">
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-weight: 500;">{{ issue.user.get_full_name|default:issue.user.username }}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">{% trans "ID:" %} {{ issue.user.username }}</span>
+                        </div>
+                    </td>
+                    <td style="padding: 15px 20px;">
+                        {% if issue.user.role == 'student' %}
+                            <span style="padding: 4px 10px; background: rgba(99, 102, 241, 0.1); color: var(--primary); border-radius: 15px; font-size: 0.8rem;">
+                                {% if issue.user.grade %}{{ issue.user.grade }}{% else %}{% trans "Sinf ko'rsatilmagan" %}{% endif %}
+                            </span>
+                        {% elif issue.user.role == 'teacher' %}
+                            <span style="padding: 4px 10px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-radius: 15px; font-size: 0.8rem;">
+                                {% trans "O'qituvchi" %}
+                            </span>
+                        {% else %}
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">{{ issue.user.get_role_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.9rem;">
+                        {{ issue.issued_at|date:"d.m.Y" }}<br>
+                        <small style="opacity: 0.6;">{{ issue.issued_at|date:"H:i" }}</small>
+                    </td>
+                    <td style="padding: 15px 20px; color: var(--text-muted); font-size: 0.9rem;">
+                        {% if issue.is_returned %}
+                            {{ issue.returned_at|date:"d.m.Y" }}<br>
+                            <small style="opacity: 0.6;">{{ issue.returned_at|date:"H:i" }}</small>
+                        {% else %}
+                            <span style="opacity: 0.3;">—</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px 20px; border-top-right-radius: 10px; border-bottom-right-radius: 10px;">
+                        {% if issue.is_returned %}
+                            <span style="padding: 5px 12px; background: rgba(255,255,255,0.05); color: var(--text-muted); border-radius: 20px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1);">
+                                <i class="fas fa-check-double"></i> {% trans "Qaytarildi" %}
+                            </span>
+                        {% else %}
+                            <span style="padding: 5px 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 20px; font-size: 0.75rem; border: 1px solid rgba(16, 185, 129, 0.2);">
+                                <i class="fas fa-hand-holding-heart"></i> {% trans "Berilgan" %}
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr id="empty-state">
+                    <td colspan="6" style="padding: 60px; text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.2;"></i>
+                        <p>{% trans "Hozircha amallar tarixi mavjud emas" %}</p>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="no-results" style="display: none;">
+                    <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-muted);">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% include 'pagination.html' %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const rows = document.querySelectorAll('.history-row');
+    const noResults = document.getElementById('no-results');
+    const emptyState = document.getElementById('empty-state');
+
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') e.preventDefault();
+    });
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (found === 0 && rows.length > 0) {
+            noResults.style.display = '';
+        } else {
+            noResults.style.display = 'none';
+        }
+        
+        if (emptyState && query.length > 0) {
+            emptyState.style.display = 'none';
+        } else if (emptyState && query.length === 0 && rows.length === 0) {
+            emptyState.style.display = '';
+        }
+    });
+});
+</script>
+{% endblock %}

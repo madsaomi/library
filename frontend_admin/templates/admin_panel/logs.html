@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Loglar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Tizim amallari tarixi" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'admin_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel animate-fade">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h3><i class="fas fa-history" style="color: var(--text-muted);"></i> {% trans "Oxirgi amallar" %}</h3>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" class="glass-card" placeholder="{% trans 'Qidirish...' %}" style="padding: 8px 15px; border: 1px solid var(--border);">
+            <button class="btn-primary" style="padding: 8px 15px;"><i class="fas fa-filter"></i> {% trans "Filtr" %}</button>
+        </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for log in logs %}
+        <div class="glass-card {% if log.action_type == 'CREATE' or log.action_type == 'RETURN' %}border-success{% elif log.action_type == 'ISSUE' %}border-primary{% elif log.action_type == 'LOGIN' %}border-secondary{% else %}border-muted{% endif %}" style="padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span class="{% if log.action_type == 'CREATE' or log.action_type == 'RETURN' %}text-success{% elif log.action_type == 'ISSUE' %}text-primary{% elif log.action_type == 'LOGIN' %}text-secondary{% else %}text-muted{% endif %}" style="font-weight: 600;">
+                    {{ log.action_type }}
+                </span>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">{{ log.message }}</p>
+                <small style="color: var(--text-muted); opacity: 0.7;">{% trans "Foydalanuvchi" %}: {% if log.user %}{{ log.user.username }}{% else %}{% trans "Tizim" %}{% endif %}</small>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">{{ log.created_at|timesince }} {% trans "oldin" %}</span>
+        </div>
+        {% empty %}
+        <div class="glass-card" style="padding: 40px; text-align: center; color: var(--text-muted);">
+            <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+            <p>{% trans "Hozircha amallar tarixi mavjud emas" %}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

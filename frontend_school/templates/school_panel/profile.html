@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Profil" %} | School Admin{% endblock %}
+{% block page_title %}{% trans "Mening profilim" %}{% endblock %}
+
+{% block sidebar_nav %}
+<a href="{% url 'frontend_school:dashboard' %}" class="nav-link">
+    <i class="fas fa-th-large"></i> <span>{% trans "Dashboard" %}</span>
+</a>
+<a href="{% url 'frontend_school:qr_scanner' %}" class="nav-link">
+    <i class="fas fa-qrcode"></i> <span>{% trans "QR Skaner" %}</span>
+</a>
+<a href="{% url 'frontend_school:books_list' %}" class="nav-link">
+    <i class="fas fa-book"></i> <span>{% trans "Kitoblar" %}</span>
+</a>
+<a href="{% url 'frontend_school:students_list' %}" class="nav-link">
+    <i class="fas fa-user-graduate"></i> <span>{% trans "O'quvchilar" %}</span>
+</a>
+<a href="{% url 'frontend_school:teachers_list' %}" class="nav-link">
+    <i class="fas fa-chalkboard-teacher"></i> <span>{% trans "O'qituvchilar" %}</span>
+</a>
+<a href="{% url 'frontend_school:news_list' %}" class="nav-link">
+    <i class="fas fa-newspaper"></i> <span>{% trans "Yangiliklar" %}</span>
+</a>
+
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div class="glass-panel animate-fade" style="padding: 40px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="width: 120px; height: 120px; background: linear-gradient(135deg, var(--secondary), #7c3aed); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <i class="fas fa-user-shield" style="font-size: 4rem; color: white;"></i>
+            </div>
+            <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+            <p style="color: var(--text-muted);">
+                {{ user.get_role_display }} | {{ user.school.name|default:_("Maktab biriktirilmagan") }}
+            </p>
+        </div>
+
+        <div class="responsive-grid-2" style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="glass-card" style="padding: 20px;">
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">{% trans "Login" %}</p>
+                <p style="font-weight: 600;">{{ user.username }}</p>
+            </div>
+            <div class="glass-card" style="padding: 20px;">
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">{% trans "Maktab ID" %}</p>
+                <p style="font-weight: 600;">#{{ user.school.id|default:"0" }}</p>
+            </div>
+            <div class="glass-card" style="padding: 20px;">
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">{% trans "ID raqam" %}</p>
+                <p style="font-weight: 600;">#{{ user.id|stringformat:"05d" }}</p>
+            </div>
+            <div class="glass-card" style="padding: 20px;">
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">{% trans "A'zo bo'lgan sana" %}</p>
+                <p style="font-weight: 600;">{{ user.date_joined|date:"d.m.Y" }}</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'frontend_school:change_password' %}" class="btn-primary" style="padding: 12px 30px; text-decoration: none; flex: 1; max-width: 300px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-key" style="margin-right: 8px;"></i> {% trans "Parolni o'zgartirish" %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Muassasalar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Muassasalar boshqaruvi" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'admin_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel animate-fade">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 20px; flex-wrap: wrap;">
+        <h3><i class="fas fa-building" style="color: var(--secondary);"></i> {% trans "Davlat muassasalari va tashkilotlar" %}</h3>
+        
+        <div style="display: flex; gap: 15px; flex: 1; max-width: 500px;">
+            <div style="position: relative; flex: 1;">
+                <input type="text" id="search-input" placeholder="{% trans 'Muassasa nomi yoki manzil bo\'yicha qidirish...' %}" 
+                       style="width: 100%; padding: 12px 20px 12px 45px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; color: var(--input-text); outline: none; transition: 0.3s;">
+                <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            </div>
+            <a href="{% url 'frontend_admin:muassasa_add' %}" class="btn-primary" style="padding: 12px 20px; background: linear-gradient(135deg, var(--secondary), #7c3aed); text-decoration: none; white-space: nowrap;">
+                <i class="fas fa-plus"></i> {% trans "Yangi muassasa" %}
+            </a>
+        </div>
+    </div>
+
+    <div id="inst-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        {% for inst in institutions %}
+        <div class="inst-card glass-card" data-search="{{ inst.name|lower }} {{ inst.address|lower }}" style="padding: 25px;">
+            <h4 style="margin-bottom: 10px;">{{ inst.name }}</h4>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">{{ inst.address }}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="glass-panel" style="padding: 4px 12px; font-size: 0.75rem;">{% trans "Aktiv" %}</span>
+                <div style="display: flex; gap: 10px;" onclick="event.stopPropagation()">
+                    <a href="{% url 'frontend_admin:muassasa_edit' inst.pk %}" class="glass-card" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: var(--accent); border: 1px solid rgba(245, 158, 11, 0.25); transition: 0.3s;" title="{% trans 'Tahrirlash' %}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'frontend_admin:muassasa_delete' inst.pk %}" class="glass-card" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); transition: 0.3s;" title="{% trans 'O\'chirish' %}">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div id="empty-state" class="glass-card" style="padding: 40px; text-align: center; width: 100%; grid-column: 1 / -1;">
+            <p style="color: var(--text-muted);">{% trans "Hozircha muassasalar mavjud emas" %}</p>
+        </div>
+        {% endfor %}
+        <div id="no-results" style="display: none; grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted);">
+            <p>{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const cards = document.querySelectorAll('.inst-card');
+    const noResults = document.getElementById('no-results');
+    const emptyState = document.getElementById('empty-state');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        cards.forEach(card => {
+            const searchText = card.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                card.style.display = '';
+                found++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (found === 0 && cards.length > 0) {
+            noResults.style.display = 'block';
+        } else {
+            noResults.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

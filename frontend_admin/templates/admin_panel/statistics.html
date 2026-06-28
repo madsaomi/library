@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Statistika" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Tizim statistikasi" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'admin_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<style>
+    .stats-charts-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+    @media (max-width: 768px) {
+        .stats-charts-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+    <div class="stats-charts-container">
+        <div class="glass-panel animate-fade" style="padding: 20px 24px;">
+            <h3 style="margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;"><i class="fas fa-chart-line" style="color: var(--primary);"></i> {% trans "Foydalanish dinamikasi" %}</h3>
+            <div style="height: 300px;">
+                <canvas id="usageChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="glass-panel animate-fade" style="padding: 20px 24px; animation-delay: 0.2s;">
+            <h3 style="margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;"><i class="fas fa-chart-pie" style="color: var(--accent);"></i> {% trans "Kategoriyalar" %}</h3>
+            <div style="height: 300px;">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="glass-panel animate-fade" style="margin-top: 30px; padding: 20px 24px; animation-delay: 0.3s;">
+        <h3 style="margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;"><i class="fas fa-trophy" style="color: #fbbf24;"></i> {% trans "Eng faol maktablar" %}</h3>
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+        {% for school in top_schools %}
+        <div class="glass-card" style="display: flex; justify-content: space-between; padding: 15px 25px;">
+            <span>{{ forloop.counter }}. {{ school.name }}</span>
+            <span style="font-weight: 600;">{{ school.reader_count }} {% trans "ta kitobxon" %}</span>
+        </div>
+        {% empty %}
+        <p style="text-align: center; color: var(--text-muted);">{% trans "Hozircha ma'lumotlar yo'q" %}</p>
+        {% endfor %}
+    </div>
+</div>
+
+{{ usage_labels|json_script:"usage-labels" }}
+{{ usage_data|json_script:"usage-data" }}
+{{ category_labels|json_script:"category-labels" }}
+{{ category_data|json_script:"category-data" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Helper to get JSON data
+    const getJsonData = (id) => JSON.parse(document.getElementById(id).textContent);
+
+    // Usage Dynamics Chart
+    const usageCtx = document.getElementById('usageChart').getContext('2d');
+    new Chart(usageCtx, {
+        type: 'line',
+        data: {
+            labels: getJsonData('usage-labels'),
+            datasets: [{
+                label: '{% trans "Kitob berishlar" %}',
+                data: getJsonData('usage-data'),
+                borderColor: '#d97706',
+                backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointBackgroundColor: '#d97706'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(217, 119, 6, 0.05)' },
+                    ticks: { color: 'rgba(217, 119, 6, 0.5)' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: 'rgba(217, 119, 6, 0.5)' }
+                }
+            }
+        }
+    });
+
+    // Category Chart
+    const catCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(catCtx, {
+        type: 'doughnut',
+        data: {
+            labels: getJsonData('category-labels'),
+            datasets: [{
+                data: getJsonData('category-data'),
+                backgroundColor: [
+                    '#d97706', '#92400e', '#78350f', '#fbbf24', '#f59e0b', '#b45309'
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        padding: 20,
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

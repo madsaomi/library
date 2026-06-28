@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Mening kitoblarim" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Mening kitoblarim" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'user_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel animate-fade" style="margin-bottom: 30px;">
+    <h3 style="margin-bottom: 25px;"><i class="fas fa-bookmark" style="color: var(--primary);"></i> {% trans "Hozir o'qilayotgan kitoblar" %}</h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for issue in issues %}
+        <div class="book-issue-card glass-card animate-fade" style="display: flex; gap: 20px; padding: 20px; flex-wrap: wrap;">
+            <div style="width: 100px; height: 140px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                {% if issue.book.cover %}
+                <img src="{{ issue.book.cover.url }}" alt="{{ issue.book.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <div class="flex-center" style="height: 100%;"><i class="fas fa-book" style="opacity: 0.2;"></i></div>
+                {% endif %}
+            </div>
+            <div style="flex-grow: 1;">
+                <h4 style="margin-bottom: 10px;">{{ issue.book.title }}</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">{% trans "Olingan sana" %}: {{ issue.issued_at|date:"d.m.Y" }}</p>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="font-size: 0.8rem; padding: 4px 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 20px;">
+                        {% trans "Muddat" %}: 15 {% trans "kun" %}
+                    </span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">{% trans "Qolgan vaqt" %}: 12 {% trans "kun" %}</span>
+                </div>
+            </div>
+            <div class="book-issue-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="{% url 'frontend_user:issue_qr' issue.pk %}" class="btn-primary" style="padding: 8px 16px; background: rgba(168, 85, 247, 0.1); color: var(--secondary); border: 1px solid rgba(168, 85, 247, 0.2);">
+                    <i class="fas fa-undo"></i> {% trans "Topshirish" %}
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div style="padding: 20px; text-align: center; color: var(--text-muted);">{% trans "Hozircha sizda olingan kitoblar yo'q" %}</div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="glass-panel animate-fade">
+    <h3 style="margin-bottom: 25px;"><i class="fas fa-clock" style="color: var(--secondary);"></i> {% trans "Bron qilingan (kutilmoqda)" %}</h3>
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for request in requests %}
+        <div class="glass-card animate-fade" style="display: flex; gap: 20px; padding: 20px; border-left: 4px solid var(--secondary);">
+            <div style="width: 80px; height: 110px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                {% if request.book.cover %}
+                <img src="{{ request.book.cover.url }}" alt="{{ request.book.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <div class="flex-center" style="height: 100%;"><i class="fas fa-book" style="opacity: 0.1;"></i></div>
+                {% endif %}
+            </div>
+            <div style="flex-grow: 1;">
+                <h4 style="margin-bottom: 5px;">{{ request.book.title }}</h4>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">{% trans "So'ralgan sana" %}: {{ request.requested_at|date:"d.m.Y" }}</p>
+                <span style="display: inline-block; margin-top: 10px; font-size: 0.75rem; padding: 4px 10px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                    {% trans "Holati" %}: {{ request.get_status_display }}
+                </span>
+            </div>
+            <div class="flex-center">
+                <a href="{% url 'frontend_user:request_qr' request.pk %}" class="btn-primary" style="padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                    <i class="fas fa-qrcode"></i> {% trans "QR ko'rsatish" %}
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div style="padding: 20px; text-align: center; color: var(--text-muted);">{% trans "Bron qilingan kitoblar yo'q" %}</div>
+        {% endfor %}
+    </div>
+</div>
+<div class="glass-panel animate-fade" style="margin-top: 30px;">
+    <h3 style="margin-bottom: 25px;"><i class="fas fa-history" style="color: #10b981;"></i> {% trans "O'qish tarixi" %}</h3>
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+        {% for item in history %}
+        <div class="glass-card animate-fade" style="display: flex; gap: 15px; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 20px;">
+            <div style="width: 60px; height: 85px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; flex-shrink: 0;">
+                {% if item.book.cover %}
+                <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.7;">
+                {% else %}
+                <div class="flex-center" style="height: 100%; opacity: 0.1;"><i class="fas fa-book"></i></div>
+                {% endif %}
+            </div>
+            <div style="flex-grow: 1;">
+                <h4 style="margin-bottom: 5px; font-size: 0.95rem; opacity: 0.8;">{{ item.book.title }}</h4>
+                <p style="color: var(--text-muted); font-size: 0.75rem; margin-bottom: 5px;">
+                    <i class="fas fa-calendar-check"></i> {% trans "Qaytarilgan" %}: {{ item.returned_at|date:"d.m.Y" }}
+                </p>
+                <span style="font-size: 0.7rem; color: #10b981; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">{% trans "Tugatildi" %}</span>
+            </div>
+            <div class="flex-center">
+                <a href="{% url 'frontend_user:book_detail' item.book.pk %}" style="color: var(--primary); text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                    {% trans "Qayta olish" %}
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem; opacity: 0.6;">{% trans "Siz hali kitob o'qib bo'lmagansiz" %}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

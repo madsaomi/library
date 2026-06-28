@@ -1,0 +1,26 @@
+{% load i18n %}
+<a href="{% url 'frontend_school:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+    <i class="fas fa-chart-line"></i> <span>{% trans "Dashboard" %}</span>
+</a>
+<a href="{% url 'frontend_school:qr_scanner' %}" class="nav-link {% if request.resolver_match.url_name == 'qr_scanner' %}active{% endif %}">
+    <i class="fas fa-qrcode"></i> <span>{% trans "QR Skaner" %}</span>
+</a>
+<a href="{% url 'frontend_school:students_list' %}" class="nav-link {% if 'student' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="fas fa-users"></i> <span>{% trans "O'quvchilar" %}</span>
+</a>
+<a href="{% url 'frontend_school:teachers_list' %}" class="nav-link {% if 'teacher' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="fas fa-chalkboard-teacher"></i> <span>{% trans "O'qituvchilar" %}</span>
+</a>
+<a href="{% url 'frontend_school:books_list' %}" class="nav-link {% if 'book' in request.resolver_match.url_name and 'issued' not in request.resolver_match.url_name and 'history' not in request.resolver_match.url_name %}active{% endif %}">
+    <i class="fas fa-book"></i> <span>{% trans "Kitoblar" %}</span>
+</a>
+<a href="{% url 'frontend_school:issued_books_list' %}" class="nav-link {% if request.resolver_match.url_name == 'issued_books_list' %}active{% endif %}">
+    <i class="fas fa-hand-holding-heart"></i> <span>{% trans "O'qilayotganlar" %}</span>
+</a>
+<a href="{% url 'frontend_school:history_list' %}" class="nav-link {% if request.resolver_match.url_name == 'history_list' %}active{% endif %}">
+    <i class="fas fa-history"></i> <span>{% trans "Tarix" %}</span>
+</a>
+<a href="{% url 'frontend_school:news_list' %}" class="nav-link {% if 'news' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="fas fa-newspaper"></i> <span>{% trans "Yangiliklar" %}</span>
+</a>
+

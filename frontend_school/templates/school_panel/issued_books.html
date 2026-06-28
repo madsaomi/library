@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "O'qilayotgan kitoblar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "O'qilayotgan kitoblar" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel animate-fade">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 20px; flex-wrap: wrap;">
+        <h3><i class="fas fa-hand-holding-heart" style="color: var(--accent);"></i> {% trans "O'qilayotgan kitoblar ro'yxati" %}</h3>
+        
+        <div style="position: relative; flex: 1; max-width: 400px;">
+            <input type="text" id="search-input" placeholder="{% trans 'Kitob nomi или foydalanuvchi bo\'yicha qidirish...' %}" 
+                   style="width: 100%; padding: 12px 20px 12px 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; outline: none; transition: 0.3s;">
+            <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0 10px;">
+            <thead>
+                <tr style="color: var(--text-muted); font-size: 0.9rem; text-align: left;">
+                    <th style="padding: 10px 20px;">{% trans "Kitob nomi" %}</th>
+                    <th style="padding: 10px 20px;">{% trans "Foydalanuvchi" %}</th>
+                    <th style="padding: 10px 20px;">{% trans "Sinf / Lavozim" %}</th>
+                    <th style="padding: 10px 20px;">{% trans "Berilgan sana" %}</th>
+                    <th style="padding: 10px 20px;">{% trans "Holati" %}</th>
+                </tr>
+            </thead>
+            <tbody id="issued-books-body">
+                {% for issue in issues %}
+                <tr class="issue-row glass-card" data-search="{{ issue.book.title|lower }} {{ issue.user.first_name|lower }} {{ issue.user.last_name|lower }} {{ issue.user.username|lower }} {{ issue.user.grade|default:''|lower }}" style="transition: 0.3s;">
+                    <td style="padding: 15px 20px; border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                {% if issue.book.cover %}
+                                    <img src="{{ issue.book.cover.url }}" alt="cover" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
+                                {% else %}
+                                    <i class="fas fa-book" style="color: var(--secondary);"></i>
+                                {% endif %}
+                            </div>
+                            <span style="font-weight: 500;">{{ issue.book.title }}</span>
+                        </div>
+                    </td>
+                    <td style="padding: 15px 20px;">
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-weight: 500;">{{ issue.user.first_name }} {{ issue.user.last_name }}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">{% trans "ID:" %} {{ issue.user.username }}</span>
+                        </div>
+                    </td>
+                    <td style="padding: 15px 20px;">
+                        {% if issue.user.role == 'student' %}
+                            <span style="padding: 4px 10px; background: rgba(99, 102, 241, 0.1); color: var(--primary); border-radius: 15px; font-size: 0.8rem;">
+                                {% if issue.user.grade %}{{ issue.user.grade }}{% else %}{% trans "Sinf ko'rsatilmagan" %}{% endif %}
+                            </span>
+                        {% elif issue.user.role == 'teacher' %}
+                            <span style="padding: 4px 10px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-radius: 15px; font-size: 0.8rem;">
+                                {% trans "O'qituvchi" %}
+                            </span>
+                        {% else %}
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">{{ issue.user.get_role_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px 20px; color: var(--text-muted);">{{ issue.issued_at|date:"d.m.Y H:i" }}</td>
+                    <td style="padding: 15px 20px; border-top-right-radius: 10px; border-bottom-right-radius: 10px;">
+                        <span style="padding: 5px 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 20px; font-size: 0.8rem;">{% trans "Berilgan" %}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr id="empty-state">
+                    <td colspan="5" style="padding: 40px; text-align: center; color: var(--text-muted);">{% trans "Hozircha o'qilayotgan kitoblar yo'q" %}</td>
+                </tr>
+                {% endfor %}
+                <tr id="no-results" style="display: none;">
+                    <td colspan="5" style="padding: 40px; text-align: center; color: var(--text-muted);">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const rows = document.querySelectorAll('.issue-row');
+    const noResults = document.getElementById('no-results');
+    const emptyState = document.getElementById('empty-state');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (found === 0 && rows.length > 0) {
+            noResults.style.display = '';
+        } else {
+            noResults.style.display = 'none';
+        }
+        
+        if (emptyState && query.length > 0) {
+            emptyState.style.display = 'none';
+        } else if (emptyState && query.length === 0 && rows.length === 0) {
+            emptyState.style.display = '';
+        }
+    });
+});
+</script>
+{% endblock %}

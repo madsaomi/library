@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Profilni tahrirlash" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Ma'lumotlarni tahrirlash" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'user_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="glass-panel animate-fade" style="padding: 40px;">
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px;">
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                        <i class="fas fa-user" style="color: var(--primary); margin-right: 8px;"></i> {% trans "Ism" %}
+                    </label>
+                    <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control" data-limit-chars="50" required>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                        <i class="fas fa-id-card" style="color: var(--secondary); margin-right: 8px;"></i> {% trans "Familiya" %}
+                    </label>
+                    <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control" data-limit-chars="50" required>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 18px; border-radius: 16px; font-weight: 700;">
+                    <i class="fas fa-save" style="margin-right: 8px;"></i> {% trans "Saqlash" %}
+                </button>
+                <a href="{% url 'frontend_user:profile' %}" class="glass-card" style="flex: 1; padding: 18px; border-radius: 16px; text-align: center; text-decoration: none; color: white; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); transition: 0.3s; background: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.2);" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)';">
+                    <i class="fas fa-times" style="margin-right: 8px;"></i> {% trans "Bekor qilish" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

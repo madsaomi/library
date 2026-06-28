@@ -1,0 +1,10 @@
+{% load i18n %}
+<a href="{% url 'frontend_user:library' %}" class="nav-link {% if request.resolver_match.url_name == 'library' %}active{% endif %}">
+    <i class="fas fa-book"></i> <span>{% trans "Kutubxona" %}</span>
+</a>
+<a href="{% url 'frontend_user:my_books' %}" class="nav-link {% if request.resolver_match.url_name == 'my_books' or 'qr' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="fas fa-bookmark"></i> <span>{% trans "Mening kitoblarim" %}</span>
+</a>
+<a href="{% url 'frontend_user:news_list' %}" class="nav-link {% if request.resolver_match.url_name == 'news_list' %}active{% endif %}">
+    <i class="fas fa-newspaper"></i> <span>{% trans "Yangiliklar" %}</span>
+</a>

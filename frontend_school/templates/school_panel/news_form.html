@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Yangilik" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div class="glass-panel animate-fade" style="padding: 40px; border-radius: 24px;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr; gap: 30px;">
+                {% for field in form %}
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                        {% if field.name == 'title' %}<i class="fas fa-heading" style="color: var(--primary); margin-right: 8px;"></i>{% endif %}
+                        {% if field.name == 'body' %}<i class="fas fa-align-left" style="color: var(--secondary); margin-right: 8px;"></i>{% endif %}
+                        {% if field.name == 'image' %}<i class="fas fa-image" style="color: #10b981; margin-right: 8px;"></i>{% endif %}
+                        {% if field.name == 'is_published' %}<i class="fas fa-paper-plane" style="color: var(--accent); margin-right: 8px;"></i>{% endif %}
+                        {{ field.label }}
+                    </label>
+                    
+                    {% if field.name == 'is_published' %}
+                        <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 14px; border: 1px solid var(--border);">
+                            <label class="switch">
+                                {{ field }}
+                                <span class="slider"></span>
+                            </label>
+                            <span style="font-size: 0.9rem; color: var(--text-main);">{% trans "Saytda ko'rsatish" %}</span>
+                        </div>
+                    {% else %}
+                        <div style="position: relative;">
+                            {{ field }}
+                            <style>
+                                .form-control {
+                                    transition: all 0.3s ease;
+                                    border: 1px solid var(--border);
+                                    background: rgba(255,255,255,0.05);
+                                    padding: 14px 18px;
+                                    border-radius: 14px;
+                                }
+                                .form-control:focus {
+                                    border-color: var(--primary);
+                                    background: rgba(255,255,255,0.08);
+                                    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+                                }
+                            </style>
+                        </div>
+                    {% endif %}
+                    
+                    {% if field.errors %}
+                    <p style="color: #ef4444; font-size: 0.8rem; margin-top: 8px;"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div style="margin-top: 45px; display: flex; gap: 15px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fas fa-save"></i> {% trans "Saqlash" %}
+                </button>
+                <a href="{% url 'frontend_school:news_list' %}" class="glass-card" style="flex: 1; padding: 18px; border-radius: 16px; text-align: center; text-decoration: none; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--border); transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

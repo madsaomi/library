@@ -1,0 +1,26 @@
+{% load i18n %}
+<a href="{% url 'frontend_admin:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+    <i class="fas fa-university"></i> <span>{% trans "Bosh sahifa" %}</span>
+</a>
+<a href="{% url 'frontend_admin:districts_list' %}" class="nav-link {% if request.resolver_match.url_name == 'districts_list' or 'district' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="fas fa-map-marker-alt"></i> <span>{% trans "Tumanlar" %}</span>
+</a>
+<a href="{% url 'frontend_admin:schools_list' %}" class="nav-link {% if request.resolver_match.url_name == 'schools_list' or 'school' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="fas fa-school"></i> <span>{% trans "Maktablar" %}</span>
+</a>
+<a href="{% url 'frontend_admin:muassasalar_list' %}" class="nav-link {% if 'muassasa' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="fas fa-building"></i> <span>{% trans "Muassasalar" %}</span>
+</a>
+<a href="{% url 'frontend_admin:statistics' %}" class="nav-link {% if request.resolver_match.url_name == 'statistics' %}active{% endif %}">
+    <i class="fas fa-chart-pie"></i> <span>{% trans "Statistika" %}</span>
+</a>
+<a href="{% url 'frontend_admin:system_logs' %}" class="nav-link {% if request.resolver_match.url_name == 'system_logs' %}active{% endif %}">
+    <i class="fas fa-list-ul"></i> <span>{% trans "Tizim loglari" %}</span>
+</a>
+<a href="{% url 'frontend_admin:all_users_list' %}" class="nav-link {% if request.resolver_match.url_name == 'all_users_list' %}active{% endif %}">
+    <i class="fas fa-users"></i> <span>{% trans "Foydalanuvchilar" %}</span>
+</a>
+<a href="{% url 'frontend_admin:news_list' %}" class="nav-link {% if 'news' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="fas fa-newspaper"></i> <span>{% trans "Yangiliklar" %}</span>
+</a>
+

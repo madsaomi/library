@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Yangiliklar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Maktab yangiliklari" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'user_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="news-container" style="max-width: 900px; margin: 0 auto;">
+    {% for news in news_list %}
+    <div class="glass-panel animate-fade" style="margin-bottom: 30px; padding: 30px; border-radius: 24px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary);"></div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: rgba(217, 119, 6, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-bullhorn" style="color: var(--primary);"></i>
+                </div>
+                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700;">{{ news.title }}</h3>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 20px;">
+                <i class="far fa-calendar-alt"></i> {{ news.created_at|date:"d.m.Y" }}
+            </span>
+        </div>
+        
+        {% if news.image %}
+        <div style="margin: 20px 0; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+            <img src="{{ news.image.url }}" alt="{{ news.title }}" style="width: 100%; height: auto; display: block; max-height: 400px; object-fit: cover;">
+        </div>
+        {% endif %}
+        
+        <div class="news-body" style="color: var(--text-main); line-height: 1.7; font-size: 1rem; opacity: 0.9;">
+            {{ news.body|linebreaks }}
+        </div>
+        
+        <div style="margin-top: 25px; pt: 20px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 0.85rem;">
+            <i class="fas fa-school"></i> <span>{{ news.school.name }}</span>
+        </div>
+    </div>
+    {% empty %}
+    <div class="glass-panel flex-center animate-fade" style="padding: 100px; flex-direction: column; gap: 20px;">
+        <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.3;">
+            <i class="fas fa-newspaper" style="font-size: 3rem;"></i>
+        </div>
+        <p style="color: var(--text-muted); font-size: 1.2rem;">{% trans "Hozircha yangiliklar yo'q" %}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

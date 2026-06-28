@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "School Admin | Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Maktab boshqaruvi" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="stats-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
+    <a href="{% url 'frontend_school:students_list' %}" class="glass-card animate-fade" style="padding: 30px; text-align: center; border-left: 4px solid var(--primary); text-decoration: none; display: block; color: inherit; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+        <i class="fas fa-users" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+        <h3 style="font-size: 2rem; margin-bottom: 5px;">{{ student_count|default:"0" }}</h3>
+        <p style="color: var(--text-muted); margin: 0;">{% trans "O'quvchilar" %}</p>
+    </a>
+    <a href="{% url 'frontend_school:books_list' %}" class="glass-card animate-fade" style="padding: 30px; text-align: center; border-left: 4px solid var(--secondary); animation-delay: 0.1s; text-decoration: none; display: block; color: inherit; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+        <i class="fas fa-book" style="font-size: 2.5rem; color: var(--secondary); margin-bottom: 15px;"></i>
+        <h3 style="font-size: 2rem; margin-bottom: 5px;">{{ total_copies|default:"0" }}</h3>
+        <p style="color: var(--text-muted); margin: 0;">{% trans "Jami kitoblar" %}</p>
+    </a>
+    <a href="{% url 'frontend_school:issued_books_list' %}" class="glass-card animate-fade" style="padding: 30px; text-align: center; border-left: 4px solid var(--accent); animation-delay: 0.2s; text-decoration: none; display: block; color: inherit; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+        <i class="fas fa-hand-holding-heart" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 15px;"></i>
+        <h3 style="font-size: 2rem; margin-bottom: 5px;">{{ issued_count|default:"0" }}</h3>
+        <p style="color: var(--text-muted); margin: 0;">{% trans "Berilgan kitoblar" %}</p>
+    </a>
+    <a href="{% url 'frontend_school:books_list' %}" class="glass-card animate-fade" style="padding: 30px; text-align: center; border-left: 4px solid #10b981; animation-delay: 0.3s; text-decoration: none; display: block; color: inherit; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+        <i class="fas fa-check-circle" style="font-size: 2.5rem; color: #10b981; margin-bottom: 15px;"></i>
+        <h3 style="font-size: 2rem; margin-bottom: 5px;">{{ available_copies|default:"0" }}</h3>
+        <p style="color: var(--text-muted); margin: 0;">{% trans "Qolgan kitoblar" %}</p>
+    </a>
+    <a href="{% url 'frontend_school:news_list' %}" class="glass-card animate-fade" style="padding: 30px; text-align: center; border-left: 4px solid #f59e0b; animation-delay: 0.4s; text-decoration: none; display: block; color: inherit; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+        <i class="fas fa-newspaper" style="font-size: 2.5rem; color: #f59e0b; margin-bottom: 15px;"></i>
+        <h3 style="font-size: 2rem; margin-bottom: 5px;">{{ news_count|default:"0" }}</h3>
+        <p style="color: var(--text-muted); margin: 0;">{% trans "Yangiliklar" %}</p>
+    </a>
+</div>
+
+<div class="responsive-grid-2 stats-row" style="margin-bottom: 30px;">
+    <div class="glass-panel animate-fade" style="padding: 30px; animation-delay: 0.3s;">
+        <h3 style="margin-bottom: 25px;"><i class="fas fa-bolt" style="color: var(--accent);"></i> {% trans "Tezkor amallar" %}</h3>
+        <div style="display: flex; gap: 15px;">
+            <a href="{% url 'frontend_school:qr_scanner' %}" class="btn-primary" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 35px; background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                <i class="fas fa-qrcode" style="font-size: 2.5rem;"></i>
+                <span style="font-size: 1.1rem; font-weight: 700;">{% trans "QR Skaner" %}</span>
+                <p style="font-size: 0.8rem; opacity: 0.8; margin: 0; font-weight: 400;">{% trans "Kitob berish va qabul qilish" %}</p>
+            </a>
+        </div>
+    </div>
+
+    <div class="glass-panel animate-fade" style="padding: 30px; animation-delay: 0.4s;">
+        <h3 style="margin-bottom: 25px;"><i class="fas fa-history" style="color: var(--primary);"></i> {% trans "Oxirgi amallar" %}</h3>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            {% for activity in recent_activities %}
+            <div class="glass-card {% if activity.is_returned %}border-success{% else %}border-primary{% endif %}" style="padding: 12px 15px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas {% if activity.is_returned %}fa-undo{% else %}fa-book-reader{% endif %} {% if activity.is_returned %}text-success{% else %}text-primary{% endif %}"></i>
+                    </div>
+                    <div>
+                        <p style="margin: 0; font-weight: 600; font-size: 0.9rem;">{{ activity.book.title }}</p>
+                        <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">{{ activity.user.get_full_name|default:activity.user.username }}</p>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--text-muted);">{{ activity.issued_at|date:"d.m.Y H:i" }}</p>
+                    <span style="font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.05);">
+                        {% if activity.is_returned %}{% trans "Qaytarildi" %}{% else %}{% trans "Berildi" %}{% endif %}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+            <p style="color: var(--text-muted); text-align: center; padding: 20px;">{% trans "Hozircha amallar mavjud emas" %}</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

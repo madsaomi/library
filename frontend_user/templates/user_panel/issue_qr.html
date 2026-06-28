@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Kitob topshirish" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Topshirish QR-kodi" %}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'user_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto; text-align: center;">
+    <div class="glass-panel animate-fade" style="padding: 40px;">
+        <div id="instruction-state">
+            <div style="width: 80px; height: 80px; background: rgba(168, 85, 247, 0.1); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <i class="fas fa-undo" style="font-size: 2.5rem; color: var(--secondary);"></i>
+            </div>
+            <h2 style="margin-bottom: 20px;">{% trans "Kitobni qaytarish" %}</h2>
+            <p style="color: var(--text-muted); margin-bottom: 35px; line-height: 1.6;">
+                {% trans "Kitobni qaytarish uchun quyidagi QR-kodni kutubxonachiga ko'rsating." %}
+            </p>
+        </div>
+
+        <div id="success-state" style="display: none;">
+            <div style="width: 80px; height: 80px; background: #10b981; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <i class="fas fa-check" style="font-size: 2.5rem; color: white;"></i>
+            </div>
+            <h2 style="margin-bottom: 10px; color: #10b981;">{% trans "Kitob topshirildi!" %}</h2>
+            <p style="color: var(--text-muted); margin-bottom: 35px;">{% trans "Kitob kutubxonaga muvaffaqiyatli qaytarildi." %}</p>
+        </div>
+        
+        <div id="qr-container" style="display: inline-block; padding: 25px; background: white; border-radius: 15px; margin-bottom: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div id="qrcode"></div>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee;">
+                <p style="margin: 0; font-size: 0.7rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{% trans "Manual ID:" %}</p>
+                <div id="manual-id-display" style="font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: 700; color: #333; letter-spacing: 2px;">
+                    {{ issue_obj.qr_token }}
+                </div>
+                <div style="margin-top: 15px; width: 100%; height: 4px; background: #eee; border-radius: 2px; overflow: hidden; position: relative;">
+                    <div id="timer-bar" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: var(--secondary); transition: width 1s linear;"></div>
+                </div>
+                <p style="margin: 8px 0 0 0; font-size: 0.65rem; color: #999; text-transform: uppercase;">
+                    {% trans "Yangilanishiga:" %} <span id="timer-text">00:00</span>
+                </p>
+            </div>
+        </div>
+
+        <div style="text-align: left; margin-bottom: 35px;">
+            <div class="glass-card" style="padding: 20px; border-left: 4px solid var(--secondary);">
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">{% trans "Kitob:" %}</p>
+                <p style="font-weight: 600; font-size: 1.1rem;">{{ issue_obj.book.title }}</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 15px; margin-bottom: 5px;">{% trans "Olingan sana:" %}</p>
+                <p style="font-weight: 600;">{{ issue_obj.issued_at|date:"d.m.Y" }}</p>
+            </div>
+        </div>
+
+        <a href="{% url 'frontend_user:my_books' %}" class="btn-primary" style="width: 100%; padding: 15px; background: linear-gradient(135deg, var(--secondary), #7c3aed);">
+            {% trans "Mening kitoblarimga qaytish" %}
+        </a>
+    </div>
+</div>
+
+<script>
+    let currentToken = "";
+    let qrInstance = null;
+    const manualIdEl = document.getElementById('manual-id-display');
+    const timerBar = document.getElementById('timer-bar');
+    const timerText = document.getElementById('timer-text');
+
+    function updateQR() {
+        fetch("{% url 'frontend_user:get_rotating_token' 'issue' issue_obj.id %}")
+            .then(res => res.json())
+            .then(data => {
+                if (data.token && data.token !== currentToken) {
+                    currentToken = data.token;
+                    manualIdEl.innerText = currentToken;
+                    
+                    const qrEl = document.getElementById("qrcode");
+                    qrEl.innerHTML = ""; // Clear existing
+                    
+                    qrInstance = new QRCode(qrEl, {
+                        text: currentToken,
+                        width: 250,
+                        height: 250,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                }
+            });
+    }
+
+    function updateTimer() {
+        const now = Math.floor(Date.now() / 1000);
+        const timeLeft = 120 - (now % 120);
+        const progress = (timeLeft / 120) * 100;
+        
+        timerBar.style.width = progress + "%";
+        
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerText.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        // Refresh QR just as it changes
+        if (timeLeft === 119 || currentToken === "") {
+            updateQR();
+        }
+    }
+
+    // Start timer
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    const statusUrl = "{% url 'frontend_user:check_return_status' issue_obj.id %}";
+    function checkStatus() {
+        fetch(statusUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_returned) {
+                    document.getElementById('instruction-state').style.display = 'none';
+                    document.getElementById('qr-container').style.display = 'none';
+                    document.getElementById('success-state').style.display = 'block';
+                    return;
+                }
+                setTimeout(checkStatus, 3000);
+            });
+    }
+    checkStatus();
+</script>
+{% endblock %}

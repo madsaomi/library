@@ -1,0 +1,41 @@
+# ========== PYTHON & DJANGO ==========
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+*.sqlite3-journal
+.pytest_cache/
+media/
+staticfiles/
+
+# Compiled translation files
+locale/*/LC_MESSAGES/*.mo
+
+# Virtual Environments
+venv/
+env/
+.venv/
+ENV/
+
+# ========== NEXT.JS & NODE ==========
+node_modules/
+.next/
+out/
+build/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========== ENVIRONMENT VARIABLES ==========
+.env
+.env.local
+.env.*.local
+
+# ========== IDE & OS FILES ==========
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo

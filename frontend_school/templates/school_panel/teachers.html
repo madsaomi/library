@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "O'qituvchilar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "O'qituvchilar ro'yxati" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel animate-fade">
+    <div class="search-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 20px; flex-wrap: wrap;">
+        <h3 style="margin: 0;"><i class="fas fa-chalkboard-teacher" style="color: var(--secondary);"></i> {% trans "Maktab o'qituvchilari" %}</h3>
+        
+        <div style="display: flex; gap: 15px; flex-grow: 1; max-width: 500px;">
+            <form method="GET" id="search-form" onsubmit="return false;" style="display: flex; flex-grow: 1; position: relative;">
+                <input type="text" name="q" id="search-input" value="{{ query|default:'' }}" placeholder="{% trans 'Ism yoki login bo\'yicha qidirish...' %}" 
+                       style="width: 100%; padding: 12px 20px 12px 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white !important; outline: none; transition: 0.3s;">
+                <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            </form>
+            <a href="{% url 'frontend_school:teacher_add' %}" class="btn-primary" style="padding: 12px 20px; background: linear-gradient(135deg, var(--secondary), #7c3aed); text-decoration: none; white-space: nowrap;">
+                <i class="fas fa-plus"></i> {% trans "Yangi o'qituvchi" %}
+            </a>
+        </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <th style="padding: 15px;">{% trans "Login" %}</th>
+                    <th style="padding: 15px;">{% trans "Ism (F.I.SH)" %}</th>
+                    <th style="padding: 15px;">{% trans "Tug'ilgan sana" %}</th>
+                    <th style="padding: 15px;">{% trans "Fan" %}</th>
+                    <th style="padding: 15px;">{% trans "Manzil" %}</th>
+                    <th style="padding: 15px;">{% trans "Parol" %}</th>
+                    <th style="padding: 15px;">{% trans "Amallar" %}</th>
+                </tr>
+            </thead>
+            <tbody id="teacher-table-body">
+                {% for teacher in teachers %}
+                <tr class="teacher-row" data-search="{{ teacher.username|lower }} {{ teacher.first_name|lower }} {{ teacher.last_name|lower }} {{ teacher.subject|default:''|lower }}" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 15px;">{{ teacher.username }}</td>
+                    <td style="padding: 15px;">{{ teacher.first_name }} {{ teacher.last_name }}</td>
+                    <td style="padding: 15px; color: var(--text-muted);">{{ teacher.birth_date|date:"d.m.Y"|default:"—" }}</td>
+                    <td style="padding: 15px;"><span class="glass-card" style="padding: 4px 12px; font-size: 0.8rem;">{% if teacher.subject %}{{ teacher.subject }}{% else %}{% trans "O'qituvchi" %}{% endif %}</span></td>
+                    <td style="padding: 15px; color: var(--text-muted); font-size: 0.85rem;">{{ teacher.address|default:"—" }}</td>
+                    <td style="padding: 15px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="password-hidden" id="pass-{{ teacher.id }}" style="font-family: monospace; color: var(--text-muted);">••••••••</span>
+                            <span class="password-visible" id="pass-val-{{ teacher.id }}" style="display: none; font-family: monospace; color: var(--text-main);">{{ teacher.raw_password|default:'---' }}</span>
+                            <button onclick="togglePassword('{{ teacher.id }}')" style="background: none; border: none; color: var(--secondary); cursor: pointer; padding: 0;">
+                                <i class="fas fa-eye" id="eye-{{ teacher.id }}"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td style="padding: 15px;">
+                        <a href="{% url 'frontend_school:teacher_edit' teacher.pk %}" style="color: var(--secondary); margin-right: 15px;"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'frontend_school:teacher_delete' teacher.pk %}" style="color: #ef4444;"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr id="empty-state">
+                    <td colspan="7" style="padding: 40px; text-align: center; color: var(--text-muted);">{% trans "O'qituvchilar topilmadi" %}</td>
+                </tr>
+                {% endfor %}
+                <tr id="no-results" style="display: none;">
+                    <td colspan="7" style="padding: 40px; text-align: center; color: var(--text-muted);">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% include 'pagination.html' %}
+    </div>
+</div>
+
+<script>
+function togglePassword(id) {
+    const hidden = document.getElementById('pass-' + id);
+    const visible = document.getElementById('pass-val-' + id);
+    const eye = document.getElementById('eye-' + id);
+    
+    if (visible.style.display === 'none') {
+        visible.style.display = 'inline';
+        hidden.style.display = 'none';
+        eye.classList.remove('fa-eye');
+        eye.classList.add('fa-eye-slash');
+    } else {
+        visible.style.display = 'none';
+        hidden.style.display = 'inline';
+        eye.classList.remove('fa-eye-slash');
+        eye.classList.add('fa-eye');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const rows = document.querySelectorAll('.teacher-row');
+    const noResults = document.getElementById('no-results');
+    const emptyState = document.getElementById('empty-state');
+
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') e.preventDefault();
+    });
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (found === 0 && rows.length > 0) {
+            noResults.style.display = '';
+        } else {
+            noResults.style.display = 'none';
+        }
+        
+        if (emptyState && query.length > 0) {
+            emptyState.style.display = 'none';
+        } else if (emptyState && query.length === 0 && rows.length === 0) {
+            emptyState.style.display = '';
+        }
+    });
+});
+</script>
+{% endblock %}

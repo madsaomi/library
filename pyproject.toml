@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "core.settings"
+python_files = ["tests.py", "test_*.py"]
+testpaths = ["accounts", "books", "schools", "frontend_admin", "frontend_school", "frontend_user", "stats"]

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Barcha kitoblar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Barcha kitoblar" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'admin_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel animate-fade" style="padding: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; flex-wrap: wrap;">
+        <h3><i class="fas fa-book" style="color: var(--accent); margin-right: 10px;"></i> {% trans "Tizimdagi barcha kitoblar" %}</h3>
+        
+        <div style="position: relative; flex: 1; max-width: 400px;">
+<input type="text" id="search-input" placeholder="{% trans 'Kitob nomi, maktab yoki kategoriya bo\'yicha qidirish...' %}" 
+                    style="width: 100%; padding: 12px 20px 12px 45px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; color: var(--input-text); outline: none; transition: 0.3s;">
+            <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        </div>
+    </div>
+    
+    <div class="table-container" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Muqova" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Kitob nomi" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Maktab" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Kategoriya" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Jami" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Mavjud" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "O'qilgan" %}</th>
+                </tr>
+            </thead>
+            <tbody id="book-table-body">
+                {% for book in books %}
+                <tr class="book-row" data-search="{{ book.title|lower }} {{ book.school.name|default:''|lower }} {{ book.category.name|default:''|lower }}" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s;">
+                    <td style="padding: 10px 15px;">
+                        {% if book.cover %}
+                            <img src="{{ book.cover.url }}" alt="{{ book.title }}" style="width: 45px; height: 60px; object-fit: cover; border-radius: 6px;">
+                        {% else %}
+                            <div style="width: 45px; height: 60px; background: rgba(255,255,255,0.05); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-book" style="color: var(--text-muted);"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px; font-weight: 600;">{{ book.title }}</td>
+                    <td style="padding: 15px; color: var(--text-muted);">{{ book.school.name|default:"-" }}</td>
+                    <td style="padding: 15px;">
+                        <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: var(--accent); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem;">
+                            {{ book.category.name|default:"-" }}
+                        </span>
+                    </td>
+                    <td style="padding: 15px;">{{ book.total_count }}</td>
+                    <td style="padding: 15px; color: #10b981;">{{ book.available_count }}</td>
+                    <td style="padding: 15px; color: var(--secondary);">{{ book.borrow_count }}</td>
+                </tr>
+                {% empty %}
+                <tr id="empty-state">
+                    <td colspan="7" style="padding: 40px; text-align: center; color: var(--text-muted);">
+                        {% trans "Kitoblar topilmadi" %}
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="no-results" style="display: none;">
+                    <td colspan="7" style="padding: 40px; text-align: center; color: var(--text-muted);">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% include 'pagination.html' %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const rows = document.querySelectorAll('.book-row');
+    const noResults = document.getElementById('no-results');
+    const emptyState = document.getElementById('empty-state');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (found === 0 && rows.length > 0) {
+            noResults.style.display = '';
+        } else {
+            noResults.style.display = 'none';
+        }
+        
+        if (emptyState && query.length > 0) {
+            emptyState.style.display = 'none';
+        } else if (emptyState && query.length === 0 && rows.length === 0) {
+            emptyState.style.display = '';
+        }
+    });
+});
+</script>
+{% endblock %}

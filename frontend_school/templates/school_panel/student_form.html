@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "O'quvchi" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div class="glass-panel animate-fade" style="padding: 40px; border-radius: 24px;">
+        <form method="post">
+            {% csrf_token %}
+            <div class="responsive-grid-2" style="gap: 25px;">
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                        <i class="fas fa-user" style="color: var(--secondary); margin-right: 8px;"></i>
+                        {{ form.first_name.label }}
+                    </label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <p style="color: #ef4444; font-size: 0.8rem; margin-top: 8px;"><i class="fas fa-exclamation-circle"></i> {{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                        <i class="fas fa-graduation-cap" style="color: #10b981; margin-right: 8px;"></i>
+                        {% trans "Sinf va Harf" %}
+                    </label>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            {{ form.grade_number }}
+                        </div>
+                        <div style="flex: 1;">
+                            {{ form.grade_letter }}
+                        </div>
+                    </div>
+                </div>
+                
+                {% for field in form %}
+                {% if field.name != 'grade_number' and field.name != 'grade_letter' and field.name != 'first_name' %}
+                <div class="form-group {% if field.name == 'password' %}full-width{% endif %}">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                        {% if field.name == 'last_name' %}<i class="fas fa-user" style="color: var(--secondary); margin-right: 8px;"></i>{% endif %}
+                        {% if field.name == 'password' %}<i class="fas fa-lock" style="color: #ef4444; margin-right: 8px;"></i>{% endif %}
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.name == 'password' and form.instance.pk %}
+                    <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;"><i class="fas fa-info-circle"></i> {% trans "Parolni o'zgartirmoqchi bo'lsangizgina to'ldiring." %}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                    <p style="color: #ef4444; font-size: 0.8rem; margin-top: 8px;"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div style="margin-top: 45px; display: flex; gap: 15px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 18px; border-radius: 16px; font-weight: 700;">
+                    <i class="fas fa-save"></i> {% trans "Saqlash" %}
+                </button>
+                <a href="{% url 'frontend_school:students_list' %}" class="glass-card" style="flex: 1; padding: 18px; border-radius: 16px; text-align: center; text-decoration: none; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--border); transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

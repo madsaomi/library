@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Faol o'qishlar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Faol o'qishlar" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'admin_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel animate-fade" style="padding: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h3><i class="fas fa-hand-holding-heart" style="color: #10b981; margin-right: 10px;"></i> {% trans "Hozirda o'qilayotgan kitoblar" %}</h3>
+    </div>
+    
+    <div class="table-container" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Kitob nomi" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Foydalanuvchi" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Rol" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Maktab" %}</th>
+                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Berilgan sana" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in active_loans %}
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s;">
+                    <td style="padding: 15px; font-weight: 600;">{{ loan.book.title }}</td>
+                    <td style="padding: 15px; color: var(--text-muted);">{{ loan.user.username }}</td>
+                    <td style="padding: 15px;">
+                        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem;">
+                            {{ loan.user.get_role_display }}
+                        </span>
+                    </td>
+                    <td style="padding: 15px; color: var(--text-muted);">{{ loan.book.school.name|default:"-" }}</td>
+                    <td style="padding: 15px; color: var(--text-muted);">{{ loan.issued_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="padding: 40px; text-align: center; color: var(--text-muted);">
+                        {% trans "Hozirda faol o'qishlar mavjud emas" %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include 'pagination.html' %}
+    </div>
+</div>
+{% endblock %}
