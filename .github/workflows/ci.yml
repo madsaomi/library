@@ -1,4 +1,4 @@
-name: CI/CD
+name: CI
 
 on:
   push:
@@ -43,20 +43,3 @@ jobs:
           DATABASE_URL: postgres://kutubxona:kutubxona@localhost:5432/kutubxona_test
           SECRET_KEY: ci-test-secret-key
           DEBUG: "False"
-
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Link and Deploy to Railway
-        run: |
-          railway link --project 5cc4da5e
-          railway up
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
