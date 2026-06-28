@@ -27,15 +27,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-only-change-in-production')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 't')
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '.railway.app,localhost,127.0.0.1').split(',')
 
 # Security settings for Production (Railway)
-CSRF_TRUSTED_ORIGINS = [
-    'https://elektronkutibxan-production.up.railway.app',
-    'https://elektronkutibxan-production-7949.up.railway.app',
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-]
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://*.railway.app,http://localhost:8000,http://127.0.0.1:8000').split(',')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Only require secure cookies in production to allow local HTTP testing

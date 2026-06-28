@@ -18,7 +18,8 @@ COPY . .
 
 RUN python manage.py compilemessages
 RUN python manage.py collectstatic --noinput
+RUN chmod +x start.sh
 
 EXPOSE $PORT
 
-CMD python manage.py migrate --noinput && python manage.py ensure_admin && gunicorn core.wsgi:application --bind 0.0.0.0:$PORT --preload --timeout 120 --workers 4
+CMD ./start.sh
