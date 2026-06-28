@@ -19,6 +19,6 @@ COPY . .
 RUN python manage.py compilemessages
 RUN python manage.py collectstatic --noinput
 
-EXPOSE 8000
+EXPOSE $PORT
 
-CMD gunicorn core.wsgi:application --bind 0.0.0.0:8000 --preload --timeout 120 --workers 4
+CMD gunicorn core.wsgi:application --bind 0.0.0.0:$PORT --preload --timeout 120 --workers 4
