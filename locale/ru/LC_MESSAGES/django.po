@@ -517,6 +517,9 @@ msgstr "Книга"
 msgid "Kitoblar"
 msgstr "Книги"
 
+msgid "Nusxalar"
+msgstr "Экземпляры"
+
 msgid "Kitoblar ro'yxati"
 msgstr "Список книг"
 
@@ -1458,8 +1461,10 @@ msgstr "QR Сканер"
 msgid "Kitob berish yoki qabul qilish"
 msgstr "Выдача или приём книги"
 
-msgid "O'quvchi telefonidagi QR-kodni skanerlang. Tizim amal turini o'zi aniqlaydi."
-msgstr "Отсканируйте QR-код с телефона ученика. Система сама определит тип операции."
+msgid ""
+"O'quvchi telefonidagi QR-kodni skanerlang. Tizim amal turini o'zi aniqlaydi."
+msgstr ""
+"Отсканируйте QR-код с телефона ученика. Система сама определит тип операции."
 
 msgid "Skanerlashni boshlash uchun bosing"
 msgstr "Нажмите, чтобы начать сканирование"
@@ -1547,6 +1552,192 @@ msgstr "Нет уведомлений"
 msgid "Tizimda xatolik yuz berdi"
 msgstr "Произошла системная ошибка"
 
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Daraja"
+msgstr "Уровень"
+
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Ikonkalar"
+msgstr "Иконки"
+
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Yutuqlar"
+msgstr "Достижения"
+
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Mening yutuqlarim"
+msgstr "Мои достижения"
+
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Hozircha yutuqlar mavjud emas"
+msgstr "Пока нет достижений"
+
+#: frontend_user/templates/user_panel/challenges.html
+#: frontend_user/templates/user_panel/sidebar_items.html
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Chellenjlar"
+msgstr "Челленджи"
+
+#: frontend_user/templates/user_panel/my_books.html
+msgid "So'ralgan"
+msgstr "Запрошено"
+
+#: frontend_user/templates/user_panel/my_books.html
+msgid "Bron qilingan"
+msgstr "Забронировано"
+
+#: frontend_user/templates/user_panel/my_books.html
+msgid "O'qilgan kitoblar"
+msgstr "Прочитанные книги"
+
+#: frontend_user/templates/user_panel/my_books.html
+msgid "Kutubxonaga o'tish"
+msgstr "Перейти в библиотеку"
+
+#: frontend_user/templates/user_panel/book_detail.html
+msgid "hozir o'qiyapti"
+msgstr "сейчас читают"
+
+#: frontend_user/templates/user_panel/book_detail.html
+msgid "Mashhur"
+msgstr "Популярная"
+
+#: frontend_user/templates/user_panel/library.html
+msgid "Tugagan"
+msgstr "Нет в наличии"
+
+#: templates/base.html
+msgid "Bildirishnomalar"
+msgstr "Уведомления"
+
+#: templates/base.html
+msgid "Hammasini o'qilgan deb belgilash"
+msgstr "Отметить все как прочитанные"
+
+#: frontend_user/templates/user_panel/library.html
+msgid "Hozircha hech kim kitob olmagan"
+msgstr "Никто сейчас не читает книги"
+
+#: frontend_user/templates/user_panel/library.html
+msgid "So'nggi faoliyat"
+msgstr "Последняя активность"
+
+#: templates/base.html
+msgid "Yopish"
+msgstr "Закрыть"
+
+#: frontend_school/templates/school_panel/students.html
+msgid "Keyingi sinfga o'tkazish"
+msgstr "Перевести в следующий класс"
+
+#: frontend_school/templates/school_panel/students.html
+msgid "Barcha o'quvchilarni keyingi sinfga o'tkazishni tasdiqlaysizmi?"
+msgstr "Подтверждаете перевод всех учеников в следующий класс?"
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Bitiruvchilar"
+msgstr "Выпускники"
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Jami bitiruvchilar"
+msgstr "Всего выпускников"
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Aktiv ijaralar"
+msgstr "Активные аренды"
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Bitiruvchi"
+msgstr "Выпускник"
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Bitiruvchilar topilmadi"
+msgstr "Выпускники не найдены"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Statistika"
+msgstr "Статистика"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Aktiv o'quvchilar"
+msgstr "Активные ученики"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Ijaralar"
+msgstr "Аренды"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Ma'lumot topilmadi"
+msgstr "Данные не найдены"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Aktiv o'quvchilar yo'q"
+msgstr "Нет активных учеников"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Yutuqlar topilmadi"
+msgstr "Достижения не найдены"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Faol chellenjlar yo'q"
+msgstr "Нет активных челленджей"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Top o'quvchilar"
+msgstr "Топ учеников"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Post qilish"
+msgstr "Опубликовать"
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "kitob"
+msgstr "книг"
+
+#: frontend_school/templates/school_panel/students.html
+msgid "ta o'quvchi"
+msgstr "ученик(ов)"
+
+#: frontend_school/templates/school_panel/teachers.html
+msgid "ta o'qituvchi"
+msgstr "учител(ей)"
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "ta bitiruvchi"
+msgstr "выпускник(ов)"
+
+#: frontend_school/templates/school_panel/news.html
+msgid "ta yangilik"
+msgstr "новост(ей)"
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Berilgan"
+msgstr "Выдано"
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Qabul qilingan"
+msgstr "Принято"
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Yaratilgan"
+msgstr "Создано"
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Kirish"
+msgstr "Вход"
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Yangilangan"
+msgstr "Обновлено"
+
+#: frontend_school/templatetags/action_tags.py
+msgid "O'chirilgan"
+msgstr "Удалено"
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "QR kutubxonasi yuklanmadi. Sahifani yangilang."
+msgstr "Библиотека QR не загрузилась. Обновите страницу."
+
 msgid "Saytda ko'rsatish"
 msgstr "Показывать на сайте"
 
@@ -1574,5 +1765,537 @@ msgstr "ID вручную:"
 msgid "School Admin | Online Kutibxona"
 msgstr "Админ школы | Онлайн Библиотека"
 
-msgid "Bildirishnomalar yo\'q"
+msgid "Bildirishnomalar yo\\'q"
 msgstr "Нет уведомлений"
+
+msgid "Tizim amallari"
+msgstr "Системные действия"
+
+msgid "Barcha amallar"
+msgstr "Все действия"
+
+msgid "7 kun"
+msgstr "7 дней"
+
+msgid "Barcha vaqt"
+msgstr "Всё время"
+
+msgid "Filtrlash"
+msgstr "Фильтр"
+
+msgid "Amallar tarixi topilmadi"
+msgstr "История действий не найдена"
+
+msgid "Filtrlarni tozalash"
+msgstr "Очистить фильтры"
+
+msgid "ta"
+msgstr "шт"
+
+msgid "Tizim"
+msgstr "Система"
+
+msgid "Qidirish..."
+msgstr "Поиск..."
+
+msgid "Kitob qaytarish"
+msgstr "Возврат книги"
+
+msgid "Yaratish"
+msgstr "Создание"
+
+msgid "Oy"
+msgstr "Месяц"
+
+msgid "Bugun"
+msgstr "Сегодня"
+
+msgid "Kitoblar"
+msgstr "Книги"
+
+msgid "Kitobxonlar"
+msgstr "Читатели"
+
+msgid "Maktablar"
+msgstr "Школы"
+
+msgid "Bugun berilgan"
+msgstr "Выдано сегодня"
+
+msgid "Bugun qaytarilgan"
+msgstr "Возвращено сегодня"
+
+msgid "Davr"
+msgstr "Период"
+
+msgid "30 kun"
+msgstr "30 дней"
+
+msgid "12 oy"
+msgstr "12 месяцев"
+
+msgid "Kitob qaytarishlar"
+msgstr "Возвраты книг"
+
+msgid "Kategoriyasiz"
+msgstr "Без категории"
+
+msgid "Eng faol kitobxonlar"
+msgstr "Самые активные читатели"
+
+msgid "ta kitob"
+msgstr "книг"
+
+msgid "Foydalanish dinamikasi"
+msgstr "Динамика использования"
+
+msgid "Kategoriyalar"
+msgstr "Категории"
+
+msgid "Eng faol maktablar"
+msgstr "Самые активные школы"
+
+msgid "Hozircha ma'lumotlar yo'q"
+msgstr "Пока нет данных"
+
+msgid "Ijarada"
+msgstr "В аренде"
+
+msgid "Umumiy XP"
+msgstr "Общий XP"
+
+msgid "Avtomatik yangilash"
+msgstr "Автообновление"
+
+msgid "To'xtatish"
+msgstr "Остановить"
+
+msgid "Yangi foydalanuvchilar"
+msgstr "Новые пользователи"
+
+msgid "Aktiv ijaralar"
+msgstr "Активные аренды"
+
+msgid "Tahlil"
+msgstr "Аналитика"
+
+msgid "Asosiy"
+msgstr "Главное"
+
+msgid "Boshqaruv"
+msgstr "Управление"
+
+msgid "Kontent"
+msgstr "Контент"
+
+msgid "kunlik streak"
+msgstr "дней подряд"
+
+msgid "Hisob ma'lumotlari"
+msgstr "Информация об аккаунте"
+
+msgid "To'liq ism"
+msgstr "Полное имя"
+
+msgid "Elektron pochta"
+msgstr "Электронная почта"
+
+msgid "A'zo bo'lgan"
+msgstr "Дата регистрации"
+
+msgid "Oxirgi kirish"
+msgstr "Последний вход"
+
+msgid "So'nggi amallar"
+msgstr "Последние действия"
+
+msgid "Hozircha amallar yo'q"
+msgstr "Пока нет действий"
+
+msgid "Streak"
+msgstr "Стрик"
+
+msgid "Eng uzun streak"
+msgstr "Самый длинный стрик"
+
+msgid "Berish"
+msgstr "Выдачи"
+
+msgid "Qaytarish"
+msgstr "Возвраты"
+
+msgid "Yangi"
+msgstr "Добавить"
+
+msgid "Barcha"
+msgstr "Все"
+
+msgid "Chop etilgan"
+msgstr "Опубликовано"
+
+msgid "Hozircha yangiliklar yo'q"
+msgstr "Пока нет новостей"
+
+msgid "Yangi xabar qo'shish"
+msgstr "Добавить новость"
+
+msgid "Xabarni tahrirlash"
+msgstr "Редактировать новость"
+
+#: frontend_admin/views.py:277
+msgid "kitob berilgan"
+msgstr "книг выдано"
+
+#: frontend_admin/views.py:278
+msgid "kitob o'qigan"
+msgstr "книг прочитано"
+
+#: frontend_admin/views.py:298
+msgid "So'nggi {n} kun ichidagi faol maktablar va kitobxonlar"
+msgstr "Активные школы и читатели за последние {n} дней"
+
+#: frontend_admin/views.py:302
+msgid "Yangilik muvaffaqiyatli yaratildi"
+msgstr "Новость успешно создана"
+
+#: frontend_admin/views.py:291
+msgid "Ma'lumotlar mavjud emas"
+msgstr "Данные отсутствуют"
+
+#: frontend_admin/templates/admin_panel/statistics.html:58
+msgid "Yangilik qilish"
+msgstr "Создать новость"
+
+#: frontend_admin/templates/admin_panel/all_users.html:29
+msgid "Adminlar"
+msgstr "Админы"
+
+#: frontend_admin/templates/admin_panel/all_users.html:32
+msgid "Superadmin"
+msgstr "Суперadmin"
+
+#: frontend_admin/templates/admin_panel/all_users.html:35
+msgid "Bugun kirdi"
+msgstr "Зашли сегодня"
+
+#: frontend_admin/templates/admin_panel/all_users.html:111
+msgid "Holat"
+msgstr "Статус"
+
+#: frontend_admin/templates/admin_panel/all_users.html:113
+msgid "Ro'yxatdan o'tgan"
+msgstr "Дата регистрации"
+
+#: frontend_admin/templates/admin_panel/all_users.html:131
+msgid "Faol"
+msgstr "Активен"
+
+#: frontend_admin/templates/admin_panel/all_users.html:131
+msgid "Faolsiz"
+msgstr "Неактивен"
+
+#: frontend_admin/templates/admin_panel/user_detail.html:50
+msgid "XP ball"
+msgstr "XP баллы"
+
+#: frontend_admin/templates/admin_panel/user_detail.html:118
+msgid "Kitob olish tarixi"
+msgstr "История выдачи книг"
+
+#: frontend_admin/templates/admin_panel/user_detail.html:130
+msgid "Orqaga"
+msgstr "Назад"
+
+msgid "Faol,Faolsiz"
+msgstr "Активен,Неактивен"
+
+msgid "Jami muassasalar"
+msgstr "Всего учреждений"
+
+msgid "Jami maktablar"
+msgstr "Всего школ"
+
+msgid "Jami tumanlar"
+msgstr "Всего районов"
+
+msgid "ta tuman"
+msgstr "районов"
+
+msgid "Haqiqatdan ham"
+msgstr "Вы уверены, что хотите удалить"
+
+msgid "o'chirmoqchimisiz?"
+msgstr "?"
+
+#, python-format
+msgid "Haqiqatdan ham \"%(object)s\" o'chirmoqchimisiz?"
+msgstr "Вы уверены, что хотите удалить \"%(object)s\"?"
+
+msgid "Yan"
+msgstr "Янв"
+
+msgid "Fev"
+msgstr "Фев"
+
+msgid "Mar"
+msgstr "Мар"
+
+msgid "Apr"
+msgstr "Апр"
+
+msgid "May"
+msgstr "Май"
+
+msgid "Iyun"
+msgstr "Июн"
+
+msgid "Iyl"
+msgstr "Июл"
+
+msgid "Avg"
+msgstr "Авг"
+
+msgid "Sen"
+msgstr "Сен"
+
+msgid "Okt"
+msgstr "Окт"
+
+msgid "Noy"
+msgstr "Ноя"
+
+msgid "Dek"
+msgstr "Дек"
+
+#: frontend_school/templates/school_panel/students.html:16
+msgid "Jami o'quvchilar"
+msgstr "Всего учеников"
+
+#: frontend_school/templates/school_panel/students.html:20
+msgid "Kitob o'qiyotganlar"
+msgstr "Читают книги"
+
+#: frontend_school/templates/school_panel/teachers.html:16
+msgid "Jami o'qituvchilar"
+msgstr "Всего учителей"
+
+#: frontend_school/templates/school_panel/books.html:18
+msgid "Jami nusxa"
+msgstr "Всего экземпляров"
+
+#: frontend_school/templates/school_panel/issued_books.html:40
+msgid "ta aktiv"
+msgstr "активных"
+
+#: frontend_school/templates/school_panel/issued_books.html:35
+msgid "Kitob nomi yoki foydalanuvchi..."
+msgstr "Название книги или пользователь..."
+
+#: frontend_school/templates/school_panel/books.html:50
+msgid "Kitob nomi..."
+msgstr "Название книги..."
+
+#: frontend_school/templates/school_panel/students.html:39
+msgid "Ism, login yoki sinf..."
+msgstr "Имя, логин или класс..."
+
+#: frontend_school/templates/school_panel/teachers.html:39
+msgid "Ism yoki login..."
+msgstr "Имя или логин..."
+
+#: frontend_school/templates/school_panel/history.html:14
+msgid "Jami amallar"
+msgstr "Всего действий"
+
+#: frontend_school/templates/school_panel/history.html:42
+msgid "ta yozuv"
+msgstr "записей"
+
+#: frontend_school/templates/school_panel/news.html:14
+msgid "Jami yangiliklar"
+msgstr "Всего новостей"
+
+#: frontend_school/templates/school_panel/news.html:18
+msgid "Maktab yangiliklari"
+msgstr "Новости школы"
+
+#: frontend_school/templates/school_panel/news.html:22
+msgid "Tizim xabarlari"
+msgstr "Системные сообщения"
+
+#: frontend_school/templates/school_panel/student_form.html:30
+msgid "Sinf va harf"
+msgstr "Класс и буква"
+
+#: frontend_school/templates/school_panel/qr_unified.html:16
+msgid "Bugungi skaner"
+msgstr "Сегодня отсканировано"
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "O'quvchi telefonidagi QR-kodni skanerlang"
+msgstr "Отсканируйте QR-код с телефона ученика"
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Muvaffaqiyatli!"
+msgstr "Успешно!"
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Xatolik!"
+msgstr "Ошибка!"
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Foydalanuvchi"
+msgstr "Пользователь"
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Kamera xatoligi:"
+msgstr "Ошибка камеры:"
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Tizimda xatolik yuz berdi"
+msgstr "Произошла системная ошибка"
+
+msgid "Birinchi kitob"
+msgstr "Первая книга"
+
+msgid "Ixtiyoriy o'quvchi"
+msgstr "Заядлый читатель"
+
+msgid "Kitob qurti"
+msgstr "Книжный червь"
+
+msgid "O'qish afsonasi"
+msgstr "Легенда чтения"
+
+msgid "Bilimdon"
+msgstr "Эрудит"
+
+msgid "Hammayeydi"
+msgstr "Всеядный"
+
+msgid "Tez o'quvchi"
+msgstr "Скорочтение"
+
+msgid "Doimiy o'quvchi"
+msgstr "Завсегдатай"
+
+msgid "Tinimsiz o'quvchi"
+msgstr "Неутомимый"
+
+msgid "Kutubxonadan birinchi kitobni oldi"
+msgstr "Взял первую книгу в библиотеке"
+
+msgid "10 ta kitob o'qidi"
+msgstr "Прочитал 10 книг"
+
+msgid "50 ta kitob o'qidi"
+msgstr "Прочитал 50 книг"
+
+msgid "100 ta kitob o'qidi"
+msgstr "Прочитал 100 книг"
+
+msgid "5 xil kategoriyadagi kitoblarni o'qidi"
+msgstr "Прочитал книги из 5 разных категорий"
+
+msgid "Maktabdagi barcha kategoriyalardan kitob o'qidi"
+msgstr "Прочитал книги из всех категорий школы"
+
+msgid "3 kun ichida 5 ta kitobni qaytardi"
+msgstr "Вернул 5 книг в течение 3 дней"
+
+msgid "4 haftalik streak-ga erishdi"
+msgstr "Достиг streak в 4 недели"
+
+msgid "8 haftalik streak-ga erishdi"
+msgstr "Достиг streak в 8 недель"
+
+msgid "Hali kitob o'qilmagan"
+msgstr "Еще не прочитано ни одной книги"
+
+msgid "Hali kategoriyalar bo'yicha ma'lumot yo'q"
+msgstr "Нет данных по категориям"
+
+msgid "Oylik kitoblar"
+msgstr "Книги по месяцам"
+
+msgid "Eng yaxshi o'quvchilar"
+msgstr "Лучшие ученики"
+
+msgid "Hafta"
+msgstr "Неделя"
+
+msgid "sinf"
+msgstr "класс"
+
+msgid "Aktiv chellenjlar yo'q"
+msgstr "Нет активных челленджей"
+
+msgid "Yangi chellenjlar tez orada paydo bo'ladi"
+msgstr "Скоро появятся новые челленджи"
+
+msgid "Barcha yutuqlar"
+msgstr "Все достижения"
+
+msgid "Hozircha kitoblar yo'q"
+msgstr "Пока нет книг"
+
+msgid "hafta"
+msgstr "нед."
+
+msgid "haftalik streak"
+msgstr "недельный стрик"
+
+msgid "14 kun"
+msgstr ""
+
+msgid "Boshqa"
+msgstr ""
+
+msgid "Faoliyat"
+msgstr ""
+
+msgid "Faoliyat yo'q"
+msgstr ""
+
+msgid "Hozircha ma'lumot yo'q"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "Ikonka"
+msgstr ""
+
+msgid "OY O'QUVCHISI"
+msgstr ""
+
+msgid "Progress"
+msgstr ""
+
+msgid "Sahifa"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "XP"
+msgstr ""
+
+msgid "Yangilik qilib post qilish"
+msgstr ""
+
+msgid "aktiv kitob"
+msgstr ""
+
+msgid "Hisob bloklandi"
+msgstr "Аккаунт заблокирован"
+
+msgid "Hisobingiz vaqtincha bloklandi"
+msgstr "Ваш аккаунт временно заблокирован"
+
+msgid ""
+"Ko'p marta noto'g'ri urinishlar tufayli hisobingiz 1 soatga bloklangan. "
+"Iltimos, birozdan so'ng qayta urinib ko'ring."
+msgstr ""
+"Слишком много неверных попыток. Аккаунт заблокирован на 1 час. Пожалуйста, "
+"попробуйте позже."

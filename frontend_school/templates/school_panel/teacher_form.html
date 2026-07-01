@@ -1,41 +1,42 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "O'qituvchi" %} | Online Kutibxona{% endblock %}
+{% block title %}{{ title }} | Online Kutibxona{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
 
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto;">
-    <div class="glass-panel animate-fade" style="padding: 40px; border-radius: 24px;">
+<div style="max-width: 480px; margin: 0 auto;">
+    <div class="glass-panel animate-fade" style="padding: 32px;">
         <form method="post">
             {% csrf_token %}
-            <div class="responsive-grid-2" style="gap: 25px;">
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
                 {% for field in form %}
-                <div class="form-group {% if field.name == 'password' %}full-width{% endif %}">
-                    <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
-                        {% if field.name == 'username' %}<i class="fas fa-user-tag" style="color: var(--primary); margin-right: 8px;"></i>{% endif %}
-                        {% if field.name == 'first_name' %}<i class="fas fa-user-tie" style="color: var(--secondary); margin-right: 8px;"></i>{% endif %}
-                        {% if field.name == 'last_name' %}<i class="fas fa-user-tie" style="color: var(--secondary); margin-right: 8px;"></i>{% endif %}
-                        {% if field.name == 'subject' %}<i class="fas fa-book-reader" style="color: #f59e0b; margin-right: 8px;"></i>{% endif %}
-                        {% if field.name == 'password' %}<i class="fas fa-lock" style="color: #ef4444; margin-right: 8px;"></i>{% endif %}
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.8rem; color: var(--text-muted);">
+                        {% if field.name == 'first_name' %}<i class="fas fa-user-tie" style="color: var(--secondary); margin-right: 4px;"></i>{% endif %}
+                        {% if field.name == 'last_name' %}<i class="fas fa-user-tie" style="color: var(--secondary); margin-right: 4px;"></i>{% endif %}
+                        {% if field.name == 'subject' %}<i class="fas fa-book-reader" style="color: #f59e0b; margin-right: 4px;"></i>{% endif %}
+                        {% if field.name == 'address' %}<i class="fas fa-map-marker-alt" style="color: var(--text-muted); margin-right: 4px;"></i>{% endif %}
                         {{ field.label }}
                     </label>
                     {{ field }}
-                    {% if field.name == 'password' and form.instance.pk %}
-                    <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;"><i class="fas fa-info-circle"></i> {% trans "Parolni o'zgartirmoqchi bo'lsangizgina to'ldiring." %}</p>
-                    {% endif %}
                     {% if field.errors %}
-                    <p style="color: #ef4444; font-size: 0.8rem; margin-top: 8px;"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
+                    <p style="color: #ef4444; font-size: 0.75rem; margin-top: 4px;"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
-            
-            <div style="margin-top: 45px; display: flex; gap: 15px;">
-                <button type="submit" class="btn-primary" style="flex: 2; padding: 18px; border-radius: 16px; font-weight: 700; background: linear-gradient(135deg, var(--secondary), #7c3aed);">
+
+            <div style="margin-top: 28px; display: flex; gap: 12px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 10px 0; font-size: 0.85rem; border-radius: 10px;">
                     <i class="fas fa-save"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend_school:teachers_list' %}" class="glass-card" style="flex: 1; padding: 18px; border-radius: 16px; text-align: center; text-decoration: none; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--border); transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                <a href="{% url 'frontend_school:teachers_list' %}" class="glass-card" style="flex: 1; padding: 10px 0; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--border); font-size: 0.85rem;">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>
@@ -48,4 +49,10 @@
     <option value="{{ subject.name }}">
     {% endfor %}
 </datalist>
+
+<style>
+    .form-control { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--input-text); outline: none; font-size: 0.85rem; transition: 0.3s; box-sizing: border-box; }
+    .form-control:focus { border-color: var(--secondary); }
+    select.form-control { appearance: auto; }
+</style>
 {% endblock %}

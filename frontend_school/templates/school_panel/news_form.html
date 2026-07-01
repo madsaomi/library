@@ -1,69 +1,90 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Yangilik" %} | Online Kutibxona{% endblock %}
+{% block title %}{{ title }} | Online Kutibxona{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
 
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto;">
-    <div class="glass-panel animate-fade" style="padding: 40px; border-radius: 24px;">
+<div style="max-width: 480px; margin: 0 auto;">
+    <div class="glass-panel animate-fade" style="padding: 32px;">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <div style="display: grid; grid-template-columns: 1fr; gap: 30px;">
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
                 {% for field in form %}
-                <div class="form-group">
-                    <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
-                        {% if field.name == 'title' %}<i class="fas fa-heading" style="color: var(--primary); margin-right: 8px;"></i>{% endif %}
-                        {% if field.name == 'body' %}<i class="fas fa-align-left" style="color: var(--secondary); margin-right: 8px;"></i>{% endif %}
-                        {% if field.name == 'image' %}<i class="fas fa-image" style="color: #10b981; margin-right: 8px;"></i>{% endif %}
-                        {% if field.name == 'is_published' %}<i class="fas fa-paper-plane" style="color: var(--accent); margin-right: 8px;"></i>{% endif %}
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.8rem; color: var(--text-muted);">
                         {{ field.label }}
                     </label>
-                    
+
                     {% if field.name == 'is_published' %}
-                        <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 14px; border: 1px solid var(--border);">
-                            <label class="switch">
-                                {{ field }}
-                                <span class="slider"></span>
-                            </label>
-                            <span style="font-size: 0.9rem; color: var(--text-main);">{% trans "Saytda ko'rsatish" %}</span>
+                    <div style="display: flex; align-items: center; gap: 12px; background: var(--input-bg); padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border);">
+                        {{ field }}
+                        <span style="font-size: 0.85rem;">{% trans "Saytda ko'rsatish" %}</span>
+                    </div>
+
+                    {% elif field.name == 'image' %}
+                    <div style="position: relative; overflow: hidden; display: inline-block;">
+                        <div id="fake-upload-btn" style="padding: 10px 18px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.8rem;">
+                            <i class="fas fa-upload" style="color: #10b981;"></i>
+                            <span id="file-name-label">{% trans "Rasm tanlash" %}</span>
                         </div>
+                        <input type="file" name="image" accept="image/*" id="id_image"
+                               style="position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;"
+                               onchange="handleFileChange(this)">
+                    </div>
+
                     {% else %}
-                        <div style="position: relative;">
-                            {{ field }}
-                            <style>
-                                .form-control {
-                                    transition: all 0.3s ease;
-                                    border: 1px solid var(--border);
-                                    background: rgba(255,255,255,0.05);
-                                    padding: 14px 18px;
-                                    border-radius: 14px;
-                                }
-                                .form-control:focus {
-                                    border-color: var(--primary);
-                                    background: rgba(255,255,255,0.08);
-                                    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-                                }
-                            </style>
-                        </div>
+                    <div>
+                        {{ field }}
+                    </div>
                     {% endif %}
-                    
+
                     {% if field.errors %}
-                    <p style="color: #ef4444; font-size: 0.8rem; margin-top: 8px;"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
+                    <p style="color: #ef4444; font-size: 0.75rem; margin-top: 4px;"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
-            
-            <div style="margin-top: 45px; display: flex; gap: 15px;">
-                <button type="submit" class="btn-primary" style="flex: 2; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+
+            <div style="margin-top: 28px; display: flex; gap: 12px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 10px 0; font-size: 0.85rem; border-radius: 10px;">
                     <i class="fas fa-save"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend_school:news_list' %}" class="glass-card" style="flex: 1; padding: 18px; border-radius: 16px; text-align: center; text-decoration: none; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--border); transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                <a href="{% url 'frontend_school:news_list' %}" class="glass-card" style="flex: 1; padding: 10px 0; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--border); font-size: 0.85rem;">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>
         </form>
     </div>
 </div>
+
+<style>
+    .form-control { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--input-text); outline: none; font-size: 0.85rem; transition: 0.3s; box-sizing: border-box; }
+    .form-control:focus { border-color: var(--primary); }
+    .form-control[type="file"] { padding: 8px; }
+    #fake-upload-btn:hover { background: var(--hover-bg); }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: var(--hover-bg); border-radius: 24px; transition: 0.3s; }
+    .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: var(--text-muted); border-radius: 50%; transition: 0.3s; }
+    .switch input:checked + .slider { background: #10b981; }
+    .switch input:checked + .slider:before { transform: translateX(20px); background: white; }
+</style>
+
+<script>
+function handleFileChange(input) {
+    if (input.files && input.files[0]) {
+        document.getElementById('file-name-label').innerText = input.files[0].name;
+        const btn = document.getElementById('fake-upload-btn');
+        btn.style.borderColor = '#10b981';
+        btn.style.background = 'rgba(16, 185, 129, 0.1)';
+        btn.querySelector('i').className = 'fas fa-check';
+    }
+}
+</script>
 {% endblock %}

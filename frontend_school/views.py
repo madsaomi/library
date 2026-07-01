@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 from accounts.models import CustomUser
 from accounts.utils import verify_dynamic_token
 from books.models import Book, BookIssue, BookRequest, Category
+from books.achievements import award_xp
 from stats.models import ActionLog
 from .models import News
 from .forms import BookForm, StudentForm, TeacherForm, NewsForm
@@ -36,18 +37,39 @@ def dashboard(request):
     school = request.user.school
     context = {}
     if school:
-        recent_activities = BookIssue.objects.filter(book__school=school).order_by('-issued_at')[:5]
+        recent_activities = BookIssue.objects.filter(book__school=school).order_by('-issued_at')[:10]
         stats = Book.objects.filter(school=school).aggregate(
             total_copies=Sum('total_count'),
             available_copies=Sum('available_count')
         )
-        from django.db.models import Q
+        from django.db.models import Q, Count
+        from django.db.models.functions import TruncMonth
         # Base news filter: current school's news
         news_filter = Q(school=school)
-        # Only school admins and superusers see global news
         if request.user.role == 'school_admin' or request.user.is_superuser:
             news_filter |= Q(school__isnull=True)
-            
+
+        # Monthly issues for chart
+        today = timezone.now()
+        six_months_ago = today - timezone.timedelta(days=180)
+        monthly_qs = (
+            BookIssue.objects
+            .filter(book__school=school, issued_at__gte=six_months_ago)
+            .annotate(month=TruncMonth('issued_at'))
+            .values('month')
+            .annotate(count=Count('id'))
+            .order_by('month')
+        )
+        month_labels = []
+        monthly_data = []
+        months_uz = [_('Yan'), _('Fev'), _('Mar'), _('Apr'), _('May'), _('Iyun'),
+                     _('Iyl'), _('Avg'), _('Sen'), _('Okt'), _('Noy'), _('Dek')]
+        for entry in monthly_qs:
+            if entry['month']:
+                m = entry['month'].month - 1
+                month_labels.append(months_uz[m] if m < len(months_uz) else str(entry['month'].month))
+                monthly_data.append(entry['count'])
+
         context = {
             'student_count': CustomUser.objects.filter(school=school, role='student').count(),
             'book_count': Book.objects.filter(school=school).count(),
@@ -56,6 +78,8 @@ def dashboard(request):
             'issued_count': BookIssue.objects.filter(book__school=school, is_returned=False).count(),
             'recent_activities': recent_activities,
             'news_count': News.objects.filter(news_filter, is_published=True).count(),
+            'month_labels': json.dumps(month_labels),
+            'monthly_data': json.dumps(monthly_data),
         }
     return render(request, 'school_panel/dashboard.html', context)
 
@@ -65,6 +89,13 @@ def students_list(request):
     school = request.user.school
     query = request.GET.get('q')
     students = CustomUser.objects.filter(school=school, role='student')
+    
+    # Stats
+    total_students = students.count()
+    active_loans = BookIssue.objects.filter(book__school=school, is_returned=False)
+    reading_students = active_loans.values('user').distinct().count()
+    today = timezone.now().date()
+    entered_today = students.filter(last_login__date=today).count()
     
     if query:
         from django.db.models import Q
@@ -82,7 +113,11 @@ def students_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'school_panel/students.html', {'students': page_obj, 'page_obj': page_obj, 'query': query})
+    return render(request, 'school_panel/students.html', {
+        'students': page_obj, 'page_obj': page_obj, 'query': query,
+        'total_students': total_students, 'reading_students': reading_students,
+        'entered_today': entered_today,
+    })
 
 @login_required(login_url='login')
 @school_admin_required
@@ -90,6 +125,10 @@ def teachers_list(request):
     school = request.user.school
     query = request.GET.get('q')
     teachers = CustomUser.objects.filter(school=school, role='teacher')
+    
+    total_teachers = teachers.count()
+    today = timezone.now().date()
+    entered_today = teachers.filter(last_login__date=today).count()
     
     if query:
         from django.db.models import Q
@@ -106,7 +145,10 @@ def teachers_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'school_panel/teachers.html', {'teachers': page_obj, 'page_obj': page_obj, 'query': query})
+    return render(request, 'school_panel/teachers.html', {
+        'teachers': page_obj, 'page_obj': page_obj, 'query': query,
+        'total_teachers': total_teachers, 'entered_today': entered_today,
+    })
 
 @login_required(login_url='login')
 @school_admin_required
@@ -116,7 +158,16 @@ def books_list(request):
     category_id = request.GET.get('category')
     no_cover = request.GET.get('no_cover')
     
-    books = Book.objects.filter(school=school)
+    from django.db.models import Sum
+    all_books = Book.objects.filter(school=school)
+    total_books = all_books.count()
+    stats = all_books.aggregate(
+        total_copies=Sum('total_count'),
+        available_copies=Sum('available_count')
+    )
+    issued_count = BookIssue.objects.filter(book__school=school, is_returned=False).count()
+    
+    books = all_books
     
     if query:
         from books.search import search_books
@@ -145,22 +196,46 @@ def books_list(request):
         'categories': categories,
         'query': query,
         'selected_category': int(category_id) if category_id else None,
-        'no_cover': no_cover == '1'
+        'no_cover': no_cover == '1',
+        'total_books': total_books,
+        'total_copies': stats['total_copies'] or 0,
+        'available_copies': stats['available_copies'] or 0,
+        'issued_count': issued_count,
     })
 
 @login_required(login_url='login')
 @school_admin_required
 def issued_books_list(request):
     school = request.user.school
-    issues = BookIssue.objects.filter(book__school=school, is_returned=False).order_by('-issued_at')
-    return render(request, 'school_panel/issued_books.html', {'issues': issues})
+    issues = BookIssue.objects.filter(book__school=school, is_returned=False).select_related('book', 'user').order_by('-issued_at')
+    
+    total_issued = issues.count()
+    unique_students = issues.values('user').distinct().count()
+    unique_books = issues.values('book').distinct().count()
+    
+    from django.core.paginator import Paginator
+    paginator = Paginator(issues, 50)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'school_panel/issued_books.html', {
+        'issues': page_obj, 'page_obj': page_obj,
+        'total_issued': total_issued, 'unique_students': unique_students,
+        'unique_books': unique_books,
+    })
 
 @login_required(login_url='login')
 @school_admin_required
 def history_list(request):
     school = request.user.school
     query = request.GET.get('q')
-    history = BookIssue.objects.filter(book__school=school).order_by('-issued_at')
+    
+    all_history = BookIssue.objects.filter(book__school=school)
+    total_actions = all_history.count()
+    returned_count = all_history.filter(is_returned=True).count()
+    issued_count = all_history.filter(is_returned=False).count()
+    
+    history = all_history.select_related('book', 'user').order_by('-issued_at')
     
     if query:
         from django.db.models import Q
@@ -176,26 +251,50 @@ def history_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'school_panel/history.html', {'history': page_obj, 'page_obj': page_obj, 'query': query})
+    return render(request, 'school_panel/history.html', {
+        'history': page_obj, 'page_obj': page_obj, 'query': query,
+        'total_actions': total_actions, 'returned_count': returned_count,
+        'issued_count': issued_count,
+    })
 
 @login_required(login_url='login')
 @school_admin_required
 def news_list(request):
     school = request.user.school
     from django.db.models import Q
-    # Base filter: only school's news
     query = Q(school=school)
-    # Add global news only for admins
     if request.user.role == 'school_admin' or request.user.is_superuser:
         query |= Q(school__isnull=True)
-        
-    news = News.objects.filter(query, is_published=True).order_by('-created_at')
-    return render(request, 'school_panel/news.html', {'news': news})
+    
+    all_news = News.objects.filter(query, is_published=True).order_by('-created_at')
+    total_news = all_news.count()
+    school_news = all_news.filter(school=school).count()
+    global_news = all_news.filter(school__isnull=True).count()
+    
+    from django.core.paginator import Paginator
+    paginator = Paginator(all_news, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'school_panel/news.html', {
+        'news': page_obj, 'page_obj': page_obj,
+        'total_news': total_news, 'school_news': school_news,
+        'global_news': global_news,
+    })
 
 @login_required(login_url='login')
 @school_admin_required
 def qr_unified(request):
-    return render(request, 'school_panel/qr_unified.html')
+    school = request.user.school
+    today = timezone.now().date()
+    today_issues = BookIssue.objects.filter(book__school=school, issued_at__date=today).count()
+    today_returns = BookIssue.objects.filter(book__school=school, returned_at__date=today, is_returned=True).count()
+    total_scans = today_issues + today_returns
+    return render(request, 'school_panel/qr_unified.html', {
+        'today_scans': total_scans,
+        'today_issues': today_issues,
+        'today_returns': today_returns,
+    })
 
 @login_required(login_url='login')
 @school_admin_required
@@ -269,11 +368,18 @@ def process_qr(request):
                 action_type='ISSUE',
                 message=_("{}ga '{}' kitobi berildi").format(request_obj.user.username, book.title)
             )
+
+            xp_result = award_xp(request_obj.user, 'borrow', book=book)
             
             return JsonResponse({
                 'status': 'success', 
                 'message': _('Kitob muvaffaqiyatli berildi: {}').format(book.title),
-                'student': f'{request_obj.user.first_name} {request_obj.user.last_name}'
+                'student': f'{request_obj.user.first_name} {request_obj.user.last_name}',
+                'xp_earned': xp_result['xp_earned'],
+                'lucky_bonus': xp_result['lucky_bonus'],
+                'leveled_up': xp_result['leveled_up'],
+                'new_level': xp_result['new_level'],
+                'new_achievements': xp_result['new_achievements'],
             })
             
         except json.JSONDecodeError:
@@ -346,11 +452,18 @@ def process_receive_qr(request):
                 action_type='RETURN',
                 message=_("{}dan '{}' kitobi qabul qilindi").format(user.username, book.title)
             )
+
+            xp_result = award_xp(user, 'return')
             
             return JsonResponse({
                 'status': 'success', 
                 'message': _('Kitob muvaffaqiyatli qabul qilindi: {}').format(book.title),
-                'student': f'{user.first_name} {user.last_name}'
+                'student': f'{user.first_name} {user.last_name}',
+                'xp_earned': xp_result['xp_earned'],
+                'lucky_bonus': False,
+                'leveled_up': xp_result['leveled_up'],
+                'new_level': xp_result['new_level'],
+                'new_achievements': xp_result['new_achievements'],
             })
             
         except json.JSONDecodeError:
@@ -556,7 +669,21 @@ def news_delete(request, pk):
 def profile(request):
     if request.user.role != 'school_admin':
         return redirect('frontend_user:library')
-    return render(request, 'school_panel/profile.html')
+    school = request.user.school
+    recent_activity = ActionLog.objects.filter(
+        user=request.user
+    ).order_by('-created_at')[:10]
+    from django.db.models import Sum
+    stats = Book.objects.filter(school=school).aggregate(
+        total_copies=Sum('total_count'),
+    )
+    return render(request, 'school_panel/profile.html', {
+        'recent_activity': recent_activity,
+        'total_books': Book.objects.filter(school=school).count(),
+        'total_copies': stats['total_copies'] or 0,
+        'total_students': CustomUser.objects.filter(school=school, role='student').count(),
+        'total_teachers': CustomUser.objects.filter(school=school, role='teacher').count(),
+    })
 
 @login_required(login_url='login')
 @school_admin_required
@@ -573,3 +700,111 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'school_panel/password_change.html', {'form': form})
+
+@login_required(login_url='login')
+@school_admin_required
+def statistics(request):
+    school = request.user.school
+    today = timezone.now().date()
+
+    from django.db.models import Sum, Count
+    from books.models import UserAchievement, Challenge, BookIssue
+
+    active_students = CustomUser.objects.filter(
+        school=school, role='student', is_archived=False,
+        bookissue__is_returned=False
+    ).distinct()[:20]
+    active_count = CustomUser.objects.filter(
+        school=school, role='student', is_archived=False,
+        bookissue__is_returned=False
+    ).distinct().count()
+    top_students = CustomUser.objects.filter(
+        school=school, role='student', is_archived=False
+    ).order_by('-total_books_read')[:10]
+    recent_yutuqlar = UserAchievement.objects.filter(
+        user__school=school, user__role='student'
+    ).select_related('user', 'achievement').order_by('-earned_at')[:15]
+    active_chellenjlar = Challenge.objects.filter(
+        is_active=True, start_date__lte=today, end_date__gte=today
+    ).filter(
+        Q(school=school) | Q(school__isnull=True)
+    )
+    total_students = CustomUser.objects.filter(school=school, role='student', is_archived=False).count()
+    total_books = Book.objects.filter(school=school).count()
+    total_issues = BookIssue.objects.filter(book__school=school).count()
+    active_issues = BookIssue.objects.filter(book__school=school, is_returned=False).count()
+
+    return render(request, 'school_panel/statistics.html', {
+        'active_students': active_students,
+        'active_count': active_count,
+        'top_students': top_students,
+        'recent_yutuqlar': recent_yutuqlar,
+        'active_chellenjlar': active_chellenjlar,
+        'total_students': total_students,
+        'total_books': total_books,
+        'total_issues': total_issues,
+        'active_issues': active_issues,
+    })
+
+@login_required(login_url='login')
+@school_admin_required
+def post_top_student_news(request, pk):
+    school = request.user.school
+    student = get_object_or_404(CustomUser, pk=pk, school=school, role='student')
+    from books.models import UserAchievement
+    achievements = UserAchievement.objects.filter(user=student).select_related('achievement')
+    from .models import News
+    achievement_lines = ""
+    for ach in achievements:
+        achievement_lines += f"  • {ach.achievement.name} (+{ach.achievement.xp_reward} XP)\n"
+    title = _("Eng faol o'quvchi: {name}").format(name=f"{student.first_name} {student.last_name}")
+    body = _(
+        "🏆 {name} — {grade}-sinf o'quvchisi\n\n"
+        "📚 Jami o'qilgan kitoblar: {books}\n"
+        "⭐ XP ball: {xp} ({level}-daraja)\n"
+        "🎯 Yutuqlari:\n{achievements}\n\n"
+        "{school} jamoasi {name}ni tabriklaydi va barcha o'quvchilarni faol kitob o'qishga chorlaydi! 📖"
+    ).format(
+        name=f"{student.first_name} {student.last_name}",
+        grade=student.grade or "—",
+        books=student.total_books_read,
+        xp=student.xp_points,
+        level=student.level,
+        achievements=achievement_lines or "  —",
+        school=school.name,
+    )
+    News.objects.create(school=school, title=title, body=body, is_published=True)
+    messages.success(request, _("Yangilik muvaffaqiyatli yaratildi!"))
+    return redirect('frontend_school:statistics')
+
+@login_required(login_url='login')
+@school_admin_required
+def graduates_list(request):
+    school = request.user.school
+    query = request.GET.get('q')
+    graduates = CustomUser.objects.filter(school=school, role='student', is_archived=True)
+
+    total_graduates = graduates.count()
+    total_books = Book.objects.filter(school=school).count()
+    total_active = BookIssue.objects.filter(book__school=school, is_returned=False).count()
+
+    if query:
+        graduates = graduates.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(grade__icontains=query)
+        )
+
+    graduates = graduates.order_by('last_name', 'first_name')
+
+    from django.core.paginator import Paginator
+    paginator = Paginator(graduates, 50)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'school_panel/graduates.html', {
+        'graduates': page_obj, 'page_obj': page_obj, 'query': query,
+        'total_graduates': total_graduates, 'total_books': total_books,
+        'total_active': total_active,
+    })

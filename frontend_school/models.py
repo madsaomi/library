@@ -1,6 +1,17 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+class GradePromotionLog(models.Model):
+    promoted_at = models.DateTimeField(auto_now_add=True)
+    year = models.IntegerField(unique=True)
+
+    class Meta:
+        verbose_name = _("Sinf o'tkazish logi")
+        verbose_name_plural = _("Sinf o'tkazish loglari")
+
+    def __str__(self):
+        return f"{self.year} - {self.promoted_at}"
+
 class News(models.Model):
     school = models.ForeignKey('schools.School', on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("Maktab"))
     title = models.CharField(_("Sarlavha"), max_length=255)

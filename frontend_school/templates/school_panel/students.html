@@ -9,66 +9,87 @@
 {% endblock %}
 
 {% block content %}
-<div class="glass-panel animate-fade">
-    <div class="search-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 20px; flex-wrap: wrap;">
-        <h3 style="margin: 0;"><i class="fas fa-users" style="color: var(--primary);"></i> {% trans "Maktab o'quvchilari" %}</h3>
-        
-        <div style="display: flex; gap: 15px; flex-grow: 1; max-width: 500px;">
-            <form method="GET" id="search-form" onsubmit="return false;" style="display: flex; flex-grow: 1; position: relative;">
-                <input type="text" name="q" id="search-input" value="{{ query|default:'' }}" placeholder="{% trans 'Ism, login yoki sinf bo\'yicha qidirish...' %}" 
-                       style="width: 100%; padding: 12px 20px 12px 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white !important; outline: none; transition: 0.3s;">
-                <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-            </form>
-            <a href="{% url 'frontend_school:student_add' %}" class="btn-primary" style="padding: 12px 20px; text-decoration: none; white-space: nowrap;">
-                <i class="fas fa-plus"></i> {% trans "Yangi o'quvchi" %}
-            </a>
+<div class="animate-fade">
+    <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ total_students|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Jami o'quvchilar" %}</div>
         </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ reading_students|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Kitob o'qiyotganlar" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #6366f1;">{{ entered_today|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Bugun kirdi" %}</div>
+        </div>
+        <a href="{% url 'frontend_school:student_add' %}" class="glass-card stat-card" style="padding: 14px 10px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px dashed var(--primary);">
+            <i class="fas fa-plus" style="font-size: 0.8rem; color: var(--primary);"></i>
+            <span style="font-size: 0.75rem; font-weight: 500; color: var(--primary);">{% trans "Yangi o'quvchi" %}</span>
+        </a>
     </div>
 
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    <th style="padding: 15px;">{% trans "Login" %}</th>
-                    <th style="padding: 15px;">{% trans "Ism (F.I.SH)" %}</th>
-                    <th style="padding: 15px;">{% trans "Tug'ilgan sana" %}</th>
-                    <th style="padding: 15px;">{% trans "Sinf" %}</th>
-                    <th style="padding: 15px;">{% trans "Parol" %}</th>
-                    <th style="padding: 15px;">{% trans "Amallar" %}</th>
-                </tr>
-            </thead>
-            <tbody id="student-table-body">
-                {% for student in students %}
-                <tr class="student-row" data-search="{{ student.username|lower }} {{ student.first_name|lower }} {{ student.last_name|lower }} {{ student.grade|lower }}" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <td style="padding: 15px;">{{ student.username }}</td>
-                    <td style="padding: 15px;">{{ student.first_name }} {{ student.last_name }}</td>
-                    <td style="padding: 15px; color: var(--text-muted);">{{ student.birth_date|date:"d.m.Y"|default:"—" }}</td>
-                    <td style="padding: 15px;"><span class="glass-card" style="padding: 4px 12px; font-size: 0.8rem;">{{ student.grade }}</span></td>
-                    <td style="padding: 15px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="password-hidden" id="pass-{{ student.id }}" style="font-family: monospace; color: var(--text-muted);">••••••••</span>
-                            <span class="password-visible" id="pass-val-{{ student.id }}" style="display: none; font-family: monospace; color: var(--text-main);">{{ student.raw_password|default:'---' }}</span>
-                            <button onclick="togglePassword('{{ student.id }}')" style="background: none; border: none; color: var(--primary); cursor: pointer; padding: 0;">
-                                <i class="fas fa-eye" id="eye-{{ student.id }}"></i>
-                            </button>
+    <div style="margin-bottom: 16px;">
+        <a href="{% url 'frontend_school:graduates_list' %}" class="glass-card" style="padding: 8px 16px; font-size: 0.78rem; text-decoration: none; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; color: var(--text);">
+            <i class="fas fa-graduation-cap"></i> {% trans "Bitiruvchilar" %}
+        </a>
+    </div>
+
+    <div class="glass-panel" style="padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="position: relative;">
+                <input type="text" id="search-input" placeholder="{% trans 'Ism, login yoki sinf...' %}"
+                       style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none; width: 220px; font-size: 0.8rem;">
+                <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">{{ page_obj.paginator.count }} {% trans "ta o'quvchi" %}</div>
+        </div>
+
+        <div class="info-grid" style="gap: 6px;">
+            {% for student in students %}
+            <div class="glass-card info-row student-row" data-search="{{ student.username|lower }} {{ student.first_name|lower }} {{ student.last_name|lower }} {{ student.grade|lower }}" style="padding: 10px 14px;">
+                <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                    <div class="avatar-circle" style="width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), #a855f7); flex-shrink: 0;">
+                        <span class="avatar-initials" style="font-size: 0.75rem;">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</span>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; font-size: 0.82rem;">{{ student.first_name }} {{ student.last_name }}</div>
+                        <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">
+                            <span>@{{ student.username }}</span>
+                            <span class="badge" style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 1px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 4px;">{{ student.grade }}</span>
+                            {% if student.birth_date %}
+                            <span style="margin-left: 6px;"><i class="far fa-calendar-alt"></i> {{ student.birth_date|date:"d.m.Y" }}</span>
+                            {% endif %}
                         </div>
-                    </td>
-                    <td style="padding: 15px;">
-                        <a href="{% url 'frontend_school:student_edit' student.pk %}" style="color: var(--primary); margin-right: 15px;"><i class="fas fa-edit"></i></a>
-                        <a href="{% url 'frontend_school:student_delete' student.pk %}" style="color: #ef4444;"><i class="fas fa-trash"></i></a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr id="empty-state">
-                    <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-muted);">{% trans "O'quvchilar topilmadi" %}</td>
-                </tr>
-                {% endfor %}
-                <tr id="no-results" style="display: none;">
-                    <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-muted);">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% include 'pagination.html' %}
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="password-hidden" id="pass-{{ student.id }}" style="font-family: monospace; color: var(--text-muted); font-size: 0.7rem;">••••••••</span>
+                        <span class="password-visible" id="pass-val-{{ student.id }}" style="display: none; font-family: monospace; font-size: 0.7rem;">{{ student.raw_password|default:'---' }}</span>
+                        <button onclick="togglePassword('{{ student.id }}')" style="background: none; border: none; color: var(--primary); cursor: pointer; padding: 2px;">
+                            <i class="fas fa-eye" id="eye-{{ student.id }}" style="font-size: 0.7rem;"></i>
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <a href="{% url 'frontend_school:student_edit' student.pk %}" class="glass-card" style="padding: 4px 8px; border-radius: 6px; text-decoration: none; font-size: 0.65rem; color: var(--primary); white-space: nowrap;"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'frontend_school:student_delete' student.pk %}" class="glass-card" style="padding: 4px 8px; border-radius: 6px; text-decoration: none; font-size: 0.65rem; color: #ef4444; white-space: nowrap;"><i class="fas fa-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div id="empty-state" style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                <i class="fas fa-users" style="font-size: 2rem; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
+                {% trans "O'quvchilar topilmadi" %}
+            </div>
+            {% endfor %}
+            <div id="no-results" style="display: none; grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                {% trans "Qidiruv bo'yicha hech narsa topilmadi" %}
+            </div>
+        </div>
+        <div style="margin-top: 16px;">
+            {% include 'pagination.html' %}
+        </div>
     </div>
 </div>
 
@@ -77,7 +98,7 @@ function togglePassword(id) {
     const hidden = document.getElementById('pass-' + id);
     const visible = document.getElementById('pass-val-' + id);
     const eye = document.getElementById('eye-' + id);
-    
+
     if (visible.style.display === 'none') {
         visible.style.display = 'inline';
         hidden.style.display = 'none';
@@ -93,13 +114,10 @@ function togglePassword(id) {
 
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
     const rows = document.querySelectorAll('.student-row');
     const noResults = document.getElementById('no-results');
     const emptyState = document.getElementById('empty-state');
-
-    searchInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') e.preventDefault();
-    });
 
     searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
@@ -120,11 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             noResults.style.display = 'none';
         }
-        
-        if (emptyState && query.length > 0) {
-            emptyState.style.display = 'none';
-        } else if (emptyState && query.length === 0 && rows.length === 0) {
-            emptyState.style.display = '';
+        if (emptyState) {
+            emptyState.style.display = (query.length === 0 && rows.length === 0) ? '' : 'none';
         }
     });
 });

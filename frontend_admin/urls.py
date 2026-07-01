@@ -19,8 +19,10 @@ urlpatterns = [
     path('muassasalar/<int:pk>/edit/', views.muassasa_edit, name='muassasa_edit'),
     path('muassasalar/<int:pk>/delete/', views.muassasa_delete, name='muassasa_delete'),
     path('statistics/', views.statistics, name='statistics'),
+    path('statistics/json/', views.statistics_json, name='statistics_json'),
     path('logs/', views.system_logs, name='system_logs'),
     path('users/', views.all_users_list, name='all_users_list'),
+    path('users/<int:pk>/', views.user_detail, name='user_detail'),
     path('books/', views.all_books_list, name='all_books_list'),
     path('active-loans/', views.all_active_loans_list, name='all_active_loans_list'),
     path('admin/add/', views.admin_add, name='admin_add'),
@@ -34,4 +36,5 @@ urlpatterns = [
     path('news/<int:pk>/edit/', views.news_edit, name='news_edit'),
     path('news/<int:pk>/delete/', views.news_delete, name='news_delete'),
     path('check-username/', views.check_username, name='check_username'),
+    path('statistics/create-news/', views.create_stats_news, name='create_stats_news'),
 ]

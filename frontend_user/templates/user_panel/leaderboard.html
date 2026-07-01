@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Top o'quvchilar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Eng yaxshi o'quvchilar" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'user_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <!-- Period Tabs -->
+    <div class="glass-panel" style="padding: 15px; margin-bottom: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="?period=week" class="btn-small {% if current_period == 'week' %}btn-primary{% else %}glass-card{% endif %}" style="padding: 8px 20px; text-decoration: none; border-radius: 10px;">
+            <i class="fas fa-calendar-week"></i> {% trans "Hafta" %}
+        </a>
+        <a href="?period=month" class="btn-small {% if current_period == 'month' %}btn-primary{% else %}glass-card{% endif %}" style="padding: 8px 20px; text-decoration: none; border-radius: 10px;">
+            <i class="fas fa-calendar-alt"></i> {% trans "Oy" %}
+        </a>
+        <a href="?period=all" class="btn-small {% if current_period == 'all' %}btn-primary{% else %}glass-card{% endif %}" style="padding: 8px 20px; text-decoration: none; border-radius: 10px;">
+            <i class="fas fa-infinity"></i> {% trans "Barcha vaqt" %}
+        </a>
+    </div>
+
+    <!-- Leaderboard Table -->
+    <div class="glass-panel" style="padding: 20px; overflow: hidden;">
+        {% if students %}
+        <table class="leaderboard-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="padding: 15px 10px; text-align: left; width: 60px;">#</th>
+                    <th style="padding: 15px 10px; text-align: left;">{% trans "O'quvchi" %}</th>
+                    <th style="padding: 15px 10px; text-align: center;">{% trans "Daraja" %}</th>
+                    <th style="padding: 15px 10px; text-align: center;">XP</th>
+                    <th style="padding: 15px 10px; text-align: center;">{% trans "Kitoblar" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr style="border-bottom: 1px solid var(--border); transition: 0.3s;" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 15px 10px;">
+                        {% if forloop.counter == 1 %}
+                        <span style="font-size: 1.5rem;">🥇</span>
+                        {% elif forloop.counter == 2 %}
+                        <span style="font-size: 1.5rem;">🥈</span>
+                        {% elif forloop.counter == 3 %}
+                        <span style="font-size: 1.5rem;">🥉</span>
+                        {% else %}
+                        <span style="color: var(--text-muted); font-weight: 700;">{{ forloop.counter }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px 10px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fas {{ student.selected_icon|default:'fa-user' }}" style="color: white; font-size: 1rem;"></i>
+                            </div>
+                            <div>
+                                <strong>{{ student.first_name }} {{ student.last_name }}</strong>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ student.grade|default:"-" }} {% trans "sinf" %}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 15px 10px; text-align: center;">
+                        <span class="level-badge" style="background: var(--primary); color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.8rem;">
+                            {{ student.level }}
+                        </span>
+                    </td>
+                    <td style="padding: 15px 10px; text-align: center; font-weight: 700; color: var(--primary);">
+                        {{ student.xp_points }}
+                    </td>
+                    <td style="padding: 15px 10px; text-align: center;">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                            <i class="fas fa-book" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <strong>{{ student.period_books }}</strong>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+            <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+            <p>{% trans "Hozircha ma'lumot yo'q" %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.leaderboard-table tr:last-child {
+    border-bottom: none !important;
+}
+.btn-small {
+    transition: 0.3s;
+}
+.btn-small:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

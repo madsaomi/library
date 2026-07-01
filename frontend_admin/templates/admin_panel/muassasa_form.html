@@ -9,35 +9,63 @@
 {% endblock %}
 
 {% block content %}
-<div style="max-width: 600px; margin: 0 auto;">
-    <div class="glass-panel animate-fade" style="padding: 40px;">
-        <form method="post">
+<div style="max-width: 480px; margin: 0 auto;">
+    <div class="glass-panel animate-fade" style="padding: 32px;">
+        <form method="post" id="instForm">
             {% csrf_token %}
-            <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
-                {% for field in form %}
-                <div class="form-group">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
-                        {% if field.name == 'name' %}<i class="fas fa-building" style="color: var(--primary); margin-right: 8px;"></i>{% endif %}
-                        {% if field.name == 'address' %}<i class="fas fa-map-marker-alt" style="color: var(--secondary); margin-right: 8px;"></i>{% endif %}
-                        {{ field.label }}
-                    </label>
-                    {{ field }}
-                    {% if field.errors %}
-                    <p style="color: #ef4444; font-size: 0.8rem; margin-top: 5px;">{{ field.errors.0 }}</p>
-                    {% endif %}
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Muassasa nomi" %}</label>
+                {{ form.name }}
+                <div style="display: flex; justify-content: flex-end;">
+                    <span id="name-counter" style="font-size: 0.65rem; color: var(--text-muted);">0 / 150</span>
                 </div>
-                {% endfor %}
+                {% if form.name.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.name.errors.0 }}</span>{% endif %}
             </div>
-            
-            <div style="margin-top: 25px; display: flex; gap: 12px;">
-                <button type="submit" class="btn-primary" style="flex: 2; padding: 18px; border-radius: 16px; font-weight: 700;">
-                    <i class="fas fa-save"></i> {% trans "Saqlash" %}
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 32px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Manzil" %}</label>
+                {{ form.address }}
+                <div style="display: flex; justify-content: flex-end;">
+                    <span id="address-counter" style="font-size: 0.65rem; color: var(--text-muted);">0 / 255</span>
+                </div>
+                {% if form.address.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.address.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;">
+                    <i class="fas fa-check"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend_admin:muassasalar_list' %}" class="glass-card" style="flex: 1; padding: 18px; border-radius: 16px; text-align: center; text-decoration: none; color: var(--text-main); display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--border); transition: 0.3s;" onmouseover="this.style.background='var(--glass)'" onmouseout="this.style.background='transparent'">
+                <a href="{% url 'frontend_admin:muassasalar_list' %}" class="glass-card" style="flex: 1; padding: 12px; border-radius: 10px; text-align: center; text-decoration: none; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--border); font-size: 0.85rem;">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.querySelector('[name="name"]');
+    const addressInput = document.querySelector('[name="address"]');
+    const nameCounter = document.getElementById('name-counter');
+    const addressCounter = document.getElementById('address-counter');
+
+    function updateCounter(input, counter, max) {
+        if (!input || !counter) return;
+        const len = input.value.length;
+        counter.textContent = len + ' / ' + max;
+        counter.style.color = len > max ? '#ef4444' : 'var(--text-muted)';
+    }
+
+    if (nameInput) {
+        nameInput.addEventListener('input', function() { updateCounter(this, nameCounter, 150); });
+        updateCounter(nameInput, nameCounter, 150);
+    }
+    if (addressInput) {
+        addressInput.addEventListener('input', function() { updateCounter(this, addressCounter, 255); });
+        updateCounter(addressInput, addressCounter, 255);
+    }
+});
+</script>
 {% endblock %}

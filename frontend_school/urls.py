@@ -10,6 +10,7 @@ urlpatterns = [
     path('books/', views.books_list, name='books_list'),
     path('issued-books/', views.issued_books_list, name='issued_books_list'),
     path('history/', views.history_list, name='history_list'),
+    path('statistics/', views.statistics, name='statistics'),
     path('news/', views.news_list, name='news_list'),
     path('qr-scanner/', views.qr_unified, name='qr_scanner'),
     path('process-qr/', views.process_qr, name='process_qr'),
@@ -29,4 +30,6 @@ urlpatterns = [
     path('news/<int:pk>/delete/', views.news_delete, name='news_delete'),
     path('profile/', views.profile, name='profile'),
     path('profile/password/', views.change_password, name='change_password'),
+    path('graduates/', views.graduates_list, name='graduates_list'),
+    path('statistics/post-news/<int:pk>/', views.post_top_student_news, name='post_top_student_news'),
 ]

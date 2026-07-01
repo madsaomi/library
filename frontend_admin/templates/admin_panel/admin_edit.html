@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ title }} | Online Kutibxona{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'admin_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 480px; margin: 0 auto;">
+    <div class="glass-panel animate-fade" style="padding: 32px;">
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Ism" %}</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.first_name.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Familiya" %}</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.last_name.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Username" %}</label>
+                <div style="padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text-muted); font-size: 0.85rem; opacity: 0.6;">
+                    {{ form.instance.username }}
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 32px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Maktab" %}</label>
+                {{ form.school }}
+                {% if form.school.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.school.errors.0 }}</span>{% endif %}
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--border); margin-bottom: 24px;">
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 32px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Parol" %}</label>
+                {{ form.password }}
+                {% if form.password.help_text %}<span style="color: var(--text-muted); font-size: 0.7rem;">{{ form.password.help_text }}</span>{% endif %}
+                {% if form.password.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.password.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;">
+                    <i class="fas fa-check"></i> {% trans "Saqlash" %}
+                </button>
+                <a href="{% url 'frontend_admin:all_users_list' %}" class="glass-card" style="flex: 1; padding: 12px; border-radius: 10px; text-align: center; text-decoration: none; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--border); font-size: 0.85rem;">
+                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
