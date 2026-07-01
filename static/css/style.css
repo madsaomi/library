@@ -191,11 +191,11 @@ select option,
 }
 
 /* Responsive grid helpers - use instead of inline grid styles */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
-.grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
+.grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 24px; }
 
 .table-responsive-wrap {
   width: 100%;
@@ -424,7 +424,7 @@ select option,
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 15px;
+  gap: 16px;
 }
 
 .stat-card {
@@ -674,7 +674,7 @@ select option,
 
   .stat-grid {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
-    gap: 10px;
+    gap: 12px !important;
   }
 
   .stat-card {
