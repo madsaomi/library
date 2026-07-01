@@ -9,67 +9,113 @@
 {% endblock %}
 
 {% block content %}
-<div class="glass-panel animate-fade" style="padding: 30px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; flex-wrap: wrap;">
-        <h3><i class="fas fa-users" style="color: var(--secondary); margin-right: 10px;"></i> {% trans "Tizimdagi barcha foydalanuvchilar" %}</h3>
-        
-        <div style="display: flex; gap: 15px; flex: 1; max-width: 500px;">
-            <div style="position: relative; flex: 1;">
-                <input type="text" id="search-input" placeholder="{% trans 'Username, ism yoki maktab bo\'yicha qidirish...' %}" 
-                       style="width: 100%; padding: 12px 20px 12px 45px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; color: var(--input-text); outline: none; transition: 0.3s;">
-                <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-            </div>
-            <a href="{% url 'frontend_admin:admin_add' %}" class="btn-primary" style="padding: 12px 20px; text-decoration: none; white-space: nowrap;">
-                <i class="fas fa-plus"></i> {% trans "Yangi Admin" %}
-            </a>
+<div class="animate-fade">
+    <div class="stat-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 20px;">
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ total_count }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">{% trans "Jami" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ student_count }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">{% trans "O'quvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #f59e0b;">{{ teacher_count }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">{% trans "O'qituvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #6366f1;">{{ school_admin_count }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">{% trans "Adminlar" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #f43f5e;">{{ active_today }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">{% trans "Bugun kirdi" %}</div>
         </div>
     </div>
-    
-    <div class="table-container" style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Username" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Ism Familiya" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Rol" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Maktab" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Qo'shilgan sana" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Amallar" %}</th>
-                </tr>
-            </thead>
-            <tbody id="user-table-body">
-                {% for user in users %}
-                <tr class="user-row" data-search="{{ user.username|lower }} {{ user.first_name|lower }} {{ user.last_name|lower }} {{ user.school.name|default:''|lower }}" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s;">
-                    <td style="padding: 15px; font-weight: 600;">{{ user.username }}</td>
-                    <td style="padding: 15px; color: var(--text-muted);">{{ user.get_full_name|default:"-" }}</td>
-                    <td style="padding: 15px;">
-                        <span class="badge" style="background: rgba(168, 85, 247, 0.1); color: var(--secondary); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem;">
-                            {{ user.get_role_display }}
-                        </span>
-                    </td>
-                    <td style="padding: 15px; color: var(--text-muted);">{% if user.school %}{{ user.school.name }}{% else %}-{% endif %}</td>
-                    <td style="padding: 15px; color: var(--text-muted);">{{ user.date_joined|date:"Y-m-d H:i" }}</td>
-                    <td style="padding: 15px;">
+
+    <div class="glass-panel" style="padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; gap: 16px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <a href="{% url 'frontend_admin:all_users_list' %}" class="glass-card" style="padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.78rem; {% if not role_filter %}background: var(--primary); color: #fff;{% else %}color: var(--text-muted);{% endif %}">{% trans "Barcha" %}</a>
+                <a href="{% url 'frontend_admin:all_users_list' %}?role=student" class="glass-card" style="padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.78rem; {% if role_filter == 'student' %}background: #10b981; color: #fff;{% else %}color: var(--text-muted);{% endif %}">{% trans "O'quvchilar" %}</a>
+                <a href="{% url 'frontend_admin:all_users_list' %}?role=teacher" class="glass-card" style="padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.78rem; {% if role_filter == 'teacher' %}background: #f59e0b; color: #fff;{% else %}color: var(--text-muted);{% endif %}">{% trans "O'qituvchilar" %}</a>
+                <a href="{% url 'frontend_admin:all_users_list' %}?role=school_admin" class="glass-card" style="padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.78rem; {% if role_filter == 'school_admin' %}background: #6366f1; color: #fff;{% else %}color: var(--text-muted);{% endif %}">{% trans "Adminlar" %}</a>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <div style="position: relative;">
+                    <input type="text" id="search-input" placeholder="{% trans 'Qidirish...' %}"
+                           style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none; width: 200px; font-size: 0.8rem;">
+                    <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
+                </div>
+                <a href="{% url 'frontend_admin:admin_add' %}" class="btn-primary" style="padding: 8px 16px; text-decoration: none; white-space: nowrap; font-size: 0.8rem;">
+                    <i class="fas fa-plus"></i> {% trans "Yangi Admin" %}
+                </a>
+            </div>
+        </div>
+
+        <div class="table-container" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <th style="padding: 10px 12px; color: var(--text-muted); font-weight: 500;">{% trans "Foydalanuvchi" %}</th>
+                        <th style="padding: 10px 12px; color: var(--text-muted); font-weight: 500;">{% trans "Rol" %}</th>
+                        <th style="padding: 10px 12px; color: var(--text-muted); font-weight: 500;">{% trans "Holat" %}</th>
+                        <th style="padding: 10px 12px; color: var(--text-muted); font-weight: 500;">{% trans "Maktab" %}</th>
+                        <th style="padding: 10px 12px; color: var(--text-muted); font-weight: 500;">{% trans "Oxirgi kirish" %}</th>
+                        <th style="padding: 10px 12px; color: var(--text-muted); font-weight: 500;">{% trans "Ro'yxatdan o'tgan" %}</th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body">
+                    {% for user in users %}
+                    <tr class="user-row" data-search="{{ user.username|lower }} {{ user.first_name|lower }} {{ user.last_name|lower }} {{ user.school.name|default:''|lower }}"
                         {% if user.role == 'school_admin' %}
-                        <a href="{% url 'frontend_admin:admin_edit' user.pk %}" class="glass-card" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: var(--accent); border: 1px solid rgba(245, 158, 11, 0.25); transition: 0.3s;" title="{% trans 'Tahrirlash' %}">
-                            <i class="fas fa-edit"></i>
-                        </a>
+                        onclick="window.location='{% url 'frontend_admin:admin_edit' user.pk %}'"
+                        {% else %}
+                        onclick="window.location='{% url 'frontend_admin:user_detail' user.pk %}'"
                         {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr id="empty-state">
-                    <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-muted);">
-                        {% trans "Foydalanuvchilar topilmadi" %}
-                    </td>
-                </tr>
-                {% endfor %}
-                <tr id="no-results" style="display: none;">
-                    <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-muted);">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% include 'pagination.html' %}
+                        style="border-bottom: 1px solid rgba(255,255,255,0.04); transition: 0.2s; cursor: pointer;">
+                        <td style="padding: 10px 12px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="avatar-circle" style="width: 32px; height: 32px; min-width: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center;">
+                                    <span class="avatar-initials" style="color: #fff; font-weight: 600; font-size: 0.7rem;">
+                                        {{ user.first_name|first|default:user.username|first|upper }}{{ user.last_name|first|upper }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-main); font-size: 0.82rem;">{{ user.username }}</div>
+                                    <div style="color: var(--text-muted); font-size: 0.7rem;">{{ user.get_full_name|default:"" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 10px 12px;">
+                            <span class="badge" style="background: rgba(168,85,247,0.1); color: var(--secondary); padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; white-space: nowrap;">
+                                {{ user.get_role_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 10px 12px;">
+                            <span style="display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: {% if user.is_active %}#10b981{% else %}#ef4444{% endif %};">
+                                <span style="width: 7px; height: 7px; border-radius: 50%; background: {% if user.is_active %}#10b981{% else %}#ef4444{% endif %}; display: inline-block;"></span>
+                                {{ user.is_active|yesno:_("Faol,Faolsiz") }}
+                            </span>
+                        </td>
+                        <td style="padding: 10px 12px; color: var(--text-muted); font-size: 0.75rem;">{% if user.school %}{{ user.school.name|truncatechars:18 }}{% else %}<span style="color: rgba(255,255,255,0.2);">—</span>{% endif %}</td>
+                        <td style="padding: 10px 12px; color: var(--text-muted); font-size: 0.72rem;">{{ user.last_login|date:"Y-m-d H:i"|default:"—" }}</td>
+                        <td style="padding: 10px 12px; color: var(--text-muted); font-size: 0.72rem;">{{ user.date_joined|date:"Y-m-d" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr id="empty-state">
+                        <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                            {% trans "Foydalanuvchilar topilmadi" %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="no-results" style="display: none;">
+                        <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {% include 'pagination.html' %}
+        </div>
     </div>
 </div>
 
@@ -99,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             noResults.style.display = 'none';
         }
-        
+
         if (emptyState && query.length > 0) {
             emptyState.style.display = 'none';
         } else if (emptyState && query.length === 0 && rows.length === 0) {

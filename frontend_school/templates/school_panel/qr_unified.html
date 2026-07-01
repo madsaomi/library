@@ -7,169 +7,95 @@
 {% block extra_head %}
 <script src="https://unpkg.com/html5-qrcode"></script>
 <style>
-    #reader {
-        width: 100%;
-        border-radius: 20px;
-        overflow: hidden;
-        border: none !important;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
+    #reader { width: 100%; border-radius: 14px; overflow: hidden; border: none !important; }
     #reader__dashboard_section_csr button {
-        background: var(--primary) !important;
-        color: white !important;
-        border: none !important;
-        padding: 12px 24px !important;
-        border-radius: 12px !important;
-        cursor: pointer !important;
-        font-weight: 600 !important;
-        transition: 0.3s !important;
+        background: var(--primary) !important; color: white !important; border: none !important;
+        padding: 10px 20px !important; border-radius: 8px !important; cursor: pointer !important;
+        font-weight: 600 !important; transition: 0.3s !important;
     }
-    #reader__dashboard_section_csr button:hover {
-        filter: brightness(1.2);
-        transform: translateY(-2px);
-    }
-
-    /* Modal Styles */
+    #reader__dashboard_section_csr button:hover { filter: brightness(1.2); transform: translateY(-1px); }
     .qr-modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(10px);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        padding: 20px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
+        position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+        display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px;
+        opacity: 0; transition: opacity 0.3s ease;
     }
-    .qr-modal-overlay.active {
-        display: flex;
-        opacity: 1;
-    }
+    .qr-modal-overlay.active { display: flex; opacity: 1; }
     .qr-modal-content {
-        background: var(--modal-bg);
-        border: 1px solid var(--modal-border);
-        border-radius: 24px;
-        padding: 30px;
-        width: 100%;
-        max-width: 420px;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
-        transform: translateY(20px);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        background: var(--modal-bg); border: 1px solid var(--modal-border); border-radius: 20px;
+        padding: 28px; width: 100%; max-width: 380px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
     }
-    .qr-modal-overlay.active .qr-modal-content {
-        transform: translateY(0);
-    }
-    .qr-modal-header {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-    .qr-modal-header h3 {
-        margin-bottom: 8px;
-    }
-    .qr-modal-header p {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-    }
-    .qr-modal-footer {
-        display: flex;
-        gap: 12px;
-        margin-top: 25px;
-    }
-    .qr-modal-footer button {
-        flex: 1;
-        padding: 12px;
-        border-radius: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-    .btn-secondary {
-        background: var(--modal-btn-secondary-bg);
-        border: 1px solid var(--modal-btn-secondary-border);
-        color: var(--modal-btn-secondary-text);
-    }
-    .btn-secondary:hover {
-        background: var(--glass);
-    }
+    .qr-modal-overlay.active .qr-modal-content { transform: translateY(0); }
 </style>
 {% endblock %}
 
 {% block sidebar_nav %}
-<a href="{% url 'frontend_school:dashboard' %}" class="nav-link">
-    <i class="fas fa-chart-line"></i> <span>{% trans "Dashboard" %}</span>
-</a>
-<a href="{% url 'frontend_school:qr_scanner' %}" class="nav-link active">
-    <i class="fas fa-qrcode"></i> <span>{% trans "QR Skaner" %}</span>
-</a>
-<a href="{% url 'frontend_school:students_list' %}" class="nav-link">
-    <i class="fas fa-users"></i> <span>{% trans "O'quvchilar" %}</span>
-</a>
-<a href="{% url 'frontend_school:teachers_list' %}" class="nav-link">
-    <i class="fas fa-chalkboard-teacher"></i> <span>{% trans "O'qituvchilar" %}</span>
-</a>
-<a href="{% url 'frontend_school:books_list' %}" class="nav-link">
-    <i class="fas fa-book"></i> <span>{% trans "Kitoblar" %}</span>
-</a>
-<a href="{% url 'frontend_school:news_list' %}" class="nav-link">
-    <i class="fas fa-newspaper"></i> <span>{% trans "Yangiliklar" %}</span>
-</a>
+{% include 'school_panel/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
-<div style="max-width: 700px; margin: 0 auto;">
-    <div class="glass-panel animate-fade" style="padding: 30px 20px; text-align: center;">
-        <div style="margin-bottom: 25px;">
-            <div style="width: 70px; height: 70px; background: rgba(217, 119, 6, 0.1); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                <i class="fas fa-camera" style="font-size: 2rem; color: var(--primary);"></i>
-            </div>
-            <h2 style="margin-bottom: 5px; font-size: 1.4rem;">{% trans "Kitob berish yoki qabul qilish" %}</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 400px; margin: 0 auto;">{% trans "O'quvchi telefonidagi QR-kodni skanerlang. Tizim amal turini o'zi aniqlaydi." %}</p>
+<div class="animate-fade">
+    <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ today_scans|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Bugungi skaner" %}</div>
         </div>
-        
-        <div id="reader-container" style="display: none; margin-bottom: 25px;">
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #6366f1;">{{ today_issues|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Berilgan" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ today_returns|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Qaytarilgan" %}</div>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding: 24px; max-width: 500px; margin: 0 auto; text-align: center;">
+        <div style="width: 56px; height: 56px; background: rgba(99,102,241,0.1); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+            <i class="fas fa-camera" style="font-size: 1.5rem; color: var(--primary);"></i>
+        </div>
+        <h3 style="margin-bottom: 4px; font-size: 1.1rem;">{% trans "Kitob berish yoki qabul qilish" %}</h3>
+        <p style="color: var(--text-muted); font-size: 0.78rem; margin-bottom: 20px;">{% trans "O'quvchi telefonidagi QR-kodni skanerlang" %}</p>
+
+        <div id="reader-container" style="display: none; margin-bottom: 20px;">
             <div id="reader"></div>
         </div>
 
-        <div id="scanner-placeholder" class="glass-card" style="width: 100%; height: 300px; display: flex; align-items: center; justify-content: center; border: 2px dashed rgba(255,255,255,0.1); margin-bottom: 25px; position: relative; overflow: hidden; cursor: pointer; transition: 0.3s;" onclick="startScanner()" onmouseover="this.style.borderColor='var(--primary)'; this.style.background='rgba(255,255,255,0.02)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='transparent';">
-            <div style="text-align: center; z-index: 1;">
-                <i class="fas fa-qrcode" style="font-size: 3.5rem; color: var(--primary); opacity: 0.5; margin-bottom: 20px; display: block;"></i>
-                <p style="color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">{% trans "Skanerlashni boshlash uchun bosing" %}</p>
+        <div id="scanner-placeholder" class="glass-card" style="height: 220px; display: flex; align-items: center; justify-content: center; border: 2px dashed rgba(255,255,255,0.1); margin-bottom: 20px; cursor: pointer; transition: 0.3s; position: relative;" onclick="startScanner()" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+            <div>
+                <i class="fas fa-qrcode" style="font-size: 2.5rem; color: var(--primary); opacity: 0.4; display: block; margin-bottom: 12px;"></i>
+                <p style="color: var(--text-muted); font-size: 0.8rem;">{% trans "Skanerlashni boshlash uchun bosing" %}</p>
             </div>
-            <!-- Decorative corners -->
-            <div style="position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; border-top: 3px solid var(--primary); border-left: 3px solid var(--primary); border-top-left-radius: 12px;"></div>
-            <div style="position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border-top: 3px solid var(--primary); border-right: 3px solid var(--primary); border-top-right-radius: 12px;"></div>
-            <div style="position: absolute; bottom: 20px; left: 20px; width: 40px; height: 40px; border-bottom: 3px solid var(--primary); border-left: 3px solid var(--primary); border-bottom-left-radius: 12px;"></div>
-            <div style="position: absolute; bottom: 20px; right: 20px; width: 40px; height: 40px; border-bottom: 3px solid var(--primary); border-right: 3px solid var(--primary); border-bottom-right-radius: 12px;"></div>
+            <div style="position: absolute; top: 12px; left: 12px; width: 28px; height: 28px; border-top: 2px solid var(--primary); border-left: 2px solid var(--primary); border-top-left-radius: 8px;"></div>
+            <div style="position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-top: 2px solid var(--primary); border-right: 2px solid var(--primary); border-top-right-radius: 8px;"></div>
+            <div style="position: absolute; bottom: 12px; left: 12px; width: 28px; height: 28px; border-bottom: 2px solid var(--primary); border-left: 2px solid var(--primary); border-bottom-left-radius: 8px;"></div>
+            <div style="position: absolute; bottom: 12px; right: 12px; width: 28px; height: 28px; border-bottom: 2px solid var(--primary); border-right: 2px solid var(--primary); border-bottom-right-radius: 8px;"></div>
         </div>
 
-        <div id="result-message" class="glass-card" style="display: none; padding: 25px; margin-bottom: 25px; border-left: 5px solid #10b981; text-align: left; background: rgba(255,255,255,0.03);">
-            <div style="display: flex; align-items: flex-start; gap: 15px;">
-                <div id="res-icon-bg" style="width: 45px; height: 45px; border-radius: 50%; background: #10b981; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i id="res-icon" class="fas fa-check" style="color: white; font-size: 1.2rem;"></i>
+        <div id="result-message" style="display: none; padding: 16px; margin-bottom: 20px; border-radius: 12px; border-left: 4px solid #10b981; background: var(--input-bg); text-align: left;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <div id="res-icon-bg" style="width: 36px; height: 36px; border-radius: 50%; background: #10b981; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i id="res-icon" class="fas fa-check" style="color: white; font-size: 0.9rem;"></i>
                 </div>
-                <div>
-                    <h4 id="res-status" style="color: #10b981; margin-bottom: 5px; font-size: 1.1rem; font-weight: 700;">{% trans "Muvaffaqiyatli!" %}</h4>
-                    <p id="res-text" style="color: var(--text-main); font-size: 0.95rem; line-height: 1.5;"></p>
+                <div style="flex: 1;">
+                    <h4 id="res-status" style="color: #10b981; margin: 0 0 2px 0; font-size: 0.9rem; font-weight: 700;">{% trans "Muvaffaqiyatli!" %}</h4>
+                    <p id="res-text" style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;"></p>
                 </div>
             </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
-            <button id="start-btn" class="btn-primary" style="padding: 18px 40px; width: 100%; max-width: 350px; font-size: 1.1rem; border-radius: 16px;" onclick="startScanner()">
-                <i class="fas fa-camera"></i> &nbsp; {% trans "Skanerni yoqish" %}
+        <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <button id="start-btn" class="btn-primary" style="padding: 12px 0; width: 100%; max-width: 300px; font-size: 0.9rem; border-radius: 10px;" onclick="startScanner()">
+                <i class="fas fa-camera"></i> {% trans "Skanerni yoqish" %}
             </button>
-            <button id="manual-entry-btn" class="glass-card" style="padding: 15px; width: 100%; max-width: 350px; background: var(--hover-bg); border: 1px solid var(--border); color: var(--text-main); display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 16px; cursor: pointer; transition: 0.3s;" onclick="showManualModal()">
-                <i class="fas fa-keyboard" style="color: var(--primary);"></i> <span>{% trans "Kod orqali kiritish" %}</span>
+            <button id="manual-entry-btn" class="glass-card" style="padding: 10px 0; width: 100%; max-width: 300px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; cursor: pointer; font-size: 0.85rem;" onclick="showManualModal()">
+                <i class="fas fa-keyboard" style="color: var(--primary);"></i> {% trans "Kod orqali kiritish" %}
             </button>
         </div>
-        
-        <div style="margin-top: 40px;">
-            <a href="{% url 'frontend_school:dashboard' %}" style="color: var(--text-muted); text-decoration: none; font-size: 0.95rem; opacity: 0.7; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+
+        <div style="margin-top: 24px;">
+            <a href="{% url 'frontend_school:dashboard' %}" style="color: var(--text-muted); text-decoration: none; font-size: 0.8rem; opacity: 0.6; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
                 <i class="fas fa-arrow-left"></i> {% trans "Orqaga qaytish" %}
             </a>
         </div>
@@ -179,23 +105,21 @@
 <!-- Manual Entry Modal -->
 <div id="manual-modal" class="qr-modal-overlay">
     <div class="qr-modal-content">
-        <div class="qr-modal-header">
-            <h3>{% trans "Kod orqali kiritish" %}</h3>
-            <p>{% trans "Amal turini tanlang va tokenni kiriting" %}</p>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 4px;">{% trans "Kod orqali kiritish" %}</h4>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0;">{% trans "Amal turini tanlang va tokenni kiriting" %}</p>
         </div>
-        <div class="qr-modal-body">
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button id="type-req" class="btn-primary" style="flex: 1; padding: 10px; font-size: 0.85rem; background: var(--primary);" onclick="setManualType('REQ_')">{% trans "Kitob berish" %}</button>
-                <button class="btn-primary" style="flex: 1; padding: 10px; font-size: 0.85rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border);" id="type-ret" onclick="setManualType('RET_')">{% trans "Kitob qabul" %}</button>
-            </div>
-            <div style="display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; padding: 0 15px;">
-                <span id="prefix-display" style="color: var(--primary); font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; border-right: 1px solid var(--border); padding-right: 15px; margin-right: 15px;">REQ_</span>
-                <input type="text" id="manual-token" class="form-control" style="flex: 1; background: transparent; border: none; color: var(--input-text); padding: 15px 0; font-size: 1.1rem; letter-spacing: 2px; outline: none; text-transform: uppercase;" placeholder="1_A2B3C4D5">
-            </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <button id="type-req" class="btn-primary" style="flex: 1; padding: 8px; font-size: 0.8rem; background: var(--primary); border-radius: 8px;" onclick="setManualType('REQ_')">{% trans "Kitob berish" %}</button>
+            <button id="type-ret" style="flex: 1; padding: 8px; font-size: 0.8rem; border-radius: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;" onclick="setManualType('RET_')">{% trans "Kitob qabul" %}</button>
         </div>
-        <div class="qr-modal-footer">
-            <button id="modal-cancel-btn" class="btn-secondary" onclick="closeManualModal()">{% trans "Bekor qilish" %}</button>
-            <button id="modal-confirm-btn" class="btn-primary" onclick="submitManualToken()">{% trans "Tasdiqlash" %}</button>
+        <div style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 0 12px;">
+            <span id="prefix-display" style="color: var(--primary); font-weight: 700; font-size: 0.95rem; border-right: 1px solid var(--border); padding-right: 12px; margin-right: 12px;">REQ_</span>
+            <input type="text" id="manual-token" style="flex: 1; background: transparent; border: none; color: var(--input-text); padding: 12px 0; font-size: 0.95rem; outline: none; text-transform: uppercase;" placeholder="1_A2B3C4D5">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button id="modal-cancel-btn" class="glass-card" style="flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); font-size: 0.8rem;" onclick="closeManualModal()">{% trans "Bekor qilish" %}</button>
+            <button id="modal-confirm-btn" class="btn-primary" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.8rem;" onclick="submitManualToken()">{% trans "Tasdiqlash" %}</button>
         </div>
     </div>
 </div>
@@ -205,18 +129,14 @@ var modalEl = document.getElementById('manual-modal');
 var QR_currentPrefix = 'REQ_';
 
 function showManualModal() {
-    if (!modalEl || !document.body.contains(modalEl)) {
-        return;
-    }
+    if (!modalEl || !document.body.contains(modalEl)) return;
     modalEl.classList.add('active');
     document.getElementById('manual-token').value = '';
     setManualType('REQ_');
     setTimeout(function() { document.getElementById('manual-token').focus(); }, 300);
 }
 
-function closeManualModal() {
-    document.getElementById('manual-modal').classList.remove('active');
-}
+function closeManualModal() { document.getElementById('manual-modal').classList.remove('active'); }
 
 function setManualType(prefix) {
     QR_currentPrefix = prefix;
@@ -225,24 +145,24 @@ function setManualType(prefix) {
     var ret = document.getElementById('type-ret');
     if (prefix === 'REQ_') {
         req.style.background = 'var(--primary)';
-        ret.style.background = 'rgba(255,255,255,0.05)';
+        req.style.color = 'white';
+        ret.style.background = 'var(--input-bg)';
+        ret.style.color = 'var(--text-muted)';
     } else {
-        ret.style.background = 'linear-gradient(135deg, var(--secondary), #7c3aed)';
-        req.style.background = 'rgba(255,255,255,0.05)';
+        ret.style.background = '#10b981';
+        ret.style.color = 'white';
+        req.style.background = 'var(--input-bg)';
+        req.style.color = 'var(--text-muted)';
     }
 }
 
 function submitManualToken() {
     var input = document.getElementById('manual-token');
     var val = input.value.trim();
-    if (val.length > 0) {
-        closeManualModal();
-        processToken(QR_currentPrefix + val);
-    }
+    if (val.length > 0) { closeManualModal(); processToken(QR_currentPrefix + val); }
 }
 
 function processToken(token) {
-    var startBtn = document.getElementById('start-btn');
     var resultMsg = document.getElementById('result-message');
     var resStatus = document.getElementById('res-status');
     var resText = document.getElementById('res-text');
@@ -251,17 +171,14 @@ function processToken(token) {
 
     fetch("{% url 'frontend_school:process_qr_unified' %}", {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
         body: JSON.stringify({ token: token })
     })
-    .then(function(response) { return response.json(); })
+    .then(function(r) { return r.json(); })
     .then(function(data) {
         resultMsg.style.display = 'block';
-        startBtn.disabled = false;
-        startBtn.style.opacity = '1';
+        document.getElementById('start-btn').disabled = false;
+        document.getElementById('start-btn').style.opacity = '1';
 
         if (data.status === 'success') {
             var isIssue = token.startsWith('REQ_');
@@ -271,9 +188,9 @@ function processToken(token) {
             resultMsg.style.borderLeftColor = themeColor;
             resIconBg.style.background = themeColor;
             resIcon.className = isIssue ? 'fas fa-book-reader' : 'fas fa-check';
-    resText.innerHTML = '<strong></strong><br><span style="opacity: 0.8">{% trans "Foydalanuvchi" %}: <span id="res-student-name"></span></span>';
-    if (data.student) document.getElementById('res-student-name').textContent = data.student;
-    if (data.message) document.getElementById('res-text').querySelector('strong').textContent = data.message;
+            resText.innerHTML = '<strong></strong><br><span style="opacity:0.8">{% trans "Foydalanuvchi" %}: <span id="res-student-name"></span></span>';
+            if (data.student) document.getElementById('res-student-name').textContent = data.student;
+            if (data.message) resText.querySelector('strong').textContent = data.message;
         } else {
             resStatus.innerText = "{% trans 'Xatolik!' %}";
             resStatus.style.color = "#ef4444";
@@ -283,10 +200,10 @@ function processToken(token) {
             resText.innerText = data.message;
         }
     })
-    .catch(function(error) {
-        console.error('Error:', error);
-        startBtn.disabled = false;
-        startBtn.style.opacity = '1';
+    .catch(function(err) {
+        console.error(err);
+        document.getElementById('start-btn').disabled = false;
+        document.getElementById('start-btn').style.opacity = '1';
         alert("{% trans 'Tizimda xatolik yuz berdi' %}");
     });
 }
@@ -304,41 +221,67 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <script>
-    try {
-        const html5QrCode = new Html5Qrcode("reader");
+var html5QrCode = null;
 
-        function startScanner() {
-            var ph = document.getElementById('scanner-placeholder');
-            var rc = document.getElementById('reader-container');
-            var rm = document.getElementById('result-message');
-            var sb = document.getElementById('start-btn');
-            ph.style.display = 'none';
-            rc.style.display = 'block';
-            rm.style.display = 'none';
-            sb.disabled = true;
-            sb.style.opacity = '0.5';
+function startScanner() {
+    var ph = document.getElementById('scanner-placeholder');
+    var rc = document.getElementById('reader-container');
+    var rm = document.getElementById('result-message');
+    var sb = document.getElementById('start-btn');
 
-            const config = { fps: 20, qrbox: { width: 280, height: 280 } };
-
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-            .catch(err => {
-                alert("{% trans 'Kamera xatoligi:' %} " + err);
-                ph.style.display = 'flex';
-                rc.style.display = 'none';
-                sb.disabled = false;
-                sb.style.opacity = '1';
-            });
-        }
-
-        function onScanSuccess(decodedText, decodedResult) {
-            html5QrCode.stop().then(() => {
-                document.getElementById('reader-container').style.display = 'none';
-                document.getElementById('scanner-placeholder').style.display = 'flex';
-                if (typeof processToken === 'function') processToken(decodedText);
-            });
-        }
-    } catch(e) {
-        console.warn("QR scanner library not loaded:", e);
+    if (typeof Html5Qrcode === 'undefined') {
+        alert("{% trans 'QR kutubxonasi yuklanmadi. Sahifani yangilang.' %}");
+        return;
     }
+
+    ph.style.display = 'none';
+    rc.style.display = 'block';
+    rm.style.display = 'none';
+    sb.disabled = true;
+    sb.style.opacity = '0.5';
+
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+    }
+
+    Html5Qrcode.getCameras().then(function(cameras) {
+        if (!cameras || cameras.length === 0) {
+            throw new Error("No camera found");
+        }
+        var qrConfig = { fps: 20, qrbox: { width: 240, height: 240 } };
+        html5QrCode.start(
+            { facingMode: "environment" },
+            qrConfig,
+            onScanSuccess
+        ).catch(function(err) {
+            if (err.toString().indexOf("NotFoundError") !== -1) {
+                return html5QrCode.start(
+                    { facingMode: "user" },
+                    qrConfig,
+                    onScanSuccess
+                );
+            }
+            throw err;
+        }).catch(function(err) {
+            throw err;
+        });
+    }).catch(function() {
+        ph.style.display = 'flex';
+        rc.style.display = 'none';
+        sb.disabled = false;
+        sb.style.opacity = '1';
+        showManualModal();
+    });
+}
+
+function onScanSuccess(decodedText, decodedResult) {
+    if (html5QrCode) {
+        html5QrCode.stop().then(function() {
+            document.getElementById('reader-container').style.display = 'none';
+            document.getElementById('scanner-placeholder').style.display = 'flex';
+            if (typeof processToken === 'function') processToken(decodedText);
+        }).catch(function() {});
+    }
+}
 </script>
 {% endblock %}

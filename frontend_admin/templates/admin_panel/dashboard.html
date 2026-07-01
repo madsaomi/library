@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
+{% load action_tags %}
 
 {% block title %}{% trans "Super Admin | Online Kutibxona" %}{% endblock %}
 {% block page_title %}{% trans "Tizim boshqaruvi" %}{% endblock %}
@@ -14,137 +15,101 @@
 {% endblock %}
 
 {% block content %}
-<div class="stats-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px;">
-    <a href="{% url 'frontend_admin:schools_list' %}" class="glass-card animate-fade" style="padding: 25px; display: flex; align-items: center; gap: 20px; text-decoration: none; color: inherit; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-        <div style="background: rgba(99, 102, 241, 0.1); width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-school" style="font-size: 1.5rem; color: var(--primary);"></i>
-        </div>
-        <div>
-            <h3 style="font-size: 1.5rem;">{{ school_count|default:"0" }}</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">{% trans "Maktablar" %}</p>
-        </div>
-    </a>
-    <a href="{% url 'frontend_admin:all_users_list' %}" class="glass-card animate-fade" style="padding: 25px; display: flex; align-items: center; gap: 20px; animation-delay: 0.1s; text-decoration: none; color: inherit; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-        <div style="background: rgba(168, 85, 247, 0.1); width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-users" style="font-size: 1.5rem; color: var(--secondary);"></i>
-        </div>
-        <div>
-            <h3 style="font-size: 1.5rem;">{{ user_count|default:"0" }}</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">{% trans "Foydalanuvchilar" %}</p>
-        </div>
-    </a>
-    <a href="{% url 'frontend_admin:all_books_list' %}" class="glass-card animate-fade" style="padding: 25px; display: flex; align-items: center; gap: 20px; animation-delay: 0.2s; text-decoration: none; color: inherit; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-        <div style="background: rgba(245, 158, 11, 0.1); width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-book" style="font-size: 1.5rem; color: var(--accent);"></i>
-        </div>
-        <div>
-            <h3 style="font-size: 1.5rem;">{{ total_books|default:"0" }}</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">{% trans "Kitoblar" %}</p>
-        </div>
-    </a>
-    <a href="{% url 'frontend_admin:all_active_loans_list' %}" class="glass-card animate-fade" style="padding: 25px; display: flex; align-items: center; gap: 20px; animation-delay: 0.3s; text-decoration: none; color: inherit; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-        <div style="background: rgba(16, 185, 129, 0.1); width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-hand-holding-heart" style="font-size: 1.5rem; color: #10b981;"></i>
-        </div>
-        <div>
-            <h3 style="font-size: 1.5rem;">{{ active_loans|default:"0" }}</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">{% trans "Faol o'qishda" %}</p>
-        </div>
-    </a>
-</div>
+<div class="animate-fade">
+    <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+        <a href="{% url 'frontend_admin:schools_list' %}" class="glass-card stat-card" style="padding: 16px 12px; text-decoration: none;">
+            <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">{{ school_count|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">{% trans "Maktablar" %}</div>
+        </a>
+        <a href="{% url 'frontend_admin:all_users_list' %}" class="glass-card stat-card" style="padding: 16px 12px; text-decoration: none;">
+            <div class="stat-value" style="font-size: 1.3rem; color: #10b981;">{{ user_count|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">{% trans "Foydalanuvchilar" %}</div>
+        </a>
+        <a href="{% url 'frontend_admin:all_books_list' %}" class="glass-card stat-card" style="padding: 16px 12px; text-decoration: none;">
+            <div class="stat-value" style="font-size: 1.3rem; color: #f59e0b;">{{ total_books|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">{% trans "Kitoblar" %}</div>
+        </a>
+        <a href="{% url 'frontend_admin:all_active_loans_list' %}" class="glass-card stat-card" style="padding: 16px 12px; text-decoration: none;">
+            <div class="stat-value" style="font-size: 1.3rem; color: #6366f1;">{{ active_loans|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">{% trans "Aktiv ijaralar" %}</div>
+        </a>
+    </div>
 
-<!-- Charts Row -->
-<div class="responsive-grid-2" style="margin-bottom: 30px;">
-    <div class="glass-panel animate-fade" style="padding: 25px;">
-        <h3 style="margin-bottom: 20px;"><i class="fas fa-chart-bar" style="color: var(--primary); margin-right: 10px;"></i> {% trans "Oylik kitob berishlar" %}</h3>
-        <canvas id="issuesChart" height="200"></canvas>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+        <div class="glass-panel" style="padding: 20px;">
+            <h3 class="section-title" style="font-size: 0.85rem; margin-bottom: 16px;">
+                <i class="fas fa-chart-bar" style="color: var(--primary);"></i> {% trans "Oylik kitob berishlar" %}
+            </h3>
+            <div style="height: 200px;">
+                <canvas id="issuesChart"></canvas>
+            </div>
+        </div>
+        <div class="glass-panel" style="padding: 20px;">
+            <h3 class="section-title" style="font-size: 0.85rem; margin-bottom: 16px;">
+                <i class="fas fa-chart-pie" style="color: var(--secondary);"></i> {% trans "Foydalanuvchi turlari" %}
+            </h3>
+            <div style="height: 200px;">
+                <canvas id="rolesChart"></canvas>
+            </div>
+        </div>
     </div>
-    <div class="glass-panel animate-fade" style="padding: 25px;">
-        <h3 style="margin-bottom: 20px;"><i class="fas fa-chart-pie" style="color: var(--secondary); margin-right: 10px;"></i> {% trans "Foydalanuvchi turlari" %}</h3>
-        <canvas id="rolesChart" height="200"></canvas>
-    </div>
-</div>
 
-{% if top_books %}
-<div class="glass-panel animate-fade" style="padding: 25px; margin-bottom: 30px;">
-    <h3 style="margin-bottom: 20px;"><i class="fas fa-trophy" style="color: var(--accent); margin-right: 10px;"></i> {% trans "Eng ko'p o'qilgan kitoblar (Top 10)" %}</h3>
-    <canvas id="topBooksChart" height="120"></canvas>
-</div>
-{% endif %}
+    {% if top_books %}
+    <div class="glass-panel" style="padding: 20px; margin-bottom: 24px;">
+        <h3 class="section-title" style="font-size: 0.85rem; margin-bottom: 16px;">
+            <i class="fas fa-trophy" style="color: #fbbf24;"></i> {% trans "Eng ko'p o'qilgan kitoblar (Top 10)" %}
+        </h3>
+        <div style="height: 120px;">
+            <canvas id="topBooksChart"></canvas>
+        </div>
+    </div>
+    {% endif %}
 
-<div class="glass-panel animate-fade" style="padding: 30px; animation-delay: 0.4s;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h3><i class="fas fa-school" style="color: var(--primary); margin-right: 10px;"></i> {% trans "So'nggi qo'shilgan maktablar" %}</h3>
-        <a href="{% url 'frontend_admin:schools_list' %}" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem;">{% trans "Barchasini ko'rish" %}</a>
+    <div class="glass-panel" style="padding: 20px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 class="section-title" style="font-size: 0.85rem; margin: 0;">
+                <i class="fas fa-school" style="color: var(--primary);"></i> {% trans "So'nggi qo'shilgan maktablar" %}
+            </h3>
+            <a href="{% url 'frontend_admin:schools_list' %}" class="glass-card" style="padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; color: var(--text-muted);">{% trans "Barchasi" %} <i class="fas fa-arrow-right" style="font-size: 0.6rem;"></i></a>
+        </div>
+        <div class="info-grid" style="gap: 6px;">
+            {% for school in schools %}
+            <a href="{% url 'frontend_admin:school_detail' school.pk %}" class="glass-card info-row" style="padding: 10px 14px; text-decoration: none;">
+                <div>
+                    <div style="font-size: 0.82rem; font-weight: 600;">{{ school.name }}</div>
+                    <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">{{ school.district.name|default:"—" }} · {{ school.address|truncatechars:30 }}</div>
+                </div>
+                <span style="color: var(--primary); font-size: 0.7rem;"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            {% empty %}
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 20px;">{% trans "Hozircha maktablar qo'shilmagan" %}</p>
+            {% endfor %}
+        </div>
     </div>
-    
-    <div class="table-container" style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Maktab nomi" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Tuman (Rayon)" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Manzil" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Kontakt" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Amallar" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for school in schools %}
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s;">
-                    <td style="padding: 15px; font-weight: 600;">{{ school.name }}</td>
-                    <td style="padding: 15px; color: var(--text-muted);">{{ school.district.name|default:"—" }}</td>
-                    <td style="padding: 15px; color: var(--text-muted);">{{ school.address }}</td>
-                    <td style="padding: 15px; color: var(--text-muted);">{{ school.contact }}</td>
-                    <td style="padding: 15px;">
-                        <a href="{% url 'frontend_admin:school_detail' school.pk %}" class="btn-primary" style="padding: 6px 12px; font-size: 0.75rem;">{% trans "Ko'rish" %}</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" style="padding: 40px; text-align: center; color: var(--text-muted);">
-                        {% trans "Hozircha maktablar qo'shilmagan" %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
 
-<div class="glass-panel animate-fade" style="padding: 30px; animation-delay: 0.5s; margin-top: 30px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h3><i class="fas fa-list-ul" style="color: var(--secondary); margin-right: 10px;"></i> {% trans "Oxirgi harakatlar" %}</h3>
-        <a href="{% url 'frontend_admin:system_logs' %}" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem;">{% trans "Barchasini ko'rish" %}</a>
-    </div>
-    
-    <div class="table-container" style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Vaqt" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Foydalanuvchi" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Amal" %}</th>
-                    <th style="padding: 15px; color: var(--text-muted); font-weight: 500;">{% trans "Xabar" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for log in recent_logs %}
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                    <td style="padding: 15px; color: var(--text-muted); font-size: 0.85rem;">{{ log.created_at|date:"d.m.Y H:i" }}</td>
-                    <td style="padding: 15px; font-weight: 500;">{% if log.user %}{{ log.user.username }}{% else %}{% trans "Tizim" %}{% endif %}</td>
-                    <td style="padding: 15px;"><span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">{{ log.action_type }}</span></td>
-                    <td style="padding: 15px; color: var(--text-muted);">{{ log.message }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-muted);">
-                        {% trans "Harakatlar tarixi bo'sh" %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="glass-panel" style="padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 class="section-title" style="font-size: 0.85rem; margin: 0;">
+                <i class="fas fa-history" style="color: var(--secondary);"></i> {% trans "Oxirgi harakatlar" %}
+            </h3>
+            <a href="{% url 'frontend_admin:system_logs' %}" class="glass-card" style="padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; color: var(--text-muted);">{% trans "Barchasi" %} <i class="fas fa-arrow-right" style="font-size: 0.6rem;"></i></a>
+        </div>
+        <div class="activity-list">
+            {% for log in recent_logs %}
+            <div class="activity-item" style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="badge" style="background: rgba(99,102,241,0.1); color: var(--primary); padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;">{{ log.action_type|action_name }}</span>
+                        <span style="font-size: 0.78rem;">{% if log.user %}{{ log.user.username }}{% else %}{% trans "Tizim" %}{% endif %}</span>
+                    </div>
+                    <span style="font-size: 0.68rem; color: var(--text-muted);">{{ log.created_at|date:"d.m H:i" }}</span>
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; margin-left: 72px;">{{ log.message }}</div>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 20px;">{% trans "Harakatlar tarixi bo'sh" %}</p>
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -152,11 +117,11 @@
 {% block extra_scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    const textColor = isLight ? '#451a03' : '#fef3c7';
-    const gridColor = isLight ? 'rgba(69, 26, 3, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+    const theme = document.documentElement.getAttribute('data-theme');
+    const isLight = theme !== 'dark';
+    const textColor = isLight ? '#334155' : '#e2e8f0';
+    const gridColor = isLight ? 'rgba(51, 65, 85, 0.1)' : 'rgba(255, 255, 255, 0.08)';
 
-    // Monthly Issues Chart
     const ctx1 = document.getElementById('issuesChart');
     if (ctx1) {
         new Chart(ctx1, {
@@ -166,24 +131,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: '{% trans "Berilgan kitoblar" %}',
                     data: {{ monthly_issues|safe }},
-                    backgroundColor: 'rgba(217, 119, 6, 0.7)',
-                    borderColor: '#d97706',
+                    backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                    borderColor: '#6366f1',
                     borderWidth: 2,
-                    borderRadius: 8,
+                    borderRadius: 6,
                 }]
             },
             options: {
-                responsive: true,
-                plugins: { legend: { labels: { color: textColor } } },
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { color: textColor }, grid: { color: gridColor } },
-                    y: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true }
+                    x: { ticks: { color: textColor, font: { size: 9 } }, grid: { display: false } },
+                    y: { ticks: { color: textColor, font: { size: 9 } }, grid: { color: gridColor }, beginAtZero: true }
                 }
             }
         });
     }
 
-    // Roles Pie Chart
     const ctx2 = document.getElementById('rolesChart');
     if (ctx2) {
         const roleLabels = {
@@ -192,34 +156,27 @@ document.addEventListener('DOMContentLoaded', function() {
             'student': '{% trans "Student" %}',
             'teacher': '{% trans "Teacher" %}',
         };
-        const colors = ['#d97706', '#78350f', '#fbbf24', '#92400e'];
+        const colors = ['#6366f1', '#10b981', '#f59e0b', '#a855f7'];
         const roles = {{ roles|safe }};
         const labels = Object.keys(roles).map(k => roleLabels[k] || k);
         const data = Object.values(roles);
-        
+
         new Chart(ctx2, {
             type: 'doughnut',
             data: {
                 labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: colors.slice(0, data.length),
-                    borderWidth: 0,
-                }]
+                datasets: [{ data: data, backgroundColor: colors.slice(0, data.length), borderWidth: 0 }]
             },
             options: {
-                responsive: true,
+                responsive: true, maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: textColor, padding: 15 }
-                    }
+                    legend: { position: 'bottom', labels: { color: textColor, padding: 10, font: { size: 9 }, boxWidth: 10 } }
                 }
             }
         });
     }
 
-    // Top Books Chart
+    {% trans "O'qilganlar soni" as chart_label %}
     const ctx3 = document.getElementById('topBooksChart');
     if (ctx3) {
         new Chart(ctx3, {
@@ -227,21 +184,21 @@ document.addEventListener('DOMContentLoaded', function() {
             data: {
                 labels: [{% for b in top_books %}"{{ b.title|escapejs }}",{% endfor %}],
                 datasets: [{
-                    label: '{% trans "O\'qilganlar soni" %}',
+                    label: '{{ chart_label|escapejs }}',
                     data: [{% for b in top_books %}{{ b.borrow_count }},{% endfor %}],
-                    backgroundColor: 'rgba(251, 191, 36, 0.7)',
+                    backgroundColor: 'rgba(251, 191, 36, 0.6)',
                     borderColor: '#fbbf24',
                     borderWidth: 2,
-                    borderRadius: 6,
+                    borderRadius: 4,
                 }]
             },
             options: {
                 indexAxis: 'y',
-                responsive: true,
-                plugins: { legend: { labels: { color: textColor } } },
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true },
-                    y: { ticks: { color: textColor }, grid: { display: false } }
+                    x: { ticks: { color: textColor, font: { size: 9 } }, grid: { color: gridColor }, beginAtZero: true },
+                    y: { ticks: { color: textColor, font: { size: 8 } }, grid: { display: false } }
                 }
             }
         });

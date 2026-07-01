@@ -16,6 +16,18 @@ class CustomUser(AbstractUser):
     birth_date = models.DateField(_("Tug'ilgan sana"), null=True, blank=True)
     address = models.CharField(_("Yashash manzili"), max_length=255, null=True, blank=True)
     raw_password = models.CharField(_("Ochiq parol"), max_length=128, null=True, blank=True) # Foydalanuvchiga parolni ko'rsatish uchun
+    is_archived = models.BooleanField(_("Arxivlangan"), default=False)
+
+    # Gamification fields
+    xp_points = models.IntegerField(_("XP ball"), default=0)
+    level = models.IntegerField(_("Daraja"), default=1)
+    current_streak = models.IntegerField(_("Joriy streak"), default=0)
+    longest_streak = models.IntegerField(_("Eng uzun streak"), default=0)
+    last_activity_date = models.DateField(_("Oxirgi faollik"), null=True, blank=True)
+    total_books_read = models.IntegerField(_("O'qilgan kitoblar"), default=0)
+    monthly_books_read = models.IntegerField(_("Oylik kitoblar"), default=0)
+    selected_icon = models.CharField(_("Tanlangan ikonka"), max_length=50, default='fa-book')
+    unlocked_icons = models.JSONField(_("Ochiq ikonkalar"), default=list)
 
     def save(self, *args, **kwargs):
         if self.is_superuser and self.role != 'superuser':

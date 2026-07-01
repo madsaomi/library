@@ -10,55 +10,77 @@
 
 {% block content %}
 <div class="glass-panel animate-fade" style="padding: clamp(20px, 5vw, 40px);">
-    <div class="book-detail-layout" style="display: flex; gap: clamp(20px, 5vw, 40px); align-items: flex-start; flex-wrap: wrap;">
-        <div class="book-cover" style="width: 100%; max-width: 300px; height: auto; aspect-ratio: 2/3; flex-shrink: 0; background: #111; border-radius: 15px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); margin: 0 auto;">
-            {% if book.cover %}
-            <img src="{{ book.cover.url }}" alt="{{ book.title }}" style="width: 100%; height: 100%; object-fit: cover;">
-            {% else %}
-            <div class="flex-center" style="height: 100%;"><i class="fas fa-book" style="font-size: 5rem; opacity: 0.1;"></i></div>
-            {% endif %}
+    <div style="display: flex; gap: clamp(20px, 5vw, 40px); align-items: flex-start; flex-wrap: wrap;">
+        <div style="width: 100%; max-width: 280px; flex-shrink: 0; margin: 0 auto;">
+            <div style="aspect-ratio: 2/3; background: var(--hover-bg); border-radius: 16px; overflow: hidden; border: 1px solid var(--border);">
+                {% if book.cover %}
+                <img src="{{ book.cover.url }}" alt="{{ book.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <div style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-book" style="font-size: 4rem; opacity: 0.15; color: var(--text-muted);"></i>
+                </div>
+                {% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px;">
+                <div class="glass-card" style="padding: 10px 6px; text-align: center;">
+                    <div style="font-size: 0.5rem; color: var(--text-muted); text-transform: uppercase;">{% trans "Jami" %}</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">{{ book.total_count }}</div>
+                </div>
+                <div class="glass-card" style="padding: 10px 6px; text-align: center;">
+                    <div style="font-size: 0.5rem; color: #10b981; text-transform: uppercase;">{% trans "Mavjud" %}</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #10b981;">{{ book.available_count }}</div>
+                </div>
+                <div class="glass-card" style="padding: 10px 6px; text-align: center;">
+                    <div style="font-size: 0.5rem; color: var(--primary); text-transform: uppercase;">{% trans "O'qilgan" %}</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">{{ book.borrow_count }}</div>
+                </div>
+            </div>
         </div>
-        
-        <div style="flex-grow: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-                <div style="flex: 1; min-width: 200px;">
-                    <span style="color: var(--primary); font-weight: 600; text-transform: uppercase; font-size: 0.9rem;">
-                        {% if book.category %}{{ book.category.name }}{% else %}{% trans "Kategoriyasiz" %}{% endif %}
-                    </span>
-                    <h2 style="font-size: clamp(1.5rem, 6vw, 2.5rem); margin: 10px 0; line-height: 1.2;">{{ book.title }}</h2>
-                    {% if book.author %}
-                    <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px;">
-                        {% trans "Muallif" %}: {{ book.author }}
-                    </p>
-                    {% endif %}
-                </div>
-                <div class="glass-card" style="padding: 10px 20px; text-align: center;">
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">{% trans "Mavjud" %}</p>
-                    <p style="font-size: 1.5rem; font-weight: 700;">{{ book.available_count }}</p>
-                </div>
+
+        <div style="flex: 1; min-width: 280px;">
+            <div style="margin-bottom: 12px;">
+                <span class="badge" style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 3px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">
+                    {% if book.category %}{{ book.category.name }}{% else %}{% trans "Kategoriyasiz" %}{% endif %}
+                </span>
+                {% if book.borrow_count > 50 %}
+                <span class="badge" style="background: rgba(245,158,11,0.1); color: #f59e0b; padding: 3px 10px; border-radius: 6px; font-size: 0.7rem; margin-left: 6px;">
+                    <i class="fas fa-star"></i> {% trans "Mashhur" %}
+                </span>
+                {% endif %}
             </div>
 
-            <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted);">
-                    <i class="fas fa-eye"></i> <span>{{ book.borrow_count }} {% trans "marta o'qilgan" %}</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted);">
-                    <i class="fas fa-calendar-alt"></i> <span>{% trans "2024-yil" %}</span>
-                </div>
+            <h2 style="font-size: clamp(1.4rem, 5vw, 2rem); margin: 10px 0 6px 0; line-height: 1.2; color: var(--text-main);">{{ book.title }}</h2>
+
+            {% if book.author %}
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin: 0 0 16px 0;">
+                <i class="fas fa-user-pen"></i> {{ book.author }}
+            </p>
+            {% endif %}
+
+            <div style="display: flex; gap: 18px; margin-bottom: 24px; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-muted);">
+                <span><i class="fas fa-eye"></i> {{ book.borrow_count }} {% trans "marta o'qilgan" %}</span>
+                <span><i class="fas fa-users"></i> {{ book.currently_reading_count }} {% trans "hozir o'qiyapti" %}</span>
+                <span>
+                    <i class="fas fa-star" style="color: #f59e0b;"></i>
+                    {% if book.borrow_count > 50 %}<span style="color: #f59e0b;">{{ book.borrow_count }}</span>
+                    {% elif book.borrow_count > 20 %}<span style="color: #94a3b8;">{{ book.borrow_count }}</span>
+                    {% else %}{{ book.borrow_count }}{% endif %}
+                </span>
             </div>
 
-            <h4 style="margin-bottom: 15px;">{% trans "Tavsif" %}</h4>
-            <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; font-size: 1.1rem;">
-                {{ book.description }}
+            <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-main);">{% trans "Tavsif" %}</h4>
+            <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 30px; font-size: 0.95rem;">
+                {{ book.description|default:_("Ta'rif mavjud emas") }}
             </p>
 
-            <div class="book-actions" style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
                 {% if book.available_count > 0 %}
-                <a href="{% url 'frontend_user:reserve_book' book.pk %}" class="btn-primary" style="padding: 15px 30px; font-size: 1rem; text-decoration: none; flex: 1; min-width: 200px;">
+                <a href="{% url 'frontend_user:reserve_book' book.pk %}" class="btn-primary" style="padding: 14px 28px; font-size: 0.95rem; text-decoration: none; flex: 1; min-width: 200px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px;">
                     <i class="fas fa-plus-circle"></i> {% trans "Kitobni bron qilish" %}
                 </a>
                 {% else %}
-                <button class="btn-primary" style="padding: 15px 30px; font-size: 1rem; background: #374151; cursor: not-allowed; flex: 1; min-width: 200px;" disabled>
+                <button class="btn-primary" style="padding: 14px 28px; font-size: 0.95rem; background: #374151; cursor: not-allowed; flex: 1; min-width: 200px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; border: none; color: #94a3b8;" disabled>
                     <i class="fas fa-clock"></i> {% trans "Navbatga turish" %}
                 </button>
                 {% endif %}

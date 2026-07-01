@@ -1,0 +1,2235 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-25 10:00+0000\n"
+"PO-Revision-Date: 2024-04-25 10:00+0000\n"
+"Last-Translator: Auto\n"
+"Language-Team: ru\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Kirish | Online Kutibxona"
+msgstr ""
+
+msgid "Xush kelibsiz"
+msgstr ""
+
+msgid "Online kutibxonaga kirish"
+msgstr ""
+
+msgid "Foydalanuvchi nomi"
+msgstr ""
+
+msgid "Parol"
+msgstr ""
+
+msgid "Kirish"
+msgstr ""
+
+msgid "Chiqish"
+msgstr ""
+
+msgid "Online Kutibxona"
+msgstr ""
+
+msgid "Kutubxona"
+msgstr ""
+
+msgid "QR Skaner"
+msgstr ""
+
+msgid "Bosh sahifa"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Tizim"
+msgstr ""
+
+msgid "Saqlash"
+msgstr ""
+
+msgid "Bekor qilish"
+msgstr ""
+
+msgid "Tahrirlash"
+msgstr ""
+
+msgid "O'chirish"
+msgstr ""
+
+msgid "Ko'rish"
+msgstr ""
+
+msgid "Batafsil"
+msgstr ""
+
+msgid "Qidirish"
+msgstr ""
+
+msgid "Tozalash"
+msgstr ""
+
+msgid "Muvaffaqiyatli!"
+msgstr ""
+
+msgid "Xatolik!"
+msgstr ""
+
+msgid "Orqaga qaytish"
+msgstr ""
+
+msgid "Tasdiqlash"
+msgstr ""
+
+msgid "belgi"
+msgstr ""
+
+msgid "so'z"
+msgstr ""
+
+msgid "O'chirishni tasdiqlash"
+msgstr ""
+
+msgid "Haqiqatdan ham ushbu"
+msgstr ""
+
+msgid "o'chirmoqchimisiz?"
+msgstr ""
+
+msgid "o'chirilgandan so'ng uni qayta tiklab bo'lmaydi."
+msgstr ""
+
+msgid "Yangi"
+msgstr ""
+
+msgid "ID:"
+msgstr ""
+
+msgid "2024-yil"
+msgstr ""
+
+msgid "CREATE"
+msgstr ""
+
+msgid "LOGIN"
+msgstr ""
+
+msgid "ISSUE"
+msgstr ""
+
+msgid "RETURN"
+msgstr ""
+
+msgid "DELETE"
+msgstr ""
+
+msgid "UPDATE"
+msgstr ""
+
+msgid "Superuser"
+msgstr ""
+
+msgid "School Admin"
+msgstr ""
+
+msgid "Student"
+msgstr ""
+
+msgid "Teacher"
+msgstr ""
+
+msgid "O'quvchilar"
+msgstr ""
+
+msgid "O'qituvchilar"
+msgstr ""
+
+msgid "Foydalanuvchi"
+msgstr ""
+
+msgid "Foydalanuvchilar"
+msgstr ""
+
+msgid "Rol"
+msgstr ""
+
+msgid "Maktab"
+msgstr ""
+
+msgid "Maktablar"
+msgstr ""
+
+msgid "Tuman"
+msgstr ""
+
+msgid "Tumanlar"
+msgstr ""
+
+msgid "Tuman nomi"
+msgstr ""
+
+msgid "Maktab nomi"
+msgstr ""
+
+msgid "Muassasa"
+msgstr ""
+
+msgid "Muassasalar"
+msgstr ""
+
+msgid "Muassasa nomi"
+msgstr ""
+
+msgid "Manzil"
+msgstr ""
+
+msgid "Kontakt"
+msgstr ""
+
+msgid "Tumanlar boshqaruvi"
+msgstr ""
+
+msgid "Tumanlar (Rayonlar)"
+msgstr ""
+
+msgid "Yangi tuman"
+msgstr ""
+
+msgid "ta maktab"
+msgstr ""
+
+msgid "Hozircha tumanlar mavjud emas"
+msgstr ""
+
+msgid "Davlat muassasalari va tashkilotlar"
+msgstr ""
+
+msgid "Hozircha muassasalar mavjud emas"
+msgstr ""
+
+msgid "Yangi muassasa"
+msgstr ""
+
+msgid "Davlat muassasasi"
+msgstr ""
+
+msgid "Aktiv"
+msgstr ""
+
+msgid "Maktablar boshqaruvi"
+msgstr ""
+
+msgid "Tizimdagi barcha maktablar"
+msgstr ""
+
+msgid "Yangi maktab qo'shish"
+msgstr ""
+
+msgid "Tuman bo'yicha saralash"
+msgstr ""
+
+msgid "Barcha tumanlar"
+msgstr ""
+
+msgid "Filtrni tozalash"
+msgstr ""
+
+msgid "Maktablar topilmadi"
+msgstr ""
+
+msgid "Nukus shahri"
+msgstr ""
+
+msgid "Amudaryo tumani"
+msgstr ""
+
+msgid "Beruniy tumani"
+msgstr ""
+
+msgid "Chimboy tumani"
+msgstr ""
+
+msgid "Ellikqala tumani"
+msgstr ""
+
+msgid "Kegeyli tumani"
+msgstr ""
+
+msgid "Mo'ynoq tumani"
+msgstr ""
+
+msgid "Nukus tumani"
+msgstr ""
+
+msgid "Qonliko'l tumani"
+msgstr ""
+
+msgid "Qorao'zak tumani"
+msgstr ""
+
+msgid "Qo'ng'irot tumani"
+msgstr ""
+
+msgid "Shumanay tumani"
+msgstr ""
+
+msgid "Taxtako'pir tumani"
+msgstr ""
+
+msgid "To'rtko'l tumani"
+msgstr ""
+
+msgid "Xo'jayli tumani"
+msgstr ""
+
+msgid "Taxiatosh tumani"
+msgstr ""
+
+msgid "Bo'zatov tumani"
+msgstr ""
+
+msgid "Matematika"
+msgstr ""
+
+msgid "Fizika"
+msgstr ""
+
+msgid "Kimyo"
+msgstr ""
+
+msgid "Biologiya"
+msgstr ""
+
+msgid "Informatika"
+msgstr ""
+
+msgid "O'zbek tili"
+msgstr ""
+
+msgid "Qoraqalpoq tili"
+msgstr ""
+
+msgid "Rus tili"
+msgstr ""
+
+msgid "Ingliz tili"
+msgstr ""
+
+msgid "Tarix"
+msgstr ""
+
+msgid "Geografiya"
+msgstr ""
+
+msgid "Adabiyot"
+msgstr ""
+
+msgid "Tasviriy san'at"
+msgstr ""
+
+msgid "Musiqa"
+msgstr ""
+
+msgid "Jismoniy tarbiya"
+msgstr ""
+
+msgid "Badiiy adabiyot"
+msgstr ""
+
+msgid "Ilmiy-ommabop"
+msgstr ""
+
+msgid "Tarixiy"
+msgstr ""
+
+msgid "Darslik"
+msgstr ""
+
+msgid "Xorijiy tillar"
+msgstr ""
+
+msgid "Psixologiya"
+msgstr ""
+
+msgid "Bolalar adabiyoti"
+msgstr ""
+
+msgid "Detektiv"
+msgstr ""
+
+msgid "Qoraqalpoq davlat universiteti"
+msgstr ""
+
+msgid "Nukus davlat pedagogika instituti"
+msgstr ""
+
+msgid "Toshkent tibbiyot akademiyasi Nukus filiali"
+msgstr ""
+
+msgid "O'zbekiston davlat san'at va madaniyat instituti Nukus filiali"
+msgstr ""
+
+msgid "Toshkent axborot texnologiyalari universiteti Nukus filiali"
+msgstr ""
+
+msgid "Beruniy nomidagi Qoraqalpoq davlat universiteti"
+msgstr ""
+
+msgid "Nukus innovatsion instituti"
+msgstr ""
+
+msgid "Nukus 1-sonli maktab"
+msgstr ""
+
+msgid "Nukus 2-sonli maktab"
+msgstr ""
+
+msgid "Nukus 3-sonli maktab"
+msgstr ""
+
+msgid "Amudaryo 1-sonli maktab"
+msgstr ""
+
+msgid "Amudaryo 2-sonli maktab"
+msgstr ""
+
+msgid "Beruniy 1-sonli maktab"
+msgstr ""
+
+msgid "Beruniy 2-sonli maktab"
+msgstr ""
+
+msgid "Chimboy 1-sonli maktab"
+msgstr ""
+
+msgid "Chimboy 2-sonli maktab"
+msgstr ""
+
+msgid "Ellikqala 1-sonli maktab"
+msgstr ""
+
+msgid "Ellikqala 2-sonli maktab"
+msgstr ""
+
+msgid "Kegeyli 1-sonli maktab"
+msgstr ""
+
+msgid "Kegeyli 2-sonli maktab"
+msgstr ""
+
+msgid "Mo'ynoq 1-sonli maktab"
+msgstr ""
+
+msgid "Mo'ynoq 2-sonli maktab"
+msgstr ""
+
+msgid "Qonliko'l 1-sonli maktab"
+msgstr ""
+
+msgid "Qonliko'l 2-sonli maktab"
+msgstr ""
+
+msgid "Qorao'zak 1-sonli maktab"
+msgstr ""
+
+msgid "Qorao'zak 2-sonli maktab"
+msgstr ""
+
+msgid "Qo'ng'irot 1-sonli maktab"
+msgstr ""
+
+msgid "Qo'ng'irot 2-sonli maktab"
+msgstr ""
+
+msgid "Shumanay 1-sonli maktab"
+msgstr ""
+
+msgid "Shumanay 2-sonli maktab"
+msgstr ""
+
+msgid "Taxtako'pir 1-sonli maktab"
+msgstr ""
+
+msgid "Taxtako'pir 2-sonli maktab"
+msgstr ""
+
+msgid "To'rtko'l 1-sonli maktab"
+msgstr ""
+
+msgid "To'rtko'l 2-sonli maktab"
+msgstr ""
+
+msgid "Xo'jayli 1-sonli maktab"
+msgstr ""
+
+msgid "Xo'jayli 2-sonli maktab"
+msgstr ""
+
+msgid "Taxiatosh 1-sonli maktab"
+msgstr ""
+
+msgid "Taxiatosh 2-sonli maktab"
+msgstr ""
+
+msgid "Bo'zatov 1-sonli maktab"
+msgstr ""
+
+msgid "Bo'zatov 2-sonli maktab"
+msgstr ""
+
+msgid "Amallar"
+msgstr ""
+
+msgid "Tizim boshqaruvi"
+msgstr ""
+
+msgid "Admin login (username)"
+msgstr ""
+
+msgid "Admin paroli"
+msgstr ""
+
+msgid "Parolni tasdiqlash"
+msgstr ""
+
+msgid "Parollar mos kelmadi."
+msgstr ""
+
+msgid "Maktab va admin yaratildi! Login: {}"
+msgstr ""
+
+msgid "Maktab yaratildi (admin biriktirilmadi)."
+msgstr ""
+
+msgid "Asl paroli"
+msgstr ""
+
+msgid "Kitob"
+msgstr ""
+
+msgid "Kitoblar"
+msgstr ""
+
+msgid "Nusxalar"
+msgstr ""
+
+msgid "Kitoblar ro'yxati"
+msgstr ""
+
+msgid "Yangi kitob"
+msgstr ""
+
+msgid "Jami kitoblar"
+msgstr ""
+
+msgid "O'qilayotgan kitoblar"
+msgstr ""
+
+msgid "Qolgan kitoblar"
+msgstr ""
+
+msgid "Kitob nomi"
+msgstr ""
+
+msgid "Sarlavha"
+msgstr ""
+
+msgid "Nomi"
+msgstr ""
+
+msgid "Muqova"
+msgstr ""
+
+msgid "Kategoriya"
+msgstr ""
+
+msgid "Kategoriyalar"
+msgstr ""
+
+msgid "Barcha kategoriyalar"
+msgstr ""
+
+msgid "Kitoblar katalogi"
+msgstr ""
+
+msgid "Maktab kutubxonasi"
+msgstr ""
+
+msgid "Kitob nomi bo'yicha qidirish..."
+msgstr ""
+
+msgid "Muqovasiz"
+msgstr ""
+
+msgid "Jami"
+msgstr ""
+
+msgid "Mavjud"
+msgstr ""
+
+msgid "O'qilmoqda"
+msgstr ""
+
+msgid "Kitoblar topilmadi"
+msgstr ""
+
+msgid "Hozircha kitoblar topilmadi"
+msgstr ""
+
+msgid "Umumiy soni"
+msgstr ""
+
+msgid "Mavjud soni"
+msgstr ""
+
+msgid "O'qilganlar soni"
+msgstr ""
+
+msgid "Kitob berish"
+msgstr ""
+
+msgid "Kitob qabul"
+msgstr ""
+
+msgid "Kitob qabul qilish"
+msgstr ""
+
+msgid "Kitob berish (QR)"
+msgstr ""
+
+msgid "Kitob berish yoki qabul qilish"
+msgstr ""
+
+msgid "Kitob berish va qabul qilish"
+msgstr ""
+
+msgid "Qaytarildi"
+msgstr ""
+
+msgid "Berildi"
+msgstr ""
+
+msgid "Kutilmoqda"
+msgstr ""
+
+msgid "Tasdiqlandi"
+msgstr ""
+
+msgid "Rad etildi"
+msgstr ""
+
+msgid "Yakunlandi"
+msgstr ""
+
+msgid "Topshirish"
+msgstr ""
+
+msgid "Qaytarilgan"
+msgstr ""
+
+msgid "Tugatildi"
+msgstr ""
+
+msgid "Yana o'qish"
+msgstr ""
+
+msgid "Olingan sana"
+msgstr ""
+
+msgid "So'ralgan sana"
+msgstr ""
+
+msgid "Muddat"
+msgstr ""
+
+msgid "kun"
+msgstr ""
+
+msgid "Qolgan vaqt"
+msgstr ""
+
+msgid "Holati"
+msgstr ""
+
+msgid "QR ko'rsatish"
+msgstr ""
+
+msgid "Maktab boshqaruvi"
+msgstr ""
+
+msgid "Statistika"
+msgstr ""
+
+msgid "Tizim loglari"
+msgstr ""
+
+msgid "Faol o'qishda"
+msgstr ""
+
+msgid "So'nggi qo'shilgan maktablar"
+msgstr ""
+
+msgid "Barchasini ko'rish"
+msgstr ""
+
+msgid "Tezkor amallar"
+msgstr ""
+
+msgid "Oxirgi amallar"
+msgstr ""
+
+msgid "Oxirgi harakatlar"
+msgstr ""
+
+msgid "Hozircha amallar mavjud emas"
+msgstr ""
+
+msgid "Tizim statistikasi"
+msgstr ""
+
+msgid "Foydalanish dinamikasi"
+msgstr ""
+
+msgid "Eng faol maktablar"
+msgstr ""
+
+msgid "ta kitobxon"
+msgstr ""
+
+msgid "Kitob berishlar"
+msgstr ""
+
+msgid "Hozircha ma'lumotlar yo'q"
+msgstr ""
+
+msgid "Harakatlar tarixi bo'sh"
+msgstr ""
+
+msgid ""
+"Noma'lum QR-kod turi. Iltimos, kitob berish yoki qaytarish kodini "
+"skanerlang."
+msgstr ""
+
+msgid ""
+"Eski yoki noto'g'ri QR-kod. Iltimos, o'quvchi telefonida kodni yangilasini "
+"kutib turing."
+msgstr ""
+
+msgid "Bron topilmadi yoki allaqachon tasdiqlangan"
+msgstr ""
+
+msgid "Kitob qolmagan"
+msgstr ""
+
+msgid "Kitob muvaffaqiyatli berildi: {}"
+msgstr ""
+
+msgid "Ushbu kitob uchun faol topshirish topilmadi"
+msgstr ""
+
+msgid "Kitob muvaffaqiyatli qabul qilindi: {}"
+msgstr ""
+
+msgid "Yangi o'quvchi uchun parol: {}"
+msgstr ""
+
+msgid "Yangi o'qituvchi uchun parol: {}"
+msgstr ""
+
+msgid "Parolingiz muvaffaqiyatli o'zgartirildi!"
+msgstr ""
+
+msgid "Yangi maktab ({}) va uning admini ({}) yaratildi."
+msgstr ""
+
+msgid "O'quvchilar ro'yxati"
+msgstr ""
+
+msgid "Maktab o'quvchilari"
+msgstr ""
+
+msgid "Ism, login yoki sinf bo'yicha qidirish..."
+msgstr ""
+
+msgid "Yangi o'quvchi"
+msgstr ""
+
+msgid "Ism (F.I.SH)"
+msgstr ""
+
+msgid "O'quvchilar topilmadi"
+msgstr ""
+
+msgid "O'qituvchilar ro'yxati"
+msgstr ""
+
+msgid "Maktab o'qituvchilari"
+msgstr ""
+
+msgid "Ism yoki login bo'yicha qidirish..."
+msgstr ""
+
+msgid "Yangi o'qituvchi"
+msgstr ""
+
+msgid "O'qituvchilar topilmadi"
+msgstr ""
+
+msgid "Kamera xatoligi:"
+msgstr ""
+
+msgid "Kitob haqida ma'lumot"
+msgstr ""
+
+msgid "Kategoriyasiz"
+msgstr ""
+
+msgid "marta o'qilgan"
+msgstr ""
+
+msgid "Kitobni bron qilish"
+msgstr ""
+
+msgid "Navbatga turish"
+msgstr ""
+
+msgid "Kitoblar tarixi"
+msgstr ""
+
+msgid "Kitobxonlik tarixi"
+msgstr ""
+
+msgid "Barcha amallar tarixi"
+msgstr ""
+
+msgid "Kitob, o'quvchi yoki ID..."
+msgstr ""
+
+msgid "Kim olgan"
+msgstr ""
+
+msgid "Berilgan vaqt"
+msgstr ""
+
+msgid "Qaytarilgan vaqt"
+msgstr ""
+
+msgid "Hozircha amallar tarixi mavjud emas"
+msgstr ""
+
+msgid "Faol o'qishlar"
+msgstr ""
+
+msgid "Barcha foydalanuvchilar"
+msgstr ""
+
+msgid "Barcha kitoblar"
+msgstr ""
+
+msgid "Tizimdagi barcha foydalanuvchilar"
+msgstr ""
+
+msgid "Tizimdagi barcha kitoblar"
+msgstr ""
+
+msgid "Yangi Admin (Kutubxonachi)"
+msgstr ""
+
+msgid "Ism Familiya"
+msgstr ""
+
+msgid "Qo'shilgan sana"
+msgstr ""
+
+msgid "O'qilgan"
+msgstr ""
+
+msgid "Sinf ko'rsatilmagan"
+msgstr ""
+
+msgid "Sinf / Lavozim"
+msgstr ""
+
+msgid "Berilgan sana"
+msgstr ""
+
+msgid "O'qilayotgan kitoblar ro'yxati"
+msgstr ""
+
+msgid "Yangilik"
+msgstr ""
+
+msgid "Yangiliklar"
+msgstr ""
+
+msgid "Yangilik qo'shish"
+msgstr ""
+
+msgid "Yangi yangilik qo'shish"
+msgstr ""
+
+msgid "Yangilikni tahrirlash"
+msgstr ""
+
+msgid "yangilikni"
+msgstr ""
+
+msgid "Yangiliklar mavjud emas"
+msgstr ""
+
+msgid "Maktab yangiliklari"
+msgstr ""
+
+msgid "So'nggi yangiliklar"
+msgstr ""
+
+msgid "Yangi kitob qo'shish"
+msgstr ""
+
+msgid "Kitobni tahrirlash"
+msgstr ""
+
+msgid "kitobni"
+msgstr ""
+
+msgid "Yangi o'quvchi qo'shish"
+msgstr ""
+
+msgid "O'quvchi ma'lumotlarini tahrirlash"
+msgstr ""
+
+msgid "o'quvchini"
+msgstr ""
+
+msgid "Yangi o'qituvchi qo'shish"
+msgstr ""
+
+msgid "O'qituvchi ma'lumotlarini tahrirlash"
+msgstr ""
+
+msgid "o'qituvchini"
+msgstr ""
+
+msgid "Yangi muassasa qo'shish"
+msgstr ""
+
+msgid "Muassasa ma'lumotlarini tahrirlash"
+msgstr ""
+
+msgid "muassasani"
+msgstr ""
+
+msgid "Yangi tuman qo'shish"
+msgstr ""
+
+msgid "Tuman ma'lumotlarini tahrirlash"
+msgstr ""
+
+msgid "tumanni"
+msgstr ""
+
+msgid "Maktab ma'lumotlarini tahrirlash"
+msgstr ""
+
+msgid "maktabni"
+msgstr ""
+
+msgid "Yangi maktab admini qo'shish"
+msgstr ""
+
+msgid "Admin ma'lumotlarini tahrirlash"
+msgstr ""
+
+msgid "Sahifa topilmadi"
+msgstr ""
+
+msgid "Xatolik 404"
+msgstr ""
+
+msgid "Afsuski, bunday sahifa mavjud emas"
+msgstr ""
+
+msgid ""
+"Siz qidirayotgan sahifa o'chirilgan, nomi o'zgartirilgan yoki vaqtincha "
+"mavjud emas bo'lishi mumkin."
+msgstr ""
+
+msgid "Bosh sahifaga qaytish"
+msgstr ""
+
+msgid "Tizimda xatolik"
+msgstr ""
+
+msgid "Xatolik 500"
+msgstr ""
+
+msgid "Tizimda kutilmagan xatolik yuz berdi"
+msgstr ""
+
+msgid ""
+"Biz bu haqda xabar topdik va tez orada muammoni bartaraf etamiz. Iltimos, "
+"birozdan so'ng qayta urinib ko'ring."
+msgstr ""
+
+msgid "Kitob nomi, muallifi yoki kategoriyasi..."
+msgstr ""
+
+msgid "O'qilayotganlar"
+msgstr ""
+
+msgid "Hozircha o'qilayotgan kitoblar yo'q"
+msgstr ""
+
+msgid "Tavsif"
+msgstr ""
+
+msgid "Hozircha yangiliklar yo'q"
+msgstr ""
+
+msgid "Maktab ma'lumotlari"
+msgstr ""
+
+msgid "Maktab statistikasi"
+msgstr ""
+
+msgid "O'quvchilar yo'q"
+msgstr ""
+
+msgid "Kitoblar yo'q"
+msgstr ""
+
+msgid "Hozircha maktablar qo'shilmagan"
+msgstr ""
+
+msgid "Tizim amallari tarixi"
+msgstr ""
+
+msgid "Loglar"
+msgstr ""
+
+msgid "Filtr"
+msgstr ""
+
+msgid "Qidirish..."
+msgstr ""
+
+msgid "oldin"
+msgstr ""
+
+msgid "Tizim administratori"
+msgstr ""
+
+msgid "Roli"
+msgstr ""
+
+msgid "O'chirishni tasdiqlang"
+msgstr ""
+
+msgid "Oblozhkani o'chirib tashlamoqchimisiz?"
+msgstr ""
+
+msgid "Bekor"
+msgstr ""
+
+msgid "Rasm tanlash"
+msgstr ""
+
+msgid "O'chirildi"
+msgstr ""
+
+msgid "Hozirda oblozhka mavjud"
+msgstr ""
+
+msgid "Maktab admini hisobi"
+msgstr ""
+
+msgid "Ushbu maktabni boshqarish uchun yangi foydalanuvchi yaratiladi."
+msgstr ""
+
+msgid "Barchasi"
+msgstr ""
+
+msgid ""
+"O'quvchi telefonidagi QR-kodni skanerlang. Tizim amal turini o'zi aniqlaydi."
+msgstr ""
+
+msgid "Skanerlashni boshlash uchun bosing"
+msgstr ""
+
+msgid "Skanerni yoqish"
+msgstr ""
+
+msgid "Kod orqali kiritish"
+msgstr ""
+
+msgid "Amal turini tanlang va tokenni kiriting"
+msgstr ""
+
+msgid "Matn"
+msgstr ""
+
+msgid "Rasm"
+msgstr ""
+
+msgid "Nashr qilingan"
+msgstr ""
+
+msgid "Yaratilgan sana"
+msgstr ""
+
+msgid "Vaqt"
+msgstr ""
+
+msgid "Amal"
+msgstr ""
+
+msgid "Xabar"
+msgstr ""
+
+msgid "Mening kitoblarim"
+msgstr ""
+
+msgid "Hozir o'qilayotgan kitoblar"
+msgstr ""
+
+msgid "Hozircha sizda olingan kitoblar yo'q"
+msgstr ""
+
+msgid "Bron qilingan (kutilmoqda)"
+msgstr ""
+
+msgid "Bron qilingan kitoblar yo'q"
+msgstr ""
+
+msgid "O'qish tarixi"
+msgstr ""
+
+msgid "Siz hali kitob o'qib bo'lmagansiz"
+msgstr ""
+
+msgid "Profil"
+msgstr ""
+
+msgid "Mening profilim"
+msgstr ""
+
+msgid "Xavfsizlik"
+msgstr ""
+
+msgid "Maktab biriktirilmagan"
+msgstr ""
+
+msgid "ID raqam"
+msgstr ""
+
+msgid "A'zo bo'lgan sana"
+msgstr ""
+
+msgid "Ma'lumotlarni tahrirlash"
+msgstr ""
+
+msgid "Parolni o'zgartirish"
+msgstr ""
+
+msgid "Parolni saqlash"
+msgstr ""
+
+msgid "Hisobingiz xavfsizligini ta'minlash uchun kuchli paroldan foydalaning"
+msgstr ""
+
+msgid "Barcha maktablar"
+msgstr ""
+
+msgid "Ism"
+msgstr ""
+
+msgid "Familiya"
+msgstr ""
+
+msgid "Tug'ilgan sana"
+msgstr ""
+
+msgid "Fan"
+msgstr ""
+
+msgid "Yashash manzili"
+msgstr ""
+
+msgid "Sinf"
+msgstr ""
+
+msgid "Harf"
+msgstr ""
+
+msgid "Bo'sh qoldirilsa, avtomatik yaratiladi"
+msgstr ""
+
+msgid ""
+"Yangi foydalanuvchi uchun majburiy. Tahrirlashda bo'sh qoldirsa o'zgarmaydi."
+msgstr ""
+
+msgid "Limit: %(limit)s ta so'z. Siz %(count)s ta so'z kiritdingiz."
+msgstr ""
+
+msgid "Limit: %(limit)s ta belgi. Siz %(count)s ta belgi kiritdingiz."
+msgstr ""
+
+msgid "Uzbek"
+msgstr ""
+
+msgid "Russian"
+msgstr ""
+
+msgid "English"
+msgstr ""
+
+msgid "Qaraqalpaqsha"
+msgstr ""
+
+msgid "Tilni tanlash"
+msgstr ""
+
+msgid "{}ga '{}' kitobi berildi"
+msgstr ""
+
+msgid "{}dan '{}' kitobi qabul qilindi"
+msgstr ""
+
+msgid "Umumiy"
+msgstr ""
+
+msgid "Super Admin"
+msgstr ""
+
+msgid "O'qituvchi"
+msgstr ""
+
+msgid "Yangi Admin"
+msgstr ""
+
+msgid "Yuklagan"
+msgstr ""
+
+msgid "Joylangan"
+msgstr ""
+
+msgid "Yozilgan"
+msgstr ""
+
+msgid "Muallif"
+msgstr ""
+
+msgid "Yangiliklar boshqaruvi"
+msgstr ""
+
+msgid "Barcha global yangiliklar"
+msgstr ""
+
+msgid "Hozircha global yangiliklar yo'q"
+msgstr ""
+
+msgid "Yangi xabar"
+msgstr ""
+
+msgid "Username, ism yoki maktab bo'yicha qidirish..."
+msgstr ""
+
+msgid "Avtomatik maktablar yaratish"
+msgstr ""
+
+msgid ""
+"Ushbu tumanga avtomatik tarzda n-ta maktab qo'shish uchun raqam kiriting."
+msgstr ""
+
+msgid "Masalan: 10"
+msgstr ""
+
+msgid "E'lon qilingan"
+msgstr ""
+
+msgid "Qoralama"
+msgstr ""
+
+msgid "Tuman ma'lumotlari"
+msgstr ""
+
+msgid "Tumanni tanlang"
+msgstr ""
+
+msgid "Mavjud maktablar"
+msgstr ""
+
+msgid "Bo'sh maktab qolmagan"
+msgstr ""
+
+msgid "maktab"
+msgstr ""
+
+msgid "Login bo'sh!"
+msgstr ""
+
+msgid "Ushbu login band!"
+msgstr ""
+
+msgid "Login kiriting"
+msgstr ""
+
+msgid "Admin"
+msgstr ""
+
+msgid "User"
+msgstr ""
+
+msgid "Super Admin | Online Kutibxona"
+msgstr ""
+
+msgid "Noto'g'ri so'rov"
+msgstr ""
+
+msgid "Noto'g'ri so'rov yuborildi"
+msgstr ""
+
+msgid "Sizning so'rovingizda xatolik mavjud yoki tizim uni qabul qila olmadi."
+msgstr ""
+
+msgid "Ruxsat etilmagan"
+msgstr ""
+
+msgid "Sizda ushbu sahifaga kirish huquqi yo'q"
+msgstr ""
+
+msgid "Ushbu sahifaga kirish taqiqlangan yoki yetarli huquqlarga ega emassiz."
+msgstr ""
+
+msgid "CSRF xatolik"
+msgstr ""
+
+msgid "Xavfsizlik tokeni yaroqsiz"
+msgstr ""
+
+msgid ""
+"Sahifa muddati tugagan yoki so'rov noto'g'ri yuborilgan. Iltimos, avvalgi "
+"sahifaga qaytib, qayta urinib ko'ring."
+msgstr ""
+
+msgid "Xatolik 400"
+msgstr ""
+
+msgid "Xatolik 403"
+msgstr ""
+
+msgid "Oylik kitob berishlar"
+msgstr ""
+
+msgid "Foydalanuvchi turlari"
+msgstr ""
+
+msgid "Berilgan kitoblar"
+msgstr ""
+
+msgid "Eng ko'p o'qilgan kitoblar (Top 10)"
+msgstr ""
+
+msgid "Bildirishnomalar yo'q"
+msgstr ""
+
+msgid "Navbatdan chiqish"
+msgstr ""
+
+msgid "Siz navbatga qo'shildingiz"
+msgstr ""
+
+msgid "Siz allaqachon navbatdasiz"
+msgstr ""
+
+msgid "Siz navbatdan chiqdingiz"
+msgstr ""
+
+msgid "Kitob tasdiqlandi"
+msgstr ""
+
+msgid "\"{title}\" kitobi sizga berildi"
+msgstr ""
+
+msgid "\"{title}\" kitobi bo'shadi. Navbat sizda!"
+msgstr ""
+
+msgid "Kitob mavjud!"
+msgstr ""
+
+msgid "Bu kitob sizning maktabingizga tegishli emas"
+msgstr ""
+
+msgid "Kitob mavjud, bron qilishingiz mumkin"
+msgstr ""
+
+msgid "Mavzuni almashtirish"
+msgstr ""
+
+# request_qr.html / issue_qr.html
+msgid "Bron QR-kodi"
+msgstr ""
+
+msgid "Bron qilish kodi"
+msgstr ""
+
+msgid "Topshirish QR-kodi"
+msgstr ""
+
+msgid "Kitobni qaytarish"
+msgstr ""
+
+msgid "Kitob topshirish"
+msgstr ""
+
+msgid "QR-kodni ko'rsating"
+msgstr ""
+
+msgid "Kitobni olish uchun quyidagi QR-kodni kutubxonachiga ko'rsating."
+msgstr ""
+
+msgid "Kutubxonachi skanerlagandan so'ng broningiz tasdiqlanadi."
+msgstr ""
+
+msgid "Muvaffaqiyatli bron qilindi!"
+msgstr ""
+
+msgid "Kitob muvaffaqiyatli berildi. Yoqimli mutolaa tilaymiz!"
+msgstr ""
+
+msgid "Kitobni qaytarish uchun quyidagi QR-kodni kutubxonachiga ko'rsating."
+msgstr ""
+
+msgid "Kitob topshirildi!"
+msgstr ""
+
+msgid "Kitob kutubxonaga muvaffaqiyatli qaytarildi."
+msgstr ""
+
+msgid "Mening kitoblarimga qaytish"
+msgstr ""
+
+msgid "Tanlangan kitob:"
+msgstr ""
+
+msgid "Sana:"
+msgstr ""
+
+msgid "Status:"
+msgstr ""
+
+msgid "Yangilanishiga:"
+msgstr ""
+
+msgid "Kutilmoqda..."
+msgstr ""
+
+msgid "Olingan sana:"
+msgstr ""
+
+msgid "Berilgan"
+msgstr ""
+
+msgid "Qayta olish"
+msgstr ""
+
+# qr_unified.html
+msgid "QR Skaner | Online Kutibxona"
+msgstr ""
+
+msgid "QR Skaner"
+msgstr ""
+
+msgid "Kitob berish yoki qabul qilish"
+msgstr ""
+
+msgid ""
+"O'quvchi telefonidagi QR-kodni skanerlang. Tizim amal turini o'zi aniqlaydi."
+msgstr ""
+
+msgid "Skanerlashni boshlash uchun bosing"
+msgstr ""
+
+msgid "Skanerni yoqish"
+msgstr ""
+
+msgid "Kod orqali kiritish"
+msgstr ""
+
+msgid "Orqaga qaytish"
+msgstr ""
+
+msgid "Amal turini tanlang va tokenni kiriting"
+msgstr ""
+
+msgid "Kitob berish"
+msgstr ""
+
+msgid "Kitob qabul"
+msgstr ""
+
+msgid "Bekor qilish"
+msgstr ""
+
+msgid "Tasdiqlash"
+msgstr ""
+
+# books.html
+msgid "Barcha kitoblar"
+msgstr ""
+
+msgid "Qidiruvi"
+msgstr ""
+
+msgid "Kitob qidirish"
+msgstr ""
+
+msgid "Qidiruv bo'yicha hech narsa topilmadi"
+msgstr ""
+
+# common
+msgid "Foydalanuvchilar topilmadi"
+msgstr ""
+
+msgid "Hozirda faol o'qishlar mavjud emas"
+msgstr ""
+
+msgid "Hozirda o'qilayotgan kitoblar"
+msgstr ""
+
+msgid "Profilni tahrirlash"
+msgstr ""
+
+msgid "Parolni o'zgartirmoqchi bo'lsangizgina to'ldiring."
+msgstr ""
+
+msgid "Sinf va Harf"
+msgstr ""
+
+msgid "O'quvchi"
+msgstr ""
+
+msgid "Maktab Admini"
+msgstr ""
+
+msgid "Maktab ID"
+msgstr ""
+
+msgid "Maktab qo'shish"
+msgstr ""
+
+msgid "Muassasalar boshqaruvi"
+msgstr ""
+
+msgid "Tuman (Rayon)"
+msgstr ""
+
+msgid "Tizim xabari"
+msgstr ""
+
+msgid "Bildirishnomalar yo'q"
+msgstr ""
+
+msgid "Tizimda xatolik yuz berdi"
+msgstr ""
+
+msgid "Saytda ko'rsatish"
+msgstr ""
+
+msgid "Barcha maktablar uchun ko'rsatish"
+msgstr ""
+
+msgid "Tanlang"
+msgstr ""
+
+msgid "O'qilganlar soni"
+msgstr ""
+
+msgid "Bildirishnomalar yo'q"
+msgstr ""
+
+msgid "Kitob:"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Manual ID:"
+msgstr ""
+
+msgid "School Admin | Online Kutibxona"
+msgstr ""
+
+msgid "Bildirishnomalar yo\\'q"
+msgstr ""
+
+msgid "Tizim amallari"
+msgstr ""
+
+msgid "Barcha amallar"
+msgstr ""
+
+msgid "7 kun"
+msgstr ""
+
+msgid "Barcha vaqt"
+msgstr ""
+
+msgid "Filtrlash"
+msgstr ""
+
+msgid "Amallar tarixi topilmadi"
+msgstr ""
+
+msgid "Filtrlarni tozalash"
+msgstr ""
+
+msgid "ta"
+msgstr ""
+
+msgid "Tizim"
+msgstr ""
+
+msgid "Qidirish..."
+msgstr ""
+
+msgid "Kitob qaytarish"
+msgstr ""
+
+msgid "Yaratish"
+msgstr ""
+
+msgid "Oy"
+msgstr ""
+
+msgid "Bugun"
+msgstr ""
+
+msgid "Kitoblar"
+msgstr ""
+
+msgid "Kitobxonlar"
+msgstr ""
+
+msgid "Maktablar"
+msgstr ""
+
+msgid "Bugun berilgan"
+msgstr ""
+
+msgid "Bugun qaytarilgan"
+msgstr ""
+
+msgid "Davr"
+msgstr ""
+
+msgid "30 kun"
+msgstr ""
+
+msgid "12 oy"
+msgstr ""
+
+msgid "Kitob qaytarishlar"
+msgstr ""
+
+msgid "Kategoriyasiz"
+msgstr ""
+
+msgid "Eng faol kitobxonlar"
+msgstr ""
+
+msgid "ta kitob"
+msgstr ""
+
+msgid "Foydalanish dinamikasi"
+msgstr ""
+
+msgid "Kategoriyalar"
+msgstr ""
+
+msgid "Eng faol maktablar"
+msgstr ""
+
+msgid "Hozircha ma'lumotlar yo'q"
+msgstr ""
+
+msgid "Ijarada"
+msgstr ""
+
+msgid "Umumiy XP"
+msgstr ""
+
+msgid "Avtomatik yangilash"
+msgstr ""
+
+msgid "To'xtatish"
+msgstr ""
+
+msgid "Yangi foydalanuvchilar"
+msgstr ""
+
+msgid "Aktiv ijaralar"
+msgstr ""
+
+msgid "Tahlil"
+msgstr ""
+
+msgid "Asosiy"
+msgstr ""
+
+msgid "Boshqaruv"
+msgstr ""
+
+msgid "Kontent"
+msgstr ""
+
+msgid "kunlik streak"
+msgstr ""
+
+msgid "Hisob ma'lumotlari"
+msgstr ""
+
+msgid "To'liq ism"
+msgstr ""
+
+msgid "Elektron pochta"
+msgstr ""
+
+msgid "A'zo bo'lgan"
+msgstr ""
+
+msgid "Oxirgi kirish"
+msgstr ""
+
+msgid "So'nggi amallar"
+msgstr ""
+
+msgid "Hozircha amallar yo'q"
+msgstr ""
+
+msgid "Streak"
+msgstr ""
+
+msgid "Eng uzun streak"
+msgstr ""
+
+msgid "Berish"
+msgstr ""
+
+msgid "Qaytarish"
+msgstr ""
+
+msgid "Yangi"
+msgstr ""
+
+msgid "Barcha"
+msgstr ""
+
+msgid "Chop etilgan"
+msgstr ""
+
+msgid "Hozircha yangiliklar yo'q"
+msgstr ""
+
+msgid "Yangi xabar qo'shish"
+msgstr ""
+
+msgid "Xabarni tahrirlash"
+msgstr ""
+
+#: frontend_admin/views.py:277
+msgid "kitob berilgan"
+msgstr ""
+
+#: frontend_admin/views.py:278
+msgid "kitob o'qigan"
+msgstr ""
+
+#: frontend_admin/views.py:298
+msgid "So'nggi {n} kun ichidagi faol maktablar va kitobxonlar"
+msgstr ""
+
+#: frontend_admin/views.py:302
+msgid "Yangilik muvaffaqiyatli yaratildi"
+msgstr ""
+
+#: frontend_admin/views.py:291
+msgid "Ma'lumotlar mavjud emas"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/statistics.html:58
+msgid "Yangilik qilish"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/all_users.html:29
+msgid "Adminlar"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/all_users.html:32
+msgid "Superadmin"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/all_users.html:35
+msgid "Bugun kirdi"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/all_users.html:111
+msgid "Holat"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/all_users.html:113
+msgid "Ro'yxatdan o'tgan"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/all_users.html:131
+msgid "Faol"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/all_users.html:131
+msgid "Faolsiz"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/user_detail.html:50
+msgid "XP ball"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/user_detail.html:118
+msgid "Kitob olish tarixi"
+msgstr ""
+
+#: frontend_admin/templates/admin_panel/user_detail.html:130
+msgid "Orqaga"
+msgstr ""
+
+msgid "Faol,Faolsiz"
+msgstr ""
+
+msgid "Jami muassasalar"
+msgstr ""
+
+msgid "Jami maktablar"
+msgstr ""
+
+msgid "Jami tumanlar"
+msgstr ""
+
+msgid "ta tuman"
+msgstr ""
+
+msgid "Haqiqatdan ham"
+msgstr ""
+
+msgid "o'chirmoqchimisiz?"
+msgstr ""
+
+#, python-format
+msgid "Haqiqatdan ham \"%(object)s\" o'chirmoqchimisiz?"
+msgstr ""
+
+msgid "Yan"
+msgstr ""
+
+msgid "Fev"
+msgstr ""
+
+msgid "Mar"
+msgstr ""
+
+msgid "Apr"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "Iyun"
+msgstr ""
+
+msgid "Iyl"
+msgstr ""
+
+msgid "Avg"
+msgstr ""
+
+msgid "Sen"
+msgstr ""
+
+msgid "Okt"
+msgstr ""
+
+msgid "Noy"
+msgstr ""
+
+msgid "Dek"
+msgstr ""
+
+#: frontend_school/templates/school_panel/students.html:16
+msgid "Jami o'quvchilar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/students.html:20
+msgid "Kitob o'qiyotganlar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/teachers.html:16
+msgid "Jami o'qituvchilar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/books.html:18
+msgid "Jami nusxa"
+msgstr ""
+
+#: frontend_school/templates/school_panel/issued_books.html:40
+msgid "ta aktiv"
+msgstr ""
+
+#: frontend_school/templates/school_panel/issued_books.html:35
+msgid "Kitob nomi yoki foydalanuvchi..."
+msgstr ""
+
+#: frontend_school/templates/school_panel/books.html:50
+msgid "Kitob nomi..."
+msgstr ""
+
+#: frontend_school/templates/school_panel/students.html:39
+msgid "Ism, login yoki sinf..."
+msgstr ""
+
+#: frontend_school/templates/school_panel/teachers.html:39
+msgid "Ism yoki login..."
+msgstr ""
+
+#: frontend_school/templates/school_panel/history.html:14
+msgid "Jami amallar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/history.html:42
+msgid "ta yozuv"
+msgstr ""
+
+#: frontend_school/templates/school_panel/news.html:14
+msgid "Jami yangiliklar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/news.html:18
+msgid "Maktab yangiliklari"
+msgstr ""
+
+#: frontend_school/templates/school_panel/news.html:22
+msgid "Tizim xabarlari"
+msgstr ""
+
+#: frontend_school/templates/school_panel/student_form.html:30
+msgid "Sinf va harf"
+msgstr ""
+
+#: frontend_school/templates/school_panel/qr_unified.html:16
+msgid "Bugungi skaner"
+msgstr ""
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "O'quvchi telefonidagi QR-kodni skanerlang"
+msgstr ""
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Muvaffaqiyatli!"
+msgstr ""
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Xatolik!"
+msgstr ""
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Foydalanuvchi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Kamera xatoligi:"
+msgstr ""
+
+#: frontend_school/templates/school_panel/qr_unified.html
+msgid "Tizimda xatolik yuz berdi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/students.html
+msgid "Keyingi sinfga o'tkazish"
+msgstr ""
+
+#: frontend_school/templates/school_panel/students.html
+msgid "Barcha o'quvchilarni keyingi sinfga o'tkazishni tasdiqlaysizmi?"
+msgstr ""
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Bitiruvchilar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Jami bitiruvchilar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Aktiv ijaralar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "ta bitiruvchi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Bitiruvchi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "Bitiruvchilar topilmadi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Statistika"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Aktiv o'quvchilar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Ijaralar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Ma'lumot topilmadi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Aktiv o'quvchilar yo'q"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Yutuqlar topilmadi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Faol chellenjlar yo'q"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Top o'quvchilar"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Post qilish"
+msgstr ""
+
+#: frontend_school/templates/school_panel/statistics.html
+msgid "kitob"
+msgstr ""
+
+#: frontend_school/templates/school_panel/students.html
+msgid "ta o'quvchi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/teachers.html
+msgid "ta o'qituvchi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/graduates.html
+msgid "ta bitiruvchi"
+msgstr ""
+
+#: frontend_school/templates/school_panel/news.html
+msgid "ta yangilik"
+msgstr ""
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Berilgan"
+msgstr ""
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Qabul qilingan"
+msgstr ""
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Yaratilgan"
+msgstr ""
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Kirish"
+msgstr ""
+
+#: frontend_school/templatetags/action_tags.py
+msgid "Yangilangan"
+msgstr ""
+
+#: frontend_school/templatetags/action_tags.py
+msgid "O'chirilgan"
+msgstr ""
+
+#: frontend_user/templates/user_panel/book_detail.html
+msgid "hozir o'qiyapti"
+msgstr ""
+
+#: frontend_user/templates/user_panel/book_detail.html
+msgid "Mashhur"
+msgstr ""
+
+#: frontend_user/templates/user_panel/library.html
+msgid "Tugagan"
+msgstr ""
+
+#: templates/base.html
+msgid "Bildirishnomalar"
+msgstr ""
+
+#: templates/base.html
+msgid "Hammasini o'qilgan deb belgilash"
+msgstr ""
+
+#: frontend_user/templates/user_panel/library.html
+msgid "Hozircha hech kim kitob olmagan"
+msgstr ""
+
+#: frontend_user/templates/user_panel/library.html
+msgid "So'nggi faoliyat"
+msgstr ""
+
+#: templates/base.html
+msgid "Yopish"
+msgstr ""
+
+#: frontend_user/templates/user_panel/my_books.html
+msgid "So'ralgan"
+msgstr ""
+
+#: frontend_user/templates/user_panel/my_books.html
+msgid "Bron qilingan"
+msgstr ""
+
+#: frontend_user/templates/user_panel/my_books.html
+msgid "O'qilgan kitoblar"
+msgstr ""
+
+#: frontend_user/templates/user_panel/my_books.html
+msgid "Kutubxonaga o'tish"
+msgstr ""
+
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Daraja"
+msgstr ""
+
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Ikonkalar"
+msgstr ""
+
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Yutuqlar"
+msgstr ""
+
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Mening yutuqlarim"
+msgstr ""
+
+#: frontend_user/templates/user_panel/achievements.html
+msgid "Hozircha yutuqlar mavjud emas"
+msgstr ""
+
+#: frontend_user/templates/user_panel/challenges.html
+#: frontend_user/templates/user_panel/sidebar_items.html
+#: frontend_school/templates/school_panel/statistics.html
+msgid "Chellenjlar"
+msgstr ""
+
+msgid "Hali kitob o'qilmagan"
+msgstr ""
+
+msgid "Hali kategoriyalar bo'yicha ma'lumot yo'q"
+msgstr ""
+
+msgid "Oylik kitoblar"
+msgstr ""
+
+msgid "Eng yaxshi o'quvchilar"
+msgstr ""
+
+msgid "Hafta"
+msgstr ""
+
+msgid "sinf"
+msgstr ""
+
+msgid "Aktiv chellenjlar yo'q"
+msgstr ""
+
+msgid "Yangi chellenjlar tez orada paydo bo'ladi"
+msgstr ""
+
+msgid "Barcha yutuqlar"
+msgstr ""
+
+msgid "Hozircha kitoblar yo'q"
+msgstr ""
+
+msgid "hafta"
+msgstr ""
+
+msgid "haftalik streak"
+msgstr ""
+
+msgid "14 kun"
+msgstr ""
+
+msgid "Boshqa"
+msgstr ""
+
+msgid "Faoliyat"
+msgstr ""
+
+msgid "Faoliyat yo'q"
+msgstr ""
+
+msgid "Hozircha ma'lumot yo'q"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "Ikonka"
+msgstr ""
+
+msgid "OY O'QUVCHISI"
+msgstr ""
+
+msgid "Progress"
+msgstr ""
+
+msgid "QR kutubxonasi yuklanmadi. Sahifani yangilang."
+msgstr ""
+
+msgid "Sahifa"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "XP"
+msgstr ""
+
+msgid "Yangilik qilib post qilish"
+msgstr ""
+
+msgid "aktiv kitob"
+msgstr ""
+
+msgid "Hisob bloklandi"
+msgstr ""
+
+msgid "Hisobingiz vaqtincha bloklandi"
+msgstr ""
+
+msgid ""
+"Ko'p marta noto'g'ri urinishlar tufayli hisobingiz 1 soatga bloklangan. "
+"Iltimos, birozdan so'ng qayta urinib ko'ring."
+msgstr ""

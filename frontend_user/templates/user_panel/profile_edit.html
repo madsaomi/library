@@ -26,6 +26,21 @@
                     </label>
                     <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control" data-limit-chars="50" required>
                 </div>
+                {% if user.role == 'student' %}
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                        <i class="fas fa-icons" style="color: var(--primary); margin-right: 8px;"></i> {% trans "Ikonka" %}
+                    </label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        {% for icon in unlocked_icons %}
+                        <label class="icon-item" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; border: 2px solid {% if user.selected_icon == icon %}var(--primary){% else %}var(--border){% endif %}; background: {% if user.selected_icon == icon %}var(--glass){% else %}transparent{% endif %};">
+                            <input type="radio" name="selected_icon" value="{{ icon }}" {% if user.selected_icon == icon %}checked{% endif %} style="display: none;" onchange="this.closest('.icon-item').querySelector('i').style.color='var(--primary)'">
+                            <i class="fas {{ icon }}" style="font-size: 1.3rem; color: {% if user.selected_icon == icon %}var(--primary){% else %}var(--text-muted){% endif %};"></i>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
             </div>
             
             <div style="display: flex; gap: 12px;">

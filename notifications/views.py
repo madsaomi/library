@@ -71,3 +71,18 @@ def mark_all_read(request):
 def unread_count(request):
     count = Notification.objects.filter(user=request.user, is_read=False).count()
     return JsonResponse({"unread_count": count})
+
+
+@login_required
+def top_notification_api(request):
+    note = Notification.objects.filter(
+        user=request.user, is_read=False
+    ).order_by('-created_at').first()
+    if note:
+        return JsonResponse({
+            "id": note.id,
+            "title": note.title,
+            "body": note.body,
+            "url": note.url,
+        })
+    return JsonResponse(None, safe=False)

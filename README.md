@@ -1,99 +1,87 @@
-# 📚 Online Kutibxona (Raqamli Kutubxona)
+# Online Kutibxona
 
-Zamonaviy maktablar uchun mo'ljallangan, QR-kod tizimi orqali ishlaydigan aqlli kutubxona boshqaruv tizimi.
+Smart library management system for schools with QR-code, gamification (XP, levels, achievements), and multi-language support.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)
-![Django](https://img.shields.io/badge/django-5.0%2B-green.svg)
+![Python](https://img.shields.io/badge/python-3.13%2B-blue)
+![Django](https://img.shields.io/badge/django-5.0-green)
+![License](https://img.shields.io/badge/license-MIT-gray)
 
-## ✨ Asosiy imkoniyatlar
+## Features
 
-*   🛡️ **Xavfsiz dinamik QR-kodlar:** Har 2 daqiqada yangilanadigan HMAC asosidagi xavfsiz identifikatsiya tizimi.
-*   👨‍💼 **Ko'p darajali boshqaruv:**
-    *   **Super Admin:** Barcha maktablarni va muassasalarni nazorat qilish.
-    *   **Maktab Admini (Kutubxonachi):** Kitoblar fondini boshqarish, o'quvchilarni ro'yxatga olish va kitob berish/qabul qilish.
-    *   **O'quvchi/O'qituvchi:** Kitoblarni qidirish, bron qilish va shaxsiy kabinet orqali o'z kitoblarini kuzatish.
-*   🎨 **Premium Dizayn:** Zamonaviy "Glassmorphism" uslubidagi qulay interfeys.
-*   📸 **Kamera bilan ishlash:** QR skaner orqali kitob berish va qabul qilish.
-*   📊 **Real-vaqt statistikasi:** Kitoblar aylanishi va o'quvchilar faolligini tahlil qilish.
-*   🌍 **Ko'p tilli qo'llab-quvvatlash:** O'zbek, Rus, Ingliz va Qaraqalpaq tillari.
+- **QR-based** borrowing/returning (HMAC dynamic tokens, refresh every 2 min)
+- **3 roles**: Super Admin, School Admin (Librarian), Student/Teacher
+- **Gamification**: XP points, levels, achievements, challenges, streaks
+- **Grade promotion**: auto-promotes students on Sept 1, graduates archived
+- **Brute-force protection**: django-axes (5 attempts → 1h lockout)
+- **Notifications**: bell dropdown + push notifications + top banner
+- **Multi-language**: Uzbek, Russian, English, Karakalpak
+- **Glassmorphism UI**: light/dark theme, responsive
+- **Charts**: monthly stats, category distribution (Chart.js)
 
-## 🏗️ Loyiha strukturasi (Architecture)
+## Stack
 
-Loyiha modulli arxitekturaga asoslangan bo'lib, har bir rol uchun alohida frontend ilovalari mavjud:
+| Layer | Tech |
+|---|---|
+| Backend | Python 3.13, Django 5.0 |
+| Database | SQLite (dev) / PostgreSQL (prod) |
+| Cache | LocMemCache (dev) / Redis (prod) |
+| Frontend | Vanilla JS, CSS3, Chart.js |
+| QR | html5-qrcode + HMAC tokens |
+| Admin | Jazzmin |
 
-```text
-ebook/
-├── core/                 # Sozlamalar va global marshrutlash
-├── accounts/             # Foydalanuvchilar, rollar va xavfsizlik (HMAC Tokens)
-├── schools/              # Maktablar va muassasalar bazasi
-├── books/                # Kitoblar katalogi, inventar va ijara tizimi
-├── stats/                # Tizim loglari va tahliliy ma'lumotlar
-├── notifications/        # Push-bildirishnomalar va xabarlar
-├── frontend_admin/       # Super Admin interfeysi (Django Templates)
-├── frontend_school/      # Maktab Admini/Kutubxonachi interfeysi
-├── frontend_user/        # O'quvchi va O'qituvchi interfeysi
-├── static/               # Global CSS/JS va dizayn aktivlari
-├── templates/            # Umumiy va asosiy shablonlar (Base layouts)
-├── locale/               # Tarjima fayllari (.po / .mo)
-├── media/                # Yuklangan rasmlar va QR-kodlar
-└── README.md             # Loyiha hujjatlari
-```
-
-## 🛠️ Texnologiyalar
-
-*   **Backend:** Python 3.12+, Django 5.0+, SQLite (development) / PostgreSQL (production)
-*   **Frontend:** Vanilla JS, HTML5, CSS3 (Glassmorphism design)
-*   **QR System:** HMAC-based dynamic tokens + html5-qrcode (JS)
-*   **UI Framework:** Jazzmin (Admin panel uchun)
-
-## 🚀 O'rnatish
-
-1.  **Loyiha nusxasini olish:**
-    ```bash
-    git clone https://github.com/username/elektron-kutibxona.git
-    cd elektron-kutibxona
-    ```
-
-2.  **Virtual muhitni sozlash:**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # Windows uchun: venv\Scripts\activate
-    ```
-
-3.  **Kutubxonalarni o'rnatish:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4.  **Bazani tayyorlash:**
-    ```bash
-    python manage.py migrate
-    ```
-
-5.  **Admin foydalanuvchi yaratish:**
-    ```bash
-    python manage.py createsuperuser
-    ```
-
-6.  **Loyihani ishga tushirish:**
-    ```bash
-    python manage.py runserver
-    ```
-
-## 🌐 Tarjimalarni yangilash
+## Quick start
 
 ```bash
-# Yangi tarjimalarni qo'shgandan so'ng kompilyatsiya qilish:
-python -c "import polib; import os; \
-  for lang in ['ru','en','kaa']: \
-    po = polib.pofile(f'locale/{lang}/LC_MESSAGES/django.po'); \
-    po.save_as_mofile(f'locale/{lang}/LC_MESSAGES/django.mo')"
+git clone <repo> && cd library
+python -m venv venv && venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
 ```
 
-## 📄 Litsenziya
+## Structure
 
-Ushbu loyiha MIT litsenziyasi ostida tarqatiladi.
+```
+library/
+├── core/              # Settings, middleware, URLs
+├── accounts/          # Users, roles, auth
+├── schools/           # Schools, districts, institutions
+├── books/             # Catalog, issues, requests, achievements
+├── stats/             # Action logs
+├── notifications/     # Push subscriptions, in-app notifications
+├── frontend_admin/    # Super admin panel
+├── frontend_school/   # School admin panel
+├── frontend_user/     # Student/teacher panel
+├── static/            # CSS, JS
+├── templates/         # Base layouts
+└── locale/            # Translations (.po / .mo)
+```
 
----
-Developed with ❤️ for Modern Schools.
+## Security
+
+- **CSRF** protection, `CORS` headers
+- **Password validators**, change form
+- **Rate limiting** on login: 5 failures → 1h block (axes)
+- **Role-based access**: `user_passes_test` for admin/school_admin
+- **Session** security configurable via env vars
+- No raw SQL, no `mark_safe`
+
+## Cache
+
+Default: local memory. For Redis:
+
+```bash
+CACHE_BACKEND=django_redis.cache.RedisCache
+CACHE_LOCATION=redis://...
+```
+
+## Translations
+
+```bash
+python -c "import polib; [polib.pofile(f'locale/{l}/LC_MESSAGES/django.po').save_as_mofile(f'locale/{l}/LC_MESSAGES/django.mo') for l in ['uz','ru','en','kaa']]"
+```
+
+## License
+
+MIT

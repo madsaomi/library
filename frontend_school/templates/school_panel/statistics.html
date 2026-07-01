@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load achievement_tags %}
+
+{% block title %}{% trans "Statistika" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Statistika" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="max-width: 700px; margin: 0 auto;">
+    <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default; text-align: center;">
+            <div class="stat-value" style="font-size: 1.15rem; color: var(--primary);">{{ total_students }}</div>
+            <div class="stat-label" style="font-size: 0.65rem;">{% trans "O'quvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default; text-align: center;">
+            <div class="stat-value" style="font-size: 1.15rem; color: #10b981;">{{ active_count }}</div>
+            <div class="stat-label" style="font-size: 0.65rem;">{% trans "Aktiv o'quvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default; text-align: center;">
+            <div class="stat-value" style="font-size: 1.15rem; color: #f59e0b;">{{ total_books }}</div>
+            <div class="stat-label" style="font-size: 0.65rem;">{% trans "Kitoblar" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default; text-align: center;">
+            <div class="stat-value" style="font-size: 1.15rem; color: #6366f1;">{{ active_issues }}/{{ total_issues }}</div>
+            <div class="stat-label" style="font-size: 0.65rem;">{% trans "Ijaralar" %}</div>
+        </div>
+    </div>
+
+    <!-- Top o'quvchilar -->
+    <div class="glass-panel" style="padding: 20px; margin-bottom: 16px;">
+        <h3 style="margin: 0 0 14px 0; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-trophy" style="color: #f59e0b;"></i> {% trans "Top o'quvchilar" %}
+        </h3>
+        {% if top_students %}
+        <div class="info-grid" style="gap: 4px;">
+            {% for s in top_students %}
+            <div style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid var(--border);">
+                <span style="width: 22px; font-size: 0.7rem; font-weight: 700; text-align: center; color: {% if forloop.counter == 1 %}#f59e0b{% elif forloop.counter == 2 %}#94a3b8{% elif forloop.counter == 3 %}#b45309{% else %}var(--text-muted){% endif %};">{{ forloop.counter }}</span>
+                <div class="avatar-circle" style="width: 30px; height: 30px; background: {% if forloop.counter == 1 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, var(--primary), #7c3aed){% endif %}; flex-shrink: 0;">
+                    <span class="avatar-initials" style="font-size: 0.6rem;">{{ s.first_name|first|upper }}{{ s.last_name|first|upper }}</span>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 0.78rem; font-weight: 500;">{{ s.first_name }} {{ s.last_name }}</div>
+                    <div style="font-size: 0.62rem; color: var(--text-muted);">{{ s.grade|default:"—" }}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.8rem; font-weight: 600; color: var(--primary);">{{ s.total_books_read }}</div>
+                    <div style="font-size: 0.55rem; color: var(--text-muted);">{% trans "kitob" %}</div>
+                </div>
+                <form method="post" action="{% url 'frontend_school:post_top_student_news' s.pk %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; cursor: pointer; padding: 6px 12px; display: flex; align-items: center; gap: 5px; color: #f59e0b; font-size: 0.72rem; font-weight: 500; white-space: nowrap; transition: all 0.2s;" title="{% trans 'Yangilik qilib post qilish' %}">
+                        <i class="fas fa-newspaper"></i> {% trans "Post qilish" %}
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">{% trans "Ma'lumot topilmadi" %}</p>
+        {% endif %}
+    </div>
+
+    <!-- Aktiv o'quvchilar -->
+    <div class="glass-panel" style="padding: 20px; margin-bottom: 16px;">
+        <h3 style="margin: 0 0 14px 0; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-book-reader" style="color: #10b981;"></i> {% trans "Aktiv o'quvchilar" %} <span class="badge" style="background: rgba(16,185,129,0.1); color: #10b981; font-size: 0.55rem;">{{ active_count }}</span>
+        </h3>
+        {% if active_students %}
+        <div class="info-grid" style="gap: 4px;">
+            {% for s in active_students %}
+            <div style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid var(--border);">
+                <div class="avatar-circle" style="width: 30px; height: 30px; background: linear-gradient(135deg, #10b981, #059669); flex-shrink: 0;">
+                    <span class="avatar-initials" style="font-size: 0.6rem;">{{ s.first_name|first|upper }}{{ s.last_name|first|upper }}</span>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 0.78rem; font-weight: 500;">{{ s.first_name }} {{ s.last_name }}</div>
+                    <div style="font-size: 0.62rem; color: var(--text-muted);">@{{ s.username }} · {{ s.grade|default:"—" }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="font-size: 0.7rem; color: var(--text-muted); padding: 8px;">{% trans "Aktiv o'quvchilar yo'q" %}</div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">{% trans "Aktiv o'quvchilar yo'q" %}</p>
+        {% endif %}
+    </div>
+
+    <!-- Yutuqlar -->
+    <div class="glass-panel" style="padding: 20px; margin-bottom: 16px;">
+        <h3 style="margin: 0 0 14px 0; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-medal" style="color: #f59e0b;"></i> {% trans "Yutuqlar" %}
+        </h3>
+        {% if recent_yutuqlar %}
+        <div class="info-grid" style="gap: 4px;">
+            {% for y in recent_yutuqlar %}
+            <div style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid var(--border);">
+                <i class="{{ y.achievement.icon }}" style="font-size: 1rem; color: #f59e0b; width: 24px; text-align: center;"></i>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 0.78rem; font-weight: 500;">{{ y.achievement|ach_name }}</div>
+                    <div style="font-size: 0.62rem; color: var(--text-muted);">{{ y.user.first_name }} {{ y.user.last_name }} · {{ y.earned_at|date:"d.m.Y" }}</div>
+                </div>
+                <span class="badge" style="background: rgba(245,158,11,0.1); color: #f59e0b; font-size: 0.55rem; white-space: nowrap;">+{{ y.achievement.xp_reward }} XP</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">{% trans "Yutuqlar topilmadi" %}</p>
+        {% endif %}
+    </div>
+
+    <!-- Chellenjlar -->
+    <div class="glass-panel" style="padding: 20px; margin-bottom: 16px;">
+        <h3 style="margin: 0 0 14px 0; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-fire" style="color: #ef4444;"></i> {% trans "Chellenjlar" %}
+        </h3>
+        {% if active_chellenjlar %}
+        <div class="info-grid" style="gap: 4px;">
+            {% for c in active_chellenjlar %}
+            <div style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid var(--border);">
+                <i class="fas fa-flag-checkered" style="font-size: 1rem; color: #ef4444; width: 24px; text-align: center;"></i>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 0.78rem; font-weight: 500;">{{ c.title }}</div>
+                    <div style="font-size: 0.62rem; color: var(--text-muted);">{{ c.target_count }} {% trans "kitob" %} · {{ c.end_date|date:"d.m.Y" }} gacha</div>
+                </div>
+                <span class="badge" style="background: rgba(239,68,68,0.1); color: #ef4444; font-size: 0.55rem; white-space: nowrap;">+{{ c.xp_reward }} XP</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">{% trans "Faol chellenjlar yo'q" %}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

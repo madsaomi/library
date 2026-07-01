@@ -73,6 +73,7 @@ class BookIssue(models.Model):
     is_returned = models.BooleanField(default=False)
     return_qr_code = models.ImageField(upload_to='return_qrs/%Y/%m/%d/', null=True, blank=True)
     qr_token = models.CharField(max_length=255, null=True, blank=True)
+    xp_awarded = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.book.title} -> {self.user.username}"
@@ -110,3 +111,92 @@ class BookWaitlist(models.Model):
 
     def __str__(self):
         return f"{self.user.username} waits for {self.book.title}"
+
+
+class Achievement(models.Model):
+    key = models.CharField(_("Kalit"), max_length=50, unique=True)
+    name = models.CharField(_("Nomi"), max_length=255)
+    description = models.TextField(_("Tavsif"))
+    icon = models.CharField(_("Ikonka"), max_length=50, default='fa-trophy')
+    xp_reward = models.IntegerField(_("XP mukofoti"), default=25)
+    condition_type = models.CharField(_("Shart turi"), max_length=50, choices=(
+        ('books_count', _('Kitoblar soni')),
+        ('categories', _('Kategoriyalar soni')),
+        ('all_categories', _('Barcha kategoriyalar')),
+        ('streak', _('Streak')),
+        ('speed_return', _('Tez qaytarish')),
+    ))
+    condition_value = models.IntegerField(_("Shart qiymati"))
+
+    class Meta:
+        verbose_name = _("Yutuq")
+        verbose_name_plural = _("Yutuqlar")
+
+    def __str__(self):
+        return self.name
+
+
+class UserAchievement(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='achievements')
+    achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE)
+    earned_at = models.DateTimeField(_("Qo'lga kiritilgan vaqt"), auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'achievement']
+        verbose_name = _("Foydalanuvchi yutug'i")
+        verbose_name_plural = _("Foydalanuvchi yutuqlari")
+
+
+class Challenge(models.Model):
+    title = models.CharField(_("Sarlavha"), max_length=255)
+    description = models.TextField(_("Tavsif"))
+    challenge_type = models.CharField(_("Tur"), max_length=50, choices=(
+        ('books_count', _('Kitoblar soni')),
+        ('category', _('Kategoriya')),
+    ))
+    target_count = models.IntegerField(_("Maqsad soni"))
+    xp_reward = models.IntegerField(_("XP mukofoti"), default=50)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Kategoriya"))
+    start_date = models.DateField(_("Boshlanish sanasi"))
+    end_date = models.DateField(_("Tugash sanasi"))
+    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("Maktab"))
+    is_active = models.BooleanField(_("Faol"), default=True)
+
+    class Meta:
+        verbose_name = _("Chellenj")
+        verbose_name_plural = _("Chellenjlar")
+
+    def __str__(self):
+        return self.title
+
+
+class UserChallenge(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='challenges')
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+    progress = models.IntegerField(_("Progress"), default=0)
+    completed = models.BooleanField(_("Yakunlangan"), default=False)
+    completed_at = models.DateTimeField(_("Yakunlangan vaqt"), null=True, blank=True)
+
+    class Meta:
+        unique_together = ['user', 'challenge']
+        verbose_name = _("Foydalanuvchi chellenji")
+        verbose_name_plural = _("Foydalanuvchi chellenjlari")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.challenge.title} ({self.progress}/{self.challenge.target_count})"
+
+
+class ReaderOfMonth(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_("Foydalanuvchi"))
+    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, verbose_name=_("Maktab"))
+    month = models.IntegerField(_("Oy"))
+    year = models.IntegerField(_("Yil"))
+    books_count = models.IntegerField(_("Kitoblar soni"))
+
+    class Meta:
+        unique_together = ['school', 'month', 'year']
+        verbose_name = _("Oy o'quvchisi")
+        verbose_name_plural = _("Oy o'quvchilari")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.month}/{self.year} ({self.books_count} books)"

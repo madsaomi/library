@@ -9,47 +9,31 @@
 {% endblock %}
 
 {% block content %}
-<div style="max-width: 600px; margin: 0 auto;">
-    <div class="glass-panel animate-fade" style="padding: 40px;">
-        <form method="post" id="district-form">
+<div style="max-width: 480px; margin: 0 auto;">
+    <div class="glass-panel animate-fade" style="padding: 32px;">
+        <form method="post">
             {% csrf_token %}
-            
-            <!-- District Name & Bulk Count -->
-            <div style="margin-bottom: 30px;">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 25px;">
-                    <h3 style="color: var(--primary); margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-map-marker-alt"></i> {% trans "Tuman ma'lumotlari" %}
-                    </h3>
-                    {% if form.instance.pk %}
-                    <span style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">
-                        {{ form.instance.schools.count }} {% trans "ta maktab" %}
-                    </span>
-                    {% endif %}
-                </div>
 
-                <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-                    {% for field in form %}
-                    <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
-                            {{ field.label }}
-                        </label>
-                        {{ field }}
-                        {% if field.help_text %}
-                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 5px; line-height: 1.4;">{{ field.help_text }}</p>
-                        {% endif %}
-                        {% if field.errors %}
-                        <p style="color: #ef4444; font-size: 0.8rem; margin-top: 5px;">{{ field.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Tuman nomi" %}</label>
+                {{ form.name }}
+                {% if form.name.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.name.errors.0 }}</span>{% endif %}
             </div>
-            
-            <div style="margin-top: 40px; display: flex; gap: 12px;">
-                <button type="submit" class="btn-primary" style="flex: 2; padding: 18px; border-radius: 16px; font-weight: 700;">
-                    <i class="fas fa-save"></i> {% trans "Saqlash" %}
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 32px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Avtomatik maktablar yaratish" %}</label>
+                {{ form.bulk_schools_count }}
+                {% if form.bulk_schools_count.help_text %}
+                <span style="color: var(--text-muted); font-size: 0.7rem;">{{ form.bulk_schools_count.help_text }}</span>
+                {% endif %}
+                {% if form.bulk_schools_count.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.bulk_schools_count.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;">
+                    <i class="fas fa-check"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend_admin:districts_list' %}" class="glass-card" style="flex: 1; padding: 18px; border-radius: 16px; text-align: center; text-decoration: none; color: var(--text-main); display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--border); transition: 0.3s;" onmouseover="this.style.background='var(--glass)'" onmouseout="this.style.background='transparent'">
+                <a href="{% url 'frontend_admin:districts_list' %}" class="glass-card" style="flex: 1; padding: 12px; border-radius: 10px; text-align: center; text-decoration: none; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--border); font-size: 0.85rem;">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>

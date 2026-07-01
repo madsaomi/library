@@ -48,7 +48,7 @@ class DistrictForm(forms.ModelForm):
         model = District
         fields = ['name']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'data-limit-chars': '100'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
         }
     def clean_name(self):
         val = self.cleaned_data.get('name')
@@ -77,8 +77,8 @@ class InstitutionForm(forms.ModelForm):
         model = Institution
         fields = ['name', 'address']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'data-limit-chars': '150'}),
-            'address': forms.TextInput(attrs={'class': 'form-control', 'data-limit-chars': '255'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
         }
     def clean_name(self):
         val = self.cleaned_data.get('name')

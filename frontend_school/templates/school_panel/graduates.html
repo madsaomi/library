@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Bitiruvchilar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Bitiruvchilar" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ total_graduates|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Jami bitiruvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #f59e0b;">{{ total_books|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Kitoblar" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #6366f1;">{{ total_active|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Aktiv ijaralar" %}</div>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="position: relative;">
+                <input type="text" id="search-input" placeholder="{% trans 'Ism, login yoki sinf...' %}"
+                       style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none; width: 220px; font-size: 0.8rem;">
+                <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">{{ page_obj.paginator.count }} {% trans "ta bitiruvchi" %}</div>
+                <a href="{% url 'frontend_school:students_list' %}" style="font-size: 0.75rem; color: var(--primary); text-decoration: none; white-space: nowrap;">
+                    <i class="fas fa-arrow-left"></i> {% trans "O'quvchilar" %}
+                </a>
+            </div>
+        </div>
+
+        <div class="info-grid" style="gap: 6px;">
+            {% for g in graduates %}
+            <div class="glass-card info-row graduate-row" data-search="{{ g.username|lower }} {{ g.first_name|lower }} {{ g.last_name|lower }} {{ g.grade|lower }}" style="padding: 10px 14px;">
+                <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                    <div class="avatar-circle" style="width: 34px; height: 34px; background: linear-gradient(135deg, #f59e0b, #d97706); flex-shrink: 0;">
+                        <span class="avatar-initials" style="font-size: 0.75rem;">{{ g.first_name|first|upper }}{{ g.last_name|first|upper }}</span>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; font-size: 0.82rem;">
+                            {{ g.first_name }} {{ g.last_name }}
+                            <span class="badge" style="background: rgba(245,158,11,0.15); color: #d97706; padding: 1px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 4px;">{% trans "Bitiruvchi" %}</span>
+                        </div>
+                        <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">
+                            <span>@{{ g.username }}</span>
+                            {% if g.grade %}
+                            <span style="margin-left: 6px;"><i class="fas fa-graduation-cap"></i> {{ g.grade }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                    <div style="display: flex; gap: 4px;">
+                        <a href="{% url 'frontend_school:student_edit' g.pk %}" class="glass-card" style="padding: 4px 8px; border-radius: 6px; text-decoration: none; font-size: 0.65rem; color: var(--primary); white-space: nowrap;"><i class="fas fa-edit"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                <i class="fas fa-graduation-cap" style="font-size: 2rem; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
+                {% trans "Bitiruvchilar topilmadi" %}
+            </div>
+            {% endfor %}
+            <div id="no-results" style="display: none; grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                {% trans "Qidiruv bo'yicha hech narsa topilmadi" %}
+            </div>
+        </div>
+        <div style="margin-top: 16px;">
+            {% include 'pagination.html' %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+    const rows = document.querySelectorAll('.graduate-row');
+    const noResults = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        noResults.style.display = (found === 0 && rows.length > 0) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}
