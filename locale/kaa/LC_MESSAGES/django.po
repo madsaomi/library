@@ -1996,7 +1996,7 @@ msgid "CSRF xatolik"
 msgstr ""
 
 msgid "Eng ko'p o'qilgan kitoblar (Top 10)"
-msgstr ""
+msgstr "Kóp oqılǵan kitaplar (Top 10)"
 
 msgid "Faoliyat"
 msgstr ""
@@ -2005,7 +2005,7 @@ msgid "Faoliyat yo'q"
 msgstr ""
 
 msgid "Foydalanuvchi turlari"
-msgstr ""
+msgstr "Paydalanıwshı túrleri"
 
 msgid "Foydalanuvchilar topilmadi"
 msgstr ""
@@ -2089,7 +2089,7 @@ msgid "Olingan sana:"
 msgstr ""
 
 msgid "Oylik kitob berishlar"
-msgstr ""
+msgstr "Aylıq kitap beriwler"
 
 msgid "Profilni tahrirlash"
 msgstr ""
