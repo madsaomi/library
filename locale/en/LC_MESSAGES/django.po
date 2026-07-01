@@ -2172,3 +2172,9 @@ msgid ""
 msgstr ""
 "Too many failed login attempts. Your account is locked for 1 hour. Please "
 "try again later."
+
+msgid "Chop etishni tasdiqlaysizmi?"
+msgstr "Confirm publication?"
+
+msgid "Bugun bu haqida yangilik allaqachon chop etilgan!"
+msgstr "News already published today!"

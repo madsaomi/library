@@ -2102,3 +2102,9 @@ msgid ""
 "Ko'p marta noto'g'ri urinishlar tufayli hisobingiz 1 soatga bloklangan. "
 "Iltimos, birozdan so'ng qayta urinib ko'ring."
 msgstr ""
+
+msgid "Chop etishni tasdiqlaysizmi?"
+msgstr ""
+
+msgid "Bugun bu haqida yangilik allaqachon chop etilgan!"
+msgstr ""

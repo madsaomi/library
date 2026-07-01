@@ -734,6 +734,14 @@ def statistics(request):
     total_issues = BookIssue.objects.filter(book__school=school).count()
     active_issues = BookIssue.objects.filter(book__school=school, is_returned=False).count()
 
+    # Track which top students already have news posted today
+    from .models import News
+    posted_today_ids = set()
+    for s in top_students:
+        prefix = _("Eng faol o'quvchi: {name}").format(name=f"{s.first_name} {s.last_name}")
+        if News.objects.filter(school=school, title__startswith=prefix, created_at__date=today).exists():
+            posted_today_ids.add(s.pk)
+
     return render(request, 'school_panel/statistics.html', {
         'active_students': active_students,
         'active_count': active_count,
@@ -744,6 +752,7 @@ def statistics(request):
         'total_books': total_books,
         'total_issues': total_issues,
         'active_issues': active_issues,
+        'posted_today_ids': posted_today_ids,
     })
 
 @login_required(login_url='login')
@@ -751,9 +760,22 @@ def statistics(request):
 def post_top_student_news(request, pk):
     school = request.user.school
     student = get_object_or_404(CustomUser, pk=pk, school=school, role='student')
+
+    # Check if already posted today
+    from django.utils import timezone
+    from .models import News
+    today = timezone.localdate()
+    existing = News.objects.filter(
+        school=school,
+        title__startswith=_("Eng faol o'quvchi: {name}").format(name=f"{student.first_name} {student.last_name}"),
+        created_at__date=today,
+    ).exists()
+    if existing:
+        messages.warning(request, _("Bugun bu haqida yangilik allaqachon chop etilgan!"))
+        return redirect('frontend_school:statistics')
+
     from books.models import UserAchievement
     achievements = UserAchievement.objects.filter(user=student).select_related('achievement')
-    from .models import News
     achievement_lines = ""
     for ach in achievements:
         achievement_lines += f"  • {ach.achievement.name} (+{ach.achievement.xp_reward} XP)\n"

@@ -51,11 +51,17 @@
                     <div style="font-size: 0.8rem; font-weight: 600; color: var(--primary);">{{ s.total_books_read }}</div>
                     <div style="font-size: 0.55rem; color: var(--text-muted);">{% trans "kitob" %}</div>
                 </div>
-                <form method="post" action="{% url 'frontend_school:post_top_student_news' s.pk %}" style="margin: 0;">
+                <form method="post" action="{% url 'frontend_school:post_top_student_news' s.pk %}" style="margin: 0;" onsubmit="return confirm('{% trans "Chop etishni tasdiqlaysizmi?" as confirm_msg %}{{ confirm_msg|escapejs }}')">
                     {% csrf_token %}
+                    {% if s.pk in posted_today_ids %}
+                    <button type="submit" disabled style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 6px 12px; display: flex; align-items: center; gap: 5px; color: #10b981; font-size: 0.72rem; font-weight: 500; white-space: nowrap; cursor: default;">
+                        <i class="fas fa-check-circle"></i> {% trans "Chop etilgan" %}
+                    </button>
+                    {% else %}
                     <button type="submit" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; cursor: pointer; padding: 6px 12px; display: flex; align-items: center; gap: 5px; color: #f59e0b; font-size: 0.72rem; font-weight: 500; white-space: nowrap; transition: all 0.2s;" title="{% trans 'Yangilik qilib post qilish' %}">
                         <i class="fas fa-newspaper"></i> {% trans "Post qilish" %}
                     </button>
+                    {% endif %}
                 </form>
             </div>
             {% endfor %}

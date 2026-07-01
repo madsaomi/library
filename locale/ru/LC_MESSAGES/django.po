@@ -2299,3 +2299,9 @@ msgid ""
 msgstr ""
 "Слишком много неверных попыток. Аккаунт заблокирован на 1 час. Пожалуйста, "
 "попробуйте позже."
+
+msgid "Chop etishni tasdiqlaysizmi?"
+msgstr "Подтвердите публикацию?"
+
+msgid "Bugun bu haqida yangilik allaqachon chop etilgan!"
+msgstr "Новость об этом уже опубликована сегодня!"
