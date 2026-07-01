@@ -1443,45 +1443,8 @@ msgstr ""
 msgid "QR Skaner | Online Kutibxona"
 msgstr ""
 
-msgid "QR Skaner"
-msgstr ""
-
-msgid "Kitob berish yoki qabul qilish"
-msgstr ""
-
 msgid ""
 "O'quvchi telefonidagi QR-kodni skanerlang. Tizim amal turini o'zi aniqlaydi."
-msgstr ""
-
-msgid "Skanerlashni boshlash uchun bosing"
-msgstr ""
-
-msgid "Skanerni yoqish"
-msgstr ""
-
-msgid "Kod orqali kiritish"
-msgstr ""
-
-msgid "Orqaga qaytish"
-msgstr ""
-
-msgid "Amal turini tanlang va tokenni kiriting"
-msgstr ""
-
-msgid "Kitob berish"
-msgstr ""
-
-msgid "Kitob qabul"
-msgstr ""
-
-msgid "Bekor qilish"
-msgstr ""
-
-msgid "Tasdiqlash"
-msgstr ""
-
-# books.html
-msgid "Barcha kitoblar"
 msgstr ""
 
 msgid "Qidiruvi"
@@ -1533,9 +1496,6 @@ msgstr ""
 msgid "Tizim xabari"
 msgstr ""
 
-msgid "Bildirishnomalar yo'q"
-msgstr ""
-
 msgid "Tizimda xatolik yuz berdi"
 msgstr ""
 
@@ -1546,12 +1506,6 @@ msgid "Barcha maktablar uchun ko'rsatish"
 msgstr ""
 
 msgid "Tanlang"
-msgstr ""
-
-msgid "O'qilganlar soni"
-msgstr ""
-
-msgid "Bildirishnomalar yo'q"
 msgstr ""
 
 msgid "Kitob:"
@@ -1593,12 +1547,6 @@ msgstr ""
 msgid "ta"
 msgstr ""
 
-msgid "Tizim"
-msgstr ""
-
-msgid "Qidirish..."
-msgstr ""
-
 msgid "Kitob qaytarish"
 msgstr ""
 
@@ -1611,13 +1559,7 @@ msgstr ""
 msgid "Bugun"
 msgstr ""
 
-msgid "Kitoblar"
-msgstr ""
-
 msgid "Kitobxonlar"
-msgstr ""
-
-msgid "Maktablar"
 msgstr ""
 
 msgid "Bugun berilgan"
@@ -1638,25 +1580,10 @@ msgstr ""
 msgid "Kitob qaytarishlar"
 msgstr ""
 
-msgid "Kategoriyasiz"
-msgstr ""
-
 msgid "Eng faol kitobxonlar"
 msgstr ""
 
 msgid "ta kitob"
-msgstr ""
-
-msgid "Foydalanish dinamikasi"
-msgstr ""
-
-msgid "Kategoriyalar"
-msgstr ""
-
-msgid "Eng faol maktablar"
-msgstr ""
-
-msgid "Hozircha ma'lumotlar yo'q"
 msgstr ""
 
 msgid "Ijarada"
@@ -1725,16 +1652,10 @@ msgstr ""
 msgid "Qaytarish"
 msgstr ""
 
-msgid "Yangi"
-msgstr ""
-
 msgid "Barcha"
 msgstr ""
 
 msgid "Chop etilgan"
-msgstr ""
-
-msgid "Hozircha yangiliklar yo'q"
 msgstr ""
 
 msgid "Yangi xabar qo'shish"
@@ -1825,10 +1746,6 @@ msgstr ""
 msgid "Haqiqatdan ham"
 msgstr ""
 
-msgid "o'chirmoqchimisiz?"
-msgstr ""
-
-#, python-format
 msgid "Haqiqatdan ham \"%(object)s\" o'chirmoqchimisiz?"
 msgstr ""
 
@@ -1917,10 +1834,6 @@ msgid "Jami yangiliklar"
 msgstr ""
 
 #: frontend_school/templates/school_panel/news.html:18
-msgid "Maktab yangiliklari"
-msgstr ""
-
-#: frontend_school/templates/school_panel/news.html:22
 msgid "Tizim xabarlari"
 msgstr ""
 
@@ -1937,26 +1850,6 @@ msgid "O'quvchi telefonidagi QR-kodni skanerlang"
 msgstr ""
 
 #: frontend_school/templates/school_panel/qr_unified.html
-msgid "Muvaffaqiyatli!"
-msgstr ""
-
-#: frontend_school/templates/school_panel/qr_unified.html
-msgid "Xatolik!"
-msgstr ""
-
-#: frontend_school/templates/school_panel/qr_unified.html
-msgid "Foydalanuvchi"
-msgstr ""
-
-#: frontend_school/templates/school_panel/qr_unified.html
-msgid "Kamera xatoligi:"
-msgstr ""
-
-#: frontend_school/templates/school_panel/qr_unified.html
-msgid "Tizimda xatolik yuz berdi"
-msgstr ""
-
-#: frontend_school/templates/school_panel/students.html
 msgid "Keyingi sinfga o'tkazish"
 msgstr ""
 
@@ -1973,10 +1866,6 @@ msgid "Jami bitiruvchilar"
 msgstr ""
 
 #: frontend_school/templates/school_panel/graduates.html
-msgid "Aktiv ijaralar"
-msgstr ""
-
-#: frontend_school/templates/school_panel/graduates.html
 msgid "ta bitiruvchi"
 msgstr ""
 
@@ -1986,10 +1875,6 @@ msgstr ""
 
 #: frontend_school/templates/school_panel/graduates.html
 msgid "Bitiruvchilar topilmadi"
-msgstr ""
-
-#: frontend_school/templates/school_panel/statistics.html
-msgid "Statistika"
 msgstr ""
 
 #: frontend_school/templates/school_panel/statistics.html
@@ -2037,15 +1922,7 @@ msgid "ta o'qituvchi"
 msgstr ""
 
 #: frontend_school/templates/school_panel/graduates.html
-msgid "ta bitiruvchi"
-msgstr ""
-
-#: frontend_school/templates/school_panel/news.html
 msgid "ta yangilik"
-msgstr ""
-
-#: frontend_school/templatetags/action_tags.py
-msgid "Berilgan"
 msgstr ""
 
 #: frontend_school/templatetags/action_tags.py
@@ -2054,10 +1931,6 @@ msgstr ""
 
 #: frontend_school/templatetags/action_tags.py
 msgid "Yaratilgan"
-msgstr ""
-
-#: frontend_school/templatetags/action_tags.py
-msgid "Kirish"
 msgstr ""
 
 #: frontend_school/templatetags/action_tags.py
