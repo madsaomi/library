@@ -13,14 +13,14 @@
 <div style="max-width: 600px; margin: 0 auto;">
     <div class="glass-panel animate-fade" style="padding: 36px;">
         <div style="text-align: center; margin-bottom: 28px;">
-            <div class="avatar-circle" style="width: 72px; height: 72px; background: linear-gradient(135deg, var(--secondary), #7c3aed); box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);">
+            <div class="avatar-circle" style="width: 72px; height: 72px; min-width: 72px; background: linear-gradient(135deg, var(--secondary), #7c3aed); box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);">
                 <span class="avatar-initials" style="font-size: 1.6rem;">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
             </div>
             <h2 style="margin: 10px 0 2px 0; font-size: 1.15rem;">{{ user.get_full_name|default:user.username }}</h2>
             <p style="color: var(--text-muted); margin: 0; font-size: 0.8rem;">{{ user.get_role_display }} · {{ user.school.name|default:_("Maktab biriktirilmagan") }}</p>
         </div>
 
-        <div class="grid-4" style="gap: 10px; margin-bottom: 24px;">
+        <div class="grid-4" style="margin-bottom: 24px;">
             <a href="{% url 'frontend_school:students_list' %}" class="glass-card stat-card" style="padding: 12px 8px; text-align: center; text-decoration: none; color: inherit; display: block;">
                 <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary);">{{ total_students|default:"0" }}</div>
                 <div style="font-size: 0.6rem; color: var(--text-muted);">{% trans "O'quvchilar" %}</div>

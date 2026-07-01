@@ -685,6 +685,13 @@ select option,
     font-size: 1.15rem !important;
   }
 
+  /* Notification panel full-width on mobile */
+  #notificationPanel {
+    width: calc(100vw - 20px) !important;
+    max-width: 360px !important;
+    right: -10px !important;
+  }
+
   .responsive-grid-3 {
     grid-template-columns: 1fr;
   }
