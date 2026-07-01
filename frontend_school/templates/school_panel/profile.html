@@ -20,7 +20,7 @@
             <p style="color: var(--text-muted); margin: 0; font-size: 0.8rem;">{{ user.get_role_display }} · {{ user.school.name|default:_("Maktab biriktirilmagan") }}</p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px;">
+        <div class="grid-4" style="gap: 10px; margin-bottom: 24px;">
             <a href="{% url 'frontend_school:students_list' %}" class="glass-card stat-card" style="padding: 12px 8px; text-align: center; text-decoration: none; color: inherit; display: block;">
                 <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary);">{{ total_students|default:"0" }}</div>
                 <div style="font-size: 0.6rem; color: var(--text-muted);">{% trans "O'quvchilar" %}</div>

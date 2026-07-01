@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade" style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start;">
+<div class="animate-fade responsive-grid-1-2" style="align-items: start;">
     <div class="glass-panel" style="padding: 24px;">
         <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 24px;">
             <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
@@ -53,7 +53,7 @@
     </div>
 
     <div class="glass-panel" style="padding: 24px;">
-        <div class="stat-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 24px;">
+        <div class="grid-2 stat-grid" style="margin-bottom: 24px;">
             <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
                 <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ student_count }}</div>
                 <div class="stat-label" style="font-size: 0.7rem;">{% trans "O'quvchilar" %}</div>
@@ -64,7 +64,7 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="grid-2" style="gap: 16px;">
             <div>
                 <h3 class="section-title" style="font-size: 0.82rem; margin-bottom: 12px;">
                     <i class="fas fa-users" style="color: #10b981; font-size: 0.8rem;"></i> {% trans "O'quvchilar" %}

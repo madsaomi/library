@@ -190,6 +190,19 @@ select option,
   gap: 30px;
 }
 
+/* Responsive grid helpers - use instead of inline grid styles */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+.grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }
+
+.table-responsive-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Layout */
 .sidebar {
   width: var(--sidebar-width);
@@ -589,6 +602,10 @@ select option,
   .stats-row, .responsive-grid-2, .responsive-grid-1-2 {
     grid-template-columns: 1fr !important;
   }
+
+  .grid-2, .grid-3, .grid-4, .grid-5, .grid-6 {
+    grid-template-columns: 1fr 1fr !important;
+  }
   
   header {
     flex-direction: column;
@@ -649,6 +666,46 @@ select option,
 
   .glass-panel {
     padding: 15px;
+  }
+
+  .grid-2, .grid-3, .grid-4, .grid-5, .grid-6 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 12px 8px !important;
+  }
+
+  .stat-value {
+    font-size: 1.15rem !important;
+  }
+
+  .responsive-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Login card */
+  .auth-card {
+    padding: 30px 20px !important;
+  }
+
+  .auth-card h1.gradient-text {
+    font-size: 1.6rem !important;
+  }
+
+  /* Reduce card padding in grids */
+  .glass-card {
+    padding: 12px !important;
+  }
+
+  /* Sidebar footer on mobile */
+  .sidebar-footer {
+    gap: 8px !important;
   }
 
   /* Book detail buttons */
