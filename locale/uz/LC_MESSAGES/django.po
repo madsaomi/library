@@ -1443,10 +1443,6 @@ msgstr ""
 msgid "QR Skaner | Online Kutibxona"
 msgstr ""
 
-msgid ""
-"O'quvchi telefonidagi QR-kodni skanerlang. Tizim amal turini o'zi aniqlaydi."
-msgstr ""
-
 msgid "Qidiruvi"
 msgstr ""
 
