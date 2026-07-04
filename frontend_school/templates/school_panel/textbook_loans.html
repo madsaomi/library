@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Darsliklar" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Darslik ijaralari" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="grid-4 stat-grid" style="margin-bottom: 20px;">
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ total_loans|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Jami" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ active_loans|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Faol" %}</div>
+        </div>
+        <div class="glass-card stat-card" style="padding: 14px 10px; cursor: default;">
+            <div class="stat-value" style="font-size: 1.25rem; color: #6366f1;">{{ returned_loans|default:"0" }}</div>
+            <div class="stat-label" style="font-size: 0.68rem;">{% trans "Qaytarilgan" %}</div>
+        </div>
+        <a href="{% url 'frontend_school:textbook_distribute' %}" class="glass-card stat-card" style="padding: 14px 10px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px dashed var(--accent);">
+            <i class="fas fa-plus" style="font-size: 0.8rem; color: var(--accent);"></i>
+            <span style="font-size: 0.75rem; font-weight: 500; color: var(--accent);">{% trans "Tarqatish" %}</span>
+        </a>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <a href="{% url 'frontend_school:textbook_loans' %}" class="glass-card" style="padding: 5px 12px; font-size: 0.72rem; text-decoration: none; border-radius: 6px; {% if not selected_grade %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{% trans "Barcha sinflar" %}</a>
+            {% for g in grades_list %}
+            <a href="{% url 'frontend_school:textbook_loans' %}?grade={{ g|urlencode }}" class="glass-card" style="padding: 5px 12px; font-size: 0.72rem; text-decoration: none; border-radius: 6px; {% if selected_grade == g %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{{ g }} {% trans "sinf" %}</a>
+            {% endfor %}
+        </div>
+        <div>
+            <a href="{% url 'frontend_school:textbook_collect' %}" class="btn-primary" style="padding: 8px 16px; font-size: 0.78rem; text-decoration: none; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fas fa-undo-alt"></i> {% trans "Qaytarib olish" %}
+            </a>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding: 20px;">
+        <div class="info-grid" style="gap: 6px;">
+            {% for loan in loans %}
+            <div class="glass-card info-row" style="padding: 10px 14px; flex-direction: column; align-items: flex-start; gap: 4px;">
+                <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+                    <div class="avatar-circle" style="width: 32px; height: 32px; background: linear-gradient(135deg, #d97706, #f59e0b); flex-shrink: 0;">
+                        <span class="avatar-initials" style="font-size: 0.65rem;">{{ loan.student.first_name|first|upper }}{{ loan.student.last_name|first|upper }}</span>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; font-size: 0.82rem;">{{ loan.student.first_name }} {{ loan.student.last_name }}</div>
+                        <div style="font-size: 0.68rem; color: var(--text-muted);">
+                            <span class="badge" style="background: rgba(217,119,6,0.1); color: #d97706; padding: 1px 6px; border-radius: 4px; font-size: 0.6rem;">{{ loan.student.grade }}</span>
+                            <span style="margin-left: 6px;"><i class="fas fa-book-open"></i> {{ loan.book.title }}</span>
+                            {% if loan.book.subject %}<span style="margin-left: 6px; font-size: 0.62rem; color: var(--text-muted);">({{ loan.book.subject }})</span>{% endif %}
+                        </div>
+                    </div>
+                    <div style="text-align: right; flex-shrink: 0;">
+                        {% if loan.returned_at %}
+                        <span style="font-size: 0.68rem; color: #6366f1;"><i class="fas fa-check-circle"></i> {{ loan.returned_at|date:"d.m.Y" }}</span>
+                        {% else %}
+                        <span style="font-size: 0.68rem; color: #10b981;"><i class="fas fa-clock"></i> {% trans "Faol" %}</span>
+                        {% endif %}
+                        <div style="font-size: 0.6rem; color: var(--text-muted); margin-top: 2px;">{{ loan.academic_year }}</div>
+                    </div>
+                </div>
+                {% if loan.condition_on_issue or loan.notes %}
+                <div style="font-size: 0.65rem; color: var(--text-muted); padding-left: 42px;">
+                    {% if loan.condition_on_issue %}<span>{% trans "Holati" %}: {{ loan.get_condition_on_issue_display }}</span>{% endif %}
+                    {% if loan.notes %}<span style="margin-left: 8px;"><i class="fas fa-comment"></i> {{ loan.notes }}</span>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p style="color: var(--text-muted); font-size: 0.78rem; text-align: center; padding: 40px;">
+                <i class="fas fa-book-open" style="font-size: 2rem; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
+                {% trans "Darslik ijaralari yo'q" %}
+            </p>
+            {% endfor %}
+        </div>
+        <div style="margin-top: 16px;">
+            {% include 'pagination.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

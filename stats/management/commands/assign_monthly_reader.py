@@ -3,15 +3,22 @@ from django.utils import timezone
 from django.db.models import Count, Q
 from accounts.models import CustomUser
 from books.models import BookIssue, ReaderOfMonth
+from frontend_school.models import News
 
 
 class Command(BaseCommand):
-    help = "Assign Reader of the Month for each school"
+    help = "Assign Reader of the Month for each school and create news"
 
     def handle(self, *args, **options):
         now = timezone.now()
         month = now.month
         year = now.year
+        month_names = {
+            1: "Yanvar", 2: "Fevral", 3: "Mart", 4: "Aprel",
+            5: "May", 6: "Iyun", 7: "Iyul", 8: "Avgust",
+            9: "Sentabr", 10: "Oktabr", 11: "Noyabr", 12: "Dekabr",
+        }
+        month_name = month_names.get(month, "")
 
         schools = CustomUser.objects.filter(role='student').values_list('school_id', flat=True).distinct()
 
@@ -40,6 +47,21 @@ class Command(BaseCommand):
                         'books_count': top_student.month_books,
                     }
                 )
+
+                News.objects.create(
+                    school_id=school_id,
+                    title=f"Oy kitobxoni — {month_name}!",
+                    body="",
+                    is_published=True,
+                    template_key='top_reader',
+                    template_data={
+                        'username': top_student.username,
+                        'grade': str(top_student.grade or ''),
+                        'count': top_student.month_books,
+                        'month': month_name,
+                        'year': str(year),
+                    },
+                )
                 assigned += 1
 
-        self.stdout.write(self.style.SUCCESS(f"Reader of the Month assigned for {assigned} schools"))
+        self.stdout.write(self.style.SUCCESS(f"Reader of the Month assigned + news created for {assigned} schools"))

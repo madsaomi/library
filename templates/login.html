@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% trans "Kirish | Online Kutibxona" %}</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.4">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.6">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .auth-container {
@@ -158,6 +158,11 @@
                 <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">
                     {% trans "Kirish" %} <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
                 </button>
+                <div style="text-align: center; margin-top: 14px;">
+                    <a href="{% url 'password_reset' %}" style="color: var(--primary); font-size: 0.8rem; text-decoration: none; opacity: 0.7; transition: 0.2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.7'">
+                        <i class="fas fa-key"></i> {% trans "Parolni unutdingizmi?" %}
+                    </a>
+                </div>
             </form>
         </div>
     </div>

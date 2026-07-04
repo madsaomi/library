@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.conf import settings
 from django.views.static import serve
 
@@ -41,3 +41,8 @@ urlpatterns = [
 urlpatterns += [
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
+
+# Custom error handlers
+handler403 = lambda request, exception=None: render(request, '403.html', status=403)
+handler404 = lambda request, exception=None: render(request, '404.html', status=404)
+handler500 = lambda request: render(request, '500.html', status=500)

@@ -10,10 +10,12 @@ from django.utils.translation import gettext as _
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.core.cache import cache
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required(login_url='login')
 def library(request):
     query = request.GET.get('q')
+    page = request.GET.get('page', 1)
     if not query:
         cache_key = f'library_ids_{request.user.school_id}'
         book_ids = cache.get(cache_key)
@@ -24,6 +26,14 @@ def library(request):
     else:
         books = Book.objects.filter(school=request.user.school).order_by('-borrow_count')
         books = search_books(books, query)
+
+    paginator = Paginator(books, 24)
+    try:
+        books_page = paginator.page(page)
+    except PageNotAnInteger:
+        books_page = paginator.page(1)
+    except EmptyPage:
+        books_page = paginator.page(paginator.num_pages)
 
     categories = Category.objects.all()
 
@@ -54,7 +64,7 @@ def library(request):
     ).order_by('-created_at')[:10]
 
     return render(request, 'user_panel/library.html', {
-        'books': books,
+        'books': books_page,
         'categories': categories,
         'current_query': query or '',
         'latest_news': latest_news,
@@ -197,10 +207,8 @@ def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.raw_password = form.cleaned_data.get('new_password1')
-            user.save()
-            update_session_auth_hash(request, user)  # Important!
+            user = form.save()
+            update_session_auth_hash(request, user)
             messages.success(request, _('Parolingiz muvaffaqiyatli o\'zgartirildi!'))
             return redirect('frontend_user:profile')
     else:
@@ -220,6 +228,12 @@ def reserve_book(request, pk):
     
     # Secure: Ensure book belongs to the same school as the user
     book = get_object_or_404(Book, pk=pk, school=request.user.school)
+    
+    # Students cannot borrow textbooks (use TextbookLoan system instead)
+    if request.user.role == 'student' and book.is_textbook:
+        from django.contrib import messages
+        messages.error(request, _("Darsliklarni o'quvchilar bron qila olmaydi. Darsliklar o'quv yili boshida tarqatiladi."))
+        return redirect('frontend_user:book_detail', pk=book.pk)
     
     # Check if already requested
     request_obj = BookRequest.objects.filter(user=request.user, book=book, status='pending').first()
@@ -345,6 +359,44 @@ def leaderboard(request):
     return render(request, 'user_panel/leaderboard.html', {
         'students': students,
         'current_period': period,
+    })
+
+
+@login_required(login_url='login')
+def my_class(request):
+    from django.db.models import Count
+    from books.models import BookIssue, UserAchievement
+
+    user = request.user
+    if user.role != 'student' or not user.grade or not user.school:
+        return redirect('frontend_user:profile')
+
+    classmates = user.__class__.objects.filter(
+        school=user.school, role='student', grade=user.grade
+    ).exclude(pk=user.pk).order_by('-xp_points')
+
+    class_data = []
+    for c in classmates:
+        active_loans = BookIssue.objects.filter(user=c, is_returned=False).count()
+        total_read = c.total_books_read or 0
+        ach_count = UserAchievement.objects.filter(user=c).count()
+        class_data.append({
+            'student': c,
+            'active_loans': active_loans,
+            'total_read': total_read,
+            'achievements': ach_count,
+        })
+
+    # My own stats for comparison
+    my_active = BookIssue.objects.filter(user=user, is_returned=False).count()
+    my_read = user.total_books_read or 0
+    my_ach = UserAchievement.objects.filter(user=user).count()
+
+    return render(request, 'user_panel/my_class.html', {
+        'class_data': class_data,
+        'my_active': my_active,
+        'my_read': my_read,
+        'my_ach': my_ach,
     })
 
 

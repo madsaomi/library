@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 
 {% block title %}{% trans "Statistika" %} | Online Kutibxona{% endblock %}
 {% block page_title %}{% trans "Statistika" %}{% endblock %}
@@ -7,11 +8,6 @@
 {% block sidebar_nav %}
 {% include 'admin_panel/sidebar_items.html' %}
 {% endblock %}
-
-{% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
-
 {% block content %}
 <div class="animate-fade">
     <div class="grid-6 stat-grid">
@@ -28,15 +24,15 @@
             <div class="stat-label" style="font-size: 0.7rem;">{% trans "Maktablar" %}</div>
         </a>
         <a href="{% url 'frontend_admin:system_logs' %}?action=ISSUE&period=today" class="glass-card stat-card" style="padding: 16px 10px;" id="stat-issued_today">
-            <div class="stat-value" style="font-size: 1.3rem; color: #f59e0b;">{{ issued_today }}</div>
+            <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">{{ issued_today }}</div>
             <div class="stat-label" style="font-size: 0.7rem;">{% trans "Bugun berilgan" %}</div>
         </a>
         <a href="{% url 'frontend_admin:system_logs' %}?action=RETURN&period=today" class="glass-card stat-card" style="padding: 16px 10px;" id="stat-returned_today">
-            <div class="stat-value" style="font-size: 1.3rem; color: #a855f7;">{{ returned_today }}</div>
+            <div class="stat-value" style="font-size: 1.3rem; color: var(--secondary);">{{ returned_today }}</div>
             <div class="stat-label" style="font-size: 0.7rem;">{% trans "Bugun qaytarilgan" %}</div>
         </a>
         <div class="glass-card stat-card" style="padding: 16px 10px; cursor: default;" id="stat-total_xp">
-            <div class="stat-value" style="font-size: 1.3rem; color: #fbbf24;">{{ total_xp }}</div>
+            <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">{{ total_xp }}</div>
             <div class="stat-label" style="font-size: 0.7rem;">{% trans "Umumiy XP" %}</div>
         </div>
     </div>
@@ -123,39 +119,95 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
 <script>
-    const g = id => JSON.parse(document.getElementById(id).textContent);
+function initStatCharts() {
+    document.querySelectorAll('.stat-no-data').forEach(function(el){el.remove()});
+    document.querySelectorAll('#usageChart,#categoryChart').forEach(function(c){c.style.display='';c.style.background=''});
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const txtColor = isDark ? '#fef3c7' : '#000';
+    document.querySelectorAll('#usageChart,#categoryChart').forEach(function(c){c.style.background=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.03)';});
+    const gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.2)';
+    const font = { size: 13, weight: '600', family: 'Inter,system-ui,sans-serif' };
+    const line1 = isDark ? '#818cf8' : '#4f46e5';
+    const line2 = isDark ? '#34d399' : '#059669';
+    const fill1 = isDark ? 'rgba(99,102,241,0.08)' : 'rgba(79,70,229,0.12)';
+    const fill2 = isDark ? 'rgba(16,185,129,0.08)' : 'rgba(5,150,105,0.12)';
+    const catColors = isDark
+        ? ['#fbbf24','#f59e0b','#d97706','#a855f7','#6366f1','#10b981','#ec4899','#f97316','#06b6d4']
+        : ['#dc2626','#ea580c','#d97706','#7c3aed','#2563eb','#16a34a','#db2777','#ca8a04','#0891b2'];
+    const noData = txt => '<p class="stat-no-data" style="color:var(--text-muted);text-align:center;padding:40px;font-size:0.85rem;">'+txt+'</p>';
 
-    new Chart(document.getElementById('usageChart').getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: g('usage-labels'),
-            datasets: [
-                { label: '{% trans "Berish" %}', data: g('issue-data'), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 2 },
-                { label: '{% trans "Qaytarish" %}', data: g('return-data'), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 2 }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            interaction: { intersect: false, mode: 'index' },
-            plugins: { legend: { labels: { color: 'rgba(255,255,255,0.5)', font: { size: 10 }, boxWidth: 10, padding: 10 } } },
-            scales: {
-                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', stepSize: 1, font: { size: 10 } } },
-                x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.35)', maxTicksLimit: 12, font: { size: 10 } } }
+    function safeGet(id) {
+        var el = document.getElementById(id);
+        if (!el) throw new Error('Element #'+id+' not found');
+        return JSON.parse(el.textContent);
+    }
+
+    try {
+        var usageLabels = safeGet('usage-labels');
+        var issueData = safeGet('issue-data');
+        var returnData = safeGet('return-data');
+        var catLabels = safeGet('category-labels');
+        var catData = safeGet('category-data');
+
+        var usageEl = document.getElementById('usageChart');
+        var catEl = document.getElementById('categoryChart');
+
+        if (usageEl) {
+            var hasUsageData = issueData.some(function(v){return v>0}) || returnData.some(function(v){return v>0});
+            if (!hasUsageData) {
+                usageEl.style.display = 'none';
+                usageEl.insertAdjacentHTML('afterend', noData('Ma\'lumot yo\'q'));
+            } else {
+                window._chartInstances.push(new Chart(usageEl.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: usageLabels,
+                        datasets: [
+                            { label: '{% trans "Berish" %}', data: issueData, borderColor: line1, backgroundColor: fill1, fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: line1 },
+                            { label: '{% trans "Qaytarish" %}', data: returnData, borderColor: line2, backgroundColor: fill2, fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: line2 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: { legend: { labels: { color: txtColor, font: font, boxWidth: 16, padding: 16, usePointStyle: true } } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: gridC }, ticks: { color: txtColor, stepSize: 1, font: font } },
+                            x: { grid: { display: false }, ticks: { color: txtColor, maxTicksLimit: 12, font: font } }
+                        }
+                    }
+                }));
             }
         }
-    });
 
-    new Chart(document.getElementById('categoryChart').getContext('2d'), {
-        type: 'doughnut',
-        data: {
-            labels: g('category-labels'),
-            datasets: [{ data: g('category-data'), backgroundColor: ['#d97706','#92400e','#78350f','#fbbf24','#f59e0b','#b45309','#6366f1','#10b981','#a855f7'], borderWidth: 0 }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.5)', padding: 10, font: { size: 9 }, boxWidth: 10 } } }
+        if (catEl) {
+            var hasCatData = catData.some(function(v){return v>0});
+            if (!hasCatData) {
+                catEl.style.display = 'none';
+                catEl.insertAdjacentHTML('afterend', noData('Ma\'lumot yo\'q'));
+            } else {
+                window._chartInstances.push(new Chart(catEl.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: catLabels,
+                        datasets: [{ data: catData, backgroundColor: catColors.slice(0, catData.length), borderWidth: 2, borderColor: 'transparent' }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        cutout: '55%',
+                        plugins: { legend: { position: 'bottom', labels: { color: txtColor, padding: 16, font: font, boxWidth: 16, usePointStyle: true } } }
+                    }
+                }));
+            }
         }
-    });
+    } catch(e) { console.error('Chart error:', e); if(usageEl) usageEl.insertAdjacentHTML('afterend', noData('Xatolik: '+e.message)); }
+}
+document.addEventListener('DOMContentLoaded', initStatCharts);
+document.addEventListener('themechange', function() {
+    while(window._chartInstances.length) window._chartInstances.pop().destroy();
+    initStatCharts();
+});
 </script>
 {% endblock %}

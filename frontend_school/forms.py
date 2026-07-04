@@ -3,18 +3,26 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from books.models import Book
 from accounts.models import CustomUser
+from core.validators import validate_word_limit, validate_char_limit
+
+SUBJECT_CHOICES = [
+    ('', '---'),
+    ('Matematika', _('Matematika')),
+    ('Fizika', _('Fizika')),
+    ('Kimyo', _('Kimyo')),
+    ('Biologiya', _('Biologiya')),
+    ('Informatika', _('Informatika')),
+    ('Tarix', _('Tarix')),
+    ('Geografiya', _('Geografiya')),
+    ("O'zbek tili", _("O'zbek tili")),
+    ('Adabiyot', _('Adabiyot')),
+    ('Ingliz tili', _('Ingliz tili')),
+    ('Rus tili', _('Rus tili')),
+    ('Jismoniy tarbiya', _('Jismoniy tarbiya')),
+    ('Huquq', _('Huquq')),
+    ('Iqtisod', _('Iqtisod')),
+]
 from .models import News
-
-def validate_word_limit(value, limit):
-    if not value: return
-    words = value.split()
-    if len(words) > limit:
-        raise ValidationError(_("Limit: %(limit)s ta so'z. Siz %(count)s ta so'z kiritdingiz.") % {'limit': limit, 'count': len(words)})
-
-def validate_char_limit(value, limit):
-    if not value: return
-    if len(value) > limit:
-        raise ValidationError(_("Limit: %(limit)s ta belgi. Siz %(count)s ta belgi kiritdingiz.") % {'limit': limit, 'count': len(value)})
 
 class BookForm(forms.ModelForm):
     category_name = forms.CharField(
@@ -25,13 +33,16 @@ class BookForm(forms.ModelForm):
 
     class Meta:
         model = Book
-        fields = ['title', 'author', 'description', 'cover', 'total_count', 'available_count']
+        fields = ['title', 'author', 'description', 'cover', 'total_count', 'available_count', 'is_textbook', 'subject', 'grade']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'data-limit-chars': '150', 'data-limit-words': '20'}),
             'author': forms.TextInput(attrs={'class': 'form-control', 'data-limit-chars': '150'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-limit-words': '500'}),
             'total_count': forms.NumberInput(attrs={'class': 'form-control'}),
             'available_count': forms.NumberInput(attrs={'class': 'form-control'}),
+            'is_textbook': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'subject': forms.TextInput(attrs={'class': 'form-control', 'list': 'subject-list', 'autocomplete': 'off'}),
+            'grade': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 11}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -43,6 +54,9 @@ class BookForm(forms.ModelForm):
         
         # Add categories for datalist
         self.categories = Category.objects.all().order_by('name')
+        
+        # Pass subject list for datalist
+        self.subject_choices = [c[0] for c in SUBJECT_CHOICES if c[0]]
 
     def clean_title(self):
         title = self.cleaned_data.get('title')

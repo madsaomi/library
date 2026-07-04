@@ -48,14 +48,24 @@
                     <input type="checkbox" id="no-cover-filter" {% if no_cover %}checked{% endif %} onchange="applyFilters()" style="cursor: pointer; accent-color: var(--accent); width: 14px; height: 14px;">
                     {% trans "Muqovasiz" %}
                 </label>
-                {% if query or selected_category or no_cover %}
+                <label class="glass-card" style="padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 6px; cursor: pointer; border: 1px solid var(--border); font-size: 0.75rem; white-space: nowrap;">
+                    <input type="checkbox" id="textbook-filter" {% if textbook_filter %}checked{% endif %} onchange="applyFilters()" style="cursor: pointer; accent-color: var(--accent); width: 14px; height: 14px;">
+                    {% trans "Darslik" %}
+                </label>
+                {% if query or selected_category or no_cover or textbook_filter %}
                 <a href="{% url 'frontend_school:books_list' %}" class="glass-card" style="padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; color: #ef4444; display: flex; align-items: center; gap: 4px; border: 1px solid rgba(239,68,68,0.3);">
                     <i class="fas fa-times-circle"></i> {% trans "Tozalash" %}
                 </a>
                 {% endif %}
             </div>
+            <a href="{% url 'frontend_school:import_books_csv' %}" class="glass-card" style="padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; color: var(--accent); display: flex; align-items: center; gap: 6px; border: 1px dashed var(--accent);">
+                <i class="fas fa-file-csv"></i> {% trans "Import CSV" %}
+            </a>
             <a href="{% url 'frontend_school:book_add' %}" class="glass-card" style="padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; color: var(--accent); display: flex; align-items: center; gap: 6px; border: 1px dashed var(--accent);">
                 <i class="fas fa-plus"></i> {% trans "Yangi kitob" %}
+            </a>
+            <a href="{% url 'frontend_school:export_books_csv' %}" class="glass-card" style="padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; border: 1px solid var(--border);">
+                <i class="fas fa-download"></i> CSV
             </a>
         </div>
 
@@ -68,6 +78,11 @@
                     {% else %}
                     <div style="padding: 20px; display: flex; flex-direction: column; justify-content: center; height: 100%;">
                         <div style="font-size: 0.85rem; font-weight: 700; color: #fde68a; line-height: 1.2;">{{ book.title|truncatechars:40 }}</div>
+                    </div>
+                    {% endif %}
+                    {% if book.is_textbook %}
+                    <div style="position: absolute; top: 8px; left: 8px; background: rgba(217,119,6,0.85); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 8px; font-size: 0.5rem; color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-book-open"></i> {% trans "Darslik" %}
                     </div>
                     {% endif %}
                     <div style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); padding: 3px 10px; border-radius: 8px; font-size: 0.55rem; color: white; font-weight: 600;">
@@ -118,6 +133,7 @@
     <input type="hidden" name="q" id="filter-q">
     <input type="hidden" name="category" id="filter-category">
     <input type="hidden" name="no_cover" id="filter-no-cover">
+    <input type="hidden" name="textbook" id="filter-textbook">
 </form>
 
 <script>
@@ -125,9 +141,11 @@ function applyFilters() {
     const q = document.getElementById('search-input').value;
     const category = document.getElementById('category-filter').value;
     const noCover = document.getElementById('no-cover-filter').checked ? '1' : '';
+    const textbook = document.getElementById('textbook-filter').checked ? '1' : '';
     document.getElementById('filter-q').value = q;
     document.getElementById('filter-category').value = category;
     document.getElementById('filter-no-cover').value = noCover;
+    document.getElementById('filter-textbook').value = textbook;
     document.getElementById('filter-form').submit();
 }
 

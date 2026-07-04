@@ -22,6 +22,9 @@ class Book(models.Model):
     total_count = models.IntegerField(_("Umumiy soni"))
     available_count = models.IntegerField(_("Mavjud soni"))
     borrow_count = models.IntegerField(_("O'qilganlar soni"), default=0)
+    is_textbook = models.BooleanField(_("Darslik"), default=False, help_text=_("Maktab darsligi (o'quvchilarga yilga beriladi)"))
+    subject = models.CharField(_("Fan"), max_length=100, null=True, blank=True)
+    grade = models.IntegerField(_("Sinf"), null=True, blank=True, help_text=_("Darslik uchun mo'ljallangan sinf (1-11)"))
 
 
     @property
@@ -77,6 +80,33 @@ class BookIssue(models.Model):
 
     def __str__(self):
         return f"{self.book.title} -> {self.user.username}"
+
+class TextbookLoan(models.Model):
+    CONDITION_CHOICES = (
+        ('new', _('Yangi')),
+        ('good', _('Yaxshi')),
+        ('fair', _("Qoniqarli")),
+        ('poor', _('Yomon')),
+        ('lost', _('Yo\'qolgan')),
+    )
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, verbose_name=_("Kitob"), limit_choices_to={'is_textbook': True})
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_("O'quvchi"))
+    issued_at = models.DateField(_("Berilgan sana"), auto_now_add=True)
+    due_date = models.DateField(_("Topshirish muddati"))
+    returned_at = models.DateField(_("Qaytarilgan sana"), null=True, blank=True)
+    condition_on_issue = models.CharField(_("Holati (berishda)"), max_length=10, choices=CONDITION_CHOICES, default='new')
+    condition_on_return = models.CharField(_("Holati (qaytarishda)"), max_length=10, choices=CONDITION_CHOICES, null=True, blank=True)
+    notes = models.TextField(_("Izoh"), null=True, blank=True)
+    academic_year = models.CharField(_("O'quv yili"), max_length=20, help_text="Masalan: 2025/2026")
+
+    class Meta:
+        verbose_name = _("Darslik ijarasi")
+        verbose_name_plural = _("Darslik ijaralari")
+        unique_together = [['book', 'student', 'academic_year']]
+
+    def __str__(self):
+        return f"{self.book.title} -> {self.student.username} ({self.academic_year})"
+
 
 class BookRequest(models.Model):
     STATUS_CHOICES = (

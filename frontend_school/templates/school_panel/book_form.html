@@ -108,6 +108,12 @@
     {% endfor %}
 </datalist>
 
+<datalist id="subject-list">
+    {% for subject in form.subject_choices %}
+    <option value="{{ subject }}">
+    {% endfor %}
+</datalist>
+
 <style>
     .form-control { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--input-text); outline: none; font-size: 0.85rem; transition: 0.3s; box-sizing: border-box; }
     .form-control:focus { border-color: var(--primary); }

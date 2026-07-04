@@ -27,8 +27,9 @@ class TestCustomUser:
         assert teacher.role == "teacher"
         assert teacher.subject == "Mathematics"
 
-    def test_raw_password_field(self, superuser):
-        assert superuser.raw_password == "admin123"
+    def test_password_is_hashed(self, superuser):
+        assert superuser.password != "admin123"
+        assert superuser.password.startswith("pbkdf2_sha256$") or superuser.password.startswith("bcrypt") or superuser.password.startswith("scrypt")
 
     def test_user_str(self, superuser):
         expected = f"{superuser.username} ({superuser.get_role_display()})"

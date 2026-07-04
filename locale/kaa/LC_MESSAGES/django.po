@@ -1972,49 +1972,49 @@ msgid "haftalik streak"
 msgstr "háptelik streak"
 
 msgid "14 kun"
-msgstr ""
+msgstr "14 kún"
 
 msgid "Barcha maktablar uchun ko'rsatish"
-msgstr ""
+msgstr "Barlıq mektepler ushın ko'rsetiw"
 
 msgid "Berilgan kitoblar"
-msgstr ""
+msgstr "Berilgen kitaplar"
 
 msgid "Bildirishnomalar yo'q"
-msgstr ""
+msgstr "Bildirisler joq"
 
 msgid "Boshqa"
 msgstr ""
 
 msgid "Bron QR-kodi"
-msgstr ""
+msgstr "Bron QR-kodi"
 
 msgid "Bron qilish kodi"
-msgstr ""
+msgstr "Bron kodı"
 
 msgid "CSRF xatolik"
-msgstr ""
+msgstr "CSRF qa'tesi"
 
 msgid "Eng ko'p o'qilgan kitoblar (Top 10)"
 msgstr "Kóp oqılǵan kitaplar (Top 10)"
 
 msgid "Faoliyat"
-msgstr ""
+msgstr "Aktivlik"
 
 msgid "Faoliyat yo'q"
-msgstr ""
+msgstr "Aktivlik joq"
 
 msgid "Foydalanuvchi turlari"
 msgstr "Paydalanıwshı túrleri"
 
 msgid "Foydalanuvchilar topilmadi"
-msgstr ""
+msgstr "Paydalanıwshılar tabılmadı"
 
 msgid "Hozircha ma'lumot yo'q"
 msgstr ""
 
 msgid "Hozirda faol o'qishlar mavjud emas"
-msgstr ""
+msgstr "Ha'zir aktiv oqıwlar joq"
 
 msgid "ID"
 msgstr ""
@@ -2023,91 +2023,91 @@ msgid "Ikonka"
 msgstr ""
 
 msgid "Kitob kutubxonaga muvaffaqiyatli qaytarildi."
-msgstr ""
+msgstr "Kitap kitapxanaǵa tabıslı qaytarıldı."
 
 msgid "Kitob muvaffaqiyatli berildi. Yoqimli mutolaa tilaymiz!"
-msgstr ""
+msgstr "Kitap tabıslı berildi. Jaǵımlı oqıw tileymiz!"
 
 msgid "Kitob topshirildi!"
-msgstr ""
+msgstr "Kitap tabısıldı!"
 
 msgid "Kitob topshirish"
-msgstr ""
+msgstr "Kitap tabısıw"
 
 msgid "Kitob:"
-msgstr ""
+msgstr "Kitap:"
 
 msgid "Kitoblar ro'yxati"
-msgstr ""
+msgstr "Kitaplar dizimi"
 
 msgid "Kitobni olish uchun quyidagi QR-kodni kutubxonachiga ko'rsating."
-msgstr ""
+msgstr "Kitaptı alıw ushın QR-kodtı kitapxanashıǵa kórsetiń."
 
 msgid "Kitobni qaytarish"
-msgstr ""
+msgstr "Kitaptı qaytarıw"
 
 msgid "Kitobni qaytarish uchun quyidagi QR-kodni kutubxonachiga ko'rsating."
-msgstr ""
+msgstr "Kitaptı qaytarıw ushın QR-kodtı kitapxanashıǵa kórsetiń."
 
 msgid "Kutilmoqda..."
-msgstr ""
+msgstr "Kútilmekte..."
 
 msgid "Kutubxonachi skanerlagandan so'ng broningiz tasdiqlanadi."
-msgstr ""
+msgstr "Kitapxanashı skanerlegennen so'ŋ bronıńız tastıyıqlanadı."
 
 msgid "Maktab Admini"
-msgstr ""
+msgstr "Mektep Admini"
 
 msgid "Maktab qo'shish"
-msgstr ""
+msgstr "Mektep qosıw"
 
 msgid "Manual ID:"
-msgstr ""
+msgstr "Manual ID:"
 
 msgid "Mavzuni almashtirish"
-msgstr ""
+msgstr "Ta'qıptı almastırıw"
 
 msgid "Mening kitoblarimga qaytish"
-msgstr ""
+msgstr "Menin' kitaplarıma qaytıw"
 
 msgid "Muassasalar boshqaruvi"
-msgstr ""
+msgstr "Mekemeler basqarıwı"
 
 msgid "Muvaffaqiyatli bron qilindi!"
-msgstr ""
+msgstr "Tabıslı bron qılındı!"
 
 msgid "Noto'g'ri so'rov"
-msgstr ""
+msgstr "Nadurıs soraw"
 
 msgid "Noto'g'ri so'rov yuborildi"
-msgstr ""
+msgstr "Nadurıs soraw jiberildi"
 
 msgid "OY O'QUVCHISI"
 msgstr ""
 
 msgid "Olingan sana:"
-msgstr ""
+msgstr "Alınǵan sáne:"
 
 msgid "Oylik kitob berishlar"
 msgstr "Aylıq kitap beriwler"
 
 msgid "Profilni tahrirlash"
-msgstr ""
+msgstr "Profildi tańlaw"
 
 msgid "Progress"
 msgstr ""
 
 msgid "QR Skaner | Online Kutibxona"
-msgstr ""
+msgstr "QR Skaner | Online Kitapxana"
 
 msgid "QR-kodni ko'rsating"
-msgstr ""
+msgstr "QR-kodtı ko'rsetiń"
 
 msgid "Qidiruv bo'yicha hech narsa topilmadi"
-msgstr ""
+msgstr "Izlew boyınsha hesh narse tabılmadı"
 
 msgid "Ruxsat etilmagan"
-msgstr ""
+msgstr "Ruxsat etilmegen"
 
 msgid "Sahifa"
 msgstr ""
@@ -2116,48 +2116,49 @@ msgid ""
 "Sahifa muddati tugagan yoki so'rov noto'g'ri yuborilgan. Iltimos, avvalgi "
 "sahifaga qaytib, qayta urinib ko'ring."
 msgstr ""
+"Bettiń waqıtı o'tken yamasa soraw nadurıs jiberilgen. Qayta urınıp ko'riń."
 
 msgid "Sana:"
-msgstr ""
+msgstr "Sáne:"
 
 msgid "Saytda ko'rsatish"
-msgstr ""
+msgstr "Saytta ko'rsetiw"
 
 msgid "School Admin | Online Kutibxona"
-msgstr ""
+msgstr "School Admin | Online Kitapxana"
 
 msgid "Sizda ushbu sahifaga kirish huquqi yo'q"
-msgstr ""
+msgstr "Bul betke kiriw huqıqıńız joq"
 
 msgid "Sizning so'rovingizda xatolik mavjud yoki tizim uni qabul qila olmadi."
-msgstr ""
+msgstr "Sorawıńızda qa'te bar yamasa sistema onı qabıl qila almadı."
 
 msgid "Status:"
-msgstr ""
+msgstr "Status:"
 
 msgid "Tanlang"
-msgstr ""
+msgstr "Tańlań"
 
 msgid "Tanlangan kitob:"
-msgstr ""
+msgstr "Tańlanǵan kitap:"
 
 msgid "Topshirish QR-kodi"
-msgstr ""
+msgstr "Tabıslaw QR-kodi"
 
 msgid "Username"
 msgstr ""
 
 msgid "Ushbu sahifaga kirish taqiqlangan yoki yetarli huquqlarga ega emassiz."
-msgstr ""
+msgstr "Bul betke kiriw qadağan etilgen."
 
 msgid "XP"
 msgstr ""
 
 msgid "Xavfsizlik tokeni yaroqsiz"
-msgstr ""
+msgstr "Qawipsizlik tokeni jaramsız"
 
 msgid "Yangilanishiga:"
-msgstr ""
+msgstr "Jańalanıwına:"
 
 msgid "Yangilik qilib post qilish"
 msgstr ""
@@ -2183,3 +2184,234 @@ msgstr "Baspa etiwdi tastiqlaysizba?"
 
 msgid "Bugun bu haqida yangilik allaqachon chop etilgan!"
 msgstr "Bul haqqinda házir baspa etilgen!"
+
+msgid "Masalan: Matematika"
+msgstr "Misali: Matematika"
+
+msgid "Huquq"
+msgstr "Huqıq"
+
+msgid "Iqtisod"
+msgstr "Ekonomika"
+
+msgid "Boshqa (qo'lda kiriting)"
+msgstr "Basqa (qolda kiritiń)"
+
+msgid "Fanni kiriting"
+msgstr "Fan atın kiritiń"
+
+msgid ""
+"Darsliklarni o'quvchilar bron qila olmaydi. Darsliklar o'quv yili boshida "
+"tarqatiladi."
+msgstr ""
+"Oqıwshılar sabaqlıqlardı bronlay almaydı. Sabaqlıqlar oqıw jılı basında "
+"tarqatıladı."
+
+msgid ""
+"Darsliklarni o'quvchilar ololmaydi. Darsliklar o'quv yili boshida "
+"tarqatiladi."
+msgstr ""
+"Oqıwshılar sabaqlıqlardı ala almaydı. Sabaqlıqlar oqıw jılı basında "
+"tarqatıladı."
+
+msgid "Bu darslik. O'quvchilar darsliklarni o'quv yili boshida olishadi."
+msgstr "Bul sabaqlıq. Oqıwshılar sabaqlıqlardı oqıw jılı basında aladı."
+
+msgid "Darslik tarqatish"
+msgstr "Sabaqlıqlardı tarqatıw"
+
+msgid "Darslik qaytarib olish"
+msgstr "Sabaqlıqlardı qaytarıp alıw"
+
+msgid "{count} ta darslik tarqatildi."
+msgstr "{count} sabaqlıq tarqatıldı."
+
+msgid "{count} ta darslik qaytarib olindi."
+msgstr "{count} sabaqlıq qaytarıp alındı."
+
+msgid "Darslik tarqatish uchun yuqoridan sinfni tanlang."
+msgstr "Sabaqlıqlardı tarqatıw ushın joqarıdan klestı saylań."
+
+msgid "Bu sinf uchun darsliklar topilmadi. Avval darsliklarni qo'shing."
+msgstr "Bul klas ushın sabaqlıqlar tabılmadı. Aldın sabaqlıqlardı qosıń."
+
+msgid "Barcha darsliklar qaytarilgan"
+msgstr "Barlıq sabaqlıqlar qaytarıp alındı"
+
+msgid "Faol darslik ijaralari yo'q."
+msgstr "Aktiv sabaqlıq ijaraları joq."
+
+msgid "Qaytarilishi kerak bo'lgan darsliklar"
+msgstr "Qaytarıp alınatuǵın sabaqlıqlar"
+
+msgid "Tarqatish"
+msgstr "Tarqatıw"
+
+msgid "Tarqatilgan"
+msgstr "Tarqatılǵan"
+
+msgid "Darslik ijaralari"
+msgstr "Sabaqlıq ijaraları"
+
+msgid "Qaytarib olish"
+msgstr "Qaytarıp alıw"
+
+msgid "O'quv yili"
+msgstr "Oqıw jılı"
+
+msgid "Yaxshi"
+msgstr "Jaqsı"
+
+msgid "Qoniqarli"
+msgstr "Qanaatlandırarlı"
+
+msgid "Yomon"
+msgstr "Jaman"
+
+msgid "Yo'qolgan"
+msgstr "Joǵalǵan"
+
+msgid "Izoh"
+msgstr "Eskertiw"
+
+msgid "Avtomatik tarqatish"
+msgstr "Avtomatik tarqatıw"
+
+msgid ""
+"Barcha o'quvchilarga sinfiga mos barcha darsliklarni bir vaqtda tarqatadi"
+msgstr ""
+"Barlıq oqıwshılarga klasına say keliwshi barlıq sabaqlıqlardı bir waqıtta "
+"tarqatadı"
+
+msgid "Sinfdoshlari"
+msgstr "Klaslasları"
+
+msgid "Sinfdoshlar yo'q"
+msgstr "Klaslaslar joq"
+
+msgid "Faol ijaralar yo'q"
+msgstr "Aktiv ijara joq"
+
+msgid "Eng faol o'quvchi: {name}"
+msgstr "Eń aktiv oqıwshı: {name}"
+
+msgid "📚 Jami o'qilgan kitoblar: {books}"
+msgstr "📚 Jámi o'qılǵan kitaplar: {books}"
+
+msgid "🔥 Haftalik streak: {streak} kun"
+msgstr "🔥 Háptelik streak: {streak} kún"
+
+msgid "⭐ Daraja: {level}"
+msgstr "⭐ Dáreje: {level}"
+
+msgid ""
+"🏆 {school} jamoasi {name}ni tabriklaydi va barcha o'quvchilarni faol kitob "
+"o'qishga chorlaydi! 📖"
+msgstr ""
+"🏆 {school} jámiyeti {name}di qutlıqlaydı hám barlıq oqıwshılardı aktiv kitap"
+" oqıwǵa shaqıradı! 📖"
+
+msgid "Login va parol avtomatik tarzda yaratiladi"
+msgstr "Login va parol avtomatik jaratiladi"
+
+msgid "Parol kiriting"
+msgstr "Parol kiritiń"
+
+msgid "%(n)s kun"
+msgstr "%(n)s kún"
+
+msgid "Sinfdoshlar"
+msgstr "Klasslaslar"
+
+msgid "Sinfdoshlar topilmadi"
+msgstr "Klasslaslar tabilmadi"
+
+msgid "Mening sinfim"
+msgstr "Menin' klassim"
+
+msgid "Barcha sinflar"
+msgstr "Ha'mme klasslar"
+
+msgid "O'quvchilar sinflar bo'yicha"
+msgstr "Oqıwshılar klasslar boyınsha"
+
+msgid "Sinf va Harf"
+msgstr "Klass ha'm ha'rip"
+
+msgid "Filtrni tozalash"
+msgstr "Filtirdi tazalaw"
+
+msgid "Xatolik 400"
+msgstr "Xatalıq 400"
+
+msgid "Xatolik 403"
+msgstr "Xatalıq 403"
+
+msgid "Navbatdan chiqish"
+msgstr "Nawbettan shıgıw"
+
+msgid "Siz navbatga qo'shildingiz"
+msgstr "Siz nawbetke qosıldıńız"
+
+msgid "Siz allaqachon navbatdasiz"
+msgstr "Siz allaqashan nawbettesiz"
+
+msgid "Siz navbatdan chiqdingiz"
+msgstr "Siz nawbettan shıqtıńız"
+
+msgid "Kitob tasdiqlandi"
+msgstr "Kitap tastıyıqlandı"
+
+msgid "\"{title}\" kitobi sizga berildi"
+msgstr "\"{title}\" kitabı sizge berildi"
+
+msgid "\"{title}\" kitobi bo'shadi. Navbat sizda!"
+msgstr "\"{title}\" kitabı bosadı. Nawbet sizde!"
+
+msgid "Kitob mavjud!"
+msgstr "Kitap bar!"
+
+msgid "Bu kitob sizning maktabingizga tegishli emas"
+msgstr "Bul kitap sizdin mektebinizge tiyisli emes"
+
+msgid "Kitob mavjud, bron qilishingiz mumkin"
+msgstr "Kitap bar, bronlawsan boladı"
+
+msgid "Qayta olish"
+msgstr "Qaytadan alıw"
+
+msgid "Qidiruvi"
+msgstr "Izlew"
+
+msgid "Kitob qidirish"
+msgstr "Kitap izlew"
+
+msgid "Hozirda o'qilayotgan kitoblar"
+msgstr "Hazir oqılıp atırgan kitaplar"
+
+msgid "Parolni o'zgartirmoqchi bo'lsangizgina to'ldiring."
+msgstr "Paroldı ozgertiw ushın gana toldırın."
+
+msgid "Maktab ID"
+msgstr "Mektep ID"
+
+msgid "Tuman (Rayon)"
+msgstr "Rayon"
+
+msgid "Tizim xabari"
+msgstr "Sistema xabarı"
+
+msgid "Bildirishnomalar yo\\'q"
+msgstr ""
+
+msgid "Darsliklar"
+msgstr "Darslıqlar"
+
+msgid "Faol ijaralar"
+msgstr "Aktiv ijaralar"
+
+msgid "yana"
+msgstr "tag'ı"
+
+msgid "Foydalanuvchi nomi yoki parol noto'g'ri"
+msgstr "Paydalanıwshı atı yamasa parol nadurıs"

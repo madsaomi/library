@@ -195,6 +195,24 @@
     </div>
 </div>
 
+{% if books.paginator.num_pages > 1 %}
+<div style="display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 30px; flex-wrap: wrap;">
+    {% if books.has_previous %}
+    <a href="?page={{ books.previous_page_number }}{% if current_query %}&q={{ current_query }}{% endif %}" class="glass-card" style="padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 0.8rem; color: var(--text-main);"><i class="fas fa-chevron-left"></i></a>
+    {% endif %}
+    {% for i in books.paginator.page_range %}
+        {% if i == books.number %}
+        <span style="padding: 8px 14px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; background: var(--primary); color: white;">{{ i }}</span>
+        {% elif i >= books.number|add:-2 and i <= books.number|add:2 %}
+        <a href="?page={{ i }}{% if current_query %}&q={{ current_query }}{% endif %}" class="glass-card" style="padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 0.8rem; color: var(--text-muted);">{{ i }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if books.has_next %}
+    <a href="?page={{ books.next_page_number }}{% if current_query %}&q={{ current_query }}{% endif %}" class="glass-card" style="padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 0.8rem; color: var(--text-main);"><i class="fas fa-chevron-right"></i></a>
+    {% endif %}
+</div>
+{% endif %}
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-input');

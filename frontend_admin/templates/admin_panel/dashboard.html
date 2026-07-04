@@ -6,9 +6,6 @@
 {% block title %}{% trans "Super Admin | Online Kutibxona" %}{% endblock %}
 {% block page_title %}{% trans "Tizim boshqaruvi" %}{% endblock %}
 
-{% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'admin_panel/sidebar_items.html' %}
@@ -115,24 +112,30 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const isLight = theme !== 'dark';
-    const textColor = isLight ? '#334155' : '#e2e8f0';
-    const gridColor = isLight ? 'rgba(51, 65, 85, 0.1)' : 'rgba(255, 255, 255, 0.08)';
+function initDashCharts() {
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const txtColor = isDark ? '#fef3c7' : '#000';
+    const gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.2)';
+    const font = { size: 12, weight: '600', family: 'Inter,system-ui,sans-serif' };
+    const bar1 = isDark ? 'rgba(99, 102, 241, 0.6)' : 'rgba(79, 70, 229, 0.7)';
+    const bar1b = isDark ? '#6366f1' : '#4f46e5';
+    const amber1 = isDark ? 'rgba(251, 191, 36, 0.6)' : 'rgba(234, 88, 12, 0.7)';
+    const amber1b = isDark ? '#fbbf24' : '#ea580c';
+    const roleColors = isDark ? ['#6366f1','#10b981','#f59e0b','#a855f7'] : ['#2563eb','#16a34a','#dc2626','#7c3aed'];
 
     const ctx1 = document.getElementById('issuesChart');
     if (ctx1) {
-        new Chart(ctx1, {
+        window._chartInstances.push(new Chart(ctx1, {
             type: 'bar',
             data: {
-                labels: {{ month_labels|safe }},
+                labels: {{ month_labels|escapejs }},
                 datasets: [{
                     label: '{% trans "Berilgan kitoblar" %}',
                     data: {{ monthly_issues|safe }},
-                    backgroundColor: 'rgba(99, 102, 241, 0.6)',
-                    borderColor: '#6366f1',
+                    backgroundColor: bar1,
+                    borderColor: bar1b,
                     borderWidth: 2,
                     borderRadius: 6,
                 }]
@@ -141,11 +144,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { color: textColor, font: { size: 9 } }, grid: { display: false } },
-                    y: { ticks: { color: textColor, font: { size: 9 } }, grid: { color: gridColor }, beginAtZero: true }
+                    x: { ticks: { color: txtColor, font: font }, grid: { display: false } },
+                    y: { ticks: { color: txtColor, font: font }, grid: { color: gridC }, beginAtZero: true }
                 }
             }
-        });
+        }));
     }
 
     const ctx2 = document.getElementById('rolesChart');
@@ -156,38 +159,37 @@ document.addEventListener('DOMContentLoaded', function() {
             'student': '{% trans "Student" %}',
             'teacher': '{% trans "Teacher" %}',
         };
-        const colors = ['#6366f1', '#10b981', '#f59e0b', '#a855f7'];
-        const roles = {{ roles|safe }};
+        const roles = {{ roles|escapejs }};
         const labels = Object.keys(roles).map(k => roleLabels[k] || k);
         const data = Object.values(roles);
 
-        new Chart(ctx2, {
+        window._chartInstances.push(new Chart(ctx2, {
             type: 'doughnut',
             data: {
                 labels: labels,
-                datasets: [{ data: data, backgroundColor: colors.slice(0, data.length), borderWidth: 0 }]
+                datasets: [{ data: data, backgroundColor: roleColors.slice(0, data.length), borderWidth: 0 }]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom', labels: { color: textColor, padding: 10, font: { size: 9 }, boxWidth: 10 } }
+                    legend: { position: 'bottom', labels: { color: txtColor, padding: 14, font: font, boxWidth: 14, usePointStyle: true } }
                 }
             }
-        });
+        }));
     }
 
     {% trans "O'qilganlar soni" as chart_label %}
     const ctx3 = document.getElementById('topBooksChart');
     if (ctx3) {
-        new Chart(ctx3, {
+        window._chartInstances.push(new Chart(ctx3, {
             type: 'bar',
             data: {
                 labels: [{% for b in top_books %}"{{ b.title|escapejs }}",{% endfor %}],
                 datasets: [{
                     label: '{{ chart_label|escapejs }}',
                     data: [{% for b in top_books %}{{ b.borrow_count }},{% endfor %}],
-                    backgroundColor: 'rgba(251, 191, 36, 0.6)',
-                    borderColor: '#fbbf24',
+                    backgroundColor: amber1,
+                    borderColor: amber1b,
                     borderWidth: 2,
                     borderRadius: 4,
                 }]
@@ -197,12 +199,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { color: textColor, font: { size: 9 } }, grid: { color: gridColor }, beginAtZero: true },
-                    y: { ticks: { color: textColor, font: { size: 8 } }, grid: { display: false } }
+                    x: { ticks: { color: txtColor, font: font }, grid: { color: gridC }, beginAtZero: true },
+                    y: { ticks: { color: txtColor, font: { size: 11, weight: '600', family: 'Inter,system-ui,sans-serif' } }, grid: { display: false } }
                 }
             }
-        });
+        }));
     }
+}
+function initPage() { initDashCharts(); }
+document.addEventListener('DOMContentLoaded', initDashCharts);
+document.addEventListener('themechange', function() {
+    while(window._chartInstances.length) window._chartInstances.pop().destroy();
+    initDashCharts();
 });
 </script>
 {% endblock %}

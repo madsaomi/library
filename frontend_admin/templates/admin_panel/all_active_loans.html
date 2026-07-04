@@ -31,7 +31,7 @@
 
     <div class="glass-panel" style="padding: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-            <div style="font-size: 0.8rem; color: var(--text-muted);">{% blocktrans count counter=active_loans|length %}{{ counter }} ta faol o'qish{% plural %}{{ counter }} ta faol o'qishlar{% endblocktrans %}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">{% blocktrans count counter=active_loans|length %}{{ counter }} активная выдача{% plural %}{{ counter }} активных выдач{% endblocktrans %}</div>
             <div style="position: relative;">
                 <input type="text" id="search-input" placeholder="{% trans 'Qidirish...' %}"
                        style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none; width: 200px; font-size: 0.8rem;">

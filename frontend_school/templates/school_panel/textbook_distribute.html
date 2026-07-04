@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Darslik tarqatish" %} | Online Kutibxona{% endblock %}
+{% block page_title %}{% trans "Darslik tarqatish" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'school_panel/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+        <a href="{% url 'frontend_school:textbook_distribute' %}" class="glass-card" style="padding: 5px 12px; font-size: 0.72rem; text-decoration: none; border-radius: 6px; {% if not selected_grade %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{% trans "Barcha sinflar" %}</a>
+        {% for g in grades_list %}
+        <a href="{% url 'frontend_school:textbook_distribute' %}?grade={{ g|urlencode }}" class="glass-card" style="padding: 5px 12px; font-size: 0.72rem; text-decoration: none; border-radius: 6px; {% if selected_grade == g %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{{ g }} {% trans "sinf" %}</a>
+        {% endfor %}
+    </div>
+
+    {% if not selected_grade %}
+    <div class="glass-panel" style="padding: 40px; text-align: center;">
+        <i class="fas fa-hand-holding-heart" style="font-size: 2.5rem; color: var(--primary); opacity: 0.4; margin-bottom: 16px; display: block;"></i>
+        <h3 style="font-size: 1rem; margin-bottom: 8px;">{% trans "Sinfni tanlang" %}</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">{% trans "Darslik tarqatish uchun yuqoridan sinfni tanlang." %}</p>
+    </div>
+    {% else %}
+    <div class="glass-panel" style="padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <div>
+                <h3 style="font-size: 0.9rem; margin: 0;">
+                    <i class="fas fa-calendar-alt" style="color: var(--primary);"></i>
+                    {% trans "O'quv yili" %}: <strong>{{ academic_year }}</strong>
+                </h3>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">
+                {{ students|length }} {% trans "ta o'quvchi" %}
+            </div>
+        </div>
+
+        {% if not textbooks %}
+        <div style="padding: 30px; text-align: center; color: var(--text-muted);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; color: #f59e0b; display: block; margin-bottom: 8px;"></i>
+            <p>{% trans "Bu sinf uchun darsliklar topilmadi. Avval darsliklarni qo'shing." %}</p>
+        </div>
+        {% else %}
+        <div style="margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" onclick="document.getElementById('auto-form').submit()" class="btn-primary" style="padding: 8px 18px; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; gap: 6px; background: #10b981; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+                <i class="fas fa-magic"></i> {% trans "Avtomatik tarqatish" %}
+            </button>
+            <span style="font-size: 0.72rem; color: var(--text-muted); align-self: center;">
+                <i class="fas fa-info-circle"></i> {% trans "Barcha o'quvchilarga sinfiga mos barcha darsliklarni bir vaqtda tarqatadi" %}
+            </span>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; gap: 12px; margin-bottom: 14px;">
+                <button type="submit" class="btn-primary" style="padding: 10px 24px; font-size: 0.85rem; border-radius: 10px;">
+                    <i class="fas fa-save"></i> {% trans "Tarqatish" %}
+                </button>
+                <a href="{% url 'frontend_school:textbook_loans' %}" class="glass-card" style="padding: 10px 24px; border-radius: 10px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; border: 1px solid var(--border);">
+                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
+                </a>
+            </div>
+            <div class="info-grid" style="gap: 8px;">
+                {% for student in students %}
+                <div class="glass-card" style="padding: 12px 14px; {% if student.id in existing_loans %}border-color: #10b981;{% endif %}">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <div class="avatar-circle" style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), #a855f7); flex-shrink: 0;">
+                            <span class="avatar-initials" style="font-size: 0.65rem;">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</span>
+                        </div>
+                        <div style="flex: 1; min-width: 120px;">
+                            <div style="font-weight: 600; font-size: 0.82rem;">{{ student.first_name }} {{ student.last_name }}</div>
+                            <div style="font-size: 0.65rem; color: var(--text-muted);">{{ student.grade }} {% trans "sinf" %}</div>
+                        </div>
+                        <div style="flex: 2; min-width: 150px;">
+                            <select name="book_{{ student.id }}" class="form-control" style="width: 100%; padding: 6px 10px; font-size: 0.75rem;">
+                                <option value="">---</option>
+                                {% for tb in textbooks %}
+                                <option value="{{ tb.id }}">{{ tb.subject|default:tb.title }} - {{ tb.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% if student.id in existing_loans %}
+                        <span style="font-size: 0.65rem; color: #10b981; white-space: nowrap;"><i class="fas fa-check-circle"></i> {% trans "Tarqatilgan" %}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+
+        <form id="auto-form" method="post" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="auto" value="1">
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

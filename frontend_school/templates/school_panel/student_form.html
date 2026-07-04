@@ -27,22 +27,22 @@
 
                 <div>
                     <label style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.8rem; color: var(--text-muted);">
-                        <i class="fas fa-graduation-cap" style="color: #10b981; margin-right: 4px;"></i> {% trans "Sinf va harf" %}
-                    </label>
-                    <div style="display: flex; gap: 10px;">
-                        <div style="flex: 1;">{{ form.grade_number }}</div>
-                        <div style="flex: 1;">{{ form.grade_letter }}</div>
-                    </div>
-                </div>
-
-                <div>
-                    <label style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.8rem; color: var(--text-muted);">
                         <i class="fas fa-user" style="color: var(--primary); margin-right: 4px;"></i> {{ form.last_name.label }}
                     </label>
                     {{ form.last_name }}
                     {% if form.last_name.errors %}
                     <p style="color: #ef4444; font-size: 0.75rem; margin-top: 4px;"><i class="fas fa-exclamation-circle"></i> {{ form.last_name.errors.0 }}</p>
                     {% endif %}
+                </div>
+
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.8rem; color: var(--text-muted);">
+                        <i class="fas fa-graduation-cap" style="color: #10b981; margin-right: 4px;"></i> {% trans "Sinf va harf" %}
+                    </label>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">{{ form.grade_number }}</div>
+                        <div style="flex: 1;">{{ form.grade_letter }}</div>
+                    </div>
                 </div>
 
                 <div>

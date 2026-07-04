@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 from accounts.models import CustomUser
 from accounts.utils import verify_dynamic_token
-from books.models import Book, BookIssue, BookRequest, Category
+from books.models import Book, BookIssue, BookRequest, Category, TextbookLoan
 from books.achievements import award_xp
 from stats.models import ActionLog
 from .models import News
@@ -86,8 +86,10 @@ def dashboard(request):
 @login_required(login_url='login')
 @school_admin_required
 def students_list(request):
+    import re
     school = request.user.school
     query = request.GET.get('q')
+    grade_filter = request.GET.get('grade', '')
     students = CustomUser.objects.filter(school=school, role='student')
     
     # Stats
@@ -105,11 +107,31 @@ def students_list(request):
             Q(last_name__icontains=query) |
             Q(grade__icontains=query)
         )
-        
-    students = students.order_by('last_name', 'first_name')
+    
+    if grade_filter:
+        students = students.filter(grade=grade_filter)
+    
+    # Get distinct grades in school for filter, sorted numerically
+    all_grades_in_school = (
+        CustomUser.objects.filter(school=school, role='student')
+        .exclude(grade__isnull=True).exclude(grade='')
+        .values_list('grade', flat=True).distinct()
+    )
+    def sort_grade(g):
+        m = re.match(r'(\d+)', g)
+        return int(m.group(1)) if m else 99
+    grades_list = sorted(all_grades_in_school, key=sort_grade)
+    
+    # Sort students numerically by grade, then by name
+    students = sorted(students, key=lambda u: (
+        int(re.match(r'(\d+)', u.grade or '99').group(1)) if re.match(r'(\d+)', u.grade or '') else 99,
+        u.grade or '',
+        u.last_name or '',
+        u.first_name or '',
+    ))
     
     from django.core.paginator import Paginator
-    paginator = Paginator(students, 50)
+    paginator = Paginator(students, 100)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -117,6 +139,8 @@ def students_list(request):
         'students': page_obj, 'page_obj': page_obj, 'query': query,
         'total_students': total_students, 'reading_students': reading_students,
         'entered_today': entered_today,
+        'grades_list': grades_list,
+        'selected_grade': grade_filter,
     })
 
 @login_required(login_url='login')
@@ -157,6 +181,7 @@ def books_list(request):
     query = request.GET.get('q')
     category_id = request.GET.get('category')
     no_cover = request.GET.get('no_cover')
+    textbook = request.GET.get('textbook')
     
     from django.db.models import Sum
     all_books = Book.objects.filter(school=school)
@@ -179,6 +204,9 @@ def books_list(request):
     if no_cover == '1':
         from django.db.models import Q
         books = books.filter(Q(cover='') | Q(cover__isnull=True))
+
+    if textbook == '1':
+        books = books.filter(is_textbook=True)
         
     books = books.order_by('title')
     
@@ -197,6 +225,7 @@ def books_list(request):
         'query': query,
         'selected_category': int(category_id) if category_id else None,
         'no_cover': no_cover == '1',
+        'textbook_filter': textbook == '1',
         'total_books': total_books,
         'total_copies': stats['total_copies'] or 0,
         'available_copies': stats['available_copies'] or 0,
@@ -338,6 +367,10 @@ def process_qr(request):
             
             if request_obj.user.school != request.user.school:
                 return JsonResponse({'status': 'error', 'message': _('Xatolik: Ushbu o\'quvchi boshqa maktabga tegishli!')})
+            
+            # Students cannot borrow textbooks
+            if request_obj.user.role == 'student' and request_obj.book.is_textbook:
+                return JsonResponse({'status': 'error', 'message': _("Darsliklarni o'quvchilar ololmaydi. Darsliklar o'quv yili boshida tarqatiladi.")})
             
             from django.db.models import F
             book = request_obj.book
@@ -538,7 +571,6 @@ def student_add(request):
                 password = ''.join(secrets.choice(alphabet) for i in range(12))
             
             student.set_password(password)
-            student.raw_password = password # Visible to admin
             student.save()
             
             messages.success(request, _("Yangi o'quvchi qo'shildi! Login: {}, Parol: {}").format(username, password))
@@ -546,6 +578,28 @@ def student_add(request):
     else:
         form = StudentForm()
     return render(request, 'school_panel/student_form.html', {'form': form, 'title': _('Yangi o\'quvchi qo\'shish')})
+
+@login_required(login_url='login')
+@school_admin_required
+def student_detail(request, pk):
+    student = get_object_or_404(CustomUser, pk=pk, school=request.user.school, role='student')
+    classmates = CustomUser.objects.filter(
+        school=request.user.school, role='student', grade=student.grade
+    ).exclude(pk=student.pk).order_by('last_name', 'first_name')
+    
+    active_loans = BookIssue.objects.filter(user=student, is_returned=False).select_related('book')
+    textbook_loans = TextbookLoan.objects.filter(student=student, returned_at__isnull=True).select_related('book')
+    history = BookIssue.objects.filter(user=student, is_returned=True).order_by('-returned_at')[:10]
+    total_read = BookIssue.objects.filter(user=student, is_returned=True).count()
+    
+    return render(request, 'school_panel/student_detail.html', {
+        'student': student,
+        'classmates': classmates,
+        'active_loans': active_loans,
+        'textbook_loans': textbook_loans,
+        'history': history,
+        'total_read': total_read,
+    })
 
 @login_required(login_url='login')
 @school_admin_required
@@ -597,7 +651,6 @@ def teacher_add(request):
                 password = ''.join(secrets.choice(alphabet) for i in range(12))
             
             teacher.set_password(password)
-            teacher.raw_password = password
             teacher.save()
             
             messages.success(request, _("Yangi o'qituvchi qo'shildi! Login: {login}, Parol: {parol}").format(login=username, parol=password))
@@ -691,9 +744,7 @@ def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.raw_password = form.cleaned_data.get('new_password1')
-            user.save()
+            user = form.save()
             update_session_auth_hash(request, user)
             messages.success(request, _('Parolingiz muvaffaqiyatli o\'zgartirildi!'))
             return redirect('frontend_school:profile')
@@ -775,27 +826,22 @@ def post_top_student_news(request, pk):
         return redirect('frontend_school:statistics')
 
     from books.models import UserAchievement
-    achievements = UserAchievement.objects.filter(user=student).select_related('achievement')
-    achievement_lines = ""
-    for ach in achievements:
-        achievement_lines += f"  • {ach.achievement.name} (+{ach.achievement.xp_reward} XP)\n"
     title = _("Eng faol o'quvchi: {name}").format(name=f"{student.first_name} {student.last_name}")
-    body = _(
-        "🏆 {name} — {grade}-sinf o'quvchisi\n\n"
-        "📚 Jami o'qilgan kitoblar: {books}\n"
-        "⭐ XP ball: {xp} ({level}-daraja)\n"
-        "🎯 Yutuqlari:\n{achievements}\n\n"
-        "{school} jamoasi {name}ni tabriklaydi va barcha o'quvchilarni faol kitob o'qishga chorlaydi! 📖"
-    ).format(
-        name=f"{student.first_name} {student.last_name}",
-        grade=student.grade or "—",
-        books=student.total_books_read,
-        xp=student.xp_points,
-        level=student.level,
-        achievements=achievement_lines or "  —",
-        school=school.name,
+    News.objects.create(
+        school=school, title=title, body="", is_published=True,
+        template_key='top_reader',
+        template_data={
+            'student': {
+                'name': f"{student.first_name} {student.last_name}",
+                'grade': student.grade or "—",
+                'school': school.name,
+            },
+            'books': student.total_books_read,
+            'xp': student.xp_points,
+            'level': student.level,
+            'streak': student.current_streak,
+        },
     )
-    News.objects.create(school=school, title=title, body=body, is_published=True)
     messages.success(request, _("Yangilik muvaffaqiyatli yaratildi!"))
     return redirect('frontend_school:statistics')
 
@@ -830,3 +876,368 @@ def graduates_list(request):
         'total_graduates': total_graduates, 'total_books': total_books,
         'total_active': total_active,
     })
+
+
+@login_required(login_url='login')
+@school_admin_required
+def textbook_loans(request):
+    import re
+    school = request.user.school
+    grade_filter = request.GET.get('grade', '')
+    
+    loans = TextbookLoan.objects.filter(book__school=school).select_related('book', 'student').order_by('-issued_at')
+    
+    active_loans = loans.filter(returned_at__isnull=True).count()
+    total_loans = loans.count()
+    returned_loans = loans.filter(returned_at__isnull=False).count()
+    
+    if grade_filter:
+        loans = loans.filter(student__grade=grade_filter)
+    
+    # Distinct grades for filter
+    all_grades = (
+        CustomUser.objects.filter(school=school, role='student')
+        .exclude(grade__isnull=True).exclude(grade='')
+        .values_list('grade', flat=True).distinct()
+    )
+    def sort_grade(g):
+        m = re.match(r'(\d+)', g)
+        return int(m.group(1)) if m else 99
+    grades_list = sorted(all_grades, key=sort_grade)
+    
+    # Academic years for filter
+    years = TextbookLoan.objects.filter(book__school=school).values_list('academic_year', flat=True).distinct().order_by('-academic_year')
+    
+    from django.core.paginator import Paginator
+    paginator = Paginator(loans, 50)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'school_panel/textbook_loans.html', {
+        'loans': page_obj, 'page_obj': page_obj,
+        'active_loans': active_loans, 'total_loans': total_loans, 'returned_loans': returned_loans,
+        'grades_list': grades_list, 'selected_grade': grade_filter,
+        'years': years,
+    })
+
+
+@login_required(login_url='login')
+@school_admin_required
+def textbook_distribute(request):
+    import re
+    import datetime
+    school = request.user.school
+    grade_filter = request.GET.get('grade', '')
+    
+    # Compute current academic year
+    now = datetime.date.today()
+    if now.month >= 9:
+        academic_year = f"{now.year}/{now.year + 1}"
+    else:
+        academic_year = f"{now.year - 1}/{now.year}"
+    
+    # Get distinct grades
+    all_grades = (
+        CustomUser.objects.filter(school=school, role='student')
+        .exclude(grade__isnull=True).exclude(grade='')
+        .values_list('grade', flat=True).distinct()
+    )
+    def sort_grade(g):
+        m = re.match(r'(\d+)', g)
+        return int(m.group(1)) if m else 99
+    grades_list = sorted(all_grades, key=sort_grade)
+    
+    if request.method == 'POST':
+        auto = request.POST.get('auto') == '1'
+        due_date = datetime.date(now.year + 1, 6, 1) if now.month >= 9 else datetime.date(now.year, 6, 1)
+        created_count = 0
+
+        def create_loan(student, book):
+            nonlocal created_count
+            existing = TextbookLoan.objects.filter(
+                student=student, book=book, academic_year=academic_year
+            ).first()
+            if not existing:
+                TextbookLoan.objects.create(
+                    book=book, student=student, academic_year=academic_year,
+                    due_date=due_date, condition_on_issue='good', notes='',
+                )
+                created_count += 1
+
+        if auto:
+            # Auto-assign: all textbooks matching this grade to all students
+            students = CustomUser.objects.filter(school=school, role='student')
+            if grade_filter:
+                students = students.filter(grade=grade_filter)
+            for student in students:
+                grade_num = int(re.match(r'(\d+)', student.grade or '0').group(1)) if re.match(r'(\d+)', student.grade or '') else None
+                textbooks_for_grade = Book.objects.filter(school=school, is_textbook=True)
+                if grade_num:
+                    textbooks_for_grade = textbooks_for_grade.filter(grade=grade_num)
+                for book in textbooks_for_grade:
+                    create_loan(student, book)
+        else:
+            selected = {}
+            for key, value in request.POST.items():
+                if key.startswith('book_'):
+                    parts = key.split('_', 1)
+                    student_id = parts[1]
+                    selected[student_id] = value
+            for student_id, book_id in selected.items():
+                if not book_id:
+                    continue
+                student = get_object_or_404(CustomUser, pk=student_id, school=school, role='student')
+                book = get_object_or_404(Book, pk=book_id, school=school, is_textbook=True)
+                create_loan(student, book)
+
+        messages.success(request, _("{count} ta darslik tarqatildi.").format(count=created_count))
+        return redirect('frontend_school:textbook_loans')
+    
+    # GET: show students by grade with available textbooks
+    students = CustomUser.objects.filter(school=school, role='student')
+    if grade_filter:
+        students = students.filter(grade=grade_filter)
+    
+    students = sorted(students, key=lambda u: (
+        int(re.match(r'(\d+)', u.grade or '99').group(1)) if re.match(r'(\d+)', u.grade or '') else 99,
+        u.last_name or '', u.first_name or '',
+    ))
+    
+    # Get textbooks that match the grade (or any if no grade filter)
+    if grade_filter:
+        grade_num = int(re.match(r'(\d+)', grade_filter).group(1)) if re.match(r'(\d+)', grade_filter) else None
+    else:
+        grade_num = None
+    
+    textbooks = Book.objects.filter(school=school, is_textbook=True)
+    if grade_num:
+        textbooks = textbooks.filter(grade=grade_num)
+    textbooks = textbooks.order_by('subject', 'title')
+    
+    # Students who already have textbooks this year
+    existing_student_ids = set(
+        TextbookLoan.objects.filter(
+            student__in=students, academic_year=academic_year, returned_at__isnull=True
+        ).values_list('student_id', flat=True)
+    )
+    
+    return render(request, 'school_panel/textbook_distribute.html', {
+        'students': students, 'textbooks': textbooks,
+        'grades_list': grades_list, 'selected_grade': grade_filter,
+        'academic_year': academic_year, 'existing_loans': existing_student_ids,
+    })
+
+
+@login_required(login_url='login')
+@school_admin_required
+def textbook_collect(request):
+    import re
+    import datetime
+    school = request.user.school
+    grade_filter = request.GET.get('grade', '')
+    
+    loans = TextbookLoan.objects.filter(book__school=school, returned_at__isnull=True).select_related('book', 'student').order_by('student__grade', 'student__last_name')
+    
+    if grade_filter:
+        loans = loans.filter(student__grade=grade_filter)
+    
+    # Distinct grades for filter
+    all_grades = (
+        CustomUser.objects.filter(school=school, role='student')
+        .exclude(grade__isnull=True).exclude(grade='')
+        .values_list('grade', flat=True).distinct()
+    )
+    def sort_grade(g):
+        m = re.match(r'(\d+)', g)
+        return int(m.group(1)) if m else 99
+    grades_list = sorted(all_grades, key=sort_grade)
+    
+    if request.method == 'POST':
+        collected = 0
+        for key, value in request.POST.items():
+            if key.startswith('return_'):
+                loan_id = key.split('_', 1)[1]
+                try:
+                    loan = TextbookLoan.objects.get(id=loan_id, book__school=school, returned_at__isnull=True)
+                    loan.returned_at = datetime.date.today()
+                    condition = request.POST.get(f'condition_{loan_id}', 'fair')
+                    loan.condition_on_return = condition
+                    loan.notes = request.POST.get(f'notes_{loan_id}', loan.notes or '')
+                    loan.save()
+                    collected += 1
+                except TextbookLoan.DoesNotExist:
+                    continue
+        
+        messages.success(request, _("{count} ta darslik qaytarib olindi.").format(count=collected))
+        return redirect('frontend_school:textbook_loans')
+    
+    return render(request, 'school_panel/textbook_collect.html', {
+        'loans': loans, 'grades_list': grades_list, 'selected_grade': grade_filter,
+    })
+
+
+@login_required(login_url='login')
+@school_admin_required
+def export_students_csv(request):
+    import csv
+    from django.http import HttpResponse
+    school = request.user.school
+    students = CustomUser.objects.filter(school=school, role='student').order_by('grade', 'last_name')
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = 'attachment; filename="students.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['#', 'Username', 'Ism', 'Familiya', 'Sinf', 'Kitoblar soni'])
+    for i, s in enumerate(students, 1):
+        writer.writerow([i, s.username, s.first_name, s.last_name, s.grade, s.total_books_read])
+    return response
+
+
+@login_required(login_url='login')
+@school_admin_required
+def export_books_csv(request):
+    import csv
+    from django.http import HttpResponse
+    school = request.user.school
+    books = Book.objects.filter(school=school).order_by('title')
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = 'attachment; filename="books.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['#', 'Sarlavha', 'Muallif', 'Kategoriya', 'Umumiy', 'Mavjud', "O'qilgan", 'Darslik'])
+    for i, b in enumerate(books, 1):
+        writer.writerow([i, b.title, b.author or '', b.category.name if b.category else '', b.total_count, b.available_count, b.borrow_count, 'Ha' if b.is_textbook else ''])
+    return response
+
+
+@login_required(login_url='login')
+@school_admin_required
+def export_issues_csv(request):
+    import csv
+    from django.http import HttpResponse
+    school = request.user.school
+    issues = BookIssue.objects.filter(book__school=school).select_related('book', 'user').order_by('-issued_at')
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = 'attachment; filename="book_issues.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['#', 'Kitob', 'O\'quvchi', 'Sinf', 'Berilgan', 'Qaytarilgan', 'Holati'])
+    for i, iss in enumerate(issues, 1):
+        writer.writerow([
+            i, iss.book.title, iss.user.get_full_name() or iss.user.username,
+            iss.user.grade or '',
+            iss.issued_at.strftime('%d.%m.%Y'),
+            iss.returned_at.strftime('%d.%m.%Y') if iss.returned_at else '',
+            'Qaytarilgan' if iss.is_returned else 'Ijarada',
+        ])
+    return response
+
+
+@login_required(login_url='login')
+@school_admin_required
+def import_students_csv(request):
+    if request.method != 'POST':
+        return render(request, 'school_panel/csv_import.html', {
+            'title': _("O'quvchilarni CSV dan import qilish"),
+            'action_url': reverse('frontend_school:import_students_csv'),
+            'redirect_url': reverse('frontend_school:students_list'),
+        })
+    csv_file = request.FILES.get('csv_file')
+    if not csv_file:
+        return JsonResponse({'success': False, 'errors': [_('Fayl yuklanmadi')]}, status=400)
+    if not csv_file.name.endswith('.csv'):
+        return JsonResponse({'success': False, 'errors': [_('Faqat CSV fayl yuklang')]}, status=400)
+    school = request.user.school
+    import csv, string, secrets
+    decoded = csv_file.read().decode('utf-8-sig')
+    reader = csv.DictReader(decoded.splitlines())
+    created = 0
+    errors = []
+    for row_num, row in enumerate(reader, 2):
+        first_name = row.get('first_name', '').strip()
+        last_name = row.get('last_name', '').strip()
+        grade = row.get('grade', '').strip()
+        if not first_name or not last_name or not grade:
+            errors.append(_("Qator {}: ism, familiya va sinf majburiy").format(row_num))
+            continue
+        try:
+            student = CustomUser(
+                school=school, role='student',
+                first_name=first_name, last_name=last_name, grade=grade,
+            )
+            student.username = f"temp_{secrets.token_hex(4)}"
+            student.save()
+            district_part = clean_name(student.school.district.name if student.school and student.school.district else "no")
+            school_part = clean_name(student.school.name if student.school else "school")
+            student.username = f"{district_part}_{school_part}_{student.id}"
+            alphabet = string.ascii_letters + string.digits
+            password = ''.join(secrets.choice(alphabet) for _ in range(12))
+            student.set_password(password)
+            student.save()
+            created += 1
+        except Exception as e:
+            errors.append(_("Qator {}: {}").format(row_num, str(e)))
+    if created:
+        messages.success(request, _("{} ta o'quvchi muvaffaqiyatli import qilindi.").format(created))
+    if errors:
+        messages.warning(request, _("Importda {} ta xatolik yuz berdi.").format(len(errors)))
+    return JsonResponse({'success': True, 'created': created, 'errors': errors})
+
+
+@login_required(login_url='login')
+@school_admin_required
+def import_books_csv(request):
+    if request.method != 'POST':
+        return render(request, 'school_panel/csv_import.html', {
+            'title': _("Kitoblarni CSV dan import qilish"),
+            'action_url': reverse('frontend_school:import_books_csv'),
+            'redirect_url': reverse('frontend_school:books_list'),
+        })
+    csv_file = request.FILES.get('csv_file')
+    if not csv_file:
+        return JsonResponse({'success': False, 'errors': [_('Fayl yuklanmadi')]}, status=400)
+    if not csv_file.name.endswith('.csv'):
+        return JsonResponse({'success': False, 'errors': [_('Faqat CSV fayl yuklang')]}, status=400)
+    school = request.user.school
+    import csv
+    decoded = csv_file.read().decode('utf-8-sig')
+    reader = csv.DictReader(decoded.splitlines())
+    created = 0
+    errors = []
+    for row_num, row in enumerate(reader, 2):
+        title = row.get('title', '').strip()
+        author = row.get('author', '').strip()
+        category_name = row.get('category', '').strip()
+        total_count_str = row.get('total_count', '').strip()
+        available_count_str = row.get('available_count', '').strip()
+        description = row.get('description', '').strip()
+        is_textbook_str = row.get('is_textbook', '').strip().upper()
+        if not title or not total_count_str or not available_count_str:
+            errors.append(_("Qator {}: sarlavha, umumiy soni va mavjud soni majburiy").format(row_num))
+            continue
+        try:
+            total_count = int(total_count_str)
+            available_count = int(available_count_str)
+        except ValueError:
+            errors.append(_("Qator {}: sonlar noto'g'ri formatda").format(row_num))
+            continue
+        try:
+            category = None
+            if category_name:
+                category, _ = Category.objects.get_or_create(name=category_name)
+            book = Book(
+                school=school, title=title, author=author or None,
+                category=category, total_count=total_count,
+                available_count=available_count,
+                description=description or '',
+                is_textbook=(is_textbook_str == 'TRUE'),
+            )
+            book.save()
+            created += 1
+        except Exception as e:
+            errors.append(_("Qator {}: {}").format(row_num, str(e)))
+    if created:
+        messages.success(request, _("{} ta kitob muvaffaqiyatli import qilindi.").format(created))
+    if errors:
+        messages.warning(request, _("Importda {} ta xatolik yuz berdi.").format(len(errors)))
+    return JsonResponse({'success': True, 'created': created, 'errors': errors})

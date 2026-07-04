@@ -2048,7 +2048,7 @@ msgid "haftalik streak"
 msgstr ""
 
 msgid "14 kun"
-msgstr ""
+msgstr "14 kun"
 
 msgid "Boshqa"
 msgstr ""
@@ -2107,4 +2107,212 @@ msgid "Chop etishni tasdiqlaysizmi?"
 msgstr ""
 
 msgid "Bugun bu haqida yangilik allaqachon chop etilgan!"
+msgstr ""
+
+msgid "Login va parol avtomatik tarzda yaratiladi"
+msgstr "Login va parol avtomatik tarzda yaratiladi"
+
+msgid "Parol kiriting"
+msgstr "Parol kiriting"
+
+msgid "%(n)s kun"
+msgstr "%(n)s kun"
+
+msgid "Sinfdoshlar"
+msgstr ""
+
+msgid "Sinfdoshlari"
+msgstr ""
+
+msgid "Sinfdoshlar yo'q"
+msgstr ""
+
+msgid "Sinfdoshlar topilmadi"
+msgstr ""
+
+msgid "Mening sinfim"
+msgstr ""
+
+msgid "Barcha sinflar"
+msgstr ""
+
+msgid "O'quvchilar sinflar bo'yicha"
+msgstr ""
+
+msgid "Birinchi kitob"
+msgstr ""
+
+msgid "Ixtiyoriy o'quvchi"
+msgstr ""
+
+msgid "Kitob qurti"
+msgstr ""
+
+msgid "O'qish afsonasi"
+msgstr ""
+
+msgid "Bilimdon"
+msgstr ""
+
+msgid "Hammayeydi"
+msgstr ""
+
+msgid "Tez o'quvchi"
+msgstr ""
+
+msgid "Doimiy o'quvchi"
+msgstr ""
+
+msgid "Tinimsiz o'quvchi"
+msgstr ""
+
+msgid "Kutubxonadan birinchi kitobni oldi"
+msgstr ""
+
+msgid "10 ta kitob o'qidi"
+msgstr ""
+
+msgid "50 ta kitob o'qidi"
+msgstr ""
+
+msgid "100 ta kitob o'qidi"
+msgstr ""
+
+msgid "5 xil kategoriyadagi kitoblarni o'qidi"
+msgstr ""
+
+msgid "Maktabdagi barcha kategoriyalardan kitob o'qidi"
+msgstr ""
+
+msgid "3 kun ichida 5 ta kitobni qaytardi"
+msgstr ""
+
+msgid "4 haftalik streak-ga erishdi"
+msgstr ""
+
+msgid "8 haftalik streak-ga erishdi"
+msgstr ""
+
+msgid "Darsliklar"
+msgstr ""
+
+msgid "Masalan: Matematika"
+msgstr ""
+
+msgid "Huquq"
+msgstr ""
+
+msgid "Iqtisod"
+msgstr ""
+
+msgid "Boshqa (qo'lda kiriting)"
+msgstr ""
+
+msgid "Fanni kiriting"
+msgstr ""
+
+msgid ""
+"Darsliklarni o'quvchilar bron qila olmaydi. Darsliklar o'quv yili boshida "
+"tarqatiladi."
+msgstr ""
+
+msgid ""
+"Darsliklarni o'quvchilar ololmaydi. Darsliklar o'quv yili boshida "
+"tarqatiladi."
+msgstr ""
+
+msgid "Bu darslik. O'quvchilar darsliklarni o'quv yili boshida olishadi."
+msgstr ""
+
+msgid "Darslik tarqatish"
+msgstr ""
+
+msgid "Darslik qaytarib olish"
+msgstr ""
+
+msgid "{count} ta darslik tarqatildi."
+msgstr ""
+
+msgid "{count} ta darslik qaytarib olindi."
+msgstr ""
+
+msgid "Darslik tarqatish uchun yuqoridan sinfni tanlang."
+msgstr ""
+
+msgid "Bu sinf uchun darsliklar topilmadi. Avval darsliklarni qo'shing."
+msgstr ""
+
+msgid "Barcha darsliklar qaytarilgan"
+msgstr ""
+
+msgid "Faol darslik ijaralari yo'q."
+msgstr ""
+
+msgid "Qaytarilishi kerak bo'lgan darsliklar"
+msgstr ""
+
+msgid "Tarqatish"
+msgstr ""
+
+msgid "Tarqatilgan"
+msgstr ""
+
+msgid "Darslik ijaralari"
+msgstr ""
+
+msgid "Qaytarib olish"
+msgstr ""
+
+msgid "O'quv yili"
+msgstr ""
+
+msgid "Yaxshi"
+msgstr ""
+
+msgid "Qoniqarli"
+msgstr ""
+
+msgid "Yomon"
+msgstr ""
+
+msgid "Yo'qolgan"
+msgstr ""
+
+msgid "Izoh"
+msgstr ""
+
+msgid "Avtomatik tarqatish"
+msgstr ""
+
+msgid ""
+"Barcha o'quvchilarga sinfiga mos barcha darsliklarni bir vaqtda tarqatadi"
+msgstr ""
+
+msgid "Faol ijaralar"
+msgstr ""
+
+msgid "Faol ijaralar yo'q"
+msgstr ""
+
+msgid "yana"
+msgstr ""
+
+msgid "Foydalanuvchi nomi yoki parol noto'g'ri"
+msgstr ""
+
+msgid "Eng faol o'quvchi: {name}"
+msgstr ""
+
+msgid "📚 Jami o'qilgan kitoblar: {books}"
+msgstr ""
+
+msgid "🔥 Haftalik streak: {streak} kun"
+msgstr ""
+
+msgid "⭐ Daraja: {level}"
+msgstr ""
+
+msgid ""
+"🏆 {school} jamoasi {name}ni tabriklaydi va barcha o'quvchilarni faol kitob "
+"o'qishga chorlaydi! 📖"
 msgstr ""

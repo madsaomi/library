@@ -1450,7 +1450,7 @@ msgid "Qaytarish"
 msgstr "Returns"
 
 msgid "Yangi"
-msgstr "Add"
+msgstr "New"
 
 msgid "Barcha"
 msgstr "All"
@@ -1964,49 +1964,49 @@ msgid "haftalik streak"
 msgstr "week streak"
 
 msgid "14 kun"
-msgstr ""
+msgstr "14 days"
 
 msgid "Barcha maktablar uchun ko'rsatish"
-msgstr ""
+msgstr "Show for all schools"
 
 msgid "Berilgan kitoblar"
-msgstr ""
+msgstr "Issued books"
 
 msgid "Bildirishnomalar yo'q"
-msgstr ""
+msgstr "No notifications"
 
 msgid "Boshqa"
 msgstr ""
 
 msgid "Bron QR-kodi"
-msgstr ""
+msgstr "Reservation QR code"
 
 msgid "Bron qilish kodi"
-msgstr ""
+msgstr "Booking code"
 
 msgid "CSRF xatolik"
-msgstr ""
+msgstr "CSRF error"
 
 msgid "Eng ko'p o'qilgan kitoblar (Top 10)"
 msgstr "Most read books (Top 10)"
 
 msgid "Faoliyat"
-msgstr ""
+msgstr "Activity"
 
 msgid "Faoliyat yo'q"
-msgstr ""
+msgstr "No activity"
 
 msgid "Foydalanuvchi turlari"
 msgstr "User types"
 
 msgid "Foydalanuvchilar topilmadi"
-msgstr ""
+msgstr "No users found"
 
 msgid "Hozircha ma'lumot yo'q"
 msgstr ""
 
 msgid "Hozirda faol o'qishlar mavjud emas"
-msgstr ""
+msgstr "No active readings at the moment"
 
 msgid "ID"
 msgstr ""
@@ -2015,94 +2015,94 @@ msgid "Ikonka"
 msgstr ""
 
 msgid "Kitob kutubxonaga muvaffaqiyatli qaytarildi."
-msgstr ""
+msgstr "Book successfully returned to the library."
 
 msgid "Kitob muvaffaqiyatli berildi. Yoqimli mutolaa tilaymiz!"
-msgstr ""
+msgstr "Book issued successfully. Happy reading!"
 
 msgid "Kitob topshirildi!"
-msgstr ""
+msgstr "Book returned!"
 
 msgid "Kitob topshirish"
-msgstr ""
+msgstr "Hand in book"
 
 msgid "Kitob:"
-msgstr ""
+msgstr "Book:"
 
 msgid "Kitoblar ro'yxati"
-msgstr ""
+msgstr "Book list"
 
 msgid "Kitobni olish uchun quyidagi QR-kodni kutubxonachiga ko'rsating."
-msgstr ""
+msgstr "Show the following QR code to the librarian to receive the book."
 
 msgid "Kitobni qaytarish"
-msgstr ""
+msgstr "Return book"
 
 msgid "Kitobni qaytarish uchun quyidagi QR-kodni kutubxonachiga ko'rsating."
-msgstr ""
+msgstr "Show the following QR code to the librarian to return the book."
 
 msgid "Kutilmoqda..."
-msgstr ""
+msgstr "Waiting..."
 
 msgid "Kutubxonachi skanerlagandan so'ng broningiz tasdiqlanadi."
-msgstr ""
+msgstr "Your reservation will be confirmed after the librarian scans it."
 
 msgid "Login"
-msgstr ""
+msgstr "Username"
 
 msgid "Maktab Admini"
-msgstr ""
+msgstr "School Admin"
 
 msgid "Maktab qo'shish"
-msgstr ""
+msgstr "Add school"
 
 msgid "Manual ID:"
-msgstr ""
+msgstr "Manual ID:"
 
 msgid "Mavzuni almashtirish"
-msgstr ""
+msgstr "Toggle theme"
 
 msgid "Mening kitoblarimga qaytish"
-msgstr ""
+msgstr "Back to my books"
 
 msgid "Muassasalar boshqaruvi"
-msgstr ""
+msgstr "Institution management"
 
 msgid "Muvaffaqiyatli bron qilindi!"
-msgstr ""
+msgstr "Successfully reserved!"
 
 msgid "Noto'g'ri so'rov"
-msgstr ""
+msgstr "Invalid request"
 
 msgid "Noto'g'ri so'rov yuborildi"
-msgstr ""
+msgstr "Invalid request sent"
 
 msgid "OY O'QUVCHISI"
 msgstr ""
 
 msgid "Olingan sana:"
-msgstr ""
+msgstr "Received date:"
 
 msgid "Oylik kitob berishlar"
 msgstr "Monthly book issues"
 
 msgid "Profilni tahrirlash"
-msgstr ""
+msgstr "Edit profile"
 
 msgid "Progress"
 msgstr ""
 
 msgid "QR Skaner | Online Kutibxona"
-msgstr ""
+msgstr "QR Scanner | Online Library"
 
 msgid "QR-kodni ko'rsating"
-msgstr ""
+msgstr "Show QR code"
 
 msgid "Qidiruv bo'yicha hech narsa topilmadi"
-msgstr ""
+msgstr "No search results found"
 
 msgid "Ruxsat etilmagan"
-msgstr ""
+msgstr "Access denied"
 
 msgid "Sahifa"
 msgstr ""
@@ -2111,48 +2111,50 @@ msgid ""
 "Sahifa muddati tugagan yoki so'rov noto'g'ri yuborilgan. Iltimos, avvalgi "
 "sahifaga qaytib, qayta urinib ko'ring."
 msgstr ""
+"Page expired or request was sent incorrectly. Please go back and try again."
 
 msgid "Sana:"
-msgstr ""
+msgstr "Date:"
 
 msgid "Saytda ko'rsatish"
-msgstr ""
+msgstr "Show on site"
 
 msgid "School Admin | Online Kutibxona"
-msgstr ""
+msgstr "School Admin | Online Library"
 
 msgid "Sizda ushbu sahifaga kirish huquqi yo'q"
-msgstr ""
+msgstr "You do not have permission to access this page"
 
 msgid "Sizning so'rovingizda xatolik mavjud yoki tizim uni qabul qila olmadi."
-msgstr ""
+msgstr "Your request has an error or the system could not process it."
 
 msgid "Status:"
-msgstr ""
+msgstr "Status:"
 
 msgid "Tanlang"
-msgstr ""
+msgstr "Select"
 
 msgid "Tanlangan kitob:"
-msgstr ""
+msgstr "Selected book:"
 
 msgid "Topshirish QR-kodi"
-msgstr ""
+msgstr "Return QR code"
 
 msgid "Username"
 msgstr ""
 
 msgid "Ushbu sahifaga kirish taqiqlangan yoki yetarli huquqlarga ega emassiz."
 msgstr ""
+"Access to this page is forbidden or you do not have sufficient permissions."
 
 msgid "XP"
 msgstr ""
 
 msgid "Xavfsizlik tokeni yaroqsiz"
-msgstr ""
+msgstr "Invalid security token"
 
 msgid "Yangilanishiga:"
-msgstr ""
+msgstr "Refreshes in:"
 
 msgid "Yangilik qilib post qilish"
 msgstr ""
@@ -2178,3 +2180,233 @@ msgstr "Confirm publication?"
 
 msgid "Bugun bu haqida yangilik allaqachon chop etilgan!"
 msgstr "News already published today!"
+
+msgid "Masalan: Matematika"
+msgstr "For example: Mathematics"
+
+msgid "Huquq"
+msgstr "Law"
+
+msgid "Iqtisod"
+msgstr "Economics"
+
+msgid "Boshqa (qo'lda kiriting)"
+msgstr "Other (type manually)"
+
+msgid "Fanni kiriting"
+msgstr "Enter subject name"
+
+msgid ""
+"Darsliklarni o'quvchilar bron qila olmaydi. Darsliklar o'quv yili boshida "
+"tarqatiladi."
+msgstr ""
+"Students cannot borrow textbooks. Textbooks are distributed at the start of "
+"the school year."
+
+msgid ""
+"Darsliklarni o'quvchilar ololmaydi. Darsliklar o'quv yili boshida "
+"tarqatiladi."
+msgstr ""
+"Students cannot borrow textbooks. Textbooks are distributed at the start of "
+"the school year."
+
+msgid "Bu darslik. O'quvchilar darsliklarni o'quv yili boshida olishadi."
+msgstr ""
+"This is a textbook. Students receive textbooks at the start of the school "
+"year."
+
+msgid "Darslik tarqatish"
+msgstr "Distribute Textbooks"
+
+msgid "Darslik qaytarib olish"
+msgstr "Collect Textbooks"
+
+msgid "{count} ta darslik tarqatildi."
+msgstr "{count} textbooks distributed."
+
+msgid "{count} ta darslik qaytarib olindi."
+msgstr "{count} textbooks collected."
+
+msgid "Darslik tarqatish uchun yuqoridan sinfni tanlang."
+msgstr "Select a grade above to distribute textbooks."
+
+msgid "Bu sinf uchun darsliklar topilmadi. Avval darsliklarni qo'shing."
+msgstr "No textbooks found for this grade. Add textbooks first."
+
+msgid "Barcha darsliklar qaytarilgan"
+msgstr "All textbooks have been collected"
+
+msgid "Faol darslik ijaralari yo'q."
+msgstr "No active textbook loans."
+
+msgid "Qaytarilishi kerak bo'lgan darsliklar"
+msgstr "Textbooks to be collected"
+
+msgid "Tarqatish"
+msgstr "Distribute"
+
+msgid "Tarqatilgan"
+msgstr "Distributed"
+
+msgid "Darslik ijaralari"
+msgstr "Textbook Loans"
+
+msgid "Qaytarib olish"
+msgstr "Collect"
+
+msgid "O'quv yili"
+msgstr "Academic year"
+
+msgid "Yaxshi"
+msgstr "Good"
+
+msgid "Qoniqarli"
+msgstr "Fair"
+
+msgid "Yomon"
+msgstr "Poor"
+
+msgid "Yo'qolgan"
+msgstr "Lost"
+
+msgid "Izoh"
+msgstr "Note"
+
+msgid "Avtomatik tarqatish"
+msgstr "Auto-distribute"
+
+msgid ""
+"Barcha o'quvchilarga sinfiga mos barcha darsliklarni bir vaqtda tarqatadi"
+msgstr ""
+"Distributes all textbooks matching each student's grade to all students at "
+"once"
+
+msgid "Sinfdoshlari"
+msgstr "Classmates"
+
+msgid "Sinfdoshlar yo'q"
+msgstr "No classmates"
+
+msgid "Faol ijaralar yo'q"
+msgstr "No active loans"
+
+msgid "Eng faol o'quvchi: {name}"
+msgstr "Most active reader: {name}"
+
+msgid "📚 Jami o'qilgan kitoblar: {books}"
+msgstr "📚 Total books read: {books}"
+
+msgid "🔥 Haftalik streak: {streak} kun"
+msgstr "🔥 Weekly streak: {streak} days"
+
+msgid "⭐ Daraja: {level}"
+msgstr "⭐ Level: {level}"
+
+msgid ""
+"🏆 {school} jamoasi {name}ni tabriklaydi va barcha o'quvchilarni faol kitob "
+"o'qishga chorlaydi! 📖"
+msgstr ""
+"🏆 The team of {school} congratulates {name} and encourages all students to "
+"read actively! 📖"
+
+msgid "Parol kiriting"
+msgstr "Enter password"
+
+msgid "%(n)s kun"
+msgstr "%(n)s days"
+
+msgid "Sinfdoshlar"
+msgstr "Classmates"
+
+msgid "Sinfdoshlar topilmadi"
+msgstr "No classmates found"
+
+msgid "Mening sinfim"
+msgstr "My Class"
+
+msgid "Barcha sinflar"
+msgstr "All Classes"
+
+msgid "O'quvchilar sinflar bo'yicha"
+msgstr "Students by Class"
+
+msgid "Sinf va Harf"
+msgstr "Grade and Letter"
+
+msgid "Xatolik 400"
+msgstr "Error 400"
+
+msgid "Xatolik 403"
+msgstr "Error 403"
+
+msgid "Navbatdan chiqish"
+msgstr "Leave queue"
+
+msgid "Siz navbatga qo'shildingiz"
+msgstr "You joined the queue"
+
+msgid "Siz allaqachon navbatdasiz"
+msgstr "You are already in queue"
+
+msgid "Siz navbatdan chiqdingiz"
+msgstr "You left the queue"
+
+msgid "Kitob tasdiqlandi"
+msgstr "Book approved"
+
+msgid "\"{title}\" kitobi sizga berildi"
+msgstr "Book \"{title}\" has been issued to you"
+
+msgid "\"{title}\" kitobi bo'shadi. Navbat sizda!"
+msgstr "Book \"{title}\" is free. Your turn!"
+
+msgid "Kitob mavjud!"
+msgstr "Book available!"
+
+msgid "Bu kitob sizning maktabingizga tegishli emas"
+msgstr "This book is not from your school"
+
+msgid "Kitob mavjud, bron qilishingiz mumkin"
+msgstr "Book available, you can reserve"
+
+msgid "Qayta olish"
+msgstr "Borrow again"
+
+msgid "Qidiruvi"
+msgstr "Search"
+
+msgid "Kitob qidirish"
+msgstr "Search book"
+
+msgid "Hozirda o'qilayotgan kitoblar"
+msgstr "Currently reading"
+
+msgid "Parolni o'zgartirmoqchi bo'lsangizgina to'ldiring."
+msgstr "Fill only to change password."
+
+msgid "Maktab ID"
+msgstr "School ID"
+
+msgid "Tuman (Rayon)"
+msgstr "District"
+
+msgid "Tizim xabari"
+msgstr "System notification"
+
+msgid "Bildirishnomalar yo\\'q"
+msgstr ""
+
+msgid "Darsliklar"
+msgstr "Textbooks"
+
+msgid "Faol ijaralar"
+msgstr "Active loans"
+
+msgid "yana"
+msgstr "more"
+
+msgid "Foydalanuvchi nomi yoki parol noto'g'ri"
+msgstr "Incorrect username or password"
+
+msgid "Login va parol avtomatik tarzda yaratiladi"
+msgstr "Login and password generated automatically"

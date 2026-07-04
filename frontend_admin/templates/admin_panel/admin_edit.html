@@ -9,54 +9,115 @@
 {% endblock %}
 
 {% block content %}
-<div style="max-width: 480px; margin: 0 auto;">
-    <div class="glass-panel animate-fade" style="padding: 32px;">
-        <form method="post">
+<div class="animate-fade" style="max-width: 500px; margin: 0 auto;">
+    <div class="glass-panel" style="padding: 28px;">
+        <form method="post" autocomplete="off">
             {% csrf_token %}
 
-            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px;">
                 <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Ism" %}</label>
                 {{ form.first_name }}
+                {% if is_add %}
+                <div style="display: flex; justify-content: flex-end;">
+                    <span id="name-counter" style="font-size: 0.65rem; color: var(--text-muted);">0 / 50</span>
+                </div>
+                {% endif %}
                 {% if form.first_name.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.first_name.errors.0 }}</span>{% endif %}
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px;">
                 <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Familiya" %}</label>
                 {{ form.last_name }}
+                {% if is_add %}
+                <div style="display: flex; justify-content: flex-end;">
+                    <span id="surname-counter" style="font-size: 0.65rem; color: var(--text-muted);">0 / 50</span>
+                </div>
+                {% endif %}
                 {% if form.last_name.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.last_name.errors.0 }}</span>{% endif %}
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px;">
-                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Username" %}</label>
-                <div style="padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text-muted); font-size: 0.85rem; opacity: 0.6;">
-                    {{ form.instance.username }}
-                </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 32px;">
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px;">
                 <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Maktab" %}</label>
                 {{ form.school }}
                 {% if form.school.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.school.errors.0 }}</span>{% endif %}
             </div>
 
-            <hr style="border: none; border-top: 1px solid var(--border); margin-bottom: 24px;">
+            {% if is_add %}
+            <div style="background: rgba(245,158,11,0.03); padding: 20px; border-radius: 16px; border: 1px solid rgba(245,158,11,0.1); margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                    <i class="fas fa-user-shield" style="color: #fbbf24; font-size: 0.95rem;"></i>
+                    <span style="font-size: 0.85rem; font-weight: 600; color: #fbbf24;">{% trans "Hisob ma'lumotlari" %}</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.75rem; margin-bottom: 16px;">
+                    {% trans "Bo'sh qoldirilsa, avtomatik yaratiladi" %}
+                </p>
 
-            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 32px;">
-                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Parol" %}</label>
+                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
+                    <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{{ form.admin_username.label }}</label>
+                    {{ form.admin_username }}
+                    {% if form.admin_username.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.admin_username.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
+                    <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{{ form.admin_password.label }}</label>
+                    {{ form.admin_password }}
+                    {% if form.admin_password.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.admin_password.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{{ form.admin_password_confirm.label }}</label>
+                    {{ form.admin_password_confirm }}
+                    {% if form.admin_password_confirm.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.admin_password_confirm.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Login" %}</label>
+                <div style="padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text-muted); font-size: 0.85rem; opacity: 0.6;">
+                    {{ form.instance.username }}
+                </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--border); margin-bottom: 20px;">
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px;">
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{% trans "Yangi parol" %}</label>
                 {{ form.password }}
                 {% if form.password.help_text %}<span style="color: var(--text-muted); font-size: 0.7rem;">{{ form.password.help_text }}</span>{% endif %}
                 {% if form.password.errors %}<span style="color: #ef4444; font-size: 0.75rem;">{{ form.password.errors.0 }}</span>{% endif %}
             </div>
+            {% endif %}
 
-            <div style="display: flex; gap: 10px;">
-                <button type="submit" class="btn-primary" style="flex: 2; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="submit" class="btn-primary" style="flex: 2; min-width: 140px; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;">
                     <i class="fas fa-check"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend_admin:all_users_list' %}" class="glass-card" style="flex: 1; padding: 12px; border-radius: 10px; text-align: center; text-decoration: none; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--border); font-size: 0.85rem;">
+                <a href="{% url 'frontend_admin:all_users_list' %}" class="glass-card" style="flex: 1; min-width: 100px; padding: 12px; border-radius: 10px; text-align: center; text-decoration: none; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--border); font-size: 0.85rem;">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>
         </form>
     </div>
 </div>
+
+{% if is_add %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function initCounter(inputId, counterId, max) {
+        var input = document.querySelector('[name="' + inputId + '"]');
+        var counter = document.getElementById(counterId);
+        if (!input || !counter) return;
+        function update() {
+            var len = input.value.length;
+            counter.textContent = len + ' / ' + max;
+            counter.style.color = len > max ? '#ef4444' : 'var(--text-muted)';
+        }
+        input.addEventListener('input', update);
+        update();
+    }
+    initCounter('first_name', 'name-counter', 50);
+    initCounter('last_name', 'surname-counter', 50);
+});
+</script>
+{% endif %}
 {% endblock %}

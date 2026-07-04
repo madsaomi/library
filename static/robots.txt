@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /secret-django-admin/
+Disallow: /admin-panel/
+Disallow: /school-panel/
+Disallow: /api/
+Disallow: /login/
+Disallow: /password-reset/

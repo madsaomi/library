@@ -8,8 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% trans "Online Kutibxona" %}{% endblock %}</title>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.4">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.6">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
     <script>window.VAPID_PUBLIC_KEY = '{{ vapid_public_key|escapejs }}';</script>
     {% block extra_head %}{% endblock %}
     <style>
@@ -214,13 +215,13 @@
         }
     </style>
 </head>
-<body>
+<body hx-boost="true" hx-target="#main-area" hx-select="#main-area" hx-swap="innerHTML" hx-push-url="true">
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     
     <div class="layout-wrapper">
         <aside class="sidebar glass-panel" id="sidebar">
             <div style="height: 10px;"></div>
-            <nav class="sidebar-nav custom-scrollbar">
+            <nav class="sidebar-nav custom-scrollbar" hx-boost="false">
                 {% if user.is_authenticated %}
                 <div class="sidebar-profile">
                     <a href="{% if user.role == 'school_admin' or user.role == 'superadmin' %}{% url 'frontend_admin:profile' %}{% else %}{% url 'frontend_user:profile' %}{% endif %}" class="sidebar-profile-link">
@@ -230,6 +231,11 @@
                         <div class="sidebar-profile-info">
                             <div class="sidebar-profile-name">{{ user.get_full_name|default:user.username|truncatechars:20 }}</div>
                             <div class="sidebar-profile-role">{{ user.get_role_display }}</div>
+                            {% if user.role == 'student' and user.grade %}
+                            <div style="font-size: 0.62rem; color: #818cf8; margin-top: 2px;">
+                                <i class="fas fa-layer-group" style="font-size: 0.5rem;"></i> {{ user.grade }} {% trans "sinf" %}
+                            </div>
+                            {% endif %}
                         </div>
                     </a>
                 </div>
@@ -282,36 +288,59 @@
                 </div>
                 <button id="topNotifClose" style="flex-shrink: 0; background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; padding: 4px; border-radius: 8px; transition: 0.2s;" title="{% trans 'Yopish' %}">&times;</button>
             </div>
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <button class="mobile-header-toggle" onclick="toggleSidebar()">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1 class="gradient-text" style="margin: 0;">{% block page_title %}{% endblock %}</h1>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px; position: relative;">
-                    <div id="notificationBell" style="position: relative; color: var(--text-muted); font-size: 1.3rem; transition: 0.3s; cursor: pointer;" onclick="toggleNotifications()">
-                        <i class="fas fa-bell"></i>
-                        <span id="unreadBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #ef4444; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: 700;"></span>
+            <div id="main-area" class="htmx-container">
+                <script>window._chartInstances = [];</script>
+                <div id="htmx-loading" style="display: none; position: fixed; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary), #a855f7); z-index: 9999; animation: htmx-loading 1s ease infinite;" hx-trigger="load" hx-preserve="true"></div>
+                <style>
+                    @keyframes htmx-loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+                    .htmx-request #htmx-loading { display: block !important; }
+                </style>
+                <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <button class="mobile-header-toggle" onclick="toggleSidebar()">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="gradient-text" style="margin: 0;">{% block page_title %}{% endblock %}</h1>
                     </div>
-                    <div id="notificationPanel" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 10px; width: 360px; max-height: 400px; background: var(--dropdown-bg); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 1000; overflow: hidden;">
-                        <div style="padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">{% trans "Bildirishnomalar" %}</span>
-                            <button id="markAllReadBtn" style="background: none; border: none; color: var(--primary); font-size: 0.78rem; cursor: pointer; padding: 4px 8px; border-radius: 8px; font-family: inherit; transition: 0.2s; display: none;">{% trans "Hammasini o'qilgan deb belgilash" %}</button>
+                    <div style="display: flex; align-items: center; gap: 12px; position: relative;">
+                        <div id="notificationBell" style="position: relative; color: var(--text-muted); font-size: 1.3rem; transition: 0.3s; cursor: pointer;" onclick="toggleNotifications()">
+                            <i class="fas fa-bell"></i>
+                            <span id="unreadBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #ef4444; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: 700;"></span>
                         </div>
-                        <div id="notificationList" style="overflow-y: auto; max-height: 340px; padding: 8px;"></div>
-                        <div id="notificationEmpty" style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem; display: none;">{% trans "Bildirishnomalar yo'q" %}</div>
+                        <div id="notificationPanel" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 10px; width: 360px; max-height: 400px; background: var(--dropdown-bg); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 1000; overflow: hidden;">
+                            <div style="padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">{% trans "Bildirishnomalar" %}</span>
+                                <button id="markAllReadBtn" style="background: none; border: none; color: var(--primary); font-size: 0.78rem; cursor: pointer; padding: 4px 8px; border-radius: 8px; font-family: inherit; transition: 0.2s; display: none;">{% trans "Hammasini o'qilgan deb belgilash" %}</button>
+                            </div>
+                            <div id="notificationList" style="overflow-y: auto; max-height: 340px; padding: 8px;"></div>
+                            <div id="notificationEmpty" style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem; display: none;">{% trans "Bildirishnomalar yo'q" %}</div>
+                        </div>
                     </div>
-                </div>
-            </header>
+                </header>
 
-            <div class="animate-fade">
-                {% block content %}{% endblock %}
+                <div class="animate-fade">
+                    {% block content %}{% endblock %}
+                </div>
+                {% block extra_scripts %}{% endblock %}
             </div>
         </main>
     </div>
 
     <script src="{% static 'js/push-notifications.js' %}"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script>
+        document.addEventListener('htmx:beforeSwap', function() {
+            window._chartInstances.forEach(function(c) { if (c) c.destroy(); });
+            window._chartInstances = [];
+        });
+        document.addEventListener('htmx:afterSwap', function() {
+            if (typeof initPage === 'function') initPage();
+            document.querySelectorAll('.animate-fade').forEach(function(el) {
+                el.style.animation = 'none';
+                requestAnimationFrame(function() { el.style.animation = ''; });
+            });
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
     <script src="{% static 'js/level-up.js' %}"></script>
     <script>
@@ -410,6 +439,7 @@
             html.setAttribute('data-theme', isLight ? 'dark' : 'light');
             localStorage.setItem('theme', isLight ? 'dark' : 'light');
             updateThemeIcon();
+            document.dispatchEvent(new CustomEvent('themechange'));
         }
 
         function updateThemeIcon() {
@@ -419,14 +449,27 @@
             icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
         }
 
-        // Apply saved theme on load
+        // Apply saved theme on load (fallback to system preference)
         (function() {
             const saved = localStorage.getItem('theme');
-            if (saved === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else {
+                const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+                document.documentElement.setAttribute('data-theme', prefersLight ? 'light' : 'dark');
             }
             updateThemeIcon();
         })();
+
+        // Auto-switch when OS theme changes (only if no manual preference saved)
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(e) {
+            const saved = localStorage.getItem('theme');
+            if (!saved) {
+                document.documentElement.setAttribute('data-theme', e.matches ? 'light' : 'dark');
+                updateThemeIcon();
+                document.dispatchEvent(new CustomEvent('themechange'));
+            }
+        });
 
         // Notification bell badge
         function updateUnreadBadge() {
@@ -563,6 +606,5 @@
             }
         });
     </script>
-    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

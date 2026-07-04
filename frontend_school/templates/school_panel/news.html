@@ -45,7 +45,7 @@
                             {% endif %}
                         </div>
                         <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">{{ item.created_at|date:"d.m.Y H:i" }}</div>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin: 0;">{{ item.body|truncatewords:30 }}</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin: 0;">{{ item.render_body|truncatewords:30|linebreaks }}</p>
                     </div>
                     {% if item.image %}
                     <div style="width: 80px; height: 80px; border-radius: 10px; overflow: hidden; flex-shrink: 0;">

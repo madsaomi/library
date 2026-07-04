@@ -3,17 +3,7 @@ from django.forms import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from schools.models import School, Institution, District
-
-def validate_word_limit(value, limit):
-    if not value: return
-    words = value.split()
-    if len(words) > limit:
-        raise ValidationError(_("Limit: %(limit)s ta so'z. Siz %(count)s ta so'z kiritdingiz.") % {'limit': limit, 'count': len(words)})
-
-def validate_char_limit(value, limit):
-    if not value: return
-    if len(value) > limit:
-        raise ValidationError(_("Limit: %(limit)s ta belgi. Siz %(count)s ta belgi kiritdingiz.") % {'limit': limit, 'count': len(value)})
+from core.validators import validate_word_limit, validate_char_limit
 
 class SchoolForm(forms.ModelForm):
     class Meta:
@@ -89,19 +79,18 @@ from accounts.models import CustomUser
 
 class SchoolAdminForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), required=False, help_text=_("Yangi foydalanuvchi uchun majburiy. Tahrirlashda bo'sh qoldirsa o'zgarmaydi."))
+    admin_username = forms.CharField(label=_("Admin login (username)"), required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'username', 'autocomplete': 'new-username'}))
+    admin_password = forms.CharField(label=_("Admin paroli"), required=False, widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '********', 'autocomplete': 'new-password'}))
+    admin_password_confirm = forms.CharField(label=_("Parolni tasdiqlash"), required=False, widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '********', 'autocomplete': 'new-password'}))
     
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'school']
         widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'given-name'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'family-name'}),
             'school': forms.Select(attrs={'class': 'form-control'}),
         }
-    def clean_username(self):
-        val = self.cleaned_data.get('username')
-        validate_char_limit(val, 50)
-        return val
     def clean_first_name(self):
         val = self.cleaned_data.get('first_name')
         validate_char_limit(val, 50)
@@ -110,6 +99,25 @@ class SchoolAdminForm(forms.ModelForm):
         val = self.cleaned_data.get('last_name')
         validate_char_limit(val, 50)
         return val
+
+    def clean(self):
+        cleaned_data = super().clean()
+        admin_username = cleaned_data.get('admin_username')
+        admin_password = cleaned_data.get('admin_password')
+        admin_password_confirm = cleaned_data.get('admin_password_confirm')
+
+        if admin_username or admin_password or admin_password_confirm:
+            if not admin_username:
+                self.add_error('admin_username', _("Login kiriting"))
+            if not admin_password:
+                self.add_error('admin_password', _("Parol kiriting"))
+            if admin_password != admin_password_confirm:
+                self.add_error('admin_password_confirm', _("Parollar mos kelmadi."))
+
+            if admin_username and CustomUser.objects.filter(username=admin_username).exclude(pk=self.instance.pk if self.instance.pk else None).exists():
+                self.add_error('admin_username', _("Ushbu login band!"))
+
+        return cleaned_data
 
 class UnifiedSchoolForm(forms.ModelForm):
     existing_school_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
@@ -145,14 +153,14 @@ class UnifiedSchoolForm(forms.ModelForm):
         
         if admin_username or admin_password or admin_password_confirm:
             if not admin_username:
-                self.add_error('admin_username', _("Login kiriting."))
+                self.add_error('admin_username', _("Login kiriting"))
             if not admin_password:
-                self.add_error('admin_password', _("Parol kiriting."))
+                self.add_error('admin_password', _("Parol kiriting"))
             if admin_password != admin_password_confirm:
                 self.add_error('admin_password_confirm', _("Parollar mos kelmadi."))
             
             if CustomUser.objects.filter(username=admin_username).exclude(pk=self.current_admin_id).exists():
-                self.add_error('admin_username', _("Ushbu login band. Boshqa tanlang."))
+                self.add_error('admin_username', _("Ushbu login band!"))
 
         # Extra check: if we are in "Add" mode but existing_school_id is set,
         # ensure we are treating it as an update for the school model

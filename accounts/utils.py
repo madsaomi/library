@@ -6,9 +6,9 @@ from django.conf import settings
 
 def generate_password(length=None):
     if length is None:
-        length = random.randint(8, 16)
+        length = secrets.randbelow(9) + 8
     chars = string.ascii_letters + string.digits
-    return ''.join(random.choices(chars, k=length))
+    return ''.join(secrets.choice(chars) for i in range(length))
 
 def generate_student_login(school_id, grade, count):
     # Format: {school_id}_{grade}_{порядковый_номер}

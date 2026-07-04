@@ -10,6 +10,7 @@ from frontend_school.forms import NewsForm
 from schools.models import School, Institution, District
 from accounts.models import CustomUser
 from books.models import Book, BookIssue
+from django.db.models import Q
 import secrets
 import string
 
@@ -75,11 +76,12 @@ def dashboard(request):
 def schools_list(request):
     from django.db.models import Count, Q, Exists, OuterRef
     district_id = request.GET.get('district')
+    q = request.GET.get('q')
     
     from accounts.models import CustomUser
     from django.db.models import Prefetch
     
-    admins_qs = CustomUser.objects.filter(role='school_admin').only('id', 'username', 'raw_password', 'school_id', 'first_name', 'last_name')
+    admins_qs = CustomUser.objects.filter(role='school_admin').only('id', 'username', 'school_id', 'first_name', 'last_name')
     schools = School.objects.annotate(
         has_admin=Exists(CustomUser.objects.filter(school=OuterRef('pk'), role='school_admin')),
         student_count=Count('customuser', filter=Q(customuser__role='student')),
@@ -88,6 +90,9 @@ def schools_list(request):
     ).filter(has_admin=True).prefetch_related(
         Prefetch('customuser_set', queryset=admins_qs, to_attr='admins')
     )
+    
+    if q:
+        schools = schools.filter(Q(name__icontains=q) | Q(address__icontains=q) | Q(district__name__icontains=q))
     
     if district_id:
         schools = schools.filter(district_id=district_id)
@@ -101,6 +106,7 @@ def schools_list(request):
         'schools': schools,
         'districts': districts,
         'current_district': district_id,
+        'current_query': q or '',
         'total_students': total_students,
         'total_books': total_books,
     })
@@ -136,6 +142,8 @@ def districts_list(request):
         'total_schools': total_schools,
     })
 
+@login_required(login_url='login')
+@superuser_required
 @login_required(login_url='login')
 @superuser_required
 def statistics(request):
@@ -283,30 +291,20 @@ def create_stats_news(request):
         books_read=Count('bookissue')
     ).order_by('-books_read')[:10]
     
-    issued_label = _("kitob berilgan")
-    read_label = _("kitob o'qigan")
-    lines = []
-    if top_schools:
-        lines.append(f"🏫 {_('Eng faol maktablar')}:")
-        for i, s in enumerate(top_schools, 1):
-            lines.append(f"{i}. {s.name} — {s.active_count} {issued_label}")
-    if top_readers:
-        lines.append("")
-        lines.append(f"📚 {_('Eng faol kitobxonlar')}:")
-        for i, r in enumerate(top_readers, 1):
-            grade = f"({r.grade})" if r.grade else ""
-            lines.append(f"{i}. {r.username} {grade} — {r.books_read} {read_label}")
-    if not lines:
+    if not top_schools and not top_readers:
         messages.warning(request, _("Ma'lumotlar mavjud emas"))
         return redirect('frontend_admin:statistics')
-    
-    body = "\n".join(lines)
     
     News.objects.create(
         school=None,
         title=_("So'nggi {n} kun ichidagi faol maktablar va kitobxonlar").format(n=period_days),
-        body=body,
+        body="",
         is_published=True,
+        template_key='weekly_active',
+        template_data={
+            'schools': [{'name': s.name, 'count': s.active_count} for s in top_schools] if top_schools else [],
+            'readers': [{'username': r.username, 'grade': r.grade, 'count': r.books_read} for r in top_readers] if top_readers else [],
+        },
     )
     messages.success(request, _("Yangilik muvaffaqiyatli yaratildi"))
     return redirect('frontend_admin:news_list')
@@ -432,17 +430,25 @@ def user_detail(request, pk):
 def all_books_list(request):
     books = Book.objects.all().select_related('school', 'category').order_by('-id')
     
+    q = request.GET.get('q')
+    if q:
+        books = books.filter(Q(title__icontains=q) | Q(author__icontains=q) | Q(description__icontains=q))
+    
     from django.core.paginator import Paginator
     paginator = Paginator(books, 50)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'admin_panel/all_books.html', {'books': page_obj, 'page_obj': page_obj})
+    return render(request, 'admin_panel/all_books.html', {'books': page_obj, 'page_obj': page_obj, 'current_query': q or ''})
 
 @login_required(login_url='login')
 @superuser_required
 def all_active_loans_list(request):
     active_loans = BookIssue.objects.filter(is_returned=False).select_related('book__school', 'user').order_by('-issued_at')
+    
+    q = request.GET.get('q')
+    if q:
+        active_loans = active_loans.filter(Q(book__title__icontains=q) | Q(user__username__icontains=q) | Q(user__first_name__icontains=q) | Q(user__last_name__icontains=q))
     
     total_active = active_loans.count()
 
@@ -462,19 +468,47 @@ def all_active_loans_list(request):
         'active_loans': page_obj, 'page_obj': page_obj,
         'total_active': total_active, 'total_students': total_students,
         'unique_books': unique_books, 'unique_schools': unique_schools,
+        'current_query': q or '',
     })
 
 @login_required(login_url='login')
 @superuser_required
 def school_detail(request, pk):
     school = get_object_or_404(School, pk=pk)
+    from collections import OrderedDict
+    import re
+    
+    all_students = sorted(
+        CustomUser.objects.filter(school=school, role='student'),
+        key=lambda u: (
+            int(re.match(r'(\d+)', u.grade or '99').group(1)) if re.match(r'(\d+)', u.grade or '') else 99,
+            u.grade or '',
+            u.last_name or '',
+            u.first_name or '',
+        )
+    )
+    
+    grades = OrderedDict()
+    for s in all_students:
+        g = s.grade or _("Sinfi ko'rsatilmagan")
+        if g not in grades:
+            grades[g] = []
+        grades[g].append(s)
+    
+    def grade_sort_key(item):
+        g = item[0]
+        m = re.match(r'(\d+)', g)
+        return (0, int(m.group(1))) if m else (1, g)
+    grade_counts = sorted([(g, len(ss)) for g, ss in grades.items()], key=grade_sort_key)
+
     context = {
         'school': school,
-        'student_count': CustomUser.objects.filter(school=school, role='student').count(),
+        'student_count': len(all_students),
         'book_count': Book.objects.filter(school=school).count(),
         'issued_count': BookIssue.objects.filter(book__school=school, is_returned=False).count(),
         'school_admin': CustomUser.objects.filter(school=school, role='school_admin').first(),
-        'students': CustomUser.objects.filter(school=school, role='student').order_by('-date_joined')[:20],
+        'grades': grades,
+        'grade_counts': grade_counts,
         'books': Book.objects.filter(school=school).order_by('-id')[:20],
     }
     return render(request, 'admin_panel/school_detail.html', context)
@@ -622,7 +656,6 @@ def school_add(request):
                     first_name='Admin',
                     last_name=school.name
                 )
-                admin_user.raw_password = admin_password
                 admin_user.save()
                 
                 # Log action
@@ -677,10 +710,8 @@ def school_edit(request, pk):
                     admin.username = admin_username
                     updated = True
                 
-                # Check if password changed from what we knew (raw_password)
-                if admin_password and admin_password != admin.raw_password:
+                if admin_password:
                     admin.set_password(admin_password)
-                    admin.raw_password = admin_password
                     updated = True
                     
                 if updated:
@@ -702,7 +733,6 @@ def school_edit(request, pk):
                         first_name='Admin',
                         last_name=school.name
                     )
-                    new_admin.raw_password = admin_password
                     new_admin.save()
                     messages.success(request, f"Maktab uchun yangi admin yaratildi! Login: {admin_username}")
 
@@ -714,11 +744,7 @@ def school_edit(request, pk):
         initial = {}
         if admin:
             initial['admin_username'] = admin.username
-            if admin.raw_password:
-                initial['admin_password'] = admin.raw_password
-                initial['admin_password_confirm'] = admin.raw_password
 
-        
         form = UnifiedSchoolForm(instance=school, initial=initial, current_admin_id=admin.pk if admin else None)
     
     # Fetch Districts and Schools for consistent template behavior
@@ -754,31 +780,38 @@ def admin_add(request):
         if form.is_valid():
             admin = form.save(commit=False)
             admin.role = 'school_admin'
-            
-            # Initial save to get ID
-            admin.username = f"temp_adm_{secrets.token_hex(4)}"
+
+            # Use provided username or auto-generate
+            admin_username = form.cleaned_data.get('admin_username')
+            admin_password = form.cleaned_data.get('admin_password')
+
+            if admin_username:
+                admin.username = admin_username
+            else:
+                # Auto-generate smart username
+                admin.username = f"temp_adm_{secrets.token_hex(4)}"
+                admin.save()
+                district_part = clean_name(admin.school.district.name if admin.school and admin.school.district else "no")
+                school_part = clean_name(admin.school.name if admin.school else "school")
+                admin.username = f"{district_part}_{school_part}_adm_{admin.id}"
+
+            if admin_password:
+                admin.set_password(admin_password)
+            else:
+                # Auto-generate password
+                alphabet = string.ascii_letters + string.digits
+                admin_password = ''.join(secrets.choice(alphabet) for i in range(12))
+                admin.set_password(admin_password)
+
             admin.save()
-            
-            # Smart credentials
-            district_part = clean_name(admin.school.district.name if admin.school and admin.school.district else "no")
-            school_part = clean_name(admin.school.name if admin.school else "school")
-            
-            username = f"{district_part}_{school_part}_adm_{admin.id}"
-            admin.username = username
-            
-            alphabet = string.ascii_letters + string.digits
-            password = ''.join(secrets.choice(alphabet) for i in range(12))
-            admin.set_password(password)
-            admin.raw_password = password
-            admin.save()
-            
+
             from django.contrib import messages
-            messages.success(request, f"Admin yaratildi! Login: {username}, Parol: {password}")
-            
+            messages.success(request, f"Admin yaratildi! Login: {admin.username}, Parol: {admin_password}")
+
             return redirect('frontend_admin:all_users_list')
     else:
         form = SchoolAdminForm()
-    return render(request, 'admin_panel/muassasa_form.html', {'form': form, 'title': _('Yangi maktab admini qo\'shish')})
+    return render(request, 'admin_panel/admin_edit.html', {'form': form, 'title': _('Yangi maktab admini qo\'shish'), 'is_add': True})
 
 @login_required(login_url='login')
 @superuser_required
@@ -795,7 +828,7 @@ def admin_edit(request, pk):
             return redirect('frontend_admin:all_users_list')
     else:
         form = SchoolAdminForm(instance=admin)
-    return render(request, 'admin_panel/admin_edit.html', {'form': form, 'title': _('Admin ma\'lumotlarini tahrirlash')})
+    return render(request, 'admin_panel/admin_edit.html', {'form': form, 'title': _('Admin ma\'lumotlarini tahrirlash'), 'is_add': False})
 
 @login_required(login_url='login')
 @superuser_required
@@ -817,9 +850,8 @@ def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.raw_password = form.cleaned_data.get('new_password1')
-            user.save()
+            user = form.save()
+            update_session_auth_hash(request, user)
             update_session_auth_hash(request, user)
             messages.success(request, _('Parolingiz muvaffaqiyatli o\'zgartirildi!'))
             return redirect('frontend_admin:profile')

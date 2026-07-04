@@ -1765,9 +1765,6 @@ msgstr "ID вручную:"
 msgid "School Admin | Online Kutibxona"
 msgstr "Админ школы | Онлайн Библиотека"
 
-msgid "Bildirishnomalar yo\\'q"
-msgstr "Нет уведомлений"
-
 msgid "Tizim amallari"
 msgstr "Системные действия"
 
@@ -2246,16 +2243,19 @@ msgid "haftalik streak"
 msgstr "недельный стрик"
 
 msgid "14 kun"
-msgstr ""
+msgstr "14 дней"
 
 msgid "Boshqa"
 msgstr ""
 
+msgid "Darsliklar"
+msgstr "Учебники"
+
 msgid "Faoliyat"
-msgstr ""
+msgstr "Активность"
 
 msgid "Faoliyat yo'q"
-msgstr ""
+msgstr "Нет активности"
 
 msgid "Hozircha ma'lumot yo'q"
 msgstr ""
@@ -2305,3 +2305,161 @@ msgstr "Подтвердите публикацию?"
 
 msgid "Bugun bu haqida yangilik allaqachon chop etilgan!"
 msgstr "Новость об этом уже опубликована сегодня!"
+
+msgid "Masalan: Matematika"
+msgstr "Например: Математика"
+
+msgid "Huquq"
+msgstr "Право"
+
+msgid "Iqtisod"
+msgstr "Экономика"
+
+msgid "Boshqa (qo'lda kiriting)"
+msgstr "Другой (введите вручную)"
+
+msgid "Fanni kiriting"
+msgstr "Введите название предмета"
+
+msgid ""
+"Darsliklarni o'quvchilar bron qila olmaydi. Darsliklar o'quv yili boshida "
+"tarqatiladi."
+msgstr ""
+"Учебники нельзя забронировать ученикам. Учебники выдаются в начале учебного "
+"года."
+
+msgid ""
+"Darsliklarni o'quvchilar ololmaydi. Darsliklar o'quv yili boshida "
+"tarqatiladi."
+msgstr ""
+"Учебники нельзя выдать ученикам. Учебники выдаются в начале учебного года."
+
+msgid "Bu darslik. O'quvchilar darsliklarni o'quv yili boshida olishadi."
+msgstr "Это учебник. Ученики получают учебники в начале учебного года."
+
+msgid "Darslik tarqatish"
+msgstr "Выдача учебников"
+
+msgid "Darslik qaytarib olish"
+msgstr "Приём учебников"
+
+msgid "{count} ta darslik tarqatildi."
+msgstr "Выдано {count} учебников."
+
+msgid "{count} ta darslik qaytarib olindi."
+msgstr "Принято {count} учебников."
+
+msgid "Darslik tarqatish uchun yuqoridan sinfni tanlang."
+msgstr "Выберите класс выше для выдачи учебников."
+
+msgid "Bu sinf uchun darsliklar topilmadi. Avval darsliklarni qo'shing."
+msgstr "Учебники для этого класса не найдены. Сначала добавьте учебники."
+
+msgid "Barcha darsliklar qaytarilgan"
+msgstr "Все учебники приняты"
+
+msgid "Faol darslik ijaralari yo'q."
+msgstr "Нет активных выдач учебников."
+
+msgid "Qaytarilishi kerak bo'lgan darsliklar"
+msgstr "Учебники к приёму"
+
+msgid "Tarqatish"
+msgstr "Выдать"
+
+msgid "Tarqatilgan"
+msgstr "Выдано"
+
+msgid "Darslik ijaralari"
+msgstr "Выдачи учебников"
+
+msgid "Qaytarib olish"
+msgstr "Принять"
+
+msgid "O'quv yili"
+msgstr "Учебный год"
+
+msgid "Yaxshi"
+msgstr "Хорошо"
+
+msgid "Qoniqarli"
+msgstr "Удовлетворительно"
+
+msgid "Yomon"
+msgstr "Плохо"
+
+msgid "Yo'qolgan"
+msgstr "Потерян"
+
+msgid "Izoh"
+msgstr "Примечание"
+
+msgid "Avtomatik tarqatish"
+msgstr "Автоматическая выдача"
+
+msgid ""
+"Barcha o'quvchilarga sinfiga mos barcha darsliklarni bir vaqtda tarqatadi"
+msgstr ""
+"Автоматически выдаёт все учебники, соответствующие классу, всем ученикам "
+"сразу"
+
+msgid "Sinfdoshlari"
+msgstr "Одноклассники"
+
+msgid "Sinfdoshlar yo'q"
+msgstr "Нет одноклассников"
+
+msgid "Faol ijaralar"
+msgstr "Активные выдачи"
+
+msgid "Faol ijaralar yo'q"
+msgstr "Нет активных выдач"
+
+msgid "Sinfdoshlar"
+msgstr "Одноклассники"
+
+msgid "yana"
+msgstr "ещё"
+
+msgid "Mening sinfim"
+msgstr "Мой класс"
+
+msgid "Barcha sinflar"
+msgstr "Все классы"
+
+msgid "Sinfdoshlar topilmadi"
+msgstr "Одноклассники не найдены"
+
+msgid "O'quvchilar sinflar bo'yicha"
+msgstr "Ученики по классам"
+
+msgid "Foydalanuvchi nomi yoki parol noto'g'ri"
+msgstr "Неверное имя пользователя или пароль"
+
+msgid "Eng faol o'quvchi: {name}"
+msgstr "Самый активный читатель: {name}"
+
+msgid "📚 Jami o'qilgan kitoblar: {books}"
+msgstr "📚 Всего прочитано книг: {books}"
+
+msgid "🔥 Haftalik streak: {streak} kun"
+msgstr "🔥 Еженедельный streak: {streak} дней"
+
+msgid "⭐ Daraja: {level}"
+msgstr "⭐ Уровень: {level}"
+
+msgid ""
+"🏆 {school} jamoasi {name}ni tabriklaydi va barcha o'quvchilarni faol kitob "
+"o'qishga chorlaydi! 📖"
+msgstr ""
+"🏆 Коллектив школы {school} поздравляет {name} и призывает всех учеников к "
+"активному чтению! 📖"
+
+msgid "Login va parol avtomatik tarzda yaratiladi"
+msgstr "Логин и пароль будут созданы автоматически"
+
+msgid "Parol kiriting"
+msgstr "Введите пароль"
+
+msgid "%(n)s kun"
+msgstr "%(n)s дней"

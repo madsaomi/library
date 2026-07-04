@@ -42,3 +42,8 @@ def ach_desc(achievement):
     if msgid:
         return _(msgid)
     return achievement.description
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

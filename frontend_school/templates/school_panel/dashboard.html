@@ -4,11 +4,6 @@
 
 {% block title %}{% trans "School Admin | Online Kutibxona" %}{% endblock %}
 {% block page_title %}{% trans "Maktab boshqaruvi" %}{% endblock %}
-
-{% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-{% endblock %}
-
 {% block sidebar_nav %}
 {% include 'school_panel/sidebar_items.html' %}
 {% endblock %}
@@ -111,24 +106,27 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const isLight = theme !== 'dark';
-    const textColor = isLight ? '#334155' : '#e2e8f0';
-    const gridColor = isLight ? 'rgba(51, 65, 85, 0.1)' : 'rgba(255, 255, 255, 0.08)';
+function initSchoolDash() {
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const txtColor = isDark ? '#fef3c7' : '#000';
+    const gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.2)';
+    const font = { size: 12, weight: '600', family: 'Inter,system-ui,sans-serif' };
+    const bar1 = isDark ? 'rgba(99, 102, 241, 0.6)' : 'rgba(79, 70, 229, 0.7)';
+    const bar1b = isDark ? '#6366f1' : '#4f46e5';
 
     const ctx = document.getElementById('issuesChart');
     if (ctx) {
-        new Chart(ctx, {
+        window._chartInstances.push(new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: {{ month_labels|safe }},
+                labels: {{ month_labels|escapejs }},
                 datasets: [{
                     label: '{% trans "Berilgan kitoblar" %}',
                     data: {{ monthly_data|safe }},
-                    backgroundColor: 'rgba(99, 102, 241, 0.6)',
-                    borderColor: '#6366f1',
+                    backgroundColor: bar1,
+                    borderColor: bar1b,
                     borderWidth: 2,
                     borderRadius: 6,
                 }]
@@ -137,12 +135,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { color: textColor, font: { size: 9 } }, grid: { display: false } },
-                    y: { ticks: { color: textColor, font: { size: 9 } }, grid: { color: gridColor }, beginAtZero: true }
+                    x: { ticks: { color: txtColor, font: font }, grid: { display: false } },
+                    y: { ticks: { color: txtColor, font: font }, grid: { color: gridC }, beginAtZero: true }
                 }
             }
-        });
+        }));
     }
+}
+function initPage() { initSchoolDash(); }
+document.addEventListener('DOMContentLoaded', initSchoolDash);
+document.addEventListener('themechange', function() {
+    while(window._chartInstances.length) window._chartInstances.pop().destroy();
+    initSchoolDash();
 });
 </script>
 {% endblock %}

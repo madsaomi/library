@@ -9,11 +9,6 @@
 {% block sidebar_nav %}
 {% include 'user_panel/sidebar_items.html' %}
 {% endblock %}
-
-{% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
-
 {% block content %}
 <div class="animate-fade" style="max-width: 1000px; margin: 0 auto;">
     <!-- Avatar & Level Card -->
@@ -152,23 +147,37 @@
     </div>
 </div>
 
+<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+function initProfileCharts() {
+    var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    var txtColor = isDark ? '#fef3c7' : '#000';
+    var gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.2)';
+    var font = { size: 12, weight: '600', family: 'Inter,system-ui,sans-serif' };
+    var bar1 = isDark ? 'rgba(99, 102, 241, 0.5)' : 'rgba(79, 70, 229, 0.7)';
+    var bar1b = isDark ? '#6366f1' : '#4f46e5';
+    var pieColors = isDark
+        ? ['#818cf8','#c084fc','#f472b6','#fb923c','#34d399','#22d3ee','#facc15','#f87171']
+        : ['#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#ca8a04','#dc2626'];
+
+    document.getElementById('noBooksChart').style.display = 'none';
+    document.getElementById('noCatChart').style.display = 'none';
+
     // Books by Month Chart
     var monthsCtx = document.getElementById('booksByMonth');
     if (monthsCtx) {
-        var monthlyData = {{ monthly_data|safe }};
+        var monthlyData = {{ monthly_data|escapejs }};
         var hasBooks = monthlyData.some(function(v) { return v > 0; });
         if (hasBooks) {
-            new Chart(monthsCtx, {
+            window._chartInstances.push(new Chart(monthsCtx, {
                 type: 'bar',
                 data: {
-                    labels: {{ monthly_labels|safe }},
+                    labels: {{ monthly_labels|escapejs }},
                     datasets: [{
                         label: '{% trans "Kitoblar" %}',
                         data: monthlyData,
-                        backgroundColor: 'rgba(99, 102, 241, 0.5)',
-                        borderColor: '#6366f1',
+                        backgroundColor: bar1,
+                        borderColor: bar1b,
                         borderWidth: 2,
                         borderRadius: 6,
                     }]
@@ -178,11 +187,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1 } },
-                        x: { grid: { display: false } }
+                        y: { beginAtZero: true, grid: { color: gridC }, ticks: { color: txtColor, stepSize: 1, font: font } },
+                        x: { grid: { display: false }, ticks: { color: txtColor, font: font } }
                     }
                 }
-            });
+            }));
         } else {
             document.getElementById('noBooksChart').style.display = 'block';
         }
@@ -191,35 +200,41 @@ document.addEventListener('DOMContentLoaded', function() {
     // Category Pie Chart
     var catCtx = document.getElementById('categoryPie');
     if (catCtx) {
-        var catLabels = {{ cat_labels|safe }};
-        var catData = {{ cat_data|safe }};
+        var catLabels = {{ cat_labels|escapejs }};
+        var catData = {{ cat_data|escapejs }};
         if (catLabels.length > 0) {
-            new Chart(catCtx, {
+            window._chartInstances.push(new Chart(catCtx, {
                 type: 'doughnut',
                 data: {
                     labels: catLabels,
                     datasets: [{
                         data: catData,
-                        backgroundColor: ['#6366f1', '#a855f7', '#ec4899', '#f97316', '#10b981', '#06b6d4', '#eab308', '#ef4444'],
+                        backgroundColor: pieColors.slice(0, catData.length),
                         borderWidth: 0,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: 'var(--text-muted)', padding: 15 } } }
+                    plugins: { legend: { position: 'bottom', labels: { color: txtColor, padding: 14, font: font, boxWidth: 14, usePointStyle: true } } }
                 }
-            });
+            }));
         } else {
             document.getElementById('noCatChart').style.display = 'block';
         }
     }
 
-    // Animate XP bar on load
+    // Animate XP bar
     setTimeout(function() {
         var bar = document.getElementById('xpBar');
         if (bar) bar.style.width = '{{ xp_percent }}%';
     }, 500);
+}
+function initPage() { initProfileCharts(); }
+document.addEventListener('DOMContentLoaded', initProfileCharts);
+document.addEventListener('themechange', function() {
+    while(window._chartInstances.length) window._chartInstances.pop().destroy();
+    initProfileCharts();
 });
 </script>
 {% endblock %}

@@ -27,28 +27,52 @@
             <i class="fas fa-plus" style="font-size: 0.8rem; color: var(--primary);"></i>
             <span style="font-size: 0.75rem; font-weight: 500; color: var(--primary);">{% trans "Yangi o'quvchi" %}</span>
         </a>
+        <a href="{% url 'frontend_school:import_students_csv' %}" class="glass-card stat-card" style="padding: 14px 10px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px dashed var(--accent);">
+            <i class="fas fa-file-csv" style="font-size: 0.8rem; color: var(--accent);"></i>
+            <span style="font-size: 0.75rem; font-weight: 500; color: var(--accent);">{% trans "Import CSV" %}</span>
+        </a>
     </div>
 
-    <div style="margin-bottom: 16px;">
+    <div style="margin-bottom: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         <a href="{% url 'frontend_school:graduates_list' %}" class="glass-card" style="padding: 8px 16px; font-size: 0.78rem; text-decoration: none; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; color: var(--text);">
             <i class="fas fa-graduation-cap"></i> {% trans "Bitiruvchilar" %}
         </a>
     </div>
 
-    <div class="glass-panel" style="padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <a href="{% url 'frontend_school:students_list' %}" class="glass-card" style="padding: 5px 12px; font-size: 0.72rem; text-decoration: none; border-radius: 6px; {% if not selected_grade %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{% trans "Barcha sinflar" %}</a>
+            {% for g in grades_list %}
+            <a href="{% url 'frontend_school:students_list' %}?grade={{ g|urlencode }}" class="glass-card" style="padding: 5px 12px; font-size: 0.72rem; text-decoration: none; border-radius: 6px; {% if selected_grade == g %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{{ g }} {% trans "sinf" %}</a>
+            {% endfor %}
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
             <div style="position: relative;">
                 <input type="text" id="search-input" placeholder="{% trans 'Ism, login yoki sinf...' %}"
-                       style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none; width: 220px; font-size: 0.8rem;">
+                       style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none; width: 200px; font-size: 0.8rem;">
                 <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
             </div>
-            <div style="font-size: 0.78rem; color: var(--text-muted);">{{ page_obj.paginator.count }} {% trans "ta o'quvchi" %}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap;">{{ page_obj.paginator.count }} {% trans "ta o'quvchi" %}</div>
+            <a href="{% url 'frontend_school:export_students_csv' %}" class="glass-card" style="padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; border: 1px solid var(--border);">
+                <i class="fas fa-download"></i> CSV
+            </a>
         </div>
+    </div>
 
+    <div class="glass-panel" style="padding: 20px;">
         <div class="info-grid" style="gap: 6px;">
-            {% for student in students %}
+            {% regroup students by grade as grade_groups %}
+            {% for grade_group in grade_groups %}
+            {% if grade_group.grouper %}
+            <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; padding: 8px 4px 2px; margin-top: 8px; border-bottom: 1px solid var(--border);">
+                <i class="fas fa-layer-group" style="font-size: 0.7rem; color: var(--primary);"></i>
+                <span style="font-weight: 700; font-size: 0.85rem;">{{ grade_group.grouper }} {% trans "sinf" %}</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted); background: var(--glass); padding: 1px 8px; border-radius: 8px;">{{ grade_group.list|length }}</span>
+            </div>
+            {% endif %}
+            {% for student in grade_group.list %}
             <div class="glass-card info-row student-row" data-search="{{ student.username|lower }} {{ student.first_name|lower }} {{ student.last_name|lower }} {{ student.grade|lower }}" style="padding: 10px 14px;">
-                <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                <a href="{% url 'frontend_school:student_detail' student.pk %}" style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; text-decoration: none; color: inherit;">
                     <div class="avatar-circle" style="width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), #a855f7); flex-shrink: 0;">
                         <span class="avatar-initials" style="font-size: 0.75rem;">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</span>
                     </div>
@@ -56,20 +80,15 @@
                         <div style="font-weight: 600; font-size: 0.82rem;">{{ student.first_name }} {{ student.last_name }}</div>
                         <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 1px;">
                             <span>@{{ student.username }}</span>
-                            <span class="badge" style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 1px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 4px;">{{ student.grade }}</span>
                             {% if student.birth_date %}
                             <span style="margin-left: 6px;"><i class="far fa-calendar-alt"></i> {{ student.birth_date|date:"d.m.Y" }}</span>
                             {% endif %}
                         </div>
                     </div>
-                </div>
+                </a>
                 <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="password-hidden" id="pass-{{ student.id }}" style="font-family: monospace; color: var(--text-muted); font-size: 0.7rem;">••••••••</span>
-                        <span class="password-visible" id="pass-val-{{ student.id }}" style="display: none; font-family: monospace; font-size: 0.7rem;">{{ student.raw_password|default:'---' }}</span>
-                        <button onclick="togglePassword('{{ student.id }}')" style="background: none; border: none; color: var(--primary); cursor: pointer; padding: 2px;">
-                            <i class="fas fa-eye" id="eye-{{ student.id }}" style="font-size: 0.7rem;"></i>
-                        </button>
+                        <span style="font-family: monospace; color: var(--text-muted); font-size: 0.7rem;">••••••••</span>
                     </div>
                     <div style="display: flex; gap: 4px;">
                         <a href="{% url 'frontend_school:student_edit' student.pk %}" class="glass-card" style="padding: 4px 8px; border-radius: 6px; text-decoration: none; font-size: 0.65rem; color: var(--primary); white-space: nowrap;"><i class="fas fa-edit"></i></a>
@@ -77,6 +96,7 @@
                     </div>
                 </div>
             </div>
+            {% endfor %}
             {% empty %}
             <div id="empty-state" style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
                 <i class="fas fa-users" style="font-size: 2rem; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
@@ -94,24 +114,6 @@
 </div>
 
 <script>
-function togglePassword(id) {
-    const hidden = document.getElementById('pass-' + id);
-    const visible = document.getElementById('pass-val-' + id);
-    const eye = document.getElementById('eye-' + id);
-
-    if (visible.style.display === 'none') {
-        visible.style.display = 'inline';
-        hidden.style.display = 'none';
-        eye.classList.remove('fa-eye');
-        eye.classList.add('fa-eye-slash');
-    } else {
-        visible.style.display = 'none';
-        hidden.style.display = 'inline';
-        eye.classList.remove('fa-eye-slash');
-        eye.classList.add('fa-eye');
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-input');
     if (!searchInput) return;

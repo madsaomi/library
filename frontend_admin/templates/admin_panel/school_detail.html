@@ -35,10 +35,8 @@
                     <span><i class="fas fa-user-shield" style="color: var(--primary);"></i> {{ school_admin.username }}</span>
                     <span>
                         <i class="fas fa-key" style="color: var(--primary);"></i>
-                        <span id="admin-pass-text" style="color: var(--text-main); letter-spacing: 2px;">********</span>
-                        <i class="fas fa-eye toggle-admin-pass" style="cursor: pointer; color: var(--primary); margin-left: 3px; font-size: 0.65rem;"></i>
+                        <span style="color: var(--text-main); letter-spacing: 2px;">••••••••</span>
                     </span>
-                    <span id="admin-pass-raw" style="display: none; font-size: 0.72rem;">{{ school_admin.raw_password|default:'---' }}</span>
                 </div>
                 {% else %}
                 <div style="font-size: 0.85rem; color: var(--text-muted);">—</div>
@@ -64,62 +62,65 @@
             </div>
         </div>
 
-        <div class="grid-2" style="gap: 16px;">
-            <div>
-                <h3 class="section-title" style="font-size: 0.82rem; margin-bottom: 12px;">
-                    <i class="fas fa-users" style="color: #10b981; font-size: 0.8rem;"></i> {% trans "O'quvchilar" %}
-                </h3>
-                <div style="max-height: 280px; overflow-y: auto; padding-right: 6px;">
-                    <div class="info-grid" style="gap: 6px;">
-                        {% for student in students %}
-                        <div class="glass-card info-row" style="padding: 8px 12px;">
-                            <span style="font-size: 0.78rem;">{{ student.get_full_name|default:student.username }}</span>
-                            <span style="font-size: 0.68rem; color: var(--text-muted); background: var(--glass); padding: 1px 8px; border-radius: 6px;">{{ student.grade|default:"" }}</span>
-                        </div>
-                        {% empty %}
-                        <p style="color: var(--text-muted); font-size: 0.78rem; text-align: center; padding: 20px;">{% trans "O'quvchilar yo'q" %}</p>
-                        {% endfor %}
+        <h3 class="section-title" style="font-size: 0.82rem; margin-bottom: 12px;">
+            <i class="fas fa-users" style="color: #10b981; font-size: 0.8rem;"></i> {% trans "O'quvchilar sinflar bo'yicha" %}
+            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 400; margin-left: 8px;">({{ student_count }})</span>
+        </h3>
+
+        <div class="info-grid" style="gap: 6px;">
+            {% for grade_label, grade_students in grades.items %}
+            <div class="glass-card" style="padding: 0; border: 1px solid var(--border); overflow: hidden;">
+                <div class="grade-header" data-grade="{{ forloop.counter }}" style="padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: var(--glass); user-select: none;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-chevron-right grade-chevron" style="font-size: 0.65rem; color: var(--text-muted); transition: transform 0.2s;"></i>
+                        <span style="font-weight: 600; font-size: 0.85rem;">{{ grade_label }} {% trans "sinf" %}</span>
                     </div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); background: var(--glass); padding: 2px 10px; border-radius: 10px;">{{ grade_students|length }}</span>
+                </div>
+                <div class="grade-body" style="display: none; padding: 4px 14px 10px; gap: 4px; flex-direction: column;">
+                    {% for s in grade_students %}
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; border-radius: 6px; font-size: 0.78rem;">
+                        <span>{{ s.get_full_name|default:s.username }}</span>
+                        <span style="font-size: 0.65rem; color: var(--text-muted);">@{{ s.username }}</span>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
-            <div>
-                <h3 class="section-title" style="font-size: 0.82rem; margin-bottom: 12px;">
-                    <i class="fas fa-book" style="color: var(--primary); font-size: 0.8rem;"></i> {% trans "Kitoblar" %}
-                </h3>
-                <div style="max-height: 280px; overflow-y: auto; padding-right: 6px;">
-                    <div class="info-grid" style="gap: 6px;">
-                        {% for book in books %}
-                        <div class="glass-card info-row" style="padding: 8px 12px; flex-direction: column; align-items: flex-start; gap: 2px;">
-                            <span style="font-size: 0.78rem; font-weight: 500; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ book.title }}</span>
-                            <span style="font-size: 0.65rem; color: var(--text-muted);">{{ book.category.name|default:"---" }}</span>
-                        </div>
-                        {% empty %}
-                        <p style="color: var(--text-muted); font-size: 0.78rem; text-align: center; padding: 20px;">{% trans "Kitoblar yo'q" %}</p>
-                        {% endfor %}
-                    </div>
+            {% empty %}
+            <p style="color: var(--text-muted); font-size: 0.78rem; text-align: center; padding: 20px;">{% trans "O'quvchilar yo'q" %}</p>
+            {% endfor %}
+        </div>
+
+        <h3 class="section-title" style="font-size: 0.82rem; margin: 20px 0 12px;">
+            <i class="fas fa-book" style="color: var(--primary); font-size: 0.8rem;"></i> {% trans "Kitoblar" %}
+        </h3>
+        <div style="max-height: 280px; overflow-y: auto; padding-right: 6px;">
+            <div class="info-grid" style="gap: 6px;">
+                {% for book in books %}
+                <div class="glass-card info-row" style="padding: 8px 12px; flex-direction: column; align-items: flex-start; gap: 2px;">
+                    <span style="font-size: 0.78rem; font-weight: 500; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ book.title }}</span>
+                    <span style="font-size: 0.65rem; color: var(--text-muted);">{{ book.category.name|default:"---" }}</span>
                 </div>
+                {% empty %}
+                <p style="color: var(--text-muted); font-size: 0.78rem; text-align: center; padding: 20px;">{% trans "Kitoblar yo'q" %}</p>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('click', function(e) {
-    const target = e.target.closest('.toggle-admin-pass');
-    if (!target) return;
-    const passText = document.getElementById('admin-pass-text');
-    const passRaw = document.getElementById('admin-pass-raw');
-    if (passText.style.display === 'none') {
-        passText.style.display = '';
-        passRaw.style.display = 'none';
-        target.classList.remove('fa-eye-slash');
-        target.classList.add('fa-eye');
-    } else {
-        passText.style.display = 'none';
-        passRaw.style.display = '';
-        target.classList.remove('fa-eye');
-        target.classList.add('fa-eye-slash');
-    }
+document.querySelectorAll('.grade-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+        const body = this.nextElementSibling;
+        const chevron = this.querySelector('.grade-chevron');
+        if (body.style.display === 'none' || body.style.display === '') {
+            body.style.display = 'flex';
+            chevron.style.transform = 'rotate(90deg)';
+        } else {
+            body.style.display = 'none';
+            chevron.style.transform = '';
+        }
+    });
 });
 </script>
 {% endblock %}

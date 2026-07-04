@@ -31,7 +31,6 @@ def superuser(school):
         is_staff=True,
     )
     user.set_password("admin123")
-    user.raw_password = "admin123"
     user.save()
     return user
 
@@ -45,7 +44,6 @@ def school_admin(school):
         school=school,
     )
     user.set_password("admin123")
-    user.raw_password = "admin123"
     user.save()
     return user
 
@@ -60,7 +58,6 @@ def student(school):
         grade="9-A",
     )
     user.set_password("student123")
-    user.raw_password = "student123"
     user.save()
     return user
 
@@ -75,7 +72,6 @@ def teacher(school):
         subject="Mathematics",
     )
     user.set_password("teacher123")
-    user.raw_password = "teacher123"
     user.save()
     return user
 

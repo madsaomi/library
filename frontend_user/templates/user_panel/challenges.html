@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n %}{% load achievement_tags %}
 
 {% block title %}{% trans "Chellenjlar" %} | Online Kutibxona{% endblock %}
 {% block page_title %}{% trans "Chellenjlar" %} ⚡{% endblock %}
@@ -13,13 +13,9 @@
     {% if challenges %}
     <div class="responsive-grid-2">
         {% for challenge in challenges %}
-        {% with uc=user_challenges|dictsort:challenge.id %}
+        {% with uc=user_challenges|get_item:challenge.id %}
         <div class="glass-panel challenge-card" style="padding: 25px; position: relative; overflow: hidden;">
             <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), #a855f7);"></div>
-            {% if challenge.id in user_challenges %}
-                {% with uc_progress=user_challenges|dictsort:challenge.id %}
-                {% endwith %}
-            {% endif %}
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                 <div>
                     <h3 style="margin-bottom: 5px;">{{ challenge.title }}</h3>
@@ -34,17 +30,20 @@
                 <div style="flex: 1; min-width: 150px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         <span style="color: var(--text-muted); font-size: 0.85rem;">{% trans "Progress" %}</span>
-                        {% if challenge.id in user_challenges %}
+                        {% if uc %}
                         <span style="font-weight: 700; font-size: 0.85rem;">
-                            {% with uc=user_challenges|dictsort:challenge.id %}
-                            {% endwith %}
+                            {{ uc.progress }} / {{ challenge.target_count }}
                         </span>
                         {% else %}
                         <span style="color: var(--text-muted); font-size: 0.85rem;">0 / {{ challenge.target_count }}</span>
                         {% endif %}
                     </div>
                     <div style="height: 8px; background: var(--hover-bg); border-radius: 4px; overflow: hidden;">
+                        {% if uc %}
+                        <div style="width: {% widthratio uc.progress challenge.target_count 100 %}%; height: 100%; background: linear-gradient(90deg, var(--primary), #a855f7); border-radius: 4px; transition: width 0.5s;"></div>
+                        {% else %}
                         <div style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), #a855f7); border-radius: 4px;"></div>
+                        {% endif %}
                     </div>
                 </div>
                 <div style="text-align: right; color: var(--text-muted); font-size: 0.8rem;">

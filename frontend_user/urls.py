@@ -13,6 +13,7 @@ urlpatterns = [
     path('achievements/', views.achievements, name='achievements'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
     path('challenges/', views.challenges, name='challenges'),
+    path('my-class/', views.my_class, name='my_class'),
     path('book/<int:pk>/', views.book_detail, name='book_detail'),
     path('book/<int:pk>/reserve/', views.reserve_book, name='reserve_book'),
     path('request/<int:pk>/qr/', views.request_qr, name='request_qr'),

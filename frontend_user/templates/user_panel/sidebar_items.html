@@ -11,6 +11,9 @@
 <a href="{% url 'frontend_user:leaderboard' %}" class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}">
     <i class="fas fa-crown"></i> <span>{% trans "Top o'quvchilar" %}</span>
 </a>
+<a href="{% url 'frontend_user:my_class' %}" class="nav-link {% if request.resolver_match.url_name == 'my_class' %}active{% endif %}">
+    <i class="fas fa-users"></i> <span>{% trans "Mening sinfim" %}</span>
+</a>
 <a href="{% url 'frontend_user:challenges' %}" class="nav-link {% if request.resolver_match.url_name == 'challenges' %}active{% endif %}">
     <i class="fas fa-bolt"></i> <span>{% trans "Chellenjlar" %}</span>
 </a>
