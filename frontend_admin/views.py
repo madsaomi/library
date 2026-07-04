@@ -239,7 +239,6 @@ def statistics(request):
     }
     return render(request, 'admin_panel/statistics.html', context)
 
-from django.http import JsonResponse
 
 @login_required(login_url='login')
 @superuser_required
@@ -266,7 +265,6 @@ def create_stats_news(request):
     from django.utils import timezone
     from datetime import timedelta
     from frontend_school.models import News
-    from books.models import BookIssue
     from schools.models import School
     from django.db.models import Count, Q
     
@@ -316,7 +314,6 @@ def system_logs(request):
     from django.db.models import Q
     from django.utils import timezone
     from datetime import timedelta
-    import datetime
 
     now = timezone.now()
 
@@ -513,7 +510,7 @@ def school_detail(request, pk):
     }
     return render(request, 'admin_panel/school_detail.html', context)
 
-from .forms import SchoolForm, InstitutionForm, UnifiedSchoolForm
+from .forms import InstitutionForm, UnifiedSchoolForm
 
 @login_required(login_url='login')
 @superuser_required
@@ -549,7 +546,7 @@ def muassasa_delete(request, pk):
         return redirect('frontend_admin:muassasalar_list')
     return render(request, 'admin_panel/confirm_delete.html', {'object': inst, 'type': _('muassasani')})
 
-from .forms import DistrictForm, SchoolFormSet
+from .forms import DistrictForm
 
 @login_required(login_url='login')
 @superuser_required

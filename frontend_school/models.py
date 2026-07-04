@@ -28,7 +28,6 @@ class News(models.Model):
     def render_body(self):
         if not self.template_key or not self.template_data:
             return self.body
-        from django.template.loader import render_to_string
         from django.utils.translation import gettext
         data = self.template_data
         if self.template_key == 'weekly_active':

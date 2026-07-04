@@ -195,8 +195,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-import django.conf.locale
-from django.conf import global_settings
 
 # Add Karakalpak (kaa) to Django's supported languages info
 EXTRA_LANG_INFO = {

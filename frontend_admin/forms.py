@@ -1,9 +1,8 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
 from schools.models import School, Institution, District
-from core.validators import validate_word_limit, validate_char_limit
+from core.validators import validate_char_limit
 
 class SchoolForm(forms.ModelForm):
     class Meta:

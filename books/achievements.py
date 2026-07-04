@@ -1,7 +1,6 @@
 import random
 from datetime import date, timedelta
-from django.db.models import F, Count
-from django.utils import timezone
+from django.db.models import F
 
 LEVEL_TABLE = [
     (1, "Новичок", 0),
@@ -40,13 +39,11 @@ def check_level_up(user):
                 new_level = lvl
                 user.level = lvl
             break
-    next_lvl = get_next_level_info(user.level)
     return new_level > old_level
 
 
 def check_achievements(user):
     from .models import Achievement, UserAchievement, BookIssue, Category
-    from schools.models import School
 
     earned = []
     for ach in Achievement.objects.all():
@@ -107,7 +104,6 @@ def update_streak(user):
 
 
 def award_xp(user, action, book=None):
-    from .models import BookIssue
 
     xp = 0
     lucky_bonus = False

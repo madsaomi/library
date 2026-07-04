@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from django.db.models import Q
 from books.models import TextbookLoan, BookIssue
 from datetime import timedelta
 
@@ -23,7 +22,7 @@ class Command(BaseCommand):
                     from notifications.utils import notify_user
                     notify_user(
                         loan.student,
-                        f"Darslik muddati o'tdi!",
+                        "Darslik muddati o'tdi!",
                         f"'{loan.book.title}' darsligini qaytarish muddati {days} kun oldin tugagan. Iltimos, kutubxonaga topshiring.",
                         url="/"
                     )
@@ -31,7 +30,7 @@ class Command(BaseCommand):
                     if school_admin:
                         notify_user(
                             school_admin,
-                            f"O'quvchi darslikni qaytarmadi",
+                            "O'quvchi darslikni qaytarmadi",
                             f"{loan.student.get_full_name()} ({loan.student.grade}-sinf) — '{loan.book.title}' darsligini {days} kundan beri qaytarmadi.",
                             url="/school/textbook-loans/"
                         )
@@ -52,7 +51,7 @@ class Command(BaseCommand):
                 from notifications.utils import notify_user
                 notify_user(
                     issue.user,
-                    f"Kitobni qaytarish muddati o'tdi!",
+                    "Kitobni qaytarish muddati o'tdi!",
                     f"'{issue.book.title}' kitobini {days} kun oldin olgansiz. Iltimos, qaytarib topshiring.",
                     url="/user/my-books/"
                 )

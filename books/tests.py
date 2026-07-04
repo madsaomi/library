@@ -1,6 +1,6 @@
 import pytest
 from django.db.models import F
-from books.models import Book, BookIssue, BookRequest, Category
+from books.models import Book
 
 pytestmark = pytest.mark.django_db
 
@@ -30,7 +30,6 @@ class TestBook:
 
     def test_available_count_race_condition_fix(self, book):
         """Test that F() updates work correctly"""
-        from django.db.models import F
         Book.objects.filter(id=book.id).update(available_count=F("available_count") - 1)
         book.refresh_from_db()
         assert book.available_count == 4

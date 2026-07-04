@@ -7,8 +7,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from django.utils.translation import gettext as _
-from django.http import JsonResponse, HttpResponseRedirect
-from django.urls import reverse
+from django.http import JsonResponse
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -123,7 +122,7 @@ def profile(request):
     if request.user.role == 'superuser' or request.user.is_superuser:
         return redirect('frontend_admin:profile')
 
-    from books.models import BookIssue, BookRequest, Achievement, UserAchievement, Category
+    from books.models import BookIssue, Achievement, UserAchievement
     from django.db.models import Count
     from django.utils import timezone
     from datetime import timedelta
@@ -301,8 +300,6 @@ def get_rotating_token(request, type, pk):
     return JsonResponse({'error': 'Invalid type'}, status=400)
 
 
-from django.http import JsonResponse, HttpResponseRedirect
-from django.urls import reverse
 
 @login_required(login_url='login')
 def achievements(request):
@@ -333,8 +330,7 @@ def achievements(request):
 
 @login_required(login_url='login')
 def leaderboard(request):
-    from django.db.models import Count, Q, Prefetch
-    from books.models import BookIssue
+    from django.db.models import Count
 
     user = request.user
     period = request.GET.get('period', 'all')
@@ -364,7 +360,6 @@ def leaderboard(request):
 
 @login_required(login_url='login')
 def my_class(request):
-    from django.db.models import Count
     from books.models import BookIssue, UserAchievement
 
     user = request.user
@@ -429,7 +424,7 @@ def join_waitlist(request, book_pk):
     from books.models import Book, BookWaitlist
     book = get_object_or_404(Book, pk=book_pk)
     if book.school != request.user.school:
-        messages.error(request, _("Bu kitob sizning maktabingizga tegishli emas"))
+        messages.error(request, _("Bu kitob sizning maktabingizga tegishli emas"))  # noqa: F823
         return redirect('frontend_user:library')
     
     if book.available_count > 0:

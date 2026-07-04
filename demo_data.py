@@ -1,5 +1,8 @@
 """Fast demo data generator for Karakalpakstan school library system."""
-import django, os, sys, random
+import django
+import os
+import sys
+import random
 from datetime import date, timedelta
 
 sys.stdout.reconfigure(encoding='utf-8')
@@ -9,7 +12,6 @@ django.setup()
 
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
-from django.db import transaction
 
 from accounts.models import CustomUser
 from schools.models import District, School, Subject, Institution
@@ -81,7 +83,7 @@ admins = []
 pw = make_password('admin123')
 for s in schools:
     u = CustomUser(username=f'admin{s.id}', password=pw, first_name=f'Admin{s.id}',
-                   last_name=f'Maktab', role='school_admin', school=s)
+                   last_name='Maktab', role='school_admin', school=s)
     admins.append(u)
 CustomUser.objects.bulk_create(admins)
 print(f"  {len(admins)} admins")

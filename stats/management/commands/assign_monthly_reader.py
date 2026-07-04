@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.db.models import Count, Q
 from accounts.models import CustomUser
-from books.models import BookIssue, ReaderOfMonth
+from books.models import ReaderOfMonth
 from frontend_school.models import News
 
 

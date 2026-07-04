@@ -4,8 +4,7 @@ from django.urls import reverse
 
 school_admin_required = user_passes_test(lambda u: u.role == 'school_admin' and u.school is not None, login_url='login')
 from django.http import JsonResponse
-from django.db.models import Sum, Q, F
-from django.utils.crypto import get_random_string
+from django.db.models import Sum, Q
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -19,7 +18,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 from accounts.models import CustomUser
-from accounts.utils import verify_dynamic_token
 from books.models import Book, BookIssue, BookRequest, Category, TextbookLoan
 from books.achievements import award_xp
 from stats.models import ActionLog
@@ -380,7 +378,7 @@ def process_qr(request):
             request_obj.status = 'approved'
             request_obj.save()
             
-            issue = BookIssue.objects.create(book=book, user=request_obj.user)
+            BookIssue.objects.create(book=book, user=request_obj.user)
             
             book.available_count = F('available_count') - 1
             book.borrow_count = F('borrow_count') + 1
@@ -758,7 +756,6 @@ def statistics(request):
     school = request.user.school
     today = timezone.now().date()
 
-    from django.db.models import Sum, Count
     from books.models import UserAchievement, Challenge, BookIssue
 
     active_students = CustomUser.objects.filter(
@@ -825,7 +822,6 @@ def post_top_student_news(request, pk):
         messages.warning(request, _("Bugun bu haqida yangilik allaqachon chop etilgan!"))
         return redirect('frontend_school:statistics')
 
-    from books.models import UserAchievement
     title = _("Eng faol o'quvchi: {name}").format(name=f"{student.first_name} {student.last_name}")
     News.objects.create(
         school=school, title=title, body="", is_published=True,
@@ -1148,7 +1144,9 @@ def import_students_csv(request):
     if not csv_file.name.endswith('.csv'):
         return JsonResponse({'success': False, 'errors': [_('Faqat CSV fayl yuklang')]}, status=400)
     school = request.user.school
-    import csv, string, secrets
+    import csv
+    import string
+    import secrets
     decoded = csv_file.read().decode('utf-8-sig')
     reader = csv.DictReader(decoded.splitlines())
     created = 0
@@ -1189,7 +1187,7 @@ def import_students_csv(request):
 def import_books_csv(request):
     if request.method != 'POST':
         return render(request, 'school_panel/csv_import.html', {
-            'title': _("Kitoblarni CSV dan import qilish"),
+            'title': _("Kitoblarni CSV dan import qilish"),  # noqa: F823
             'action_url': reverse('frontend_school:import_books_csv'),
             'redirect_url': reverse('frontend_school:books_list'),
         })

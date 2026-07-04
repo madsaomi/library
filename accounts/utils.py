@@ -1,5 +1,8 @@
-import random
 import string
+import secrets
+import hmac
+import hashlib
+import time
 import qrcode
 import os
 from django.conf import settings
@@ -34,9 +37,6 @@ def generate_qr_code(data, filename):
     img.save(path)
     return os.path.join('qr', filename)
 
-import hmac
-import hashlib
-import time
 
 def generate_dynamic_token(prefix, obj_id):
     secret = settings.SECRET_KEY.encode()

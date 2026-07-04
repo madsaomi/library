@@ -1,5 +1,5 @@
 import pytest
-from schools.models import School, District, Subject
+from schools.models import Subject
 
 pytestmark = pytest.mark.django_db
 

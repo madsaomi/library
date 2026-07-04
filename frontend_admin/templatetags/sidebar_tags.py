@@ -1,5 +1,4 @@
 from django import template
-from django.db.models import Count
 from books.models import BookIssue
 
 register = template.Library()
