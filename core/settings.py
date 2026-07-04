@@ -29,7 +29,7 @@ LOGS_DIR.mkdir(exist_ok=True)
 # SECURITY WARNING: don't run with debug turned on in production!
 import sys as _sys
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 't')
-_dev_cmds = {'runserver', 'migrate', 'makemigrations', 'showmigrations', 'sqlmigrate', 'shell', 'dbshell', 'compilemessages', 'check', 'flush', 'loaddata', 'dumpdata', 'collectstatic'}
+_dev_cmds = {'runserver', 'migrate', 'makemigrations', 'showmigrations', 'sqlmigrate', 'shell', 'dbshell', 'compilemessages', 'check', 'flush', 'loaddata', 'dumpdata', 'collectstatic', 'ensure_admin'}
 if not DEBUG and any(cmd in _sys.argv for cmd in _dev_cmds):
     DEBUG = True
     import warnings as _w
