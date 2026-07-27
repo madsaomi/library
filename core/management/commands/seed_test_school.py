@@ -1,8 +1,9 @@
-from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
-from schools.models import District, School
 import random
 import re
+
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
+from schools.models import District, School
 
 User = get_user_model()
 
@@ -30,25 +31,68 @@ class Command(BaseCommand):
         if not created:
             existing = User.objects.filter(school=school, role='student').count()
             if existing > 0:
-                self.stdout.write(self.style.WARNING(
-                    f'School "{school_name}" already has {existing} students. Skipping.'
-                ))
+                self.stdout.write(
+                    self.style.WARNING(f'School "{school_name}" already has {existing} students. Skipping.')
+                )
                 return
 
         self.stdout.write(f'Creating students for "{school_name}" ({per_grade} per grade)...')
 
         letters = ['A', 'B', 'V', 'G', 'D', 'E', 'F']
         names = [
-            'Ali', 'Vali', 'Sardor', 'Jasur', 'Botir', 'Shohruh', 'Dilmurod',
-            'Aziz', 'Bekzod', 'Farrux', 'Gulnora', 'Zilola', 'Nigora', 'Malika',
-            'Sevara', 'Aziza', 'Dildora', 'Feruza', 'Kamola', 'Lola',
-            'Rustam', 'Xurshid', 'Temur', 'Nodir', 'Olim', 'Husan', 'Anvar',
+            'Ali',
+            'Vali',
+            'Sardor',
+            'Jasur',
+            'Botir',
+            'Shohruh',
+            'Dilmurod',
+            'Aziz',
+            'Bekzod',
+            'Farrux',
+            'Gulnora',
+            'Zilola',
+            'Nigora',
+            'Malika',
+            'Sevara',
+            'Aziza',
+            'Dildora',
+            'Feruza',
+            'Kamola',
+            'Lola',
+            'Rustam',
+            'Xurshid',
+            'Temur',
+            'Nodir',
+            'Olim',
+            'Husan',
+            'Anvar',
         ]
         surnames = [
-            'Karimov', 'Aliyev', 'Rahimov', 'Yusupov', 'Hasanov', 'Shukurov',
-            'Nazarov', 'Ruziyev', 'Toshmatov', 'Xolmatov', 'Murodov', 'Sultonov',
-            'Ergashev', 'Komilov', 'Norov', 'Jumayev', 'Ochilov', 'Qodirov',
-            'Raxmanov', 'Sobirov', 'Tursunov', 'Umarov', 'Xasanov', 'Ismailov',
+            'Karimov',
+            'Aliyev',
+            'Rahimov',
+            'Yusupov',
+            'Hasanov',
+            'Shukurov',
+            'Nazarov',
+            'Ruziyev',
+            'Toshmatov',
+            'Xolmatov',
+            'Murodov',
+            'Sultonov',
+            'Ergashev',
+            'Komilov',
+            'Norov',
+            'Jumayev',
+            'Ochilov',
+            'Qodirov',
+            'Raxmanov',
+            'Sobirov',
+            'Tursunov',
+            'Umarov',
+            'Xasanov',
+            'Ismailov',
         ]
         total_created = 0
         password = 'student123'
@@ -63,7 +107,7 @@ class Command(BaseCommand):
                 last_name = random.choice(surnames)
                 birth_year = 2007 + (11 - grade_num)
                 user = User(
-                    username=f'{slug}_{grade_num}_{i+1}',
+                    username=f'{slug}_{grade_num}_{i + 1}',
                     first_name=first_name,
                     last_name=last_name,
                     role='student',
@@ -87,8 +131,10 @@ class Command(BaseCommand):
         admin.set_password('admin123')
         admin.save()
 
-        self.stdout.write(self.style.SUCCESS(
-            f'Done! Created {total_created} students + 1 admin for "{school_name}".\n'
-            f'  Admin login:  username={slug}_adm, password=admin123\n'
-            f'  Student login: username={slug}_N_N, password=student123'
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'Done! Created {total_created} students + 1 admin for "{school_name}".\n'
+                f'  Admin login:  username={slug}_adm, password=admin123\n'
+                f'  Student login: username={slug}_N_N, password=student123'
+            )
+        )

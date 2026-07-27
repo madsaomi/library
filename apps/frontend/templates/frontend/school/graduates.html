@@ -1,0 +1,114 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Bitiruvchilar" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Bitiruvchilar" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="grid-3 stat-grid mb-xl">
+        <div class="glass-card stat-card p-md cursor-default">
+            <div class="stat-value text-xl text-primary">{{ total_graduates|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Jami bitiruvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card p-md cursor-default">
+            <div class="stat-value text-xl" style="color: #f59e0b;">{{ total_books|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Kitoblar" %}</div>
+        </div>
+        <div class="glass-card stat-card p-md cursor-default">
+            <div class="stat-value text-xl" style="color: #6366f1;">{{ total_active|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Aktiv ijaralar" %}</div>
+        </div>
+    </div>
+
+    <div class="glass-panel p-xl">
+        <div class="d-flex flex-between mb-lg">
+            <div class="pos-relative">
+                <input type="text" id="search-input" aria-label="{% trans 'Ism, login yoki sinf...' %}" placeholder="{% trans 'Ism, login yoki sinf...' %}"
+                       class="border rounded text-sm" style="padding: 8px 14px 8px 36px; background: var(--input-bg); color: var(--input-text); outline: none; width: 220px;">
+                <i class="fas fa-search pos-absolute text-muted text-sm" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
+            </div>
+            <div class="d-flex gap-sm align-center">
+                <div class="text-sm text-muted">{{ page_obj.paginator.count }} {% trans "ta bitiruvchi" %}</div>
+                <a href="{% url 'frontend:students_list' %}" class="text-sm text-primary text-decoration-none text-nowrap">
+                    <i class="fas fa-arrow-left"></i> {% trans "O'quvchilar" %}
+                </a>
+            </div>
+        </div>
+
+        <div class="info-grid" style="gap: 6px;">
+            {% for g in graduates %}
+            <div class="glass-card info-row graduate-row" data-search="{{ g.username|lower }} {{ g.first_name|lower }} {{ g.last_name|lower }} {{ g.grade|lower }}" style="padding: 10px 14px;">
+                <div class="d-flex align-center flex-1" style="gap: 10px; min-width: 0;">
+                    <div class="avatar-circle flex-shrink-0" style="width: 34px; height: 34px; background: linear-gradient(135deg, #f59e0b, #d97706);">
+                        <span class="avatar-initials text-sm">{{ g.first_name|first|upper }}{{ g.last_name|first|upper }}</span>
+                    </div>
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-semibold" style="font-size: 0.82rem;">
+                            {{ g.first_name }} {{ g.last_name }}
+                            <span class="badge text-primary ml-xs" style="background: rgba(245,158,11,0.15); padding: 1px 6px; border-radius: 4px; font-size: 0.6rem;">{% trans "Bitiruvchi" %}</span>
+                        </div>
+                        <div class="text-xs text-muted" style="margin-top: 1px;">
+                            <span>@{{ g.username }}</span>
+                            {% if g.grade %}
+                            <span class="ml-xs"><i class="fas fa-graduation-cap"></i> {{ g.grade }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex align-center flex-shrink-0" style="gap: 10px;">
+                    <div class="d-flex gap-xs">
+                        <a href="{% url 'frontend:student_edit' g.pk %}" class="glass-card px-sm py-xs rounded-sm text-decoration-none text-xs text-primary text-nowrap"><i class="fas fa-edit"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-users text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Foydalanuvchilar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha foydalanuvchilar ro'yxati bo'sh" %}</p>
+    </div>
+        {% endfor %}
+            <div id="no-results" class="d-none full-width p-3xl text-center text-muted text-md">
+                {% trans "Qidiruv bo'yicha hech narsa topilmadi" %}
+            </div>
+        </div>
+        <div class="mt-lg">
+            {% include 'pagination.html' %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+    const rows = document.querySelectorAll('.graduate-row');
+    const noResults = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        noResults.style.display = (found === 0 && rows.length > 0) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

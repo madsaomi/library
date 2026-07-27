@@ -1,8 +1,44 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings"
+pythonpath = [".", "apps"]
 python_files = ["tests.py", "test_*.py"]
-testpaths = ["accounts", "books", "schools", "frontend_admin", "frontend_school", "frontend_user", "stats"]
+testpaths = ["apps", "accounts", "api", "books", "schools", "stats"]
+markers = ["e2e: End-to-end Playwright tests"]
+
+[tool."pytest-playwright"]
+browser_type = "chromium"
+channel = ""
+headless = true
+viewport = {width = 1280, height = 720}
+
+[tool.coverage.run]
+source = ["."]
+omit = ["*/migrations/*", "*/tests.py", "core/wsgi.py", "manage.py", "start.sh"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 0
+
+[tool.ruff]
+target-version = "py314"
+line-length = 120
 
 [tool.ruff.lint]
-ignore = ["E402"]
+select = ["E", "F", "W", "I"]
+ignore = ["E402", "E501"]
 
+[tool.ruff.lint.per-file-ignores]
+"*/migrations/*" = ["ALL"]
+"api/tests.py" = ["ALL"]
+"conftest.py" = ["ALL"]
+"debug_*.py" = ["ALL"]
+"frontend/urls.py" = ["F403", "F405"]
+"frontend/views/__init__.py" = ["F401"]
+"frontend/views/*.py" = ["E501", "W293"]
+"e2e/*" = ["I001"]
+"api/serializers/__init__.py" = ["F401"]
+"api/views/__init__.py" = ["F401"]
+
+[tool.ruff.format]
+quote-style = "single"

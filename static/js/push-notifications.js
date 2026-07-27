@@ -1,22 +1,28 @@
-const applicationServerKey = window.VAPID_PUBLIC_KEY || '';
+var applicationServerKey = window.VAPID_PUBLIC_KEY || '';
 
 function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    return new Uint8Array([...rawData].map(ch => ch.charCodeAt(0)));
+    var padding = '='.repeat((4 - base64String.length % 4) % 4);
+    var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    var rawData = window.atob(base64);
+    return new Uint8Array([].map.call(rawData, function(ch) { return ch.charCodeAt(0); }));
 }
 
-async function subscribeToPush() {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        console.log('Push notifications not supported');
-        return;
+async function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return null;
+    try {
+        var registration = await navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+        return registration;
+    } catch (err) {
+        console.error('SW registration failed:', err);
+        return null;
     }
-    if (!applicationServerKey) return;
+}
+
+async function subscribeToPush(registration) {
+    if (!registration || !applicationServerKey) return;
 
     try {
-        const registration = await navigator.serviceWorker.register('/static/service-worker.js');
-        let subscription = await registration.pushManager.getSubscription();
+        var subscription = await registration.pushManager.getSubscription();
 
         if (!subscription) {
             subscription = await registration.pushManager.subscribe({
@@ -36,15 +42,15 @@ async function subscribeToPush() {
 }
 
 function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
+    var value = '; ' + document.cookie;
+    var parts = value.split('; ' + name + '=');
     if (parts.length === 2) return parts.pop().split(';').shift();
     return '';
 }
 
-// Auto-subscribe on page load (if VAPID keys are configured)
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async function() {
+    var registration = await registerServiceWorker();
     if (applicationServerKey) {
-        subscribeToPush();
+        subscribeToPush(registration);
     }
 });

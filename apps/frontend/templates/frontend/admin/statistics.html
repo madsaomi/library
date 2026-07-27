@@ -1,0 +1,227 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Statistika" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Statistika" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/admin/sidebar_items.html' %}
+{% endblock %}
+{% block content %}
+<div class="animate-fade">
+    <div class="grid-6 stat-grid">
+        <a href="{% url 'frontend:all_books_list' %}" class="glass-card stat-card p-lg" id="stat-total_books">
+            <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">{{ total_books }}</div>
+            <div class="stat-label text-sm">{% trans "Kitoblar" %}</div>
+        </a>
+        <a href="{% url 'frontend:all_users_list' %}" class="glass-card stat-card p-lg" id="stat-total_students">
+            <div class="stat-value" style="font-size: 1.3rem; color: #10b981;">{{ total_students }}</div>
+            <div class="stat-label text-sm">{% trans "Kitobxonlar" %}</div>
+        </a>
+        <a href="{% url 'frontend:schools_list' %}" class="glass-card stat-card p-lg" id="stat-total_schools">
+            <div class="stat-value" style="font-size: 1.3rem; color: #6366f1;">{{ total_schools }}</div>
+            <div class="stat-label text-sm">{% trans "Maktablar" %}</div>
+        </a>
+        <a href="{% url 'frontend:system_logs' %}?action=ISSUE&period=today" class="glass-card stat-card p-lg" id="stat-issued_today">
+            <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">{{ issued_today }}</div>
+            <div class="stat-label text-sm">{% trans "Bugun berilgan" %}</div>
+        </a>
+        <a href="{% url 'frontend:system_logs' %}?action=RETURN&period=today" class="glass-card stat-card p-lg" id="stat-returned_today">
+            <div class="stat-value" style="font-size: 1.3rem; color: var(--secondary);">{{ returned_today }}</div>
+            <div class="stat-label text-sm">{% trans "Bugun qaytarilgan" %}</div>
+        </a>
+        <div class="glass-card stat-card p-lg cursor-default" id="stat-total_xp">
+            <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">{{ total_xp }}</div>
+            <div class="stat-label text-sm">{% trans "Umumiy XP" %}</div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-md align-center mb-xl">
+        <span class="text-muted text-md"><i class="fas fa-calendar-alt"></i></span>
+        <form method="get" class="d-inline">
+            <select name="period" class="form-control text-md" style="width: auto; min-width: 100px; padding: 6px 10px; border-radius: 8px;" onchange="this.form.submit()">
+                <option value="7" {% if period_days == 7 %}selected{% endif %}>{% trans "7 kun" %}</option>
+                <option value="14" {% if period_days == 14 %}selected{% endif %}>{% trans "14 kun" %}</option>
+                <option value="30" {% if period_days == 30 %}selected{% endif %}>{% trans "30 kun" %}</option>
+                <option value="365" {% if period_days == 365 %}selected{% endif %}>{% trans "12 oy" %}</option>
+            </select>
+        </form>
+        <a href="{% url 'frontend:create_stats_news' %}?period={{ period_days }}" class="text-sm text-white text-decoration-none d-flex align-center gap-xs text-nowrap ml-auto" style="padding: 6px 14px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669);">
+            <i class="fas fa-newspaper"></i> {% trans "Yangilik qilish" %}
+        </a>
+    </div>
+
+    <div class="grid-2 mb-2xl">
+        <div class="glass-panel p-xl">
+            <h3 class="section-title text-md mb-lg">
+                <i class="fas fa-chart-line text-primary" style="font-size: 0.85rem;"></i> {% trans "Foydalanish dinamikasi" %}
+            </h3>
+            <div style="height: 240px;">
+                <canvas id="usageChart"></canvas>
+            </div>
+        </div>
+        <div class="glass-panel p-xl">
+            <h3 class="section-title text-md mb-lg">
+                <i class="fas fa-chart-pie" style="color: var(--accent); font-size: 0.85rem;"></i> {% trans "Kategoriyalar" %}
+            </h3>
+            <div style="height: 240px;">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="responsive-grid-1-2" style="gap: 20px;">
+        <div class="glass-panel p-xl">
+            <h3 class="section-title text-md mb-lg">
+                <i class="fas fa-trophy" style="color: #fbbf24; font-size: 0.85rem;"></i> {% trans "Eng faol maktablar" %}
+                <span class="text-muted text-xs text-normal ml-sm">({% blocktrans with n=period_days %}{{ n }} kun{% endblocktrans %})</span>
+            </h3>
+            <div class="info-grid gap-sm">
+                {% for school in top_schools %}
+                <div class="glass-card info-row p-md">
+                    <span class="text-md"><span class="text-muted text-bold mr-xs">#{{ forloop.counter }}</span> {{ school.name|truncatechars:20 }}</span>
+                    <span class="text-semibold text-md" style="color: #fbbf24;">{{ school.active_count }}</span>
+                </div>
+                {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-folder-open text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+    </div>
+        {% endfor %}
+            </div>
+        </div>
+        <div class="glass-panel p-xl">
+            <h3 class="section-title text-md mb-lg">
+                <i class="fas fa-crown" style="color: #f59e0b; font-size: 0.85rem;"></i> {% trans "Eng faol kitobxonlar" %}
+                <span class="text-muted text-xs text-normal ml-sm">({% blocktrans with n=period_days %}{{ n }} kun{% endblocktrans %})</span>
+            </h3>
+            <div class="info-grid gap-sm">
+                {% for reader in top_readers %}
+                <div class="glass-card info-row p-md">
+                    <span class="text-md">
+                        <span class="text-muted text-bold mr-xs">#{{ forloop.counter }}</span>
+                        {{ reader.username }}
+                        {% if reader.grade %}<span class="text-muted text-xs">({{ reader.grade }})</span>{% endif %}
+                    </span>
+                    <span class="text-semibold text-primary text-md">{{ reader.books_read }}</span>
+                </div>
+                {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-folder-open text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+    </div>
+        {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ usage_labels|json_script:"usage-labels" }}
+{{ issue_data|json_script:"issue-data" }}
+{{ return_data|json_script:"return-data" }}
+{{ category_labels|json_script:"category-labels" }}
+{{ category_data|json_script:"category-data" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
+<script>
+function initStatCharts() {
+    document.querySelectorAll('.stat-no-data').forEach(function(el){el.remove()});
+    document.querySelectorAll('#usageChart,#categoryChart').forEach(function(c){c.style.display='';c.style.background=''});
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const txtColor = isDark ? '#fef3c7' : '#000';
+    document.querySelectorAll('#usageChart,#categoryChart').forEach(function(c){c.style.background=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.03)';});
+    const gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.2)';
+    const font = { size: 13, weight: '600', family: 'Inter,system-ui,sans-serif' };
+    const line1 = isDark ? '#818cf8' : '#4f46e5';
+    const line2 = isDark ? '#34d399' : '#059669';
+    const fill1 = isDark ? 'rgba(99,102,241,0.08)' : 'rgba(79,70,229,0.12)';
+    const fill2 = isDark ? 'rgba(16,185,129,0.08)' : 'rgba(5,150,105,0.12)';
+    const catColors = isDark
+        ? ['#fbbf24','#f59e0b','#d97706','#a855f7','#6366f1','#10b981','#ec4899','#f97316','#06b6d4']
+        : ['#dc2626','#ea580c','#d97706','#7c3aed','#2563eb','#16a34a','#db2777','#ca8a04','#0891b2'];
+    const noData = txt => '<p class="stat-no-data text-center text-muted p-3xl text-md">'+txt+'</p>';
+
+    function safeGet(id) {
+        var el = document.getElementById(id);
+        if (!el) throw new Error('Element #'+id+' not found');
+        return JSON.parse(el.textContent);
+    }
+
+    try {
+        var usageLabels = safeGet('usage-labels');
+        var issueData = safeGet('issue-data');
+        var returnData = safeGet('return-data');
+        var catLabels = safeGet('category-labels');
+        var catData = safeGet('category-data');
+
+        var usageEl = document.getElementById('usageChart');
+        var catEl = document.getElementById('categoryChart');
+
+        if (usageEl) {
+            var hasUsageData = issueData.some(function(v){return v>0}) || returnData.some(function(v){return v>0});
+            if (!hasUsageData) {
+                usageEl.style.display = 'none';
+                usageEl.insertAdjacentHTML('afterend', noData('Ma\'lumot yo\'q'));
+            } else {
+                window._chartInstances.push(new Chart(usageEl.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: usageLabels,
+                        datasets: [
+                            { label: '{% trans "Berish" %}', data: issueData, borderColor: line1, backgroundColor: fill1, fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: line1 },
+                            { label: '{% trans "Qaytarish" %}', data: returnData, borderColor: line2, backgroundColor: fill2, fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: line2 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: { legend: { labels: { color: txtColor, font: font, boxWidth: 16, padding: 16, usePointStyle: true } } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: gridC }, ticks: { color: txtColor, stepSize: 1, font: font } },
+                            x: { grid: { display: false }, ticks: { color: txtColor, maxTicksLimit: 12, font: font } }
+                        }
+                    }
+                }));
+            }
+        }
+
+        if (catEl) {
+            var hasCatData = catData.some(function(v){return v>0});
+            if (!hasCatData) {
+                catEl.style.display = 'none';
+                catEl.insertAdjacentHTML('afterend', noData('Ma\'lumot yo\'q'));
+            } else {
+                window._chartInstances.push(new Chart(catEl.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: catLabels,
+                        datasets: [{ data: catData, backgroundColor: catColors.slice(0, catData.length), borderWidth: 2, borderColor: 'transparent' }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        cutout: '55%',
+                        plugins: { legend: { position: 'bottom', labels: { color: txtColor, padding: 16, font: font, boxWidth: 16, usePointStyle: true } } }
+                    }
+                }));
+            }
+        }
+    } catch(e) { console.error('Chart error:', e); if(usageEl) usageEl.insertAdjacentHTML('afterend', noData('Xatolik: '+e.message)); }
+}
+document.addEventListener('DOMContentLoaded', initStatCharts);
+document.addEventListener('themechange', function() {
+    while(window._chartInstances.length) window._chartInstances.pop().destroy();
+    initStatCharts();
+});
+</script>
+{% endblock %}

@@ -1,124 +1,134 @@
-# Online Kutibxona
+# Raqamli Kutubxona
 
-Smart library management system for schools with QR-code borrowing, gamification (XP, levels, achievements, streaks), multi-language support, and glassmorphism UI.
-
-![Python](https://img.shields.io/badge/python-3.13%2B-blue)
-![Django](https://img.shields.io/badge/django-5.0-green)
-![License](https://img.shields.io/badge/license-MIT-gray)
-
-## Features
-
-- **QR-based** borrowing/returning (HMAC dynamic tokens, refresh every 2 min)
-- **3 roles**: Super Admin, School Admin (Librarian), Student/Teacher
-- **Gamification**: XP points, levels, achievements, challenges, streaks
-- **Grade promotion**: auto-promotes students on Sept 1, graduates archived
-- **Brute-force protection**: django-axes (5 attempts → 1h lockout)
-- **Notifications**: bell dropdown + push notifications + top banner
-- **Multi-language**: Uzbek, Russian, English, Karakalpak
-- **Glassmorphism UI**: light/dark theme, responsive (400px–1600px)
-- **Charts**: monthly stats, category distribution (Chart.js 4.4.1)
-- **CSV import/export**: students, books, issues
-
-## Stack
-
-| Layer | Tech |
-|---|---|
-| Backend | Python 3.13+, Django 6.0 |
-| Database | SQLite (dev) / PostgreSQL (prod) |
-| Cache | LocMemCache (dev) / Redis (prod) |
-| Frontend | Vanilla JS, CSS3, HTMX 2.x, Chart.js 4.4.1 |
-| QR | html5-qrcode + HMAC-SHA256 tokens |
-| Admin | Jazzmin |
-| CI | GitHub Actions (pytest) |
+School Library Management System built with Django + DRF.
 
 ## Quick Start
 
 ```bash
-git clone <repo> && cd library
-python -m venv venv && source venv/bin/activate  # venv\Scripts\activate on Windows
+cp .env.example .env
+docker compose up -d
+```
+
+Then apply migrations and create a superuser:
+
+```bash
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py createsuperuser
+```
+
+Open http://localhost:8000
+
+## Manual Setup (no Docker)
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
+cp .env.example .env
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
 
-## Demo Credentials
-
-| Role | Login | Password |
-|------|-------|----------|
-| Super Admin | `superadmin` | `admin123` |
-| School Admin | `admin{school_id}` | `admin123` |
-| Student | `student{school_id}_{n}` | `student123` |
-
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `SECRET_KEY` | — | Django secret key (**required in production**) |
-| `DEBUG` | `False` | Debug mode |
-| `DATABASE_URL` | SQLite | PostgreSQL connection string |
-| `CACHE_BACKEND` | `LocMemCache` | Redis: `django_redis.cache.RedisCache` |
-| `CACHE_LOCATION` | — | Redis URL |
-| `EMAIL_BACKEND` | `console` | SMTP: `django.core.mail.backends.smtp.EmailBackend` |
-| `EMAIL_HOST` | — | SMTP host |
-| `EMAIL_HOST_USER` | — | SMTP user |
-| `EMAIL_HOST_PASSWORD` | — | SMTP password |
-| `VAPID_PUBLIC_KEY` | — | Web Push public key |
-| `VAPID_PRIVATE_KEY` | — | Web Push private key |
-
-## Tests
-
-```bash
-pytest -v
-```
-
-## Translations
-
-```bash
-python -c "import polib; [polib.pofile(f'locale/{l}/LC_MESSAGES/django.po').save_as_mofile(f'locale/{l}/LC_MESSAGES/django.mo') for l in ['uz','ru','en','kaa']]"
-```
-
-## Deployment
-
-### Docker
-
-```bash
-docker-compose up --build
-```
-
-### Railway
-
-Deploy from GitHub. Set required env vars (`SECRET_KEY`, `DATABASE_URL`).
-
 ## Project Structure
 
 ```
 library/
-├── core/              # Settings, middleware, URLs, validators
-├── accounts/          # Users, roles, auth, utils
-├── schools/           # Schools, districts, institutions
-├── books/             # Catalog, issues, requests, achievements
-├── stats/             # Action logs, management commands
-├── notifications/     # Push subscriptions, in-app notifications
-├── frontend_admin/    # Super admin panel (dashboard, schools, stats)
-├── frontend_school/   # School admin panel (students, books, QR, CSV)
-├── frontend_user/     # Student/teacher panel (library, profile, challenges)
-├── static/            # CSS, JS, favicon
-├── templates/         # Base layouts, auth pages
-├── locale/            # Translations (.po / .mo)
-├── scripts/           # Schedule scripts (daily, weekly, monthly)
-└── .github/           # CI workflow
+├── apps/                    # Django applications (accounts, api, books, frontend, notifications, schools, stats)
+├── core/                    # Django project core (settings, asgi, wsgi, urls)
+├── docs/                    # Project documentation (REQS.md, SECURITY.md, CHANGELOG.md)
+├── e2e/                     # End-to-end Playwright tests
+├── templates/               # Global HTML templates
+├── static/                  # Static assets (CSS, JS, images)
+├── scripts/                 # Utility & helper scripts
+└── manage.py                # Django management entrypoint
 ```
 
-## Security
+## Celery (Background Tasks)
 
-- CSRF protection, CORS headers
-- Password hashing (no plaintext storage)
-- Brute-force protection (django-axes)
-- Role-based access (`user_passes_test`)
-- HMAC-signed QR tokens with 120s expiry
-- Configurable HTTPS enforcement
+```bash
+celery -A core worker --loglevel=info
+celery -A core beat --loglevel=info  # for periodic tasks
+```
 
-## License
+Production Celery broker: set `CELERY_BROKER_URL=redis://...` and `CELERY_RESULT_BACKEND=redis://...` in `.env`.
 
-MIT
+## E2E Tests
+
+Playwright tests require **Python 3.13** (Python 3.14 has asyncio incompatibility with playwright):
+
+```bash
+# Install browsers once
+python -m playwright install chromium
+
+# Run E2E
+pytest e2e/ -m e2e -v
+```
+
+## Production Checklist
+
+- [ ] `DEBUG=False`
+- [ ] `SECRET_KEY` set to a strong random value
+- [ ] `ALLOWED_HOSTS` includes production domain
+- [ ] `CSRF_TRUSTED_ORIGINS` includes production domain
+- [ ] `DATABASE_URL` configured (PostgreSQL)
+- [ ] `CHANNEL_LAYER_BACKEND=channels_redis.core.RedisChannelLayer` + `CHANNEL_LAYER_REDIS_URL`
+- [ ] `CELERY_BROKER_URL` set to Redis
+- [ ] `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` generated
+- [ ] `SENTRY_DSN` set (optional)
+- [ ] Static files collected (`collectstatic`)
+- [ ] Migrations applied (`migrate`)
+- [ ] `start.sh` used (daphne, not gunicorn)
+
+## Tests
+
+```bash
+pytest --cov
+```
+
+### Quick Commands
+
+| Command | Description |
+|---------|-------------|
+| `make help` | Show all available commands |
+| `make test` | Run unit tests |
+| `make lint` | Run ruff linter |
+| `make format` | Auto-format code |
+| `make runserver` | Start dev server |
+| `make seed` | Seed test users |
+| `make setup` | Full project setup |
+| `make clean` | Remove cache & build artifacts |
+
+**Windows (PowerShell):** Use `.\tasks.ps1 <command>` instead of `make`.
+
+## Deployment (Railway)
+
+Push to GitHub, connect in Railway. `DATABASE_URL` is auto-injected.
+
+### Required Environment Variables
+
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `SECRET_KEY` | Django secret key | `change-me-in-production` |
+| `DEBUG` | Debug mode | `False` |
+| `ALLOWED_HOSTS` | Allowed hosts | `.railway.app` |
+| `CSRF_TRUSTED_ORIGINS` | CSRF trusted origins | `https://*.railway.app` |
+| `CHANNEL_LAYER_BACKEND` | WebSocket layer | `channels_redis.core.RedisChannelLayer` |
+| `CHANNEL_LAYER_REDIS_URL` | Redis URL for channels | `redis://localhost:6379/1` |
+| `VAPID_PUBLIC_KEY` | Push notifications | (generate with `python manage.py generate_vapid_keys`) |
+| `VAPID_PRIVATE_KEY` | Push notifications | |
+| `VAPID_ADMIN_EMAIL` | VAPID admin email | `admin@kutubxona.uz` |
+
+### Deployment Notes
+
+- Uses **daphne** (ASGI) not gunicorn — required for WebSocket support via Channels
+- `start.sh` runs migrations, celery worker+beat, then `daphne`
+- Celery uses Redis (set `CELERY_BROKER_URL` in production)
+- Static files served via WhiteNoise
+- CSP allows WebSockets: `ws://localhost:8000` dev, `wss://*.railway.app` prod
+
+## API Docs
+
+- Swagger: `/api/docs/`
+- ReDoc: `/api/redoc/`
+- OpenAPI schema: `/api/schema/`

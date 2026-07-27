@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load frontend_tags %}
+
+{% block title %}{% trans "Super Admin" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Tizim boshqaruvi" %}{% endblock %}
+
+
+{% block sidebar_nav %}
+{% include 'frontend/admin/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <!-- Quick Actions -->
+    <div class="mb-xl">
+        <div class="d-flex flex-wrap gap-sm mb-md">
+            <a href="{% url 'frontend:school_add' %}" class="glass-card py-sm px-md text-decoration-none rounded text-sm text-primary border-hover" style="gap: 6px;">
+                <i class="fas fa-school"></i> {% trans "Maktab qo'shish" %}
+            </a>
+            <a href="{% url 'frontend:all_books_list' %}?q=&action=add" class="glass-card py-sm px-md text-decoration-none rounded text-sm text-success border-hover" style="gap: 6px;">
+                <i class="fas fa-book"></i> {% trans "Kitob qo'shish" %}
+            </a>
+            <a href="{% url 'frontend:admin_news_add' %}" class="glass-card py-sm px-md text-decoration-none rounded text-sm text-warning border-hover" style="gap: 6px;">
+                <i class="fas fa-newspaper"></i> {% trans "Yangilik qo'shish" %}
+            </a>
+            <a href="{% url 'frontend:all_active_loans_list' %}" class="glass-card py-sm px-md text-decoration-none rounded text-sm text-danger border-hover" style="gap: 6px;">
+                <i class="fas fa-clock"></i> {% trans "Ijarolar" %}
+            </a>
+        </div>
+    </div>
+
+    <div class="grid-4 stat-grid mb-xl">
+        <div class="glass-card stat-card py-lg px-md hover-lift hover-glow">
+            <div class="stat-value text-primary counter" data-target="{{ school_count|default:0 }}">0</div>
+            <div class="stat-label text-sm">{% trans "Maktablar" %}</div>
+        </div>
+        <div class="glass-card stat-card py-lg px-md hover-lift hover-glow">
+            <div class="stat-value counter" data-target="{{ user_count|default:0 }}" style="color: #10b981;">0</div>
+            <div class="stat-label text-sm">{% trans "Foydalanuvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card py-lg px-md hover-lift hover-glow">
+            <div class="stat-value counter" data-target="{{ total_books|default:0 }}" style="color: #f59e0b;">0</div>
+            <div class="stat-label text-sm">{% trans "Kitoblar" %}</div>
+        </div>
+        <div class="glass-card stat-card py-lg px-md hover-lift hover-glow">
+            <div class="stat-value counter" data-target="{{ active_loans|default:0 }}" style="color: #6366f1;">0</div>
+            <div class="stat-label text-sm">{% trans "Aktiv ijaralar" %}</div>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-2xl">
+        <div class="glass-panel p-xl">
+            <h3 class="section-title text-md mb-lg">
+                <i class="fas fa-chart-bar text-primary"></i> {% trans "Oylik kitob berishlar" %}
+            </h3>
+            <div style="height: 200px;">
+                <canvas id="issuesChart"></canvas>
+            </div>
+        </div>
+        <div class="glass-panel p-xl">
+            <h3 class="section-title text-md mb-lg">
+                <i class="fas fa-chart-pie" style="color: var(--secondary);"></i> {% trans "Foydalanuvchi turlari" %}
+            </h3>
+            <div style="height: 200px;">
+                <canvas id="rolesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {% if top_books %}
+    <div class="glass-panel p-xl mb-2xl">
+        <h3 class="section-title text-md mb-lg">
+            <i class="fas fa-trophy" style="color: #fbbf24;"></i> {% trans "Eng ko'p o'qilgan kitoblar (Top 10)" %}
+        </h3>
+        <div style="height: 120px;">
+            <canvas id="topBooksChart"></canvas>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="glass-panel p-xl mb-2xl">
+        <div class="flex-between mb-lg">
+            <h3 class="section-title text-md m-0">
+                <i class="fas fa-school text-primary"></i> {% trans "So'nggi qo'shilgan maktablar" %}
+            </h3>
+            <a href="{% url 'frontend:schools_list' %}" class="glass-card py-sm px-lg text-decoration-none text-sm text-muted rounded">
+                {% trans "Barchasi" %} <i class="fas fa-arrow-right" style="font-size: 0.6rem;"></i>
+            </a>
+        </div>
+        <div class="info-grid gap-sm animate-group">
+            {% for school in schools %}
+            <a href="{% url 'frontend:school_detail' school.pk %}" class="glass-card info-row py-md px-lg text-decoration-none animate-item">
+                <div>
+                    <div class="text-semibold" style="font-size: 0.82rem;">{{ school.name }}</div>
+                    <div class="text-muted" style="font-size: 0.68rem; margin-top: 2px;">{{ school.district.name|default:"—" }} · {{ school.address|truncatechars:30 }}</div>
+                </div>
+                <span class="text-primary" style="font-size: 0.7rem;"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-folder-open text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+    </div>
+        {% endfor %}
+        </div>
+    </div>
+
+    <div class="glass-panel p-xl">
+        <div class="flex-between mb-lg">
+            <h3 class="section-title text-md m-0">
+                <i class="fas fa-history" style="color: var(--secondary);"></i> {% trans "Oxirgi harakatlar" %}
+            </h3>
+            <a href="{% url 'frontend:system_logs' %}" class="glass-card py-sm px-lg text-decoration-none text-sm text-muted rounded">
+                {% trans "Barchasi" %} <i class="fas fa-arrow-right" style="font-size: 0.6rem;"></i>
+            </a>
+        </div>
+        <div class="activity-list animate-group">
+            {% for log in recent_logs %}
+            <div class="activity-item py-sm border-bottom animate-item">
+                <div class="flex-between">
+                    <div class="d-flex align-center gap-sm">
+                        <span class="badge bg-danger text-primary px-sm py-xs rounded-sm" style="font-size: 0.65rem;">{{ log.action_type|action_name }}</span>
+                        <span style="font-size: 0.78rem;">{% if log.user %}{{ log.user.username }}{% else %}{% trans "Tizim" %}{% endif %}</span>
+                    </div>
+                    <span class="text-muted" style="font-size: 0.68rem;">{{ log.created_at|date:"d.m H:i" }}</span>
+                </div>
+                <div class="text-muted" style="font-size: 0.72rem; margin-top: 3px; margin-left: 72px;">{{ log.message }}</div>
+            </div>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-folder-open text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+    </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
+{{ month_labels|json_script:"chart-month-labels" }}
+{{ monthly_issues|json_script:"chart-monthly-issues" }}
+{{ roles|json_script:"chart-roles" }}
+{{ top_books_labels|json_script:"chart-top-books-labels" }}
+{{ top_books_data|json_script:"chart-top-books-data" }}
+<script>
+function initDashCharts() {
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const txtColor = isDark ? '#fef3c7' : '#000';
+    const gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.2)';
+    const font = { size: 12, weight: '600', family: 'Inter,system-ui,sans-serif' };
+    const bar1 = isDark ? 'rgba(99, 102, 241, 0.6)' : 'rgba(79, 70, 229, 0.7)';
+    const bar1b = isDark ? '#6366f1' : '#4f46e5';
+    const amber1 = isDark ? 'rgba(251, 191, 36, 0.6)' : 'rgba(234, 88, 12, 0.7)';
+    const amber1b = isDark ? '#fbbf24' : '#ea580c';
+    const roleColors = isDark ? ['#6366f1','#10b981','#f59e0b','#a855f7'] : ['#2563eb','#16a34a','#dc2626','#7c3aed'];
+
+    const ctx1 = document.getElementById('issuesChart');
+    if (ctx1) {
+        const monthLabels = JSON.parse(document.getElementById('chart-month-labels').textContent);
+        const monthlyIssues = JSON.parse(document.getElementById('chart-monthly-issues').textContent);
+        window._chartInstances.push(new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: '{% trans "Berilgan kitoblar" %}',
+                    data: monthlyIssues,
+                    backgroundColor: bar1,
+                    borderColor: bar1b,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: txtColor, font: font }, grid: { display: false } },
+                    y: { ticks: { color: txtColor, font: font }, grid: { color: gridC }, beginAtZero: true }
+                }
+            }
+        }));
+    }
+
+    const ctx2 = document.getElementById('rolesChart');
+    if (ctx2) {
+        const roleLabels = {
+            'superuser': '{% trans "Superuser" %}',
+            'school_admin': '{% trans "School Admin" %}',
+            'student': '{% trans "Student" %}',
+            'teacher': '{% trans "Teacher" %}',
+        };
+        const roles = JSON.parse(document.getElementById('chart-roles').textContent);
+        const labels = Object.keys(roles).map(k => roleLabels[k] || k);
+        const data = Object.values(roles);
+
+        window._chartInstances.push(new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{ data: data, backgroundColor: roleColors.slice(0, data.length), borderWidth: 0 }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: txtColor, padding: 14, font: font, boxWidth: 14, usePointStyle: true } }
+                }
+            }
+        }));
+    }
+
+    const ctx3 = document.getElementById('topBooksChart');
+    if (ctx3) {
+        const topBooksLabels = JSON.parse(document.getElementById('chart-top-books-labels').textContent);
+        const topBooksData = JSON.parse(document.getElementById('chart-top-books-data').textContent);
+        window._chartInstances.push(new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: topBooksLabels,
+                datasets: [{
+                    label: '{% trans "O\'qilganlar soni" %}',
+                    data: topBooksData,
+                    backgroundColor: amber1,
+                    borderColor: amber1b,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: txtColor, font: font }, grid: { color: gridC }, beginAtZero: true },
+                    y: { ticks: { color: txtColor, font: { size: 11, weight: '600', family: 'Inter,system-ui,sans-serif' } }, grid: { display: false } }
+                }
+            }
+        }));
+    }
+}
+function initPage() { initDashCharts(); }
+document.addEventListener('DOMContentLoaded', initDashCharts);
+document.addEventListener('themechange', function() {
+    while(window._chartInstances.length) window._chartInstances.pop().destroy();
+    initDashCharts();
+});
+</script>
+{% endblock %}

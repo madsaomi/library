@@ -1,0 +1,63 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="glass-panel p-3xl mw-500 mx-auto">
+        <form method="post" enctype="multipart/form-data" id="csv-import-form" action="{{ action_url }}">
+            {% csrf_token %}
+            <div class="mb-xl">
+                <label class="d-block mb-sm text-md text-semibold">
+                    {% trans "CSV fayl" %}
+                </label>
+                <input type="file" name="csv_file" accept=".csv" required
+                       class="w-full border rounded text-md"
+                       style="padding: 10px; background: var(--input-bg); color: var(--input-text);">
+                <div class="text-xs text-muted mt-xs">
+                    {% trans "Faqat .csv fayl yuklang" %}
+                </div>
+            </div>
+            <button type="submit" class="glass-card d-flex align-center gap-sm border-none rounded bg-primary text-white text-md cursor-pointer" style="padding: 10px 24px;">
+                <i class="fas fa-upload"></i> {% trans "Import qilish" %}
+            </button>
+        </form>
+        <div id="import-status" class="mt-lg"></div>
+    </div>
+</div>
+<script>
+document.getElementById('csv-import-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form = this;
+    var formData = new FormData(form);
+    var statusDiv = document.getElementById('import-status');
+    statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% trans "Import qilinmoqda..." %}';
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            window.location.href = '{{ redirect_url|escapejs }}';
+        } else {
+            var html = '<div class="glass-card p-md rounded bg-danger text-danger text-sm">';
+            html += '<i class="fas fa-exclamation-circle"></i> ';
+            html += (data.errors || ['{% trans "Xatolik yuz berdi" %}']).join('<br>');
+            html += '</div>';
+            statusDiv.innerHTML = html;
+        }
+    })
+    .catch(function() {
+        statusDiv.innerHTML = '<div class="glass-card p-md rounded bg-danger text-danger text-sm"><i class="fas fa-exclamation-circle"></i> {% trans "Xatolik yuz berdi" %}</div>';
+    });
+});
+</script>
+{% endblock %}

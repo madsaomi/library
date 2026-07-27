@@ -1,0 +1,91 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="mw-500 mx-auto">
+    <div class="glass-panel animate-fade p-3xl">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="d-flex flex-column gap-xl">
+                {% for field in form %}
+                <div>
+                    <label class="d-block mb-xs text-medium text-sm text-muted">
+                        {{ field.label }}
+                    </label>
+
+                    {% if field.name == 'is_published' %}
+                    <div class="d-flex align-center gap-md py-md px-lg rounded-md border" style="background: var(--input-bg);">
+                        {{ field }}
+                        <span class="text-md">{% trans "Saytda ko'rsatish" %}</span>
+                    </div>
+
+                    {% elif field.name == 'image' %}
+                    <div class="pos-relative overflow-hidden d-inline-block">
+                        <div id="fake-upload-btn" class="d-flex align-center gap-sm cursor-pointer border rounded-md text-sm" style="padding: 10px 18px; background: var(--input-bg);">
+                            <i class="fas fa-upload text-success"></i>
+                            <span id="file-name-label">{% trans "Rasm tanlash" %}</span>
+                        </div>
+                        <input type="file" name="image" accept="image/*" id="id_image"
+                               class="pos-absolute top-0 left-0 w-full h-full cursor-pointer"
+                               style="opacity: 0;"
+                               onchange="handleFileChange(this)">
+                    </div>
+
+                    {% else %}
+                    <div>
+                        {{ field }}
+                    </div>
+                    {% endif %}
+
+                    {% if field.errors %}
+                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-2xl d-flex gap-md">
+                <button type="submit" class="btn-primary text-md rounded-md" style="flex: 2; padding: 10px 0;">
+                    <i class="fas fa-save"></i> {% trans "Saqlash" %}
+                </button>
+                <a href="{% url 'frontend:school_news_list' %}" class="glass-card flex-1 rounded-md text-center text-decoration-none d-flex align-center justify-center border text-md" style="padding: 10px 0; gap: 6px;">
+                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-control { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--input-text); outline: none; font-size: 0.85rem; transition: 0.3s; box-sizing: border-box; }
+    .form-control:focus { border-color: var(--primary); }
+    .form-control[type="file"] { padding: 8px; }
+    #fake-upload-btn:hover { background: var(--hover-bg); }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: var(--hover-bg); border-radius: 24px; transition: 0.3s; }
+    .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: var(--text-muted); border-radius: 50%; transition: 0.3s; }
+    .switch input:checked + .slider { background: #10b981; }
+    .switch input:checked + .slider:before { transform: translateX(20px); background: white; }
+</style>
+
+<script>
+function handleFileChange(input) {
+    if (input.files && input.files[0]) {
+        document.getElementById('file-name-label').innerText = input.files[0].name;
+        const btn = document.getElementById('fake-upload-btn');
+        btn.style.borderColor = '#10b981';
+        btn.style.background = 'rgba(16, 185, 129, 0.1)';
+        btn.querySelector('i').className = 'fas fa-check';
+    }
+}
+</script>
+{% endblock %}

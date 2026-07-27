@@ -22,4 +22,7 @@ RUN chmod +x start.sh
 
 EXPOSE $PORT
 
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:' + ('$PORT' if '$PORT' else '8000') + '/api/health/')" || exit 1
+
 CMD ./start.sh

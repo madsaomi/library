@@ -1,0 +1,145 @@
+import random
+from datetime import date, timedelta
+
+from django.db.models import F
+
+LEVEL_TABLE = [
+    (1, 'Новичок', 0),
+    (2, 'Читатель', 30),
+    (3, 'Книголюб', 80),
+    (4, 'Начитанный', 150),
+    (5, 'Книжный червь', 250),
+    (6, 'Эрудит', 400),
+    (7, 'Интеллектуал', 600),
+    (8, 'Профессор', 850),
+    (9, 'Мудрец', 1200),
+    (10, 'Легенда', 2000),
+]
+
+
+def get_level_info(level):
+    for lvl, title, xp in LEVEL_TABLE:
+        if lvl == level:
+            return {'level': lvl, 'title': title, 'xp_required': xp}
+    return {'level': level, 'title': 'Новичок', 'xp_required': 0}
+
+
+def get_next_level_info(level):
+    for lvl, title, xp in LEVEL_TABLE:
+        if lvl == level + 1:
+            return {'level': lvl, 'title': title, 'xp_required': xp}
+    return None
+
+
+def check_level_up(user):
+    old_level = user.level
+    new_level = user.level
+    for lvl, title, xp in reversed(LEVEL_TABLE):
+        if user.xp_points >= xp:
+            if user.level < lvl:
+                new_level = lvl
+                user.level = lvl
+            break
+    return new_level > old_level
+
+
+def check_achievements(user):
+    from .models import Achievement, BookIssue, Category, UserAchievement
+
+    earned = []
+    for ach in Achievement.objects.all():
+        if UserAchievement.objects.filter(user=user, achievement=ach).exists():
+            continue
+
+        achieved = False
+
+        if ach.condition_type == 'books_count':
+            achieved = user.total_books_read >= ach.condition_value
+
+        elif ach.condition_type == 'categories':
+            cats_read = (
+                BookIssue.objects.filter(user=user, is_returned=True, book__category__isnull=False)
+                .values('book__category')
+                .distinct()
+                .count()
+            )
+            achieved = cats_read >= ach.condition_value
+
+        elif ach.condition_type == 'all_categories':
+            all_cats = Category.objects.filter(book__school=user.school).count()
+            cats_read = (
+                BookIssue.objects.filter(user=user, is_returned=True, book__category__isnull=False)
+                .values('book__category')
+                .distinct()
+                .count()
+            )
+            achieved = all_cats > 0 and cats_read >= all_cats
+
+        elif ach.condition_type == 'streak':
+            achieved = (user.longest_streak or 0) >= ach.condition_value
+
+        elif ach.condition_type == 'speed_return':
+            speed_returns = BookIssue.objects.filter(
+                user=user, is_returned=True, returned_at__lte=F('issued_at') + timedelta(days=3)
+            ).count()
+            achieved = speed_returns >= ach.condition_value
+
+        if achieved:
+            UserAchievement.objects.create(user=user, achievement=ach)
+            user.xp_points += ach.xp_reward
+            earned.append(ach)
+
+    return earned
+
+
+def update_streak(user):
+    today = date.today()
+    if user.last_activity_date:
+        delta = (today - user.last_activity_date).days
+        if delta == 0:
+            pass
+        elif 1 <= delta <= 7:
+            if user.last_activity_date.isocalendar()[1] != today.isocalendar()[1]:
+                user.current_streak += 1
+        else:
+            user.current_streak = 0
+    else:
+        user.current_streak = 1
+    user.longest_streak = max(user.longest_streak or 0, user.current_streak or 0)
+    user.last_activity_date = today
+
+
+def award_xp(user, action, book=None):
+
+    xp = 0
+    lucky_bonus = False
+
+    if action == 'borrow':
+        xp = 10
+        if random.random() < 0.1:
+            xp += 15
+            lucky_bonus = True
+
+        user.total_books_read = (user.total_books_read or 0) + 1
+        user.monthly_books_read = (user.monthly_books_read or 0) + 1
+
+    elif action == 'return':
+        xp = 5
+
+    user.xp_points = (user.xp_points or 0) + xp
+
+    update_streak(user)
+
+    leveled_up = check_level_up(user)
+
+    new_achievements = check_achievements(user)
+
+    user.save()
+
+    return {
+        'xp_earned': xp,
+        'lucky_bonus': lucky_bonus,
+        'leveled_up': leveled_up,
+        'new_level': user.level if leveled_up else None,
+        'new_achievements': [a.name for a in new_achievements],
+    }

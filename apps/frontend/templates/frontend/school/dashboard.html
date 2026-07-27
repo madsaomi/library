@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "School Admin" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Maktab boshqaruvi" %}{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="grid-5 stat-grid mb-xl">
+        <a href="{% url 'frontend:students_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
+            <div class="stat-value text-xl text-primary">{{ student_count|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "O'quvchilar" %}</div>
+        </a>
+        <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
+            <div class="stat-value text-xl text-success">{{ total_copies|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Jami kitoblar" %}</div>
+        </a>
+        <a href="{% url 'frontend:issued_books_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
+            <div class="stat-value text-xl" style="color: #6366f1;">{{ issued_count|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Berilgan kitoblar" %}</div>
+        </a>
+        <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
+            <div class="stat-value text-xl" style="color: #f59e0b;">{{ available_copies|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Qolgan kitoblar" %}</div>
+        </a>
+        <a href="{% url 'frontend:school_news_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
+            <div class="stat-value text-xl" style="color: #a855f7;">{{ news_count|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Yangiliklar" %}</div>
+        </a>
+    </div>
+
+    <div class="grid-2 mb-2xl">
+        <div class="glass-panel p-xl">
+            <h3 class="section-title text-sm mb-lg">
+                <i class="fas fa-chart-bar text-primary"></i> {% trans "Oylik kitob berishlar" %}
+            </h3>
+            <div style="height: 200px;">
+                <canvas id="issuesChart"></canvas>
+            </div>
+        </div>
+        <div class="glass-panel p-xl">
+            <h3 class="section-title text-sm mb-lg">
+                <i class="fas fa-bolt" style="color: var(--accent);"></i> {% trans "Tezkor amallar" %}
+            </h3>
+            <div class="d-flex flex-column gap-sm">
+                <a href="{% url 'frontend:qr_scanner' %}" class="glass-card d-flex align-center text-decoration-none transition p-lg gap-xl" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
+                    <div class="d-flex flex-center flex-shrink-0 rounded-md" style="width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                        <i class="fas fa-qrcode text-white text-xl"></i>
+                    </div>
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-semibold text-sm">{% trans "QR Skaner" %}</div>
+                        <div class="text-xs text-muted mt-xs">{% trans "Kitob berish va qabul qilish" %}</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted text-xs"></i>
+                </a>
+                <a href="{% url 'frontend:issued_books_list' %}" class="glass-card d-flex align-center text-decoration-none transition p-lg gap-xl" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
+                    <div class="d-flex flex-center flex-shrink-0 rounded-md" style="width: 44px; height: 44px; background: linear-gradient(135deg, #6366f1, #10b981);">
+                        <i class="fas fa-hand-holding-heart text-white text-xl"></i>
+                    </div>
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-semibold text-sm">{% trans "O'qilayotganlar" %}</div>
+                        <div class="text-xs text-muted mt-xs">{{ issued_count }} {% trans "aktiv kitob" %}</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-panel p-xl mb-2xl">
+        <div class="flex-between mb-lg">
+            <h3 class="section-title text-sm m-xs">
+                <i class="fas fa-history text-primary"></i> {% trans "Oxirgi amallar" %}
+            </h3>
+            <a href="{% url 'frontend:history_list' %}" class="glass-card text-decoration-none text-muted text-xs p-sm rounded">{% trans "Barchasi" %} <i class="fas fa-arrow-right text-xs"></i></a>
+        </div>
+        <div class="info-grid animate-group" style="gap: 6px;">
+            {% for activity in recent_activities %}
+            <div class="glass-card info-row p-md animate-item">
+                <div class="d-flex align-center gap-sm flex-1" style="min-width: 0;">
+                    {% if activity.is_returned %}
+                    <div class="d-flex flex-center flex-shrink-0 rounded-full" style="width: 36px; height: 36px; background: rgba(16,185,129,0.1);">
+                        <i class="fas fa-undo" style="color: #10b981; font-size: 0.8rem;"></i>
+                    </div>
+                    {% else %}
+                    <div class="d-flex flex-center flex-shrink-0 rounded-full" style="width: 36px; height: 36px; background: rgba(99,102,241,0.1);">
+                        <i class="fas fa-book-open" style="color: #6366f1; font-size: 0.8rem;"></i>
+                    </div>
+                    {% endif %}
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-md text-semibold">{{ activity.book.title|truncatechars:35 }}</div>
+                        <div class="text-xs text-muted mt-xs">{{ activity.user.get_full_name|default:activity.user.username }}</div>
+                    </div>
+                </div>
+                <div class="text-right flex-shrink-0">
+                    <div class="text-xs text-muted">{{ activity.issued_at|date:"d.m H:i" }}</div>
+                    {% if activity.is_returned %}
+                    <span class="badge text-xs" style="padding: 2px 8px; border-radius: 4px; background: rgba(16,185,129,0.1); color: #10b981;">{% trans "Qaytarildi" %}</span>
+                    {% else %}
+                    <span class="badge text-xs" style="padding: 2px 8px; border-radius: 4px; background: rgba(99,102,241,0.1); color: #6366f1;">{% trans "Berildi" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-folder-open text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+    </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
+{{ month_labels|json_script:"school-month-labels" }}
+{{ monthly_data|json_script:"school-monthly-data" }}
+<script>
+function initSchoolDash() {
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const txtColor = isDark ? '#fef3c7' : '#000';
+    const gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.2)';
+    const font = { size: 12, weight: '600', family: 'Inter,system-ui,sans-serif' };
+    const bar1 = isDark ? 'rgba(99, 102, 241, 0.6)' : 'rgba(79, 70, 229, 0.7)';
+    const bar1b = isDark ? '#6366f1' : '#4f46e5';
+
+    const ctx = document.getElementById('issuesChart');
+    if (ctx) {
+        const monthLabels = JSON.parse(document.getElementById('school-month-labels').textContent);
+        const monthlyData = JSON.parse(document.getElementById('school-monthly-data').textContent);
+        window._chartInstances.push(new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: '{% trans "Berilgan kitoblar" %}',
+                    data: monthlyData,
+                    backgroundColor: bar1,
+                    borderColor: bar1b,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: txtColor, font: font }, grid: { display: false } },
+                    y: { ticks: { color: txtColor, font: font }, grid: { color: gridC }, beginAtZero: true }
+                }
+            }
+        }));
+    }
+}
+function initPage() { initSchoolDash(); }
+document.addEventListener('DOMContentLoaded', initSchoolDash);
+document.addEventListener('themechange', function() {
+    while(window._chartInstances.length) window._chartInstances.pop().destroy();
+    initSchoolDash();
+});
+</script>
+{% endblock %}

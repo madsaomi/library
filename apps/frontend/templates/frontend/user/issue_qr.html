@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Kitob topshirish" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Topshirish QR-kodi" %}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/user/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="mw-600 mx-auto text-center">
+    <div class="glass-panel animate-fade p-3xl">
+        <div id="instruction-state">
+            <div class="flex-center rounded-full mb-xl" style="width: 80px; height: 80px; background: rgba(168, 85, 247, 0.1); margin: 0 auto;">
+                <i class="fas fa-undo text-2xl" style="color: var(--secondary);"></i>
+            </div>
+            <h2 class="mb-xl">{% trans "Kitobni qaytarish" %}</h2>
+            <p class="text-muted mb-2xl lh-normal">
+                {% trans "Kitobni qaytarish uchun quyidagi QR-kodni kutubxonachiga ko'rsating." %}
+            </p>
+        </div>
+
+        <div id="success-state" class="d-none">
+            <div class="flex-center rounded-full mb-xl" style="width: 80px; height: 80px; background: #10b981; margin: 0 auto;">
+                <i class="fas fa-check text-2xl text-white"></i>
+            </div>
+            <h2 class="mb-sm" style="color: #10b981;">{% trans "Kitob topshirildi!" %}</h2>
+            <p class="text-muted mb-2xl">{% trans "Kitob kutubxonaga muvaffaqiyatli qaytarildi." %}</p>
+        </div>
+
+        <div id="qr-container" class="d-inline-block mb-2xl" style="padding: 25px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div id="qrcode"></div>
+            <div class="mt-lg pt-lg" style="border-top: 1px dashed #eee;">
+                <p class="text-xs text-uppercase m-0 mb-xs" style="color: #999; letter-spacing: 1px;">{% trans "Manual ID:" %}</p>
+                <div id="manual-id-display" style="font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: 700; color: #333; letter-spacing: 2px;">
+                    {{ issue_obj.qr_token }}
+                </div>
+                <div class="mt-lg w-full pos-relative overflow-hidden" style="height: 4px; background: #eee; border-radius: 2px;">
+                    <div id="timer-bar" class="pos-absolute left-0 top-0 w-full" style="height: 100%; background: var(--secondary); transition: width 1s linear;"></div>
+                </div>
+                <p class="text-xs text-uppercase m-0 mt-sm" style="color: #999;">
+                    {% trans "Yangilanishiga:" %} <span id="timer-text">00:00</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="text-left mb-2xl">
+            <div class="glass-card p-xl" style="border-left: 4px solid var(--secondary);">
+                <p class="text-sm text-muted mb-xs">{% trans "Kitob:" %}</p>
+                <p class="text-semibold text-lg">{{ issue_obj.book.title }}</p>
+                <p class="text-sm text-muted mt-lg mb-xs">{% trans "Olingan sana:" %}</p>
+                <p class="text-semibold">{{ issue_obj.issued_at|date:"d.m.Y" }}</p>
+            </div>
+        </div>
+
+        <a href="{% url 'frontend:my_books' %}" class="btn-primary w-full p-lg" style="background: linear-gradient(135deg, var(--secondary), #7c3aed);">
+            {% trans "Mening kitoblarimga qaytish" %}
+        </a>
+    </div>
+</div>
+
+<script>
+    let currentToken = "";
+    let qrInstance = null;
+    const manualIdEl = document.getElementById('manual-id-display');
+    const timerBar = document.getElementById('timer-bar');
+    const timerText = document.getElementById('timer-text');
+
+    function updateQR() {
+        fetch("{% url 'frontend:get_rotating_token' 'issue' issue_obj.id %}")
+            .then(res => res.json())
+            .then(data => {
+                if (data.token && data.token !== currentToken) {
+                    currentToken = data.token;
+                    manualIdEl.innerText = currentToken;
+
+                    const qrEl = document.getElementById("qrcode");
+                    qrEl.innerHTML = ""; // Clear existing
+
+                    qrInstance = new QRCode(qrEl, {
+                        text: currentToken,
+                        width: 250,
+                        height: 250,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                }
+            });
+    }
+
+    function updateTimer() {
+        const now = Math.floor(Date.now() / 1000);
+        const timeLeft = 120 - (now % 120);
+        const progress = (timeLeft / 120) * 100;
+
+        timerBar.style.width = progress + "%";
+
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerText.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        // Refresh QR just as it changes
+        if (timeLeft === 119 || currentToken === "") {
+            updateQR();
+        }
+    }
+
+    // Start timer
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    const statusUrl = "{% url 'frontend:check_return_status' issue_obj.id %}";
+    function checkStatus() {
+        fetch(statusUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_returned) {
+                    document.getElementById('instruction-state').style.display = 'none';
+                    document.getElementById('qr-container').style.display = 'none';
+                    document.getElementById('success-state').style.display = 'block';
+                    return;
+                }
+                setTimeout(checkStatus, 3000);
+            });
+    }
+    checkStatus();
+</script>
+{% endblock %}

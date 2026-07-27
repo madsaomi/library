@@ -1,0 +1,124 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "O'qituvchilar" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "O'qituvchilar ro'yxati" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="grid-3 stat-grid mb-xl">
+        <div class="glass-card stat-card p-md cursor-default">
+            <div class="stat-value text-xl" style="color: var(--secondary);">{{ total_teachers|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Jami o'qituvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card p-md cursor-default">
+            <div class="stat-value text-xl text-success">{{ entered_today|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Bugun kirdi" %}</div>
+        </div>
+        <a href="{% url 'frontend:teacher_add' %}" class="glass-card stat-card p-md d-flex align-center justify-center gap-xs text-decoration-none" style="border: 1px dashed var(--secondary);">
+            <i class="fas fa-plus" style="font-size: 0.8rem; color: var(--secondary);"></i>
+            <span class="text-sm text-medium" style="color: var(--secondary);">{% trans "Yangi o'qituvchi" %}</span>
+        </a>
+    </div>
+
+    <div class="glass-panel p-xl">
+        <div class="d-flex flex-between mb-lg">
+            <div class="pos-relative">
+                <input type="text" id="search-input" aria-label="{% trans 'Ism yoki login...' %}" placeholder="{% trans 'Ism yoki login...' %}"
+                       class="border rounded text-sm" style="padding: 8px 14px 8px 36px; background: var(--input-bg); color: var(--input-text); outline: none; width: 220px;">
+                <i class="fas fa-search pos-absolute text-muted text-sm" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
+            </div>
+            <div class="text-sm text-muted">{{ page_obj.paginator.count }} {% trans "ta o'qituvchi" %}</div>
+        </div>
+
+        <div class="info-grid" style="gap: 6px;">
+            {% for teacher in teachers %}
+            <div class="glass-card info-row teacher-row" data-search="{{ teacher.username|lower }} {{ teacher.first_name|lower }} {{ teacher.last_name|lower }} {{ teacher.subject|default:''|lower }}" style="padding: 10px 14px;">
+                <div class="d-flex align-center flex-1" style="gap: 10px; min-width: 0;">
+                    <div class="avatar-circle flex-shrink-0" style="width: 34px; height: 34px; background: linear-gradient(135deg, var(--secondary), #7c3aed);">
+                        <span class="avatar-initials text-sm">{{ teacher.first_name|first|upper }}{{ teacher.last_name|first|upper }}</span>
+                    </div>
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-semibold" style="font-size: 0.82rem;">{{ teacher.first_name }} {{ teacher.last_name }}</div>
+                        <div class="text-xs text-muted" style="margin-top: 1px;">
+                            <span>@{{ teacher.username }}</span>
+                            {% if teacher.subject %}
+                            <span class="badge ml-xs" style="background: rgba(168,85,247,0.1); color: #a855f7; padding: 1px 6px; border-radius: 4px; font-size: 0.6rem;">{{ teacher.subject }}</span>
+                            {% endif %}
+                            {% if teacher.birth_date %}
+                            <span class="ml-xs"><i class="far fa-calendar-alt"></i> {{ teacher.birth_date|date:"d.m.Y" }}</span>
+                            {% endif %}
+                        </div>
+                        {% if teacher.address %}
+                        <div class="text-xs text-muted" style="margin-top: 1px;"><i class="fas fa-map-marker-alt" style="font-size: 0.5rem;"></i> {{ teacher.address|truncatechars:30 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex align-center flex-shrink-0" style="gap: 10px;">
+                    <div class="d-flex align-center gap-xs">
+                        <span class="text-muted" style="font-family: monospace; font-size: 0.7rem;">••••••••</span>
+                    </div>
+                    <div class="d-flex gap-xs">
+                        <a href="{% url 'frontend:teacher_edit' teacher.pk %}" class="glass-card px-sm py-xs rounded-sm text-decoration-none text-xs text-nowrap" style="color: var(--secondary);"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'frontend:teacher_delete' teacher.pk %}" class="glass-card px-sm py-xs rounded-sm text-decoration-none text-xs text-nowrap text-danger"><i class="fas fa-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-users text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Foydalanuvchilar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha foydalanuvchilar ro'yxati bo'sh" %}</p>
+    </div>
+        {% endfor %}
+            <div id="no-results" class="d-none full-width p-3xl text-center text-muted text-md">
+                {% trans "Qidiruv bo'yicha hech narsa topilmadi" %}
+            </div>
+        </div>
+        <div class="mt-lg">
+            {% include 'pagination.html' %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+    const rows = document.querySelectorAll('.teacher-row');
+    const noResults = document.getElementById('no-results');
+    const emptyState = document.getElementById('empty-state');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (found === 0 && rows.length > 0) {
+            noResults.style.display = '';
+        } else {
+            noResults.style.display = 'none';
+        }
+        if (emptyState) {
+            emptyState.style.display = (query.length === 0 && rows.length === 0) ? '' : 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

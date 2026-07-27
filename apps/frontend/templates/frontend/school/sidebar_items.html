@@ -1,0 +1,56 @@
+{% load i18n %}
+{% load frontend_tags %}
+
+<div class="sidebar-section-label">{% trans "Asosiy" %}</div>
+<a href="{% url 'frontend:school_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'school_dashboard' %}active{% endif %}" data-name="bosh sahifa dashboard asosiy" {% if request.resolver_match.url_name == 'school_dashboard' %}aria-current="page"{% endif %}>
+    <i class="fas fa-chart-line"></i>
+    <span>{% trans "Dashboard" %}</span>
+</a>
+<a href="{% url 'frontend:school_statistics' %}" class="nav-link {% if request.resolver_match.url_name == 'school_statistics' %}active{% endif %}" data-name="statistika statistics" {% if request.resolver_match.url_name == 'school_statistics' %}aria-current="page"{% endif %}>
+    <i class="fas fa-chart-bar"></i>
+    <span>{% trans "Statistika" %}</span>
+</a>
+
+<div class="sidebar-section-label">{% trans "Boshqaruv" %}</div>
+<a href="{% url 'frontend:students_list' %}" class="nav-link {% if 'student' in request.resolver_match.url_name and request.resolver_match.url_name != 'graduates_list' %}active{% endif %}" data-name="oquvchilar students" {% if 'student' in request.resolver_match.url_name and request.resolver_match.url_name != 'graduates_list' %}aria-current="page"{% endif %}>
+    <i class="fas fa-users"></i>
+    <span>{% trans "O'quvchilar" %}</span>
+</a>
+<a href="{% url 'frontend:graduates_list' %}" class="nav-link {% if request.resolver_match.url_name == 'graduates_list' %}active{% endif %}" data-name="bitiruvchilar arxiv graduates" {% if request.resolver_match.url_name == 'graduates_list' %}aria-current="page"{% endif %}>
+    <i class="fas fa-graduation-cap"></i>
+    <span>{% trans "Bitiruvchilar" %}</span>
+</a>
+<a href="{% url 'frontend:teachers_list' %}" class="nav-link {% if 'teacher' in request.resolver_match.url_name %}active{% endif %}" data-name="oqituvchilar teachers" {% if 'teacher' in request.resolver_match.url_name %}aria-current="page"{% endif %}>
+    <i class="fas fa-chalkboard-teacher"></i>
+    <span>{% trans "O'qituvchilar" %}</span>
+</a>
+<a href="{% url 'frontend:school_books_list' %}" class="nav-link {% if 'book' in request.resolver_match.url_name and 'issued' not in request.resolver_match.url_name and 'history' not in request.resolver_match.url_name and 'textbook' not in request.resolver_match.url_name %}active{% endif %}" data-name="kitoblar books" {% if 'book' in request.resolver_match.url_name and 'issued' not in request.resolver_match.url_name and 'history' not in request.resolver_match.url_name and 'textbook' not in request.resolver_match.url_name %}aria-current="page"{% endif %}>
+    <i class="fas fa-book"></i>
+    <span>{% trans "Kitoblar" %}</span>
+</a>
+<a href="{% url 'frontend:textbook_loans' %}" class="nav-link {% if 'textbook' in request.resolver_match.url_name %}active{% endif %}" data-name="darsliklar textbooks" {% if 'textbook' in request.resolver_match.url_name %}aria-current="page"{% endif %}>
+    <i class="fas fa-book-open"></i>
+    <span>{% trans "Darsliklar" %}</span>
+</a>
+
+<div class="sidebar-section-label">{% trans "Faoliyat" %}</div>
+<a href="{% url 'frontend:issued_books_list' %}" class="nav-link {% if request.resolver_match.url_name == 'issued_books_list' %}active{% endif %}" data-name="oqilayotganlar active loans berilgan" {% if request.resolver_match.url_name == 'issued_books_list' %}aria-current="page"{% endif %}>
+    <i class="fas fa-hand-holding-heart"></i>
+    <span>{% trans "O'qilayotganlar" %}</span>
+</a>
+<a href="{% url 'frontend:history_list' %}" class="nav-link {% if request.resolver_match.url_name == 'history_list' %}active{% endif %}" data-name="tarix history" {% if request.resolver_match.url_name == 'history_list' %}aria-current="page"{% endif %}>
+    <i class="fas fa-history"></i>
+    <span>{% trans "Tarix" %}</span>
+</a>
+
+<div class="sidebar-section-label">{% trans "Kontent" %}</div>
+<a href="{% url 'frontend:school_news_list' %}" class="nav-link {% if 'news' in request.resolver_match.url_name %}active{% endif %}" data-name="yangiliklar news" {% if 'news' in request.resolver_match.url_name %}aria-current="page"{% endif %}>
+    <i class="fas fa-newspaper"></i>
+    <span>{% trans "Yangiliklar" %}</span>
+</a>
+
+<div class="sidebar-section-label">{% trans "Boshqa" %}</div>
+<a href="{% url 'frontend:qr_scanner' %}" class="nav-link {% if request.resolver_match.url_name == 'qr_scanner' %}active{% endif %}" data-name="qr skaner scanner" {% if request.resolver_match.url_name == 'qr_scanner' %}aria-current="page"{% endif %}>
+    <i class="fas fa-qrcode"></i>
+    <span>{% trans "QR Skaner" %}</span>
+</a>

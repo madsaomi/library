@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load compress %}
 {% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
@@ -7,67 +8,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>500 - {% trans "Tizimda xatolik" %}</title>
+    {% compress css %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.6">
+    {% endcompress %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-dark, #121212);
-        }
-        .error-container {
-            max-width: 500px;
-            width: 90%;
-            margin: 0 auto;
-            text-align: center;
-        }
-        .theme-toggle-btn {
-            position: fixed; top: 20px; right: 20px; z-index: 999;
-            background: var(--hover-bg); border: 1px solid var(--border);
-            color: var(--text-muted); width: 45px; height: 45px;
-            border-radius: 12px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px); transition: 0.3s;
-        }
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-dark, #121212); }
+        .error-container { max-width: 500px; width: 90%; margin: 0 auto; text-align: center; }
     </style>
 </head>
 <body>
-    <button class="theme-toggle-btn" onclick="toggleTheme()">
+    <button class="pos-fixed bg-hover border text-muted rounded-md cursor-pointer d-flex flex-center transition" onclick="cycleTheme()" style="top: 20px; right: 20px; z-index: 999; width: 45px; height: 45px; backdrop-filter: blur(10px);">
         <i id="themeIcon" class="fas fa-moon"></i>
     </button>
     <div class="error-container">
-        <div class="glass-panel animate-fade" style="padding: 60px;">
-            <i class="fas fa-exclamation-circle" style="font-size: 5rem; color: #ef4444; margin-bottom: 30px; opacity: 0.5;"></i>
-            <h2 style="margin-bottom: 20px;">{% trans "Tizimda kutilmagan xatolik yuz berdi" %}</h2>
-            <p style="color: var(--text-muted); margin-bottom: 40px; line-height: 1.6;">
-                {% trans "Biz bu haqda xabar topdik va tez orada muammoni bartaraf etamiz. Iltimos, birozdan so'ng qayta urinib ko'ring." %}
-            </p>
-            <a href="/" class="btn-primary" style="padding: 15px 40px; text-decoration: none; display: inline-block;">
+        <div class="glass-panel animate-fade p-3xl">
+            <i class="fas fa-exclamation-circle d-block mx-auto mb-2xl text-danger" style="font-size: 5rem; opacity: 0.5;"></i>
+            <h2 class="mb-xl">{% trans "Tizimda kutilmagan xatolik yuz berdi" %}</h2>
+            <p class="text-muted mb-2xl lh-normal">{% trans "Biz bu haqda xabar topdik va tez orada muammoni bartaraf etamiz. Iltimos, birozdan so'ng qayta urinib ko'ring." %}</p>
+            <a href="/" class="btn-primary text-decoration-none d-inline-block" style="padding: 15px 40px;">
                 <i class="fas fa-home"></i> {% trans "Bosh sahifaga qaytish" %}
             </a>
         </div>
     </div>
     <script>
-        function toggleTheme() {
+        // Theme cycling: dark -> light -> autumn -> winter -> dark
+        function cycleTheme() {
             const html = document.documentElement;
-            const isLight = html.getAttribute('data-theme') === 'light';
-            html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-            localStorage.setItem('theme', isLight ? 'dark' : 'light');
+            const current = html.getAttribute('data-theme') || 'dark';
+            const themes = ['dark', 'light', 'autumn', 'winter'];
+            const idx = themes.indexOf(current);
+            const next = themes[(idx + 1) % themes.length];
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
             updateThemeIcon();
         }
+
         function updateThemeIcon() {
             const icon = document.getElementById('themeIcon');
             if (!icon) return;
-            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const icons = { 'dark': 'fa-moon', 'light': 'fa-sun', 'autumn': 'fa-leaf', 'winter': 'fa-snowflake' };
+            icon.className = 'fas ' + (icons[theme] || 'fa-moon');
         }
+
+        // Apply saved theme on load
         (function() {
             const saved = localStorage.getItem('theme');
-            if (saved === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
+            const themes = ['dark', 'light', 'autumn', 'winter'];
+            if (saved && themes.includes(saved)) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else {
+                const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+                document.documentElement.setAttribute('data-theme', prefersLight ? 'light' : 'dark');
             }
             updateThemeIcon();
         })();

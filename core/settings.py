@@ -12,11 +12,16 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
-from django.core.exceptions import ImproperlyConfigured
+
 import django.conf.locale
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+import sys
+
+sys.path.insert(0, str(BASE_DIR / 'apps'))
 
 # Ensure logs directory exists
 LOGS_DIR = BASE_DIR / 'logs'
@@ -28,35 +33,90 @@ LOGS_DIR.mkdir(exist_ok=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 import sys as _sys
+
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 't')
-_dev_cmds = {'runserver', 'migrate', 'makemigrations', 'showmigrations', 'sqlmigrate', 'shell', 'dbshell', 'compilemessages', 'check', 'flush', 'loaddata', 'dumpdata', 'collectstatic', 'ensure_admin'}
+_dev_cmds = {
+    'runserver',
+    'migrate',
+    'makemigrations',
+    'showmigrations',
+    'sqlmigrate',
+    'shell',
+    'dbshell',
+    'compilemessages',
+    'check',
+    'flush',
+    'loaddata',
+    'dumpdata',
+    'collectstatic',
+    'ensure_admin',
+}
 if not DEBUG and any(cmd in _sys.argv for cmd in _dev_cmds):
     DEBUG = True
     import warnings as _w
-    _w.warn("DEBUG auto-enabled for development command. Set DEBUG=True in .env to silence this.")
+
+    _w.warn('DEBUG auto-enabled for development command. Set DEBUG=True in .env to silence this.')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
     _is_test = 'test' in _sys.argv or bool(_sys.modules.get('pytest'))
     if DEBUG or _is_test:
-        SECRET_KEY = 'dev-only-change-in-production'
+        SECRET_KEY = 'django-insecure-dev-key-change-in-production-only-32bytes-secret-token'
     else:
         raise ImproperlyConfigured('SECRET_KEY environment variable is required when DEBUG=False')
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '.railway.app,localhost,127.0.0.1').split(',')
 
 # Security settings for Production (Railway)
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://*.railway.app,http://localhost:8000,http://127.0.0.1:8000').split(',')
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    'CSRF_TRUSTED_ORIGINS', 'https://*.railway.app,http://localhost:8000,http://127.0.0.1:8000'
+).split(',')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Only require secure cookies in production to allow local HTTP testing
+# Security settings (production only)
 if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('SECURE_COOKIES', 'False').lower() in ('true', '1', 't'):
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SAMESITE = 'None'
     CSRF_COOKIE_SECURE = True
 else:
+    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SECURE = False
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = 'same-origin'
+X_FRAME_OPTIONS = 'DENY'
+
+# Content Security Policy
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = (
+    "'self'",
+    "'unsafe-inline'",
+    'https://fonts.googleapis.com',
+    'https://cdnjs.cloudflare.com',
+    'https://cdn.jsdelivr.net',
+)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "'unsafe-inline'",
+    'https://cdnjs.cloudflare.com',
+    'https://cdn.jsdelivr.net',
+    'https://code.jquery.com',
+)
+CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com')
+CSP_IMG_SRC = ("'self'", 'data:', 'blob:')
+CSP_CONNECT_SRC = ("'self'", 'ws://localhost:8000', 'wss://*.railway.app')
+CSP_FRAME_SRC = ("'none'",)
+CSP_OBJECT_SRC = ("'none'",)
+CSP_BASE_URI = ("'self'",)
+CSP_FORM_ACTION = ("'self'",)
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
@@ -73,28 +133,34 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@kutubxona.uz'
 
 INSTALLED_APPS = [
     'jazzmin',
+    'compressor',
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     # Third party apps
     'corsheaders',
     'axes',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
+    'django_celery_beat',
     'django.contrib.postgres',
-
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     # Local apps
     'core',
     'accounts',
     'schools',
     'books',
     'stats',
-    'frontend_admin',
-    'frontend_school',
-    'frontend_user',
+    'frontend',
     'notifications',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -105,6 +171,7 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'csp.middleware.CSPMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'axes.middleware.AxesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -132,6 +199,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'core.asgi.application'
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
@@ -140,7 +208,7 @@ import dj_database_url
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
     )
 }
 
@@ -161,11 +229,11 @@ CACHE_MIDDLEWARE_KEY_PREFIX = 'kutubxona'
 
 # Static files storage for Whitenoise
 STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
     },
 }
 WHITENOISE_MANIFEST_STRICT = False
@@ -199,7 +267,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Add Karakalpak (kaa) to Django's supported languages info
 EXTRA_LANG_INFO = {
     'kaa': {
-        'bidi': False, # left-to-right
+        'bidi': False,  # left-to-right
         'code': 'kaa',
         'name': 'Karakalpak',
         'name_local': 'Qaraqalpaqsha',
@@ -231,14 +299,16 @@ LOCALE_PATHS = [
 # Add Karakalpak (kaa) to Django's internal language info to prevent KeyErrors
 LANG_INFO = django.conf.locale.LANG_INFO
 if 'kaa' not in LANG_INFO:
-    LANG_INFO.update({
-        'kaa': {
-            'bidi': False,
-            'code': 'kaa',
-            'name': 'Karakalpak',
-            'name_local': 'Qaraqalpaqsha',
-        },
-    })
+    LANG_INFO.update(
+        {
+            'kaa': {
+                'bidi': False,
+                'code': 'kaa',
+                'name': 'Karakalpak',
+                'name_local': 'Qaraqalpaqsha',
+            },
+        }
+    )
 
 
 # Static files (CSS, JavaScript, Images)
@@ -247,6 +317,17 @@ if 'kaa' not in LANG_INFO:
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+]
+
+COMPRESS_ENABLED = os.environ.get('COMPRESS_ENABLED', 'True').lower() in ('true', '1', 't')
+COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.rCSSMinFilter']
+COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
+COMPRESS_OUTPUT_DIR = 'compressor'
+COMPRESS_STORAGE = 'compressor.storage.CompressorFileStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -317,3 +398,164 @@ LOGGING = {
         },
     },
 }
+
+# Jazzmin Admin UI
+JAZZMIN_SETTINGS = {
+    'site_title': 'Online Kutubxona Admin',
+    'site_header': 'Online Kutubxona',
+    'site_brand': 'Kutubxona',
+    'welcome_sign': 'Xush kelibsiz!',
+    'copyright': 'Online Kutubxona',
+    'search_model': ['accounts.CustomUser', 'schools.School', 'books.Book'],
+    'topmenu_links': [
+        {'name': 'Bosh sahifa', 'url': 'admin:index', 'permissions': ['auth.view_user']},
+        {'model': 'accounts.CustomUser'},
+        {'app': 'books'},
+    ],
+    'usermenu_links': [
+        {'name': 'Saytga qaytish', 'url': '/', 'new_window': True},
+    ],
+    'show_sidebar': True,
+    'navigation_expanded': True,
+    'hide_apps': ['axes', 'token_blacklist'],
+    'hide_models': ['auth.Group'],
+    'order_with_respect_to': ['accounts', 'schools', 'books', 'stats', 'notifications'],
+    'icons': {
+        'accounts.CustomUser': 'fas fa-users',
+        'schools.District': 'fas fa-map-marker-alt',
+        'schools.School': 'fas fa-school',
+        'schools.Institution': 'fas fa-university',
+        'schools.Subject': 'fas fa-book-open',
+        'schools.News': 'fas fa-newspaper',
+        'schools.GradePromotionLog': 'fas fa-arrow-up',
+        'books.Category': 'fas fa-tags',
+        'books.Book': 'fas fa-book',
+        'books.BookIssue': 'fas fa-hand-holding',
+        'books.TextbookLoan': 'fas fa-book-reader',
+        'books.BookRequest': 'fas fa-clipboard-list',
+        'books.BookWaitlist': 'fas fa-clock',
+        'books.Achievement': 'fas fa-trophy',
+        'books.UserAchievement': 'fas fa-medal',
+        'books.Challenge': 'fas fa-gamepad',
+        'books.UserChallenge': 'fas fa-check-double',
+        'books.ReaderOfMonth': 'fas fa-star',
+        'stats.ActionLog': 'fas fa-history',
+        'notifications.PushSubscription': 'fas fa-bell',
+        'notifications.Notification': 'fas fa-envelope',
+    },
+    'default_icon_parents': 'fas fa-chevron-circle-right',
+    'default_icon_children': 'fas fa-circle',
+}
+
+JAZZMIN_UI_TWEAKS = {
+    'navbar_small_text': False,
+    'footer_small_text': False,
+    'body_small_text': False,
+    'brand_small_text': False,
+    'brand_colour': 'navbar-success',
+    'accent': 'accent-primary',
+    'navbar': 'navbar-dark',
+    'no_navbar_border': False,
+    'navbar_fixed': True,
+    'layout_boxed': False,
+    'footer_fixed': False,
+    'sidebar_fixed': True,
+    'sidebar': 'sidebar-dark-success',
+    'sidebar_nav_small_text': False,
+    'sidebar_disable_expand': False,
+    'sidebar_nav_child_indent': True,
+    'sidebar_nav_compact_style': False,
+    'sidebar_nav_legacy_style': False,
+    'sidebar_nav_flat_style': False,
+    'theme': 'default',
+    'dark_mode_theme': 'darkly',
+    'button_classes': {
+        'primary': 'btn-primary',
+        'secondary': 'btn-secondary',
+        'info': 'btn-info',
+        'warning': 'btn-warning',
+        'danger': 'btn-danger',
+        'success': 'btn-success',
+    },
+}
+
+# Django REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 24,
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/hour',
+    },
+}
+
+# drf-spectacular
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Online Kutubxona API',
+    'DESCRIPTION': 'School Library Management System API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+}
+
+# Celery (async task queue)
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Channels (WebSocket)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': os.environ.get(
+            'CHANNEL_LAYER_BACKEND',
+            'channels.layers.InMemoryChannelLayer',
+        ),
+        'LOCATION': os.environ.get(
+            'CHANNEL_LAYER_REDIS_URL',
+            'redis://localhost:6379/1',
+        ),
+    },
+}
+
+# Sentry (error monitoring)
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_dsn = os.environ.get('SENTRY_DSN', '')
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        integrations=[DjangoIntegration()],
+        send_default_pii=False,
+        traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0.1')),
+    )

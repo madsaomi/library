@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "O'chirish" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "O'chirishni tasdiqlash" %}{% endblock %}
+
+{% block content %}
+<div class="mw-500 mx-auto">
+    <div class="glass-panel animate-fade p-3xl text-center">
+        <i class="fas fa-exclamation-triangle text-2xl text-danger" style="opacity: 0.6; margin-bottom: 16px;"></i>
+        <p class="mb-2xl text-md">{% blocktrans %}Haqiqatdan ham "{{ object }}" o'chirmoqchimisiz?{% endblocktrans %}</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-md">
+                <button type="submit" class="btn-primary flex-1 p-md text-md bg-danger border-none">{% trans "O'chirish" %}</button>
+                <a href="javascript:history.back()" class="glass-card flex-1 p-md text-center text-decoration-none text-muted text-md border">{% trans "Bekor qilish" %}</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "O'quvchilar" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "O'quvchilar ro'yxati" %}{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="grid-4 stat-grid mb-xl">
+        <div class="glass-card stat-card p-lg" style="cursor: default;">
+            <div class="stat-value text-xl text-primary">{{ total_students|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Jami o'quvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card p-lg" style="cursor: default;">
+            <div class="stat-value text-xl text-success">{{ reading_students|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Kitob o'qiyotganlar" %}</div>
+        </div>
+        <div class="glass-card stat-card p-lg" style="cursor: default;">
+            <div class="stat-value text-xl" style="color: #6366f1;">{{ entered_today|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Bugun kirdi" %}</div>
+        </div>
+        <a href="{% url 'frontend:student_add' %}" class="glass-card stat-card d-flex flex-center text-decoration-none p-lg" style="gap: 6px; border: 1px dashed var(--primary);">
+            <i class="fas fa-plus text-primary text-md"></i>
+            <span class="text-xs text-medium text-primary">{% trans "Yangi o'quvchi" %}</span>
+        </a>
+        <a href="{% url 'frontend:import_students_csv' %}" class="glass-card stat-card d-flex flex-center text-decoration-none p-lg" style="gap: 6px; border: 1px dashed var(--accent);">
+            <i class="fas fa-file-csv text-md" style="color: var(--accent);"></i>
+            <span class="text-xs text-medium" style="color: var(--accent);">{% trans "Import CSV" %}</span>
+        </a>
+    </div>
+
+    <div class="d-flex gap-sm align-center flex-wrap mb-lg">
+        <a href="{% url 'frontend:graduates_list' %}" class="glass-card d-inline-flex align-center text-decoration-none rounded-md p-sm text-md" style="gap: 6px; color: var(--text);">
+            <i class="fas fa-graduation-cap"></i> {% trans "Bitiruvchilar" %}
+        </a>
+    </div>
+
+    <div class="d-flex align-center justify-between flex-wrap mb-lg" style="gap: 8px;">
+        <div class="d-flex align-center gap-sm flex-wrap">
+            <a href="{% url 'frontend:students_list' %}" class="glass-card text-decoration-none rounded-xs p-xs text-xs" style="{% if not selected_grade %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{% trans "Barcha sinflar" %}</a>
+            {% for g in grades_list %}
+            <a href="{% url 'frontend:students_list' %}?grade={{ g|urlencode }}" class="glass-card text-decoration-none rounded-xs p-xs text-xs" style="{% if selected_grade == g %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{{ g }} {% trans "sinf" %}</a>
+            {% endfor %}
+        </div>
+        <div class="d-flex align-center gap-sm">
+            <div class="pos-relative">
+                <input type="text" id="search-input" aria-label="{% trans 'Ism, login yoki sinf...' %}" placeholder="{% trans 'Ism, login yoki sinf...' %}"
+                       class="form-control" style="padding: 8px 14px 8px 36px; width: 200px; font-size: 0.8rem; border-radius: 8px;">
+                <i class="fas fa-search pos-absolute text-muted text-md" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
+            </div>
+            <div class="text-xs text-muted text-nowrap">{{ page_obj.paginator.count }} {% trans "ta o'quvchi" %}</div>
+            <a href="{% url 'frontend:export_students_csv' %}" class="glass-card d-flex align-center text-decoration-none text-muted text-xs border p-sm rounded-md" style="gap: 5px;">
+                <i class="fas fa-download"></i> CSV
+            </a>
+        </div>
+    </div>
+
+    <div class="glass-panel p-xl">
+        <div class="info-grid" style="gap: 6px;">
+            {% regroup students by grade as grade_groups %}
+            {% for grade_group in grade_groups %}
+            {% if grade_group.grouper %}
+            <div class="d-flex align-center gap-sm border-bottom p-xs mt-sm" style="grid-column: 1 / -1;">
+                <i class="fas fa-layer-group text-xs text-primary"></i>
+                <span class="text-bold text-md">{{ grade_group.grouper }} {% trans "sinf" %}</span>
+                <span class="text-xs text-muted bg-glass px-sm" style="border-radius: 8px; padding-top: 1px; padding-bottom: 1px;">{{ grade_group.list|length }}</span>
+            </div>
+            {% endif %}
+            {% for student in grade_group.list %}
+            <div class="glass-card info-row student-row p-md" data-search="{{ student.username|lower }} {{ student.first_name|lower }} {{ student.last_name|lower }} {{ student.grade|lower }}">
+                <a href="{% url 'frontend:student_detail' student.pk %}" class="d-flex align-center text-decoration-none" style="gap: 10px; flex: 1; min-width: 0; color: inherit;">
+                    <div class="d-flex flex-center flex-shrink-0 rounded-full" style="width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), #a855f7);">
+                        <span class="text-bold text-white text-xs">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</span>
+                    </div>
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-semibold text-md">{{ student.first_name }} {{ student.last_name }}</div>
+                        <div class="text-xs text-muted mt-xs">
+                            <span>@{{ student.username }}</span>
+                            {% if student.birth_date %}
+                            <span class="ml-xs"><i class="far fa-calendar-alt"></i> {{ student.birth_date|date:"d.m.Y" }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                <div class="d-flex align-center gap-sm flex-shrink-0">
+                    <div class="d-flex align-center gap-xs">
+                        <span class="text-muted text-xs" style="font-family: monospace;">••••••••</span>
+                    </div>
+                    <div class="d-flex gap-xs">
+                        <a href="{% url 'frontend:student_edit' student.pk %}" class="glass-card text-decoration-none text-primary text-xs p-xs rounded-xs" style="white-space: nowrap;"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'frontend:student_delete' student.pk %}" class="glass-card text-decoration-none rounded-xs p-xs text-xs" style="color: #ef4444; white-space: nowrap;"><i class="fas fa-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-users text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Foydalanuvchilar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha foydalanuvchilar ro'yxati bo'sh" %}</p>
+    </div>
+        {% endfor %}
+            <div id="no-results" class="d-none text-center text-muted text-md p-2xl" style="grid-column: 1 / -1;">
+                {% trans "Qidiruv bo'yicha hech narsa topilmadi" %}
+            </div>
+        </div>
+        <div class="mt-lg">{% include 'pagination.html' %}</div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+    const rows = document.querySelectorAll('.student-row');
+    const noResults = document.getElementById('no-results');
+    const emptyState = document.getElementById('empty-state');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (found === 0 && rows.length > 0) {
+            noResults.style.display = '';
+        } else {
+            noResults.style.display = 'none';
+        }
+        if (emptyState) {
+            emptyState.style.display = (query.length === 0 && rows.length === 0) ? '' : 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

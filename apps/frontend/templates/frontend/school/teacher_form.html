@@ -1,0 +1,58 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="mw-500 mx-auto">
+    <div class="glass-panel animate-fade p-3xl">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="d-flex flex-column gap-xl">
+                {% for field in form %}
+                <div>
+                    <label class="d-block mb-xs text-medium text-sm text-muted">
+                        {% if field.name == 'first_name' %}<i class="fas fa-user-tie mr-xs" style="color: var(--secondary);"></i>{% endif %}
+                        {% if field.name == 'last_name' %}<i class="fas fa-user-tie mr-xs" style="color: var(--secondary);"></i>{% endif %}
+                        {% if field.name == 'subject' %}<i class="fas fa-book-reader mr-xs" style="color: #f59e0b;"></i>{% endif %}
+                        {% if field.name == 'address' %}<i class="fas fa-map-marker-alt text-muted mr-xs"></i>{% endif %}
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-2xl d-flex gap-md">
+                <button type="submit" class="btn-primary text-md rounded-md" style="flex: 2; padding: 10px 0;">
+                    <i class="fas fa-save"></i> {% trans "Saqlash" %}
+                </button>
+                <a href="{% url 'frontend:teachers_list' %}" class="glass-card flex-1 rounded-md text-center text-decoration-none d-flex align-center justify-center border text-md" style="padding: 10px 0; gap: 6px;">
+                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<datalist id="subject-list">
+    {% for subject in form.subjects %}
+    <option value="{{ subject.name }}">
+    {% endfor %}
+</datalist>
+
+<style>
+    .form-control { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--input-text); outline: none; font-size: 0.85rem; transition: 0.3s; box-sizing: border-box; }
+    .form-control:focus { border-color: var(--secondary); }
+    select.form-control { appearance: auto; }
+</style>
+{% endblock %}

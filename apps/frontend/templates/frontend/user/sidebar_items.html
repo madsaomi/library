@@ -1,0 +1,22 @@
+{% load i18n %}
+<a href="{% url 'frontend:library' %}" class="nav-link {% if request.resolver_match.url_name == 'library' %}active{% endif %}" {% if request.resolver_match.url_name == 'library' %}aria-current="page"{% endif %}>
+    <i class="fas fa-home"></i> <span>{% trans "Kutubxona" %}</span>
+</a>
+<a href="{% url 'frontend:my_books' %}" class="nav-link {% if request.resolver_match.url_name == 'my_books' or 'qr' in request.resolver_match.url_name %}active{% endif %}" {% if request.resolver_match.url_name == 'my_books' or 'qr' in request.resolver_match.url_name %}aria-current="page"{% endif %}>
+    <i class="fas fa-bookmark"></i> <span>{% trans "Mening kitoblarim" %}</span>
+</a>
+<a href="{% url 'frontend:achievements' %}" class="nav-link {% if request.resolver_match.url_name == 'achievements' %}active{% endif %}" {% if request.resolver_match.url_name == 'achievements' %}aria-current="page"{% endif %}>
+    <i class="fas fa-trophy"></i> <span>{% trans "Yutuqlar" %}</span>
+</a>
+<a href="{% url 'frontend:leaderboard' %}" class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}" {% if request.resolver_match.url_name == 'leaderboard' %}aria-current="page"{% endif %}>
+    <i class="fas fa-crown"></i> <span>{% trans "Top o'quvchilar" %}</span>
+</a>
+<a href="{% url 'frontend:my_class' %}" class="nav-link {% if request.resolver_match.url_name == 'my_class' %}active{% endif %}" {% if request.resolver_match.url_name == 'my_class' %}aria-current="page"{% endif %}>
+    <i class="fas fa-users"></i> <span>{% trans "Mening sinfim" %}</span>
+</a>
+<a href="{% url 'frontend:challenges' %}" class="nav-link {% if request.resolver_match.url_name == 'challenges' %}active{% endif %}" {% if request.resolver_match.url_name == 'challenges' %}aria-current="page"{% endif %}>
+    <i class="fas fa-bolt"></i> <span>{% trans "Chellenjlar" %}</span>
+</a>
+<a href="{% url 'frontend:user_news_list' %}" class="nav-link {% if request.resolver_match.url_name == 'user_news_list' %}active{% endif %}" {% if request.resolver_match.url_name == 'user_news_list' %}aria-current="page"{% endif %}>
+    <i class="fas fa-newspaper"></i> <span>{% trans "Yangiliklar" %}</span>
+</a>

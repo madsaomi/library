@@ -1,0 +1,94 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Darsliklar" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Darslik ijaralari" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="grid-4 stat-grid mb-xl">
+        <div class="glass-card stat-card p-md cursor-default">
+            <div class="stat-value text-xl text-primary">{{ total_loans|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Jami" %}</div>
+        </div>
+        <div class="glass-card stat-card p-md cursor-default">
+            <div class="stat-value text-xl text-success">{{ active_loans|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Faol" %}</div>
+        </div>
+        <div class="glass-card stat-card p-md cursor-default">
+            <div class="stat-value text-xl" style="color: #6366f1;">{{ returned_loans|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Qaytarilgan" %}</div>
+        </div>
+        <a href="{% url 'frontend:textbook_distribute' %}" class="glass-card stat-card p-md d-flex align-center justify-center gap-xs text-decoration-none" style="border: 1px dashed var(--accent);">
+            <i class="fas fa-plus" style="font-size: 0.8rem; color: var(--accent);"></i>
+            <span class="text-sm text-medium" style="color: var(--accent);">{% trans "Tarqatish" %}</span>
+        </a>
+    </div>
+
+    <div class="d-flex flex-between gap-sm flex-wrap mb-md">
+        <div class="d-flex align-center gap-sm flex-wrap">
+            <a href="{% url 'frontend:textbook_loans' %}" class="glass-card py-xs px-md text-sm text-decoration-none rounded-sm" style="{% if not selected_grade %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{% trans "Barcha sinflar" %}</a>
+            {% for g in grades_list %}
+            <a href="{% url 'frontend:textbook_loans' %}?grade={{ g|urlencode }}" class="glass-card py-xs px-md text-sm text-decoration-none rounded-sm" style="{% if selected_grade == g %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{{ g }} {% trans "sinf" %}</a>
+            {% endfor %}
+        </div>
+        <div>
+            <a href="{% url 'frontend:textbook_collect' %}" class="btn-primary py-sm px-lg text-sm text-decoration-none rounded d-flex align-center" style="gap: 6px;">
+                <i class="fas fa-undo-alt"></i> {% trans "Qaytarib olish" %}
+            </a>
+        </div>
+    </div>
+
+    <div class="glass-panel p-xl">
+        <div class="info-grid gap-xs">
+            {% for loan in loans %}
+            <div class="glass-card info-row d-flex flex-column align-start" style="padding: 10px 14px; gap: 4px;">
+                <div class="d-flex align-center w-full" style="gap: 10px;">
+                    <div class="avatar-circle flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #d97706, #f59e0b);">
+                        <span class="avatar-initials text-xs">{{ loan.student.first_name|first|upper }}{{ loan.student.last_name|first|upper }}</span>
+                    </div>
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-semibold" style="font-size: 0.82rem;">{{ loan.student.first_name }} {{ loan.student.last_name }}</div>
+                        <div class="text-xs text-muted">
+                            <span class="badge" style="background: rgba(217,119,6,0.1); color: #d97706; padding: 1px 6px; border-radius: 4px; font-size: 0.6rem;">{{ loan.student.grade }}</span>
+                            <span class="ml-xs"><i class="fas fa-book-open"></i> {{ loan.book.title }}</span>
+                            {% if loan.book.subject %}<span class="ml-xs text-xs text-muted">({{ loan.book.subject }})</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        {% if loan.returned_at %}
+                        <span class="text-xs" style="color: #6366f1;"><i class="fas fa-check-circle"></i> {{ loan.returned_at|date:"d.m.Y" }}</span>
+                        {% else %}
+                        <span class="text-xs text-success"><i class="fas fa-clock"></i> {% trans "Faol" %}</span>
+                        {% endif %}
+                        <div class="text-xs text-muted mt-xs">{{ loan.academic_year }}</div>
+                    </div>
+                </div>
+                {% if loan.condition_on_issue or loan.notes %}
+                <div class="text-xs text-muted" style="padding-left: 42px;">
+                    {% if loan.condition_on_issue %}<span>{% trans "Holati" %}: {{ loan.get_condition_on_issue_display }}</span>{% endif %}
+                    {% if loan.notes %}<span class="ml-sm"><i class="fas fa-comment"></i> {{ loan.notes }}</span>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-book text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
+    </div>
+        {% endfor %}
+        </div>
+        <div class="mt-lg">
+            {% include 'pagination.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

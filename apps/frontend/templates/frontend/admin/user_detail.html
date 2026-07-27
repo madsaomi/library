@@ -1,0 +1,112 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ u.username }} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{{ u.get_full_name|default:u.username }}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/admin/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade mw-800 mx-auto">
+    <div class="glass-panel p-3xl">
+        <div class="d-flex align-center gap-lg mb-2xl">
+            <div class="avatar-circle flex-center flex-shrink-0" style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                <span class="avatar-initials text-white text-bold text-lg">
+                    {{ u.first_name|first|default:u.username|first|upper }}{{ u.last_name|first|upper }}
+                </span>
+            </div>
+            <div>
+                <div class="text-semibold text-lg">{{ u.get_full_name|default:u.username }}</div>
+                <div class="text-muted text-md">
+                    <span class="badge text-primary p-sm rounded-sm text-sm" style="background: rgba(168,85,247,0.1);">{{ u.get_role_display }}</span>
+                    {% if u.is_active %}
+                    <span class="text-success text-sm ml-sm"><i class="fas fa-circle text-xs mr-xs"></i>{% trans "Faol" %}</span>
+                    {% else %}
+                    <span class="text-danger text-sm ml-sm"><i class="fas fa-circle text-xs mr-xs"></i>{% trans "Faolsiz" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-3 stat-grid mb-2xl">
+            <div class="glass-card stat-card p-md cursor-default">
+                <div class="stat-value" style="font-size: 1.1rem; color: var(--primary);">{{ total_read }}</div>
+                <div class="stat-label text-xs">{% trans "O'qilgan" %}</div>
+            </div>
+            <div class="glass-card stat-card p-md cursor-default">
+                <div class="stat-value" style="font-size: 1.1rem; color: #f59e0b;">{{ issued_count }}</div>
+                <div class="stat-label text-xs">{% trans "Aktiv ijaralar" %}</div>
+            </div>
+            <div class="glass-card stat-card p-md cursor-default">
+                <div class="stat-value" style="font-size: 1.1rem; color: #10b981;">{{ u.xp_points|default:0 }}</div>
+                <div class="stat-label text-xs">{% trans "XP ball" %}</div>
+            </div>
+        </div>
+
+        <div class="info-grid mb-2xl">
+            <div class="info-row border-bottom p-md py-sm">
+                <span class="info-label text-muted text-sm">{% trans "Username" %}</span>
+                <span class="info-value text-md">{{ u.username }}</span>
+            </div>
+            <div class="info-row border-bottom p-md py-sm">
+                <span class="info-label text-muted text-sm">{% trans "To'liq ism" %}</span>
+                <span class="info-value text-md">{{ u.get_full_name|default:"—" }}</span>
+            </div>
+            <div class="info-row border-bottom p-md py-sm">
+                <span class="info-label text-muted text-sm">{% trans "Elektron pochta" %}</span>
+                <span class="info-value text-md">{{ u.email|default:"—" }}</span>
+            </div>
+            {% if u.grade %}
+            <div class="info-row border-bottom p-md py-sm">
+                <span class="info-label text-muted text-sm">{% trans "Sinf" %}</span>
+                <span class="info-value text-md">{{ u.grade }}</span>
+            </div>
+            {% endif %}
+            <div class="info-row border-bottom p-md py-sm">
+                <span class="info-label text-muted text-sm">{% trans "Maktab" %}</span>
+                <span class="info-value text-md">{% if u.school %}{{ u.school.name }}{% else %}—{% endif %}</span>
+            </div>
+            <div class="info-row border-bottom p-md py-sm">
+                <span class="info-label text-muted text-sm">{% trans "Oxirgi kirish" %}</span>
+                <span class="info-value text-md">{{ u.last_login|date:"Y-m-d H:i"|default:"—" }}</span>
+            </div>
+            <div class="info-row p-md py-sm">
+                <span class="info-label text-muted text-sm">{% trans "Ro'yxatdan o'tgan" %}</span>
+                <span class="info-value text-md">{{ u.date_joined|date:"Y-m-d H:i" }}</span>
+            </div>
+        </div>
+
+        {% if issues %}
+        <h3 class="section-title text-md mb-md">
+            <i class="fas fa-history text-primary text-md"></i> {% trans "Kitob olish tarixi" %}
+        </h3>
+        <div class="activity-list">
+            {% for issue in issues %}
+            <div class="activity-item py-sm border-bottom">
+                <div class="flex-between align-center">
+                    <div class="d-flex align-center gap-sm">
+                        {% if issue.is_returned %}
+                        <span class="text-success text-xs"><i class="fas fa-check-circle"></i></span>
+                        {% else %}
+                        <span class="text-xs" style="color: #f59e0b;"><i class="fas fa-book-open"></i></span>
+                        {% endif %}
+                        <span class="text-md">{{ issue.book.title|truncatechars:40 }}</span>
+                    </div>
+                    <span class="text-muted text-xs">
+                        {{ issue.issued_at|date:"Y-m-d" }}
+                        {% if issue.is_returned %}→ {{ issue.returned_at|date:"Y-m-d" }}{% endif %}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <a href="{% url 'frontend:all_users_list' %}" class="btn-primary mt-2xl py-md text-decoration-none text-md d-flex align-center justify-center gap-sm w-full">
+            <i class="fas fa-arrow-left"></i> {% trans "Orqaga" %}
+        </a>
+    </div>
+</div>
+{% endblock %}

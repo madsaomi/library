@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.14"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Ruff check
+        run: ruff check .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.14"]
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: kutubxona
+          POSTGRES_USER: kutubxona
+          POSTGRES_PASSWORD: kutubxona
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check Django system
+        run: python manage.py check
+        env:
+          DEBUG: "True"
+          SECRET_KEY: test
+
+      - name: Run migrations
+        run: python manage.py migrate
+        env:
+          DEBUG: "True"
+          SECRET_KEY: test
+          DATABASE_URL: postgres://kutubxona:kutubxona@localhost:5432/kutubxona
+
+      - name: Run tests with coverage
+        run: pytest --cov --cov-report=xml --cov-report=term
+        env:
+          DEBUG: "True"
+          SECRET_KEY: test
+          DATABASE_URL: postgres://kutubxona:kutubxona@localhost:5432/kutubxona
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+          flags: unittests
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: kutubxona
+          POSTGRES_USER: kutubxona
+          POSTGRES_PASSWORD: kutubxona
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright pytest-playwright
+
+      - name: Install Playwright browsers
+        run: python -m playwright install chromium --with-deps
+
+      - name: Run migrations
+        run: python manage.py migrate
+        env:
+          DEBUG: "True"
+          SECRET_KEY: test
+          DATABASE_URL: postgres://kutubxona:kutubxona@localhost:5432/kutubxona
+
+      - name: Run E2E tests
+        run: pytest e2e/ -m e2e -v --tb=short
+        env:
+          DEBUG: "True"
+          SECRET_KEY: test
+          DATABASE_URL: postgres://kutubxona:kutubxona@localhost:5432/kutubxona

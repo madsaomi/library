@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load frontend_tags %}
+
+{% block title %}{% trans "Profil" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Mening profilim" %}{% endblock %}
+
+{% block content %}
+<div class="mw-600 mx-auto">
+    <div class="glass-panel animate-fade p-3xl">
+        <div class="text-center mb-2xl">
+            <div class="avatar-circle d-inline-flex flex-center" style="width: 72px; height: 72px; background: linear-gradient(135deg, var(--secondary), #7c3aed); box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);">
+                <span class="avatar-initials text-2xl">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+            </div>
+            <h2 class="mt-sm mb-xs text-lg">{{ user.get_full_name|default:user.username }}</h2>
+            <p class="text-muted m-xs text-md">{{ user.get_role_display }} · {{ user.school.name|default:_("Maktab biriktirilmagan") }}</p>
+        </div>
+
+        <div class="grid-4 mb-2xl">
+            <a href="{% url 'frontend:students_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-md">
+                <div class="text-lg text-bold text-primary">{{ total_students|default:"0" }}</div>
+                <div class="text-xs text-muted">{% trans "O'quvchilar" %}</div>
+            </a>
+            <a href="{% url 'frontend:teachers_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-md">
+                <div class="text-lg text-bold" style="color: var(--secondary);">{{ total_teachers|default:"0" }}</div>
+                <div class="text-xs text-muted">{% trans "O'qituvchilar" %}</div>
+            </a>
+            <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-md">
+                <div class="text-lg text-bold" style="color: #f59e0b;">{{ total_books|default:"0" }}</div>
+                <div class="text-xs text-muted">{% trans "Kitoblar" %}</div>
+            </a>
+            <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-md">
+                <div class="text-lg text-bold text-success">{{ total_copies|default:"0" }}</div>
+                <div class="text-xs text-muted">{% trans "Nusxalar" %}</div>
+            </a>
+        </div>
+
+        <div class="info-grid gap-xs">
+            <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                <span class="info-label text-xs">{% trans "Login" %}</span>
+                <span class="info-value text-md">{{ user.username }}</span>
+            </div>
+            <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                <span class="info-label text-xs">{% trans "Maktab" %}</span>
+                <span class="info-value text-md">{{ user.school.name|default:"—" }}</span>
+            </div>
+            <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                <span class="info-label text-xs">{% trans "ID" %}</span>
+                <span class="info-value text-md">#{{ user.id|stringformat:"05d" }}</span>
+            </div>
+            <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                <span class="info-label text-xs">{% trans "A'zo bo'lgan" %}</span>
+                <span class="info-value text-md">{{ user.date_joined|date:"d.m.Y" }}</span>
+            </div>
+            <div class="info-row py-sm bg-transparent" style="border-radius: 0;">
+                <span class="info-label text-xs">{% trans "Oxirgi kirish" %}</span>
+                <span class="info-value text-md">{{ user.last_login|date:"d.m.Y H:i"|default:"—" }}</span>
+            </div>
+        </div>
+
+        {% if recent_activity %}
+        <div class="mt-2xl pt-xl border-top">
+            <h3 class="m-xs mb-md text-md text-muted d-flex align-center gap-xs">
+                <i class="fas fa-history text-xs"></i> {% trans "So'nggi amallar" %}
+            </h3>
+            <div class="activity-list overflow-y-auto" style="max-height: 240px;">
+                {% for log in recent_activity %}
+                <div class="d-flex align-center border-bottom p-xs gap-xs">
+                    <span class="flex-shrink-0 rounded-full" style="width: 6px; height: 6px; background: {% if log.action_type == 'ISSUE' %}#6366f1{% elif log.action_type == 'RETURN' %}#10b981{% elif log.action_type == 'CREATE' %}#d97706{% elif log.action_type == 'LOGIN' %}#a855f7{% else %}var(--text-muted){% endif %};"></span>
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-xs">{{ log.message|truncatechars:50 }}</div>
+                        <div class="text-xs text-muted mt-xs"><i class="far fa-clock"></i> {{ log.created_at|timesince }} {% trans "oldin" %}</div>
+                    </div>
+                    <span class="text-xs text-bold text-muted" style="opacity: 0.6;">{{ log.action_type|action_name }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'frontend:change_password' %}" class="btn-primary d-flex flex-center text-decoration-none text-md w-full mt-2xl p-lg gap-sm" style="border-radius: 10px;">
+            <i class="fas fa-key"></i> {% trans "Parolni o'zgartirish" %}
+        </a>
+    </div>
+</div>
+{% endblock %}

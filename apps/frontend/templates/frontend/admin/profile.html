@@ -1,0 +1,81 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Profil" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Profil" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/admin/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="mw-600 mx-auto">
+    <div class="glass-panel animate-fade p-3xl">
+        <div class="text-center mb-2xl">
+            <div class="avatar-circle flex-center" style="width: 72px; height: 72px; background: linear-gradient(135deg, var(--primary), var(--secondary)); box-shadow: 0 0 20px var(--primary-glow);">
+                <span class="avatar-initials text-xl">{{ user.username|first|upper }}</span>
+            </div>
+            <h2 class="text-xl mt-md mb-xs">{{ user.username }}</h2>
+            <p class="text-muted m-0 text-md">{{ user.get_role_display }}</p>
+        </div>
+
+        <div class="info-grid gap-sm">
+            <div class="info-row bg-transparent border-none p-md" style="border-bottom: 1px solid var(--border); border-radius: 0;">
+                <span class="info-label text-sm">{% trans "Login" %}</span>
+                <span class="info-value text-md">{{ user.username }}</span>
+            </div>
+            <div class="info-row bg-transparent border-none p-md" style="border-bottom: 1px solid var(--border); border-radius: 0;">
+                <span class="info-label text-sm">{% trans "To'liq ism" %}</span>
+                <span class="info-value text-md">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}<span class="text-muted" style="opacity: 0.4;">—</span>{% endif %}</span>
+            </div>
+            <div class="info-row bg-transparent border-none p-md" style="border-bottom: 1px solid var(--border); border-radius: 0;">
+                <span class="info-label text-sm">{% trans "Elektron pochta" %}</span>
+                <span class="info-value text-md">{% if user.email %}{{ user.email }}{% else %}<span class="text-muted" style="opacity: 0.4;">—</span>{% endif %}</span>
+            </div>
+            <div class="info-row bg-transparent border-none p-md" style="border-bottom: 1px solid var(--border); border-radius: 0;">
+                <span class="info-label text-sm">{% trans "ID" %}</span>
+                <span class="info-value text-md">#{{ user.id|stringformat:"05d" }}</span>
+            </div>
+            <div class="info-row bg-transparent border-none p-md" style="border-bottom: 1px solid var(--border); border-radius: 0;">
+                <span class="info-label text-sm">{% trans "A'zo bo'lgan" %}</span>
+                <span class="info-value text-md">{{ user.date_joined|date:"d.m.Y" }}</span>
+            </div>
+            <div class="info-row bg-transparent border-none p-md" style="border-radius: 0;">
+                <span class="info-label text-sm">{% trans "Oxirgi kirish" %}</span>
+                <span class="info-value text-md">{{ user.last_login|date:"d.m.Y H:i"|default:"—" }}</span>
+            </div>
+        </div>
+
+        <div class="mt-2xl pt-xl border-top">
+            <h3 class="text-md text-muted d-flex align-center gap-xs m-0 mb-md">
+                <i class="fas fa-history" style="font-size: 0.7rem;"></i> {% trans "So'nggi amallar" %}
+            </h3>
+            <div class="activity-list gap-xs">
+                {% for log in recent_activity %}
+                <div class="d-flex align-center gap-sm border-bottom py-sm">
+                    <span class="flex-shrink-0 rounded-full" style="width: 6px; height: 6px; background: {% if log.action_type == 'ISSUE' %}#6366f1{% elif log.action_type == 'RETURN' %}#10b981{% elif log.action_type == 'CREATE' %}#d97706{% elif log.action_type == 'LOGIN' %}#a855f7{% else %}var(--text-muted){% endif %};"></span>
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-sm">{{ log.message|truncatechars:50 }}</div>
+                        <div class="text-xs text-muted mt-xs"><i class="far fa-clock"></i> {{ log.created_at|timesince }} {% trans "oldin" %}</div>
+                    </div>
+                    <span class="text-xs text-bold text-muted" style="opacity: 0.6;">{{ log.action_type|action_name }}</span>
+                </div>
+                {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-folder-open text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+    </div>
+        {% endfor %}
+            </div>
+        </div>
+
+        <a href="{% url 'frontend:change_password' %}" class="btn-primary mt-2xl py-md text-decoration-none text-md d-flex align-center justify-center gap-sm w-full">
+            <i class="fas fa-key"></i> {% trans "Parolni o'zgartirish" %}
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Mening kitoblarim" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Mening kitoblarim" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/user/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <!-- Currently Reading -->
+    <div class="glass-panel p-xl mb-2xl">
+        <h3 class="mb-xl">
+            <i class="fas fa-book-open text-primary"></i>
+            {% trans "Hozir o'qilayotgan kitoblar" %}
+            <span class="level-badge text-white text-sm ml-sm" style="background: var(--primary); padding: 3px 12px; border-radius: 15px;">{{ issues|length }}</span>
+        </h3>
+
+        <div class="book-shelf-grid animate-group" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;">
+            {% for issue in issues %}
+            <div class="shelf-item pos-relative overflow-hidden cursor-pointer border transition rounded-2xl animate-item" style="background: var(--hover-bg);" onmouseover="this.style.transform='translateY(-6px)';this.style.borderColor='var(--primary)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border)'">
+                {% if issue.book.cover %}
+                <img src="{{ issue.book.cover.url }}" alt="{{ issue.book.title }}" class="w-full d-block object-cover" style="aspect-ratio: 3/4;">
+                {% else %}
+                <div class="d-flex align-center justify-center p-xl text-center" style="width: 100%; aspect-ratio: 3/4; background: var(--hover-bg);">
+                    <div>
+                        <i class="fas fa-book text-2xl text-muted" style="opacity: 0.3; margin-bottom: 8px;"></i>
+                        <div class="text-sm text-semibold text-muted">{{ issue.book.title|truncatechars:30 }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="p-md">
+                    <div class="text-sm text-semibold text-truncate mb-xs" style="color: var(--text-color);">{{ issue.book.title|truncatechars:25 }}</div>
+                    <div class="text-xs text-muted mb-sm">
+                        <i class="fas fa-calendar"></i> {{ issue.issued_at|date:"d.m.Y" }}
+                    </div>
+                    <a href="{% url 'frontend:issue_qr' issue.pk %}" class="btn-primary d-block text-center text-sm text-decoration-none text-semibold" style="padding: 8px; border-radius: 10px; background: var(--primary); color: white; border: none;">
+                        <i class="fas fa-undo"></i> {% trans "Topshirish" %}
+                    </a>
+                </div>
+                <div class="pos-absolute rounded-sm text-bold text-white" style="top: 8px; left: 8px; background: rgba(99,102,241,0.9); padding: 3px 8px; font-size: 0.6rem;">
+                    <i class="fas fa-plus"></i> 10 XP
+                </div>
+            </div>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-book text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
+    </div>
+        {% endfor %}
+        </div>
+    </div>
+
+    <!-- Pending Requests -->
+    <div class="glass-panel p-xl mb-2xl">
+        <h3 class="mb-xl">
+            <i class="fas fa-clock" style="color: var(--secondary);"></i>
+            {% trans "Bron qilingan" %}
+            <span class="level-badge text-white text-sm ml-sm" style="background: var(--secondary); padding: 3px 12px; border-radius: 15px;">{{ requests|length }}</span>
+        </h3>
+        <div class="d-flex flex-column gap-md">
+            {% for req in requests %}
+            <div class="glass-card d-flex gap-lg p-lg align-center rounded-lg" style="border-left: 4px solid var(--secondary); background: var(--hover-bg);">
+                <div class="rounded-sm overflow-hidden flex-shrink-0" style="width: 50px; height: 70px; background: var(--bg-card);">
+                    {% if req.book.cover %}
+                    <img src="{{ req.book.cover.url }}" alt="{{ req.book.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full flex-center" style="background: var(--hover-bg);"><i class="fas fa-book text-muted" style="opacity: 0.3;"></i></div>
+                    {% endif %}
+                </div>
+                <div class="flex-1" style="min-width: 0;">
+                    <h4 class="text-md mb-xs" style="color: var(--text-color);">{{ req.book.title }}</h4>
+                    <p class="text-sm text-muted mb-xs">
+                        {% trans "So'ralgan" %}: {{ req.requested_at|date:"d.m.Y H:i" }}
+                    </p>
+                    <span class="level-badge text-sm text-muted rounded-md" style="padding: 3px 10px; background: rgba(255,255,255,0.05);">
+                        {{ req.get_status_display }}
+                    </span>
+                </div>
+                <a href="{% url 'frontend:request_qr' req.pk %}" class="btn-primary text-decoration-none text-nowrap text-semibold rounded-md" style="padding: 8px 16px; font-size: 0.8rem; background: var(--hover-bg); border: 1px solid var(--border); color: var(--text-color);">
+                    <i class="fas fa-qrcode"></i> QR
+                </a>
+            </div>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-book text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
+    </div>
+        {% endfor %}
+        </div>
+    </div>
+
+    <!-- Reading History -->
+    <div class="glass-panel p-xl">
+        <h3 class="mb-xl">
+            <i class="fas fa-history" style="color: #10b981;"></i>
+            {% trans "O'qilgan kitoblar" %}
+            <span class="level-badge text-white text-sm ml-sm" style="background: #10b981; padding: 3px 12px; border-radius: 15px;">{{ history|length }}</span>
+        </h3>
+
+        <div class="book-shelf-grid animate-group" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px;">
+            {% for item in history %}
+            <div class="shelf-item pos-relative overflow-hidden cursor-pointer border transition animate-item" style="border-radius: 14px; background: var(--hover-bg);" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#10b981'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border)'">
+                {% if item.book.cover %}
+                <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}" class="w-full d-block object-cover" style="aspect-ratio: 3/4;">
+                {% else %}
+                <div class="d-flex align-center justify-center p-lg text-center" style="width: 100%; aspect-ratio: 3/4; background: var(--hover-bg);">
+                    <div>
+                        <i class="fas fa-book text-2xl text-muted" style="opacity: 0.3; margin-bottom: 6px;"></i>
+                        <div class="text-xs text-semibold text-muted">{{ item.book.title|truncatechars:25 }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="p-sm">
+                    <div class="text-sm text-semibold text-truncate mb-xs" style="color: var(--text-color);">{{ item.book.title|truncatechars:22 }}</div>
+                    <div class="text-xs" style="color: #10b981;">
+                        <i class="fas fa-check-circle"></i> {{ item.returned_at|date:"d.m.Y" }}
+                    </div>
+                </div>
+                <div class="pos-absolute text-white text-bold rounded-sm" style="top: 6px; right: 6px; background: rgba(16,185,129,0.9); padding: 2px 8px; font-size: 0.55rem;">
+                    <i class="fas fa-plus"></i> 5 XP
+                </div>
+            </div>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-book text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
+    </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

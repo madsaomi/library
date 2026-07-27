@@ -1,37 +1,57 @@
+version: '3.9'
+
 services:
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: kutubxona
       POSTGRES_USER: kutubxona
       POSTGRES_PASSWORD: kutubxona
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kutubxona"]
+      test: pg_isready -U kutubxona
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: redis-cli ping
       interval: 5s
       timeout: 5s
       retries: 5
 
   web:
     build: .
-    ports:
-      - "8000:8000"
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
     environment:
-      DATABASE_URL: postgres://kutubxona:kutubxona@db:5432/kutubxona
-      SECRET_KEY: dev-secret-key-change-in-production
       DEBUG: "True"
-      DJANGO_SETTINGS_MODULE: core.settings
+      SECRET_KEY: dev-secret-key-change-in-production
+      DATABASE_URL: postgres://kutubxona:kutubxona@db:5432/kutubxona
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CORS_ALLOW_ALL_ORIGINS: "True"
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
-    command: >
-      sh -c "python manage.py migrate --noinput &&
-             python manage.py runserver 0.0.0.0:8000"
+      - media_volume:/app/media
 
 volumes:
   postgres_data:
   static_volume:
+  media_volume:

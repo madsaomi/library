@@ -1,0 +1,164 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Barcha foydalanuvchilar" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Barcha foydalanuvchilar" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/admin/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="grid-5 stat-grid mb-xl">
+        <div class="glass-card stat-card p-lg cursor-default">
+            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ total_count }}</div>
+            <div class="stat-label text-sm">{% trans "Jami" %}</div>
+        </div>
+        <div class="glass-card stat-card p-lg cursor-default">
+            <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ student_count }}</div>
+            <div class="stat-label text-sm">{% trans "O'quvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card p-lg cursor-default">
+            <div class="stat-value" style="font-size: 1.25rem; color: #f59e0b;">{{ teacher_count }}</div>
+            <div class="stat-label text-sm">{% trans "O'qituvchilar" %}</div>
+        </div>
+        <div class="glass-card stat-card p-lg cursor-default">
+            <div class="stat-value" style="font-size: 1.25rem; color: #6366f1;">{{ school_admin_count }}</div>
+            <div class="stat-label text-sm">{% trans "Adminlar" %}</div>
+        </div>
+        <div class="glass-card stat-card p-lg cursor-default">
+            <div class="stat-value" style="font-size: 1.25rem; color: #f43f5e;">{{ active_today }}</div>
+            <div class="stat-label text-sm">{% trans "Bugun kirdi" %}</div>
+        </div>
+    </div>
+
+    <div class="glass-panel p-xl">
+        <div class="flex-between mb-lg gap-lg flex-wrap">
+            <div class="d-flex gap-xs flex-wrap">
+                <a href="{% url 'frontend:all_users_list' %}" class="glass-card py-sm px-lg rounded-sm text-decoration-none text-sm {% if not role_filter %}bg-primary text-white{% else %}text-muted{% endif %}">{% trans "Barcha" %}</a>
+                <a href="{% url 'frontend:all_users_list' %}?role=student" class="glass-card py-sm px-lg rounded-sm text-decoration-none text-sm {% if role_filter == 'student' %}bg-success text-white{% else %}text-muted{% endif %}">{% trans "O'quvchilar" %}</a>
+                <a href="{% url 'frontend:all_users_list' %}?role=teacher" class="glass-card py-sm px-lg rounded-sm text-decoration-none text-sm {% if role_filter == 'teacher' %}bg-primary text-white{% else %}text-muted{% endif %}">{% trans "O'qituvchilar" %}</a>
+                <a href="{% url 'frontend:all_users_list' %}?role=school_admin" class="glass-card py-sm px-lg rounded-sm text-decoration-none text-sm {% if role_filter == 'school_admin' %}bg-primary text-white{% else %}text-muted{% endif %}">{% trans "Adminlar" %}</a>
+            </div>
+            <div class="d-flex gap-md align-center">
+                <div class="pos-relative">
+                    <input type="text" id="search-input" aria-label="{% trans 'Qidirish...' %}" placeholder="{% trans 'Qidirish...' %}"
+                           class="text-md" style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none; width: 200px;">
+                    <i class="fas fa-search pos-absolute text-muted text-md" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
+                </div>
+                <a href="{% url 'frontend:admin_add' %}" class="btn-primary text-nowrap text-sm" style="padding: 8px 16px; text-decoration: none;">
+                    <i class="fas fa-plus"></i> {% trans "Yangi Admin" %}
+                </a>
+            </div>
+        </div>
+
+        <div class="table-container overflow-x-auto">
+            <table class="w-full text-md" style="border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr class="border-bottom">
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Foydalanuvchi" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Rol" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Holat" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Maktab" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Oxirgi kirish" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Ro'yxatdan o'tgan" %}</th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body" class="animate-group">
+                    {% for user in users %}
+                    <tr class="user-row animate-item" data-search="{{ user.username|lower }} {{ user.first_name|lower }} {{ user.last_name|lower }} {{ user.school.name|default:''|lower }}"
+                        {% if user.role == 'school_admin' %}
+                        onclick="window.location='{% url 'frontend:admin_edit' user.pk %}'"
+                        {% else %}
+                        onclick="window.location='{% url 'frontend:user_detail' user.pk %}'"
+                        {% endif %}
+                        class="cursor-pointer border-bottom" style="transition: 0.2s;">
+                        <td class="p-md" style="padding: 10px 12px;">
+                            <div class="d-flex align-center gap-md">
+                                <div class="flex-center rounded-full" style="width: 32px; height: 32px; min-width: 32px; background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                                    <span class="text-white text-semibold text-xs">
+                                        {{ user.first_name|first|default:user.username|first|upper }}{{ user.last_name|first|upper }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="text-semibold text-main" style="font-size: 0.82rem;">{{ user.username }}</div>
+                                    <div class="text-muted text-xs">{{ user.get_full_name|default:"" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-md" style="padding: 10px 12px;">
+                            <span class="badge text-primary p-sm rounded-sm text-nowrap" style="background: rgba(168,85,247,0.1);">
+                                {{ user.get_role_display }}
+                            </span>
+                        </td>
+                        <td class="p-md" style="padding: 10px 12px;">
+                            <span class="d-flex align-center gap-xs text-sm" style="color: {% if user.is_active %}#10b981{% else %}#ef4444{% endif %};">
+                                <span class="d-inline-block rounded-full" style="width: 7px; height: 7px; background: {% if user.is_active %}#10b981{% else %}#ef4444{% endif %};"></span>
+                                {{ user.is_active|yesno:_("Faol,Faolsiz") }}
+                            </span>
+                        </td>
+                        <td class="text-muted text-sm p-md" style="padding: 10px 12px;">{% if user.school %}{{ user.school.name|truncatechars:18 }}{% else %}<span style="color: rgba(255,255,255,0.2);">—</span>{% endif %}</td>
+                        <td class="text-muted text-sm p-md" style="padding: 10px 12px;">{{ user.last_login|date:"Y-m-d H:i"|default:"—" }}</td>
+                        <td class="text-muted text-sm p-md" style="padding: 10px 12px;">{{ user.date_joined|date:"Y-m-d" }}</td>
+                    </tr>
+                    {% empty %}
+                <tr>
+                    <td colspan="100%" class="text-center p-xl border-none">
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-users text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Foydalanuvchilar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha foydalanuvchilar ro'yxati bo'sh" %}</p>
+    </div>
+                    </td>
+                </tr>
+            {% endfor %}
+                    <tr id="no-results" class="d-none">
+                        <td colspan="6" class="text-center text-muted text-md p-3xl">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {% include 'pagination.html' %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const rows = document.querySelectorAll('.user-row');
+    const noResults = document.getElementById('no-results');
+    const emptyState = document.getElementById('empty-state');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (found === 0 && rows.length > 0) {
+            noResults.style.display = '';
+        } else {
+            noResults.style.display = 'none';
+        }
+
+        if (emptyState && query.length > 0) {
+            emptyState.style.display = 'none';
+        } else if (emptyState && query.length === 0 && rows.length === 0) {
+            emptyState.style.display = '';
+        }
+    });
+});
+</script>
+{% endblock %}

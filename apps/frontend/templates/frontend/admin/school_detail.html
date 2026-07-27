@@ -1,0 +1,141 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ school.name }} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{{ school.name }}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/admin/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade responsive-grid-1-2" style="align-items: start;">
+    <div class="glass-panel p-2xl">
+        <div class="d-flex flex-column align-center mb-2xl">
+            <div class="flex-center rounded-lg mb-lg" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                <i class="fas fa-school text-xl text-white"></i>
+            </div>
+            <div class="text-bold text-center" style="font-size: 1.05rem;">{{ school.name }}</div>
+            <div class="text-muted mt-xs" style="font-size: 0.78rem;">
+                <i class="fas fa-map-marker-alt" style="font-size: 0.6rem;"></i>
+                {% if school.district %}{{ school.district.name }}{% else %}—{% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex flex-column gap-md mb-2xl">
+            <div class="glass-card p-lg">
+                <div class="text-muted text-sm mb-xs">{% trans "Kontakt" %}</div>
+                <div class="text-semibold text-md">{{ school.contact|default:"+998..." }}</div>
+            </div>
+            <div class="glass-card p-lg">
+                <div class="text-muted text-sm mb-xs">{% trans "Maktab Admini" %}</div>
+                {% if school_admin %}
+                <div class="text-semibold text-md mb-sm">{{ school_admin.get_full_name|default:school_admin.username }}</div>
+                <div class="text-muted text-sm d-flex gap-md flex-wrap">
+                    <span><i class="fas fa-user-shield text-primary"></i> {{ school_admin.username }}</span>
+                    <span>
+                        <i class="fas fa-key text-primary"></i>
+                        <span class="text-main" style="letter-spacing: 2px;">••••••••</span>
+                    </span>
+                </div>
+                {% else %}
+                <div class="text-muted text-md">—</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-sm">
+            <a href="{% url 'frontend:school_edit' school.pk %}" class="btn-primary flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs"><i class="fas fa-edit"></i> {% trans "Tahrirlash" %}</a>
+            <a href="{% url 'frontend:school_delete' school.pk %}" class="btn-primary flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs" style="background: #ef4444; box-shadow: 0 4px 12px rgba(239,68,68,0.25);"><i class="fas fa-trash"></i> {% trans "O'chirish" %}</a>
+        </div>
+    </div>
+
+    <div class="glass-panel p-2xl">
+        <div class="grid-2 stat-grid mb-2xl">
+            <div class="glass-card stat-card p-lg cursor-default">
+                <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ student_count }}</div>
+                <div class="stat-label text-sm">{% trans "O'quvchilar" %}</div>
+            </div>
+            <div class="glass-card stat-card p-lg cursor-default">
+                <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ book_count }}</div>
+                <div class="stat-label text-sm">{% trans "Kitoblar" %}</div>
+            </div>
+        </div>
+
+        <h3 class="section-title text-md mb-md">
+            <i class="fas fa-users text-success" style="font-size: 0.8rem;"></i> {% trans "O'quvchilar sinflar bo'yicha" %}
+            <span class="text-muted text-sm text-normal ml-sm">({{ student_count }})</span>
+        </h3>
+
+        <div class="info-grid gap-sm">
+            {% for grade_label, grade_students in grades.items %}
+            <div class="glass-card border p-0" style="overflow: hidden;">
+                <div class="grade-header d-flex align-center flex-between cursor-pointer bg-glass p-lg" data-grade="{{ forloop.counter }}" style="user-select: none;">
+                    <div class="d-flex align-center gap-md">
+                        <i class="fas fa-chevron-right grade-chevron text-muted transition" style="font-size: 0.65rem;"></i>
+                        <span class="text-semibold text-md">{{ grade_label }} {% trans "sinf" %}</span>
+                    </div>
+                    <span class="text-sm text-muted bg-glass px-md py-xs rounded-md">{{ grade_students|length }}</span>
+                </div>
+                <div class="grade-body d-none p-lg" style="padding: 4px 14px 10px; gap: 4px; flex-direction: column;">
+                    {% for s in grade_students %}
+                    <div class="d-flex align-center flex-between p-xs rounded-sm text-sm" style="padding: 5px 8px;">
+                        <span>{{ s.get_full_name|default:s.username }}</span>
+                        <span class="text-muted text-xs">@{{ s.username }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-building text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Muassasalar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
+    </div>
+        {% endfor %}
+        </div>
+
+        <h3 class="section-title text-md mt-xl mb-md">
+            <i class="fas fa-book text-primary" style="font-size: 0.8rem;"></i> {% trans "Kitoblar" %}
+        </h3>
+        <div class="overflow-y-auto" style="max-height: 280px; padding-right: 6px;">
+            <div class="info-grid gap-sm">
+                {% for book in books %}
+                <div class="glass-card info-row p-md d-flex flex-column align-start" style="gap: 2px;">
+                    <span class="text-sm text-medium w-full text-truncate">{{ book.title }}</span>
+                    <span class="text-xs text-muted">{{ book.category.name|default:"---" }}</span>
+                </div>
+                {% empty %}
+
+    <div class="empty-state text-center p-3xl animate-fade">
+        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+            <i class="fas fa-building text-4xl text-primary"></i>
+        </div>
+        <h4 class="text-lg font-semibold mb-xs">{% trans "Muassasalar topilmadi" %}</h4>
+        <p class="text-muted text-sm">{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
+    </div>
+        {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.grade-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+        const body = this.nextElementSibling;
+        const chevron = this.querySelector('.grade-chevron');
+        if (body.style.display === 'none' || body.style.display === '') {
+            body.style.display = 'flex';
+            chevron.style.transform = 'rotate(90deg)';
+        } else {
+            body.style.display = 'none';
+            chevron.style.transform = '';
+        }
+    });
+});
+</script>
+{% endblock %}

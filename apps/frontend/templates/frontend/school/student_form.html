@@ -1,0 +1,76 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="mw-500 mx-auto">
+    <div class="glass-panel animate-fade p-3xl">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="d-flex flex-column gap-xl">
+                <div>
+                    <label class="d-block mb-xs text-medium text-sm text-muted">
+                        <i class="fas fa-user text-primary mr-xs"></i> {{ form.first_name.label }}
+                    </label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="d-block mb-xs text-medium text-sm text-muted">
+                        <i class="fas fa-user text-primary mr-xs"></i> {{ form.last_name.label }}
+                    </label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="d-block mb-xs text-medium text-sm text-muted">
+                        <i class="fas fa-graduation-cap text-success mr-xs"></i> {% trans "Sinf va harf" %}
+                    </label>
+                    <div class="d-flex gap-sm">
+                        <div class="flex-1">{{ form.grade_number }}</div>
+                        <div class="flex-1">{{ form.grade_letter }}</div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="d-block mb-xs text-medium text-sm text-muted">
+                        <i class="fas fa-calendar-alt mr-xs" style="color: #f59e0b;"></i> {{ form.birth_date.label }}
+                    </label>
+                    {{ form.birth_date }}
+                    {% if form.birth_date.errors %}
+                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ form.birth_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-2xl d-flex gap-md">
+                <button type="submit" class="btn-primary text-md rounded-md" style="flex: 2; padding: 10px 0;">
+                    <i class="fas fa-save"></i> {% trans "Saqlash" %}
+                </button>
+                <a href="{% url 'frontend:students_list' %}" class="glass-card flex-1 rounded-md text-center text-decoration-none d-flex align-center justify-center border text-md" style="padding: 10px 0; gap: 6px;">
+                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-control { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--input-text); outline: none; font-size: 0.85rem; transition: 0.3s; box-sizing: border-box; }
+    .form-control:focus { border-color: var(--primary); }
+    select.form-control { appearance: auto; }
+</style>
+{% endblock %}

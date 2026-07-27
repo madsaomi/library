@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load compress %}
 {% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
@@ -8,9 +9,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% trans "Online Kutibxona" %}{% endblock %}</title>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.6">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% compress css %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.6">
     <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#d97706">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kutubxona">
+    <meta name="application-name" content="Online Kutubxona">
+    {% endcompress %}
     <script>window.VAPID_PUBLIC_KEY = '{{ vapid_public_key|escapejs }}';</script>
     {% block extra_head %}{% endblock %}
     <style>
@@ -216,15 +225,16 @@
     </style>
 </head>
 <body hx-boost="true" hx-target="#main-area" hx-select="#main-area" hx-swap="innerHTML" hx-push-url="true">
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    
+    <a href="#main-content" style="position: absolute; left: -9999px; top: 8px; padding: 8px 16px; background: var(--primary); color: #fff; border-radius: 8px; z-index: 10000; text-decoration: none; font-size: 0.9rem;" onfocus="this.style.left='8px'" onblur="this.style.left='-9999px'">{% trans "Asosiy mazmunga o'tish" %}</a>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()" role="presentation" aria-hidden="true"></div>
+
     <div class="layout-wrapper">
         <aside class="sidebar glass-panel" id="sidebar">
             <div style="height: 10px;"></div>
-            <nav class="sidebar-nav custom-scrollbar" hx-boost="false">
+            <nav class="sidebar-nav custom-scrollbar" hx-boost="false" aria-label="{% trans 'Yon panel navigatsiyasi' %}">
                 {% if user.is_authenticated %}
                 <div class="sidebar-profile">
-                    <a href="{% if user.role == 'school_admin' or user.role == 'superadmin' %}{% url 'frontend_admin:profile' %}{% else %}{% url 'frontend_user:profile' %}{% endif %}" class="sidebar-profile-link">
+                    <a href="{% url 'frontend:profile' %}" class="sidebar-profile-link">
                         <div class="sidebar-profile-avatar">
                             <span class="avatar-initials">{{ user.get_full_name|default:user.username|first|upper }}</span>
                         </div>
@@ -240,23 +250,29 @@
                     </a>
                 </div>
                 {% endif %}
-                {% block sidebar_nav %}{% endblock %}
+                {% if user.role == 'superuser' %}
+                    {% include 'frontend/admin/sidebar_items.html' %}
+                {% elif user.role == 'school_admin' %}
+                    {% include 'frontend/school/sidebar_items.html' %}
+                {% elif user.role == 'student' or user.role == 'teacher' %}
+                    {% include 'frontend/user/sidebar_items.html' %}
+                {% endif %}
                 <div class="sidebar-footer">
-                    <a href="{% url 'frontend_user:profile' %}" class="footer-btn" title="{{ user.username }}">
+                    <a href="{% url 'frontend:profile' %}" class="footer-btn" title="{{ user.username }}">
                         <i class="fas fa-user"></i>
                     </a>
 
-                    <button class="footer-btn" id="themeToggle" title="{% trans 'Mavzuni almashtirish' %}" onclick="toggleTheme()">
+                    <button class="footer-btn scale-click" id="themeToggle" title="{% trans 'Mavzuni almashtirish' %}" onclick="cycleTheme()" aria-label="{% trans 'Mavzuni almashtirish' %}" type="button">
                         <i id="themeIcon" class="fas fa-moon"></i>
                     </button>
 
-                    <div class="footer-btn language-selector" title="{% trans 'Tilni tanlash' %}">
+                    <div class="footer-btn language-selector scale-click" title="{% trans 'Tilni tanlash' %}">
                         <i class="fas fa-globe"></i>
                         <div class="language-dropdown">
                             {% get_current_language as LANGUAGE_CODE %}
                             {% get_available_languages as LANGUAGES %}
                             {% for lang_code, lang_name in LANGUAGES %}
-                                <button type="button" 
+                                <button type="button"
                                         class="lang-option {% if lang_code == LANGUAGE_CODE %}active{% endif %}"
                                         onclick="changeLanguage('{{ lang_code }}')">
                                     {{ lang_name }}
@@ -277,43 +293,46 @@
             </nav>
         </aside>
 
-        <main class="main-content">
-            <div id="topNotificationBanner" style="display: none; margin-bottom: 16px; padding: 12px 20px; border-radius: 14px; background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(168,85,247,0.12)); border: 1px solid rgba(99,102,241,0.2); align-items: center; gap: 12px; animation: fadeSlideDown 0.4s ease;">
-                <div style="flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-bell" style="color: white; font-size: 0.8rem;"></i>
+        <main class="main-content" id="main-content">
+            <div id="topNotificationBanner" class="d-none mb-lg p-lg rounded-xl bg-glass border" style="animation: fadeSlideDown 0.4s ease;">
+                <div class="flex-shrink-0 rounded-full bg-primary d-flex flex-center" style="width: 32px; height: 32px;">
+                    <i class="fas fa-bell text-white text-sm"></i>
                 </div>
-                <div id="topNotifContent" style="flex: 1; min-width: 0;">
-                    <div id="topNotifTitle" style="font-size: 0.82rem; font-weight: 600; color: var(--text-color);"></div>
-                    <div id="topNotifBody" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;"></div>
+                <div id="topNotifContent" class="flex-1" style="min-width: 0;">
+                    <div id="topNotifTitle" class="text-md text-semibold text-main"></div>
+                    <div id="topNotifBody" class="text-sm text-muted mt-xs"></div>
                 </div>
-                <button id="topNotifClose" style="flex-shrink: 0; background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; padding: 4px; border-radius: 8px; transition: 0.2s;" title="{% trans 'Yopish' %}">&times;</button>
+                <button id="topNotifClose" class="flex-shrink-0 bg-transparent border-none text-muted cursor-pointer p-xs rounded transition-fast" style="font-size: 1.1rem;" title="{% trans 'Yopish' %}" aria-label="{% trans 'Bildirishnomani yopish' %}" type="button">&times;</button>
             </div>
             <div id="main-area" class="htmx-container">
                 <script>window._chartInstances = [];</script>
-                <div id="htmx-loading" style="display: none; position: fixed; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary), #a855f7); z-index: 9999; animation: htmx-loading 1s ease infinite;" hx-trigger="load" hx-preserve="true"></div>
-                <style>
-                    @keyframes htmx-loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-                    .htmx-request #htmx-loading { display: block !important; }
-                </style>
-                <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <button class="mobile-header-toggle" onclick="toggleSidebar()">
+                <div id="htmx-loading" hx-trigger="load" hx-preserve="true"></div>
+            <div id="page-overlay"></div>
+                <header class="flex-between mb-2xl flex-wrap" style="gap: 20px;">
+                    <div class="d-flex align-center" style="gap: 15px;">
+                        <button class="mobile-header-toggle" onclick="toggleSidebar()" aria-label="{% trans 'Yon panelni ochish/yopish' %}" type="button">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <h1 class="gradient-text" style="margin: 0;">{% block page_title %}{% endblock %}</h1>
+                        <h1 class="gradient-text m-xs">{% block page_title %}{% endblock %}</h1>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 12px; position: relative;">
-                        <div id="notificationBell" style="position: relative; color: var(--text-muted); font-size: 1.3rem; transition: 0.3s; cursor: pointer;" onclick="toggleNotifications()">
-                            <i class="fas fa-bell"></i>
-                            <span id="unreadBadge" style="display: none; position: absolute; top: -5px; right: -8px; background: #ef4444; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: 700;"></span>
+                    <div class="d-flex align-center pos-relative" style="gap: 12px;">
+                        {% if user.is_superuser %}
+                        <div class="global-search">
+                            <input type="text" id="globalSearchInput" class="form-control" placeholder="{% trans 'Search users, schools, books...' %}" aria-label="{% trans 'Global search' %}" oninput="debounceGlobalSearch(this.value)" autocomplete="off">
+                            <div id="globalSearchResults" class="global-search-results d-none"></div>
                         </div>
-                        <div id="notificationPanel" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 10px; width: 360px; max-height: 400px; background: var(--dropdown-bg); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 1000; overflow: hidden;">
-                            <div style="padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">{% trans "Bildirishnomalar" %}</span>
-                                <button id="markAllReadBtn" style="background: none; border: none; color: var(--primary); font-size: 0.78rem; cursor: pointer; padding: 4px 8px; border-radius: 8px; font-family: inherit; transition: 0.2s; display: none;">{% trans "Hammasini o'qilgan deb belgilash" %}</button>
+                        {% endif %}
+                        <button id="notificationBell" class="pos-relative text-muted bg-transparent border-none transition hover-opacity" style="font-size: 1.3rem; cursor: pointer; padding: 0;" onclick="toggleNotifications()" aria-label="{% trans 'Bildirishnomalar' %}" type="button">
+                            <i class="fas fa-bell"></i>
+                            <span id="unreadBadge" class="d-none pos-absolute text-white text-xs text-bold" style="top: -5px; right: -8px; background: #ef4444; padding: 2px 5px; border-radius: 10px; line-height: 1;"></span>
+                        </button>
+                        <div id="notificationPanel" class="d-none pos-absolute shadow-lg overflow-hidden" style="top: 100%; right: 0; margin-top: 10px; width: 360px; max-height: 400px; background: var(--dropdown-bg); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 16px; z-index: 1000;">
+                            <div class="flex-between border-bottom" style="padding: 14px 16px;">
+                                <span class="text-semibold text-md text-main">{% trans "Bildirishnomalar" %}</span>
+                                <button id="markAllReadBtn" class="bg-transparent border-none text-primary cursor-pointer rounded transition-fast d-none" style="font-size: 0.78rem; font-family: inherit; padding: 4px 8px;" type="button">{% trans "Hammasini o'qilgan deb belgilash" %}</button>
                             </div>
-                            <div id="notificationList" style="overflow-y: auto; max-height: 340px; padding: 8px;"></div>
-                            <div id="notificationEmpty" style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem; display: none;">{% trans "Bildirishnomalar yo'q" %}</div>
+                            <div id="notificationList" class="overflow-y-auto" style="max-height: 340px; padding: 8px;"></div>
+                            <div id="notificationEmpty" class="text-center text-muted text-md d-none" style="padding: 24px 16px;">{% trans "Bildirishnomalar yo'q" %}</div>
                         </div>
                     </div>
                 </header>
@@ -326,28 +345,62 @@
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    {% compress js %}
     <script src="{% static 'js/push-notifications.js' %}"></script>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="{% static 'js/htmx.min.js' %}"></script>
     <script>
         document.addEventListener('htmx:beforeSwap', function() {
             window._chartInstances.forEach(function(c) { if (c) c.destroy(); });
             window._chartInstances = [];
+            var overlay = document.getElementById('page-overlay');
+            if (overlay) overlay.classList.add('active');
         });
         document.addEventListener('htmx:afterSwap', function() {
             if (typeof initPage === 'function') initPage();
-            document.querySelectorAll('.animate-fade').forEach(function(el) {
+            var overlay = document.getElementById('page-overlay');
+            if (overlay) overlay.classList.remove('active');
+            document.querySelectorAll('[data-ani]').forEach(function(el, i) {
+                el.style.animation = 'none';
+                el.style.opacity = '0';
+                var delay = (i * (parseFloat(el.getAttribute('data-stagger') || 0.04)));
+                var dur = el.getAttribute('data-dur') || '0.4s';
+                el.style.animationDuration = dur;
+                setTimeout(function() {
+                    el.style.animation = '';
+                    el.style.opacity = '';
+                }, delay * 1000);
+            });
+            document.querySelectorAll('.animate-fade, .animate-fade-up, .animate-scale-in').forEach(function(el) {
                 el.style.animation = 'none';
                 requestAnimationFrame(function() { el.style.animation = ''; });
             });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
     <script src="{% static 'js/level-up.js' %}"></script>
+    {% endcompress %}
     <script>
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('sidebarOverlay').classList.toggle('active');
         }
+
+        // Close sidebar with Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                var sidebar = document.getElementById('sidebar');
+                if (sidebar && sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                    var toggleBtn = document.querySelector('.mobile-header-toggle');
+                    if (toggleBtn) toggleBtn.focus();
+                }
+                if (notificationPanelOpen) {
+                    toggleNotifications();
+                    var bell = document.getElementById('notificationBell');
+                    if (bell) bell.focus();
+                }
+            }
+        });
 
         // Real-time Word/Char Counter
         function initCounters() {
@@ -355,20 +408,20 @@
             inputs.forEach(input => {
                 const charLimit = input.getAttribute('data-limit-chars');
                 const wordLimit = input.getAttribute('data-limit-words');
-                
+
                 // Create counter element
                 const counterDiv = document.createElement('div');
                 counterDiv.className = 'field-counter';
-                counterDiv.style.cssText = 'font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; text-align: right; transition: 0.3s;';
-                
+                counterDiv.className = 'field-counter';
+
                 // Append after input
                 input.parentNode.appendChild(counterDiv);
-                
+
                 const update = () => {
                     const text = input.value.trim();
                     const chars = text.length;
                     const words = text ? text.split(/\s+/).length : 0;
-                    
+
                     let status = '';
                     if (charLimit) {
                         status += `${chars}/${charLimit} {% trans 'belgi' %}`;
@@ -378,7 +431,7 @@
                         status += `${words}/${wordLimit} {% trans 'so\'z' %}`;
                     }
                     counterDiv.innerText = status;
-                    
+
                     if ((charLimit && chars > charLimit) || (wordLimit && words > wordLimit)) {
                         counterDiv.style.color = '#ef4444';
                         counterDiv.style.fontWeight = '700';
@@ -387,7 +440,7 @@
                         counterDiv.style.fontWeight = '400';
                     }
                 };
-                
+
                 input.addEventListener('input', update);
                 update(); // Initial check
             });
@@ -403,11 +456,11 @@
                 wrapper.style.position = 'relative';
                 field.parentNode.insertBefore(wrapper, field);
                 wrapper.appendChild(field);
-                
+
                 const toggle = document.createElement('i');
-                toggle.className = 'fas fa-eye';
-                toggle.style.cssText = 'position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); transition: 0.3s; z-index: 10;';
-                
+                toggle.className = 'fas fa-eye cursor-pointer transition pos-absolute';
+                toggle.style.cssText = 'right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); z-index: 10;';
+
                 toggle.onclick = () => {
                     if (field.type === 'password') {
                         field.type = 'text';
@@ -419,7 +472,7 @@
                         toggle.style.color = 'var(--text-muted)';
                     }
                 };
-                
+
                 wrapper.appendChild(toggle);
                 field.style.paddingRight = '45px';
             });
@@ -432,12 +485,15 @@
             document.getElementById('lang-form').submit();
         }
 
-        // Theme Toggle
-        function toggleTheme() {
+        // Theme cycling: dark -> light -> autumn -> winter -> dark
+        function cycleTheme() {
             const html = document.documentElement;
-            const isLight = html.getAttribute('data-theme') === 'light';
-            html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-            localStorage.setItem('theme', isLight ? 'dark' : 'light');
+            const current = html.getAttribute('data-theme') || 'dark';
+            const themes = ['dark', 'light', 'autumn', 'winter'];
+            const idx = themes.indexOf(current);
+            const next = themes[(idx + 1) % themes.length];
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
             updateThemeIcon();
             document.dispatchEvent(new CustomEvent('themechange'));
         }
@@ -445,14 +501,16 @@
         function updateThemeIcon() {
             const icon = document.getElementById('themeIcon');
             if (!icon) return;
-            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const icons = { 'dark': 'fa-moon', 'light': 'fa-sun', 'autumn': 'fa-leaf', 'winter': 'fa-snowflake' };
+            icon.className = 'fas ' + (icons[theme] || 'fa-moon');
         }
 
         // Apply saved theme on load (fallback to system preference)
         (function() {
             const saved = localStorage.getItem('theme');
-            if (saved) {
+            const themes = ['dark', 'light', 'autumn', 'winter'];
+            if (saved && themes.includes(saved)) {
                 document.documentElement.setAttribute('data-theme', saved);
             } else {
                 const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
@@ -500,6 +558,8 @@
             notificationPanelOpen = !notificationPanelOpen;
             panel.style.display = notificationPanelOpen ? 'block' : 'none';
             if (!notificationPanelOpen) return;
+            var firstFocusable = panel.querySelector('button, [tabindex]:not([tabindex="-1"])');
+            if (firstFocusable) setTimeout(function() { firstFocusable.focus(); }, 50);
 
             fetch('/api/notifications/')
                 .then(r => r.json())
@@ -515,7 +575,8 @@
 
                     data.notifications.forEach(n => {
                         const div = document.createElement('div');
-                        div.style.cssText = 'padding: 12px 14px; border-radius: 10px; cursor: pointer; transition: 0.2s; margin-bottom: 2px;' + (n.is_read ? '' : ' background: var(--hover-bg); border-left: 3px solid var(--primary);');
+                        div.className = 'rounded-md cursor-pointer transition-fast mb-xs';
+                        div.style.cssText = 'padding: 12px 14px;' + (n.is_read ? '' : ' background: var(--hover-bg); border-left: 3px solid var(--primary);');
                         div.onmouseover = () => div.style.background = 'var(--hover-bg)';
                         div.onmouseout = () => { if (!n.is_read) div.style.background = 'var(--hover-bg)'; else div.style.background = 'transparent'; };
                         div.onclick = () => {
@@ -524,15 +585,18 @@
                         };
 
                         const title = document.createElement('div');
-                        title.style.cssText = 'font-weight: 600; font-size: 0.82rem; color: var(--text-color); margin-bottom: 2px;';
+                        title.className = 'text-semibold text-main mb-xs';
+                        title.style.cssText = 'font-size: 0.82rem;';
                         title.textContent = n.title;
 
                         const body = document.createElement('div');
-                        body.style.cssText = 'font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;';
+                        body.className = 'text-muted';
+                        body.style.cssText = 'font-size: 0.75rem; line-height: 1.3;';
                         body.textContent = n.body;
 
                         const time = document.createElement('div');
-                        time.style.cssText = 'font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; opacity: 0.6;';
+                        time.className = 'text-muted mt-xs';
+                        time.style.cssText = 'font-size: 0.65rem; opacity: 0.6;';
                         const d = new Date(n.created_at);
                         const now = new Date();
                         const diff = Math.floor((now - d) / 1000);
@@ -570,32 +634,67 @@
             }
         });
 
-        // Fetch top notification banner
-        function loadTopNotification() {
-            var banner = document.getElementById('topNotificationBanner');
-            if (!banner) return;
-            fetch('/api/notifications/top/')
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data && data.id) {
-                        document.getElementById('topNotifTitle').textContent = data.title;
-                        document.getElementById('topNotifBody').textContent = data.body;
-                        banner.style.display = 'flex';
-                        var topNotifId = data.id;
-                        document.getElementById('topNotifClose').onclick = function() {
-                            banner.style.display = 'none';
-                            fetch('/api/notifications/' + topNotifId + '/read/', { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } }).then(function() { updateUnreadBadge(); });
-                        };
+
+
+        // WebSocket for real-time notifications
+        let ws = null;
+        let wsReconnectTimer = null;
+
+        function connectWebSocket() {
+            if (ws && ws.readyState === WebSocket.OPEN) return;
+            const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const url = proto + '//' + window.location.host + '/ws/notifications/';
+            ws = new WebSocket(url);
+
+            ws.onmessage = function(e) {
+                try {
+                    const data = JSON.parse(e.data);
+                    if (data.type === 'unread_count') {
+                        updateBadgeUI(data.unread_count);
+                    } else if (data.type === 'notification') {
+                        if (data.unread_count !== undefined) updateBadgeUI(data.unread_count);
+                        showTopNotification(data);
                     }
-                })
-                .catch(function() {});
+                } catch(err) {}
+            };
+
+            ws.onclose = function() {
+                ws = null;
+                if (wsReconnectTimer) clearTimeout(wsReconnectTimer);
+                wsReconnectTimer = setTimeout(connectWebSocket, 10000);
+            };
         }
 
-        // Poll for new notifications every 60 seconds
+        function updateBadgeUI(count) {
+            const badge = document.getElementById('unreadBadge');
+            if (badge) {
+                if (count > 0) {
+                    badge.style.display = 'inline';
+                    badge.textContent = count > 99 ? '99+' : count;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        function showTopNotification(data) {
+            var banner = document.getElementById('topNotificationBanner');
+            if (!banner) return;
+            if (data && data.id) {
+                document.getElementById('topNotifTitle').textContent = data.title;
+                document.getElementById('topNotifBody').textContent = data.body;
+                banner.style.display = 'flex';
+                var notifId = data.id;
+                document.getElementById('topNotifClose').onclick = function() {
+                    banner.style.display = 'none';
+                    fetch('/api/notifications/' + notifId + '/read/', { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } });
+                };
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            connectWebSocket();
             updateUnreadBadge();
-            loadTopNotification();
-            setInterval(updateUnreadBadge, 60000);
         });
 
         // Global Search Enter Fix
@@ -605,6 +704,85 @@
                 return false;
             }
         });
+
+        // Scroll-to-Top Button
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        if (scrollTopBtn) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 400) {
+                    scrollTopBtn.classList.add('visible');
+                } else {
+                    scrollTopBtn.classList.remove('visible');
+                }
+            });
+            scrollTopBtn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Animated Stat Counters
+        document.querySelectorAll('.counter').forEach(function(el) {
+            var target = parseInt(el.getAttribute('data-target') || '0', 10);
+            if (target === 0) { el.textContent = '0'; return; }
+            var duration = 1000;
+            var start = performance.now();
+            function update(now) {
+                var elapsed = now - start;
+                var progress = Math.min(elapsed / duration, 1);
+                var eased = 1 - Math.pow(1 - progress, 3);
+                el.textContent = Math.floor(target * eased).toLocaleString();
+                if (progress < 1) requestAnimationFrame(update);
+                else el.textContent = target.toLocaleString();
+            }
+            requestAnimationFrame(update);
+        });
+
+        // Global Search (superuser)
+        var globalSearchTimer = null;
+        function debounceGlobalSearch(query) {
+            clearTimeout(globalSearchTimer);
+            globalSearchTimer = setTimeout(function() {
+                if (query.length < 2) {
+                    var r = document.getElementById('globalSearchResults');
+                    if (r) r.classList.add('d-none');
+                    return;
+                }
+                fetch('/admin/global-search/?q=' + encodeURIComponent(query), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        var container = document.getElementById('globalSearchResults');
+                        if (!container) return;
+                        if (!data.results || data.results.length === 0) {
+                            container.innerHTML = '<div class="global-search-empty">Nothing found</div>';
+                            container.classList.remove('d-none');
+                            return;
+                        }
+                        var html = data.results.map(function(r) {
+                            return '<a href="' + r.url + '" class="global-search-result-item" onclick="document.getElementById(\'globalSearchResults\').classList.add(\'d-none\')">' +
+                                '<span class="global-search-result-icon"><i class="fas ' + r.icon + '"></i></span>' +
+                                '<span class="global-search-result-title">' + r.title + '</span>' +
+                                '<span class="global-search-result-type">' + r.type + '</span>' +
+                            '</a>';
+                        }).join('');
+                        container.innerHTML = html;
+                        container.classList.remove('d-none');
+                    })
+                    .catch(function() {
+                        var r = document.getElementById('globalSearchResults');
+                        if (r) r.classList.add('d-none');
+                    });
+            }, 300);
+        }
+        document.addEventListener('click', function(e) {
+            var searchEl = document.querySelector('.global-search');
+            var results = document.getElementById('globalSearchResults');
+            if (searchEl && results && !searchEl.contains(e.target)) {
+                results.classList.add('d-none');
+            }
+        });
     </script>
+    <button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top" title="Наверх">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 </body>
 </html>
