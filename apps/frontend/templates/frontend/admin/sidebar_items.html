@@ -1,14 +1,8 @@
+{% extends 'frontend/shared/sidebar_items.html' %}
 {% load i18n %}
 {% load frontend_tags %}
 
-<!-- Sidebar Search -->
-<div class="sidebar-search mb-md">
-    <div class="relative">
-        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted" style="font-size: 0.75rem;"></i>
-        <input type="text" id="sidebarSearch" class="form-control w-full pl-8 pr-3 py-xs rounded-md text-sm" placeholder="{% trans 'Search...' %}" oninput="filterSidebar(this.value)" aria-label="{% trans 'Search navigation' %}">
-    </div>
-</div>
-
+{% block sidebar_extra %}
 <!-- System Health -->
 <div class="sidebar-section-label">{% trans "System" %}</div>
 <div class="health-status px-md py-sm mb-md" id="sysHealth">
@@ -25,7 +19,9 @@
         <span class="text-xs text-muted">{% trans "WebSocket" %}</span>
     </div>
 </div>
+{% endblock %}
 
+{% block sidebar_content %}
 <!-- Section: Asosiy -->
 <div class="sidebar-section-label">{% trans "Asosiy" %}</div>
 <a href="{% url 'frontend:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" data-name="bosh sahifa dashboard" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>
@@ -77,33 +73,9 @@
     <i class="fas fa-newspaper"></i>
     <span>{% trans "Yangiliklar" %}</span>
 </a>
+{% endblock %}
 
-<script>
-function filterSidebar(query) {
-    const items = document.querySelectorAll('.sidebar-nav .nav-link');
-    const sections = document.querySelectorAll('.sidebar-section-label');
-    const searchBox = document.getElementById('sidebarSearch');
-    const q = query.toLowerCase().trim();
-
-    items.forEach(item => {
-        const name = (item.getAttribute('data-name') || item.textContent.toLowerCase()).toLowerCase();
-        item.style.display = q === '' || name.includes(q) ? '' : 'none';
-    });
-
-    sections.forEach(s => {
-        let hasVisible = false;
-        let next = s.nextElementSibling;
-        while (next && !next.classList.contains('sidebar-section-label')) {
-            if (next.classList.contains('nav-link') && next.style.display !== 'none') {
-                hasVisible = true;
-                break;
-            }
-            next = next.nextElementSibling;
-        }
-        s.style.display = q === '' || hasVisible ? '' : 'none';
-    });
-}
-
+{% block sidebar_scripts %}
 // System Health Check
 (function() {
     function setHealth(id, status) {
@@ -128,4 +100,4 @@ function filterSidebar(query) {
     checkHealth();
     setInterval(checkHealth, 60000);
 })();
-</script>
+{% endblock %}

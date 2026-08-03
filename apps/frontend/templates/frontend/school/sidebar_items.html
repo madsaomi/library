@@ -1,6 +1,8 @@
+{% extends 'frontend/shared/sidebar_items.html' %}
 {% load i18n %}
 {% load frontend_tags %}
 
+{% block sidebar_content %}
 <div class="sidebar-section-label">{% trans "Asosiy" %}</div>
 <a href="{% url 'frontend:school_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'school_dashboard' %}active{% endif %}" data-name="bosh sahifa dashboard asosiy" {% if request.resolver_match.url_name == 'school_dashboard' %}aria-current="page"{% endif %}>
     <i class="fas fa-chart-line"></i>
@@ -54,3 +56,4 @@
     <i class="fas fa-qrcode"></i>
     <span>{% trans "QR Skaner" %}</span>
 </a>
+{% endblock %}

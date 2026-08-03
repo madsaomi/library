@@ -102,6 +102,6 @@ urlpatterns = [
     path('auth/token/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('auth/token/verify/', TokenVerifyView.as_view(), name='token-verify'),
-    # All registered router viewsets
-    path('', include(router.urls)),
+    # Versioned API
+    path('v1/', include(router.urls)),
 ]

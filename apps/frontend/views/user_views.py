@@ -1,3 +1,4 @@
+from books.achievements import get_level_info, get_next_level_info
 from books.models import Book, Category
 from books.search import search_books
 from django.contrib import messages
@@ -136,46 +137,6 @@ def news_list(request):
     return render(request, 'frontend/user/news.html', {'news_list': news})
 
 
-def get_level_info(level):
-    LEVEL_TABLE = [
-        (1, 'Новичок', 0),
-        (2, 'Читатель', 30),
-        (3, 'Книголюб', 80),
-        (4, 'Начитанный', 150),
-        (5, 'Книжный червь', 250),
-        (6, 'Эрудит', 400),
-        (7, 'Интеллектуал', 600),
-        (8, 'Профессор', 850),
-        (9, 'Мудрец', 1200),
-        (10, 'Легенда', 2000),
-    ]
-    for lvl, title, xp in LEVEL_TABLE:
-        if lvl == level:
-            return {'level': lvl, 'title': title, 'xp_required': xp}
-    return {'level': level, 'title': 'Новичок', 'xp_required': 0}
-
-
-def get_next_level_xp(level):
-    LEVEL_TABLE = [
-        (1, 'Новичок', 0),
-        (2, 'Читатель', 30),
-        (3, 'Книголюб', 80),
-        (4, 'Начитанный', 150),
-        (5, 'Книжный червь', 250),
-        (6, 'Эрудит', 400),
-        (7, 'Интеллектуал', 600),
-        (8, 'Профессор', 850),
-        (9, 'Мудрец', 1200),
-        (10, 'Легенда', 2000),
-    ]
-    for i, (lvl, title, xp) in enumerate(LEVEL_TABLE):
-        if lvl == level:
-            if i + 1 < len(LEVEL_TABLE):
-                return LEVEL_TABLE[i + 1][2]
-            return xp
-    return 30
-
-
 @login_required(login_url='login')
 def profile(request):
     if request.user.role == 'school_admin':
@@ -192,7 +153,8 @@ def profile(request):
 
     user = request.user
     level_info = get_level_info(user.level)
-    next_xp = get_next_level_xp(user.level)
+    next_level = get_next_level_info(user.level)
+    next_xp = next_level['xp_required'] if next_level else 0
     current_xp = user.xp_points or 0
 
     # Books by month chart
@@ -413,7 +375,8 @@ def achievements(request):
     unlocked_icons = user.unlocked_icons or ['fa-book']
 
     current_xp = user.xp_points or 0
-    next_xp = get_next_level_xp(user.level)
+    next_level = get_next_level_info(user.level)
+    next_xp = next_level['xp_required'] if next_level else 0
     if next_xp > 0:
         prev_xp = get_level_info(user.level)['xp_required']
         xp_percent = min(100, int((current_xp - prev_xp) / (next_xp - prev_xp) * 100))
