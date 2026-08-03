@@ -148,7 +148,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
+<script src="{% static 'js/chart.umd.min.js' %}"></script>
 {{ month_labels|json_script:"chart-month-labels" }}
 {{ monthly_issues|json_script:"chart-monthly-issues" }}
 {{ roles|json_script:"chart-roles" }}

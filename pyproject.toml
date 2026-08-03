@@ -2,7 +2,7 @@
 DJANGO_SETTINGS_MODULE = "core.settings"
 pythonpath = [".", "apps"]
 python_files = ["tests.py", "test_*.py"]
-testpaths = ["apps", "accounts", "api", "books", "schools", "stats"]
+testpaths = ["apps", "accounts", "api", "books", "core", "schools", "stats"]
 markers = ["e2e: End-to-end Playwright tests"]
 
 [tool."pytest-playwright"]
@@ -33,12 +33,8 @@ ignore = ["E402", "E501"]
 "api/tests.py" = ["ALL"]
 "conftest.py" = ["ALL"]
 "debug_*.py" = ["ALL"]
-"frontend/urls.py" = ["F403", "F405"]
-"frontend/views/__init__.py" = ["F401"]
 "frontend/views/*.py" = ["E501", "W293"]
 "e2e/*" = ["I001"]
-"api/serializers/__init__.py" = ["F401"]
-"api/views/__init__.py" = ["F401"]
 
 [tool.ruff.format]
 quote-style = "single"

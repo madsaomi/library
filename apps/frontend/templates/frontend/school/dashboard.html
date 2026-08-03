@@ -118,7 +118,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
+<script src="{% static 'js/chart.umd.min.js' %}"></script>
 {{ month_labels|json_script:"school-month-labels" }}
 {{ monthly_data|json_script:"school-monthly-data" }}
 <script>

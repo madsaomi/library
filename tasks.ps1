@@ -22,8 +22,7 @@ switch ($Command) {
         Write-Host "  clean        Remove cache files"
     }
     "install" {
-        & $PYTHON -m pip install -r requirements.txt
-        & $PYTHON -m pip install pytest pytest-django pytest-playwright
+        & $PYTHON -m pip install -r requirements-dev.txt
         & $PYTHON -m playwright install chromium
     }
     "lint" {

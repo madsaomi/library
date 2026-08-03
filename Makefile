@@ -10,9 +10,8 @@ help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-install: ## Install Python dependencies
-	$(PIP) install -r requirements.txt
-	$(PIP) install pytest pytest-django pytest-playwright playwright
+install: ## Install Python dependencies (dev = prod + tooling)
+	$(PIP) install -r requirements-dev.txt
 	playwright install chromium
 
 pre-commit: ## Install pre-commit hooks

@@ -133,7 +133,6 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@kutubxona.uz'
 
 INSTALLED_APPS = [
     'jazzmin',
-    'compressor',
     'daphne',
     'channels',
     'django.contrib.admin',
@@ -152,6 +151,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'django_extensions',
+    'simple_history',
     # Local apps
     'core',
     'accounts',
@@ -209,6 +210,7 @@ import dj_database_url
 DATABASES = {
     'default': dj_database_url.config(
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600,
     )
 }
 
@@ -233,7 +235,7 @@ STORAGES = {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
 }
 WHITENOISE_MANIFEST_STRICT = False
@@ -320,14 +322,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder',
 ]
-
-COMPRESS_ENABLED = os.environ.get('COMPRESS_ENABLED', 'True').lower() in ('true', '1', 't')
-COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.rCSSMinFilter']
-COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
-COMPRESS_OUTPUT_DIR = 'compressor'
-COMPRESS_STORAGE = 'compressor.storage.CompressorFileStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -362,8 +357,12 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'format': '%(asctime)s %(levelname)s %(name)s %(module)s %(funcName)s %(lineno)d %(message)s',
+        },
         'verbose': {
-            'format': '[{asctime}] {levelname} {name} {message}',
+            'format': '[{asctime}] {levelname} {name} {module}.{funcName}:{lineno} {message}',
             'style': '{',
         },
         'simple': {
@@ -371,31 +370,95 @@ LOGGING = {
             'style': '{',
         },
     },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
+            'filters': ['require_debug_true'],
         },
         'file': {
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs' / 'django.log',
+            'maxBytes': 10485760,
+            'backupCount': 10,
+            'formatter': 'json',
+        },
+        'error_file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'errors.log',
+            'maxBytes': 10485760,
+            'backupCount': 10,
+            'formatter': 'json',
+            'level': 'ERROR',
+        },
+        'mail_admins': {
+            'class': 'django.utils.log.AdminEmailHandler',
+            'level': 'ERROR',
             'formatter': 'verbose',
+            'filters': ['require_debug_false'],
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console', 'file', 'error_file'],
             'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
         },
         'django.request': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console', 'file', 'error_file', 'mail_admins'],
             'level': 'ERROR',
             'propagate': False,
         },
-        'frontend_school': {
+        'django.server': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
+            'propagate': False,
         },
+        'django.db.backends': {
+            'handlers': ['console', 'file'],
+            'level': os.environ.get('DB_LOG_LEVEL', 'WARNING'),
+            'propagate': False,
+        },
+        'frontend_school': {
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'INFO',
+        },
+        'api': {
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'INFO',
+        },
+        'books': {
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'INFO',
+        },
+        'accounts': {
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'INFO',
+        },
+        'schools': {
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'INFO',
+        },
+        'stats': {
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'INFO',
+        },
+        'notifications': {
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'INFO',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file', 'error_file'],
+        'level': 'WARNING',
     },
 }
 
@@ -500,7 +563,16 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/day',
         'user': '1000/hour',
+        'login': '10/minute',
     },
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1', 'v2'],
 }
 
 # drf-spectacular

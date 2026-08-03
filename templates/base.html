@@ -1,6 +1,5 @@
 {% load static %}
 {% load i18n %}
-{% load compress %}
 {% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
@@ -10,8 +9,7 @@
     <title>{% block title %}{% trans "Online Kutibxona" %}{% endblock %}</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    {% compress css %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.6">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <meta name="theme-color" content="#d97706">
@@ -19,7 +17,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Kutubxona">
     <meta name="application-name" content="Online Kutubxona">
-    {% endcompress %}
     <script>window.VAPID_PUBLIC_KEY = '{{ vapid_public_key|escapejs }}';</script>
     {% block extra_head %}{% endblock %}
     <style>
@@ -346,7 +343,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
-    {% compress js %}
     <script src="{% static 'js/push-notifications.js' %}"></script>
     <script src="{% static 'js/htmx.min.js' %}"></script>
     <script>
@@ -378,7 +374,6 @@
         });
     </script>
     <script src="{% static 'js/level-up.js' %}"></script>
-    {% endcompress %}
     <script>
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');

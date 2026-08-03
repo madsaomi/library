@@ -23,12 +23,15 @@ Open http://localhost:8000
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # or .venv\Scripts\activate on Windows
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 cp .env.example .env
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
+
+> `requirements.txt` is production-only; `requirements-dev.txt` (prod + test/lint tooling) is for local
+> development and CI. Playwright browsers: `python -m playwright install chromium`.
 
 ## Project Structure
 
@@ -36,13 +39,18 @@ python manage.py runserver
 library/
 ├── apps/                    # Django applications (accounts, api, books, frontend, notifications, schools, stats)
 ├── core/                    # Django project core (settings, asgi, wsgi, urls)
-├── docs/                    # Project documentation (REQS.md, SECURITY.md, CHANGELOG.md)
+├── docs/                    # Project documentation (agent-context/, REQS.md, SECURITY.md, CHANGELOG.md)
 ├── e2e/                     # End-to-end Playwright tests
 ├── templates/               # Global HTML templates
 ├── static/                  # Static assets (CSS, JS, images)
 ├── scripts/                 # Utility & helper scripts
+├── requirements.txt         # Production dependencies
+├── requirements-dev.txt     # + dev/test/lint tooling
 └── manage.py                # Django management entrypoint
 ```
+
+> **For AI agents**: read `docs/agent-context/00-START-HERE.md` first — it points to the full
+> project state, history, and roadmap without needing to re-scan the codebase.
 
 ## Celery (Background Tasks)
 

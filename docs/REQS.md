@@ -327,7 +327,7 @@ qr.save(f'media/qr/book_{book.id}.png')
 
 ```bash
 # 1. Установка зависимостей
-pip install django djangorestframework pillow qrcode psycopg2-binary
+pip install django djangorestframework pillow qrcode "psycopg[binary]"
 
 # 2. Создание superuser
 python manage.py createsuperuser

@@ -133,7 +133,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/chart.umd.min.js' %}?v=2"></script>
+<script src="{% static 'js/chart.umd.min.js' %}"></script>
 <script>
 function initStatCharts() {
     document.querySelectorAll('.stat-no-data').forEach(function(el){el.remove()});

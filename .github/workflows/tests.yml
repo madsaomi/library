@@ -22,8 +22,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install dependencies (dev)
+        run: pip install -r requirements-dev.txt
 
       - name: Ruff check
         run: ruff check .
@@ -61,8 +61,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install dependencies (dev)
+        run: pip install -r requirements-dev.txt
 
       - name: Check Django system
         run: python manage.py check
@@ -117,10 +117,8 @@ jobs:
           python-version: "3.13"
           cache: pip
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install playwright pytest-playwright
+      - name: Install dependencies (dev)
+        run: pip install -r requirements-dev.txt
 
       - name: Install Playwright browsers
         run: python -m playwright install chromium --with-deps

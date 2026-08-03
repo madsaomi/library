@@ -1,5 +1,31 @@
 # Changelog
 
+## v1.1.0 (2026-08-03)
+
+### Added
+- Soft delete for API resources (`SoftDeleteManager`, `SoftDeleteMixin`) — migrations `accounts/0012`, `books/0014`, `schools/0010`
+- Audit history via `django-simple-history` (`HistoricalRecords`) on key models
+- Shared sidebar (`frontend/shared/sidebar_items.html`) used by all three panels
+- `frontend:profile_edit` URL for the existing `profile_edit` view
+- `requirements-dev.txt` — prod (`requirements.txt`) vs dev/test/lint tooling split
+
+### Changed
+- Reworked `apps/frontend/urls.py` — all patterns under `app_name = 'frontend'`
+- Added `__all__` to `api/views/__init__.py` and `api/serializers/__init__.py`
+- Static pipeline: `django-compressor` removed → whitenoise `CompressedManifestStaticFilesStorage`; `{% compress %}` stripped from templates; `?v=` cache-busters removed
+- Database driver: `psycopg2-binary` → `psycopg[binary]` (v3)
+- `pyproject.toml`: `core` added to pytest `testpaths` (was silently skipped); stale per-file-ignores removed
+- AGENTS.md now points agents to `docs/agent-context/` (state/history/roadmap)
+- CI/Makefile/tasks.ps1 install `requirements-dev.txt`
+
+### Fixed
+- `frontend/admin/profile.html` missing `{% load frontend_tags %}` (500 on admin profile page)
+- `static/js/chart.umd.min.js` broken `sourceMappingURL` reference (failed manifest post-processing)
+
+### Removed
+- `gunicorn` (unused — `start.sh` runs only daphne)
+- `django-compressor`, `rcssmin`
+
 ## v1.0.0 (2026-07-04)
 
 ### Added
