@@ -42,6 +42,29 @@ def health_check(request):
         checks['cache'] = str(e)
         all_ok = False
 
+    try:
+        import redis
+
+        redis_url = getattr(settings, 'REDIS_URL', None) or getattr(settings, 'CHANNEL_LAYER_REDIS_URL', None)
+        if redis_url:
+            r = redis.from_url(redis_url, socket_connect_timeout=2)
+            r.ping()
+            checks['redis'] = 'ok'
+        else:
+            checks['redis'] = 'not_configured'
+    except Exception as e:
+        checks['redis'] = str(e)
+        all_ok = False
+
+    try:
+        from celery import current_app
+
+        current_app.control.ping(timeout=2)
+        checks['celery'] = 'ok'
+    except Exception as e:
+        checks['celery'] = str(e)
+        all_ok = False
+
     status_code = 200 if all_ok else 503
     return JsonResponse(
         {
