@@ -28,5 +28,5 @@ def login(page, live_server_url):
     page.fill('#username', 'admin')
     page.fill('#password', 'superadmin')
     page.click('button[type="submit"]')
-    page.wait_for_url('**/school/**')
+    page.wait_for_url('**/admin/**')
     return page

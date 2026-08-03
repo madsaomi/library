@@ -3,7 +3,7 @@ import pytest
 
 @pytest.mark.e2e
 def test_dashboard_loads(page, login, live_server_url):
-    page.goto(live_server_url + '/school/')
+    page.goto(live_server_url + '/admin/')
     assert page.is_visible('.main-content')
     assert 'dashboard' in page.content().lower()
 

@@ -15,8 +15,8 @@ def test_login_success(page, live_server_url):
     page.fill('#username', 'admin')
     page.fill('#password', 'superadmin')
     page.click('button[type="submit"]')
-    page.wait_for_url('**/school/**')
-    assert '/school/' in page.url
+    page.wait_for_url('**/admin/**')
+    assert '/admin/' in page.url
 
 
 @pytest.mark.e2e

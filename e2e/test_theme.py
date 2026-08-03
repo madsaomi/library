@@ -22,8 +22,10 @@ def test_theme_cycle(page, login, theme, icon):
 @pytest.mark.e2e
 def test_theme_cycles_all(page, login):
     theme_btn = page.locator('#themeToggle')
+    start = page.locator('html').get_attribute('data-theme') or 'dark'
+    start_index = THEMES.index(start)
     for i in range(4):
         current = page.locator('html').get_attribute('data-theme') or 'dark'
-        assert current == THEMES[i % 4]
+        assert current == THEMES[(start_index + i) % 4]
         theme_btn.click()
         page.wait_for_timeout(100)
