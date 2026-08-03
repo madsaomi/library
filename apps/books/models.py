@@ -1,25 +1,19 @@
 from django.conf import settings
-from django.contrib.postgres.indexes import GinIndex
 from django.db import models
-from django.db.models import F, Func, Value
 from django.utils.translation import gettext_lazy as _
-
-
-def book_search_vector():
-    return Func(
-        F('title'),
-        Value('A'),
-        F('author'),
-        Value('B'),
-        F('description'),
-        Value('C'),
-        function='to_tsvector',
-        template="%(function)s('simple', %(expressions)s)",
-    )
+from simple_history.models import HistoricalRecords
 
 
 class Category(models.Model):
     name = models.CharField(_('Nomi'), max_length=255)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return self.name
@@ -48,6 +42,15 @@ class Book(models.Model):
     grade = models.IntegerField(
         _('Sinf'), null=True, blank=True, help_text=_("Darslik uchun mo'ljallangan sinf (1-11)")
     )
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+    history = HistoricalRecords()
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     @property
     def currently_reading_count(self):
@@ -93,12 +96,7 @@ class Book(models.Model):
 
     class Meta:
         ordering = ['-id']
-        indexes = [
-            GinIndex(
-                book_search_vector(),
-                name='book_search_gin_idx',
-            ),
-        ]
+        indexes = []
 
 
 class BookIssue(models.Model):
@@ -110,6 +108,14 @@ class BookIssue(models.Model):
     return_qr_code = models.ImageField(upload_to='return_qrs/%Y/%m/%d/', null=True, blank=True)
     qr_token = models.CharField(max_length=255, null=True, blank=True)
     xp_awarded = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         indexes = [
@@ -143,6 +149,14 @@ class TextbookLoan(models.Model):
     )
     notes = models.TextField(_('Izoh'), null=True, blank=True)
     academic_year = models.CharField(_("O'quv yili"), max_length=20, help_text='Masalan: 2025/2026')
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         verbose_name = _('Darslik ijarasi')
@@ -168,6 +182,14 @@ class BookRequest(models.Model):
     status = models.CharField(_('Holati'), max_length=20, choices=STATUS_CHOICES, default='pending')
     qr_code = models.ImageField(upload_to='request_qrs/%Y/%m/%d/', null=True, blank=True)
     qr_token = models.CharField(max_length=255, null=True, blank=True)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return f'Request: {self.book.title} by {self.user.username}'
@@ -178,6 +200,14 @@ class BookWaitlist(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('Foydalanuvchi'))
     created_at = models.DateTimeField(_("Qo'shilgan sana"), auto_now_add=True)
     is_notified = models.BooleanField(_('Xabardor qilingan'), default=False)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         ordering = ['created_at']
@@ -207,6 +237,14 @@ class Achievement(models.Model):
         ),
     )
     condition_value = models.IntegerField(_('Shart qiymati'))
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         ordering = ['name']
@@ -221,6 +259,14 @@ class UserAchievement(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='achievements')
     achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE)
     earned_at = models.DateTimeField(_("Qo'lga kiritilgan vaqt"), auto_now_add=True)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         unique_together = ['user', 'achievement']
@@ -250,6 +296,14 @@ class Challenge(models.Model):
         'schools.School', on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('Maktab')
     )
     is_active = models.BooleanField(_('Faol'), default=True)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         ordering = ['-start_date']
@@ -266,6 +320,14 @@ class UserChallenge(models.Model):
     progress = models.IntegerField(_('Progress'), default=0)
     completed = models.BooleanField(_('Yakunlangan'), default=False)
     completed_at = models.DateTimeField(_('Yakunlangan vaqt'), null=True, blank=True)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         unique_together = ['user', 'challenge']
@@ -282,6 +344,14 @@ class ReaderOfMonth(models.Model):
     month = models.IntegerField(_('Oy'))
     year = models.IntegerField(_('Yil'))
     books_count = models.IntegerField(_('Kitoblar soni'))
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         unique_together = ['school', 'month', 'year']

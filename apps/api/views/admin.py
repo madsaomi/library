@@ -4,7 +4,7 @@ from accounts.models import CustomUser
 from books.models import Book, BookIssue
 from django.db.models import Count, Exists, OuterRef, Q
 from django.utils import timezone
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from schools.models import District, Institution, School
@@ -23,13 +23,33 @@ from api.serializers import (
 )
 
 
-class SchoolViewSet(viewsets.ModelViewSet):
+class SoftDeleteMixin:
+    """Soft-delete support: hides is_deleted rows and logs DELETE actions."""
+
+    delete_label = 'Deleted {instance}'
+
+    def perform_destroy(self, instance):
+        ActionLog.objects.create(
+            user=self.request.user,
+            action_type='DELETE',
+            message=self.delete_label.format(instance=instance),
+        )
+        instance.delete()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SchoolViewSet(SoftDeleteMixin, viewsets.ModelViewSet):
     permission_classes = [IsSuperuser]
     serializer_class = SchoolSerializer
 
     def get_queryset(self):
         qs = (
-            School.objects.select_related('district')
+            School.objects.filter(is_deleted=False)
+            .select_related('district')
             .annotate(
                 has_admin=Exists(CustomUser.objects.filter(school=OuterRef('pk'), role='school_admin')),
                 student_count=Count('customuser', filter=Q(customuser__role='student')),
@@ -47,33 +67,35 @@ class SchoolViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def brief(self, request):
-        qs = self.filter_queryset(School.objects.all()).only('id', 'name')
+        qs = self.filter_queryset(School.objects.filter(is_deleted=False)).only('id', 'name')
         return Response([{'id': s.id, 'name': s.name} for s in qs])
 
 
-class DistrictViewSet(viewsets.ModelViewSet):
+class DistrictViewSet(SoftDeleteMixin, viewsets.ModelViewSet):
     permission_classes = [IsSuperuser]
     serializer_class = DistrictSerializer
-    queryset = District.objects.all()
+    queryset = District.objects.filter(is_deleted=False)
 
     def get_queryset(self):
-        return District.objects.annotate(
-            school_count=Count('schools', filter=Q(schools__customuser__role='school_admin'))
-        ).order_by('name')
+        return (
+            District.objects.filter(is_deleted=False)
+            .annotate(school_count=Count('schools', filter=Q(schools__customuser__role='school_admin')))
+            .order_by('name')
+        )
 
 
-class InstitutionViewSet(viewsets.ModelViewSet):
+class InstitutionViewSet(SoftDeleteMixin, viewsets.ModelViewSet):
     permission_classes = [IsSuperuser]
     serializer_class = InstitutionSerializer
-    queryset = Institution.objects.all().order_by('-id')
+    queryset = Institution.objects.filter(is_deleted=False).order_by('-id')
 
 
-class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
+class AllUsersViewSet(SoftDeleteMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsSuperuser]
     serializer_class = CustomUserDetailSerializer
 
     def get_queryset(self):
-        qs = CustomUser.objects.select_related('school').all().order_by('-date_joined')
+        qs = CustomUser.objects.filter(is_deleted=False).select_related('school').order_by('-date_joined')
         role = self.request.query_params.get('role')
         school_id = self.request.query_params.get('school')
         archived = self.request.query_params.get('archived')
@@ -96,12 +118,13 @@ class AllUsersViewSet(viewsets.ReadOnlyModelViewSet):
         return Response({r['role']: r['count'] for r in roles})
 
 
-class AdminUserViewSet(viewsets.ModelViewSet):
+class AdminUserViewSet(SoftDeleteMixin, viewsets.ModelViewSet):
     permission_classes = [IsSuperuser]
     serializer_class = CustomUserCreateSerializer
+    delete_label = 'Deleted school admin: {instance.username}'
 
     def get_queryset(self):
-        return CustomUser.objects.filter(role='school_admin').order_by('-date_joined')
+        return CustomUser.objects.filter(role='school_admin', is_deleted=False).order_by('-date_joined')
 
     def perform_create(self, serializer):
         user = serializer.save()
@@ -115,17 +138,11 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             user=self.request.user, action_type='UPDATE', message=f'Updated school admin: {user.username}'
         )
 
-    def perform_destroy(self, instance):
-        ActionLog.objects.create(
-            user=self.request.user, action_type='DELETE', message=f'Deleted school admin: {instance.username}'
-        )
-        instance.delete()
 
-
-class AllBooksViewSet(viewsets.ReadOnlyModelViewSet):
+class AllBooksViewSet(SoftDeleteMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsSuperuser]
     serializer_class = BookSerializer
-    queryset = Book.objects.select_related('category', 'school').all().order_by('-id')
+    queryset = Book.objects.filter(is_deleted=False).select_related('category', 'school').order_by('-id')
 
 
 class AllActiveLoansViewSet(viewsets.ReadOnlyModelViewSet):

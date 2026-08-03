@@ -1,9 +1,23 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from simple_history.models import HistoricalRecords
+
+
+class SoftDeleteManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
 
 
 class District(models.Model):
     name = models.CharField(_('Tuman nomi'), max_length=255, unique=True)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return self.name
@@ -20,6 +34,15 @@ class School(models.Model):
     district = models.ForeignKey(
         District, on_delete=models.SET_NULL, null=True, blank=True, related_name='schools', verbose_name=_('Tuman')
     )
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+    history = HistoricalRecords()
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return self.name
@@ -33,6 +56,14 @@ class School(models.Model):
 class Institution(models.Model):
     name = models.CharField(_('Muassasa nomi'), max_length=255, unique=True)
     address = models.CharField(_('Manzil'), max_length=255)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return self.name
@@ -44,6 +75,14 @@ class Institution(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return self.name
@@ -52,6 +91,14 @@ class Subject(models.Model):
 class GradePromotionLog(models.Model):
     promoted_at = models.DateTimeField(auto_now_add=True)
     year = models.IntegerField(unique=True)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         db_table = 'frontend_school_gradepromotionlog'
@@ -70,9 +117,17 @@ class News(models.Model):
     body = models.TextField(_('Matn'))
     image = models.ImageField(_('Rasm'), upload_to='news_images/', null=True, blank=True)
     is_published = models.BooleanField(_('Nashr qilingan'), default=False)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
     created_at = models.DateTimeField(_('Yaratilgan sana'), auto_now_add=True, db_index=True)
     template_key = models.CharField(max_length=50, null=True, blank=True, editable=False)
     template_data = models.JSONField(null=True, blank=True, editable=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         db_table = 'frontend_school_news'
