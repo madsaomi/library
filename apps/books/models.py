@@ -4,6 +4,21 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 
+def book_search_vector():
+    return models.Func(
+        models.F('title'),
+        models.Value('A'),
+        models.F('author'),
+        models.Value('B'),
+        models.F('description'),
+        models.Value('C'),
+        function='to_tsvector',
+        template="%(function)s('simple', %(expressions)s)",
+        arg_joiner=' || ',
+        output_field=models.TextField(),
+    )
+
+
 class Category(models.Model):
     name = models.CharField(_('Nomi'), max_length=255)
     is_deleted = models.BooleanField(_("O'chirilgan"), default=False)

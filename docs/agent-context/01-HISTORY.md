@@ -74,3 +74,21 @@ Celery+Beat, jazzmin. Replace obsolete pieces:
   (requirements files + `docs/agent-context/`).
 - **Verified**: `pip install --dry-run -r requirements-dev.txt` resolves; `manage.py check` 0
   issues; `ruff check .` + `ruff format --check .` clean (156 files); `pytest` collects 168.
+
+## Session: CI fix — postgres search (2026-08-03)
+- Pushed the 5 commits; CI `lint` passed but `test`/`e2e` failed at **"Run migrations"** (Postgres).
+- Root cause in the Postgres-only search feature (never ran locally — dev uses SQLite, CI was
+  already red since `3433ecc`):
+  - `books/migrations/0012` RunPython built an **invalid GIN index** SQL: `to_tsvector()` called
+    with 7 args (missing `arg_joiner=' || '`), and `import django.contrib.postgres.indexes` had
+    been dropped (AttributeError on Postgres).
+  - `book_search_vector()` was **deleted from `books/models.py`** during the soft-delete work, but
+    `books/search.py` imports it (`from .models import book_search_vector`) → ImportError at runtime
+    on Postgres.
+- Fixed: re-added the import + `arg_joiner=' || '` in the migration's add/remove functions; restored
+  `book_search_vector()` in `books/models.py` with `output_field=models.TextField()` (Func with mixed
+  types otherwise raises FieldError inside `SearchRank`).
+- Verified: `book_search_vector()` compiles to `to_tsvector('simple', title || 'A' || author || 'B' ||
+  description || 'C')`; `SearchRank` path compiles; fresh `migrate` from scratch on SQLite applies all
+  migrations; `makemigrations --check` → no changes; ruff clean; books+api+core tests 158 passed.
+- CI runs 2026-07-27 + 08-03 were failing for this reason; `e2e`/`test` should now go green.

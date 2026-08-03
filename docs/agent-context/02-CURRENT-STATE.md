@@ -14,7 +14,12 @@ Last fully verified: 2026-08-03 (after the modernization + dependency-split sess
 - Smoke render (test client, `HTTP_HOST='localhost'`): `/admin/`, `/admin/news/`, `/profile/`,
   `/admin/statistics/`, `/admin/logs/`, `/school/`, `/school/news/`, `/library/`,
   `/library/news/`, `/library/my-books/` all 200. Student hitting `/profile/` gets 302 (intended —
-  that view is `@superuser_required`).
+  that view is `@superuser_required`)
+- **Postgres search path fixed** (2026-08-03): `book_search_vector()` restored in
+  `books/models.py`; `books/migrations/0012` GIN index SQL valid + import restored. Compiles to
+  `to_tsvector('simple', title || 'A' || author || 'B' || description || 'C')`. Fresh SQLite
+  `migrate` from scratch OK; `makemigrations --check` → no changes. This was the CI "Run
+  migrations" failure on Postgres (CI red since `3433ecc`).
 
 ## Dependencies (as of now)
 - **`requirements.txt`** — production only (used by `Dockerfile`/Railway): Django 6.0.7, DRF 3.16,
