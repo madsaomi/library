@@ -36,7 +36,9 @@ class GradePromotionMiddleware:
                     parts = student.grade.strip().split('-')
                     try:
                         num = int(parts[0])
-                    except ValueError, IndexError:
+                    except ValueError:
+                        continue
+                    except IndexError:
                         continue
                     num += 1
                     if num > 11:
