@@ -726,6 +726,9 @@ def district_delete(request, pk):
 @login_required(login_url='login')
 @superuser_required
 def school_add(request):
+    import secrets
+    import string
+
     if request.method == 'POST':
         school_id = request.POST.get('existing_school_id')
         school_name = request.POST.get('name')
@@ -751,36 +754,53 @@ def school_add(request):
 
             school.save()
 
-            # 2. Create Admin User
+            # 2. Create Admin User with auto-generated credentials
             admin_username = form.cleaned_data.get('admin_username')
             admin_password = form.cleaned_data.get('admin_password')
 
-            if admin_username and admin_password:
-                admin_user = CustomUser.objects.create_user(
-                    username=admin_username,
-                    password=admin_password,
-                    role='school_admin',
-                    school=school,
-                    first_name='Admin',
-                    last_name=school.name,
-                )
-                admin_user.save()
+            # Auto-generate credentials if not provided
+            if not admin_username:
+                district_part = district_id or 'no_district'
+                school_part = school.name.replace(' ', '_')[:20]
+                random_part = secrets.token_hex(3)
+                admin_username = f'admin_{school_part}_{random_part}'
 
-                # Log action
-                from stats.models import ActionLog
+            if not admin_password:
+                alphabet = string.ascii_letters + string.digits
+                admin_password = ''.join(secrets.choice(alphabet) for _ in range(14))
 
-                ActionLog.objects.create(
-                    user=request.user,
-                    action_type='CREATE',
-                    message=_('Yangi maktab ({}) va uning admini ({}) yaratildi.').format(
-                        school.name, admin_user.username
-                    ),
-                )
-                messages.success(request, _('Maktab va admin yaratildi! Login: {}').format(admin_user.username))
-            else:
-                messages.success(request, _('Maktab yaratildi (admin biriktirilmadi).'))
+            admin_user = CustomUser.objects.create_user(
+                username=admin_username,
+                password=admin_password,
+                role='school_admin',
+                school=school,
+                first_name='Admin',
+                last_name=school.name,
+            )
+            admin_user.save()
 
-            return redirect('frontend:schools_list')
+            # Log action
+            from stats.models import ActionLog
+
+            ActionLog.objects.create(
+                user=request.user,
+                action_type='CREATE',
+                message=_('Yangi maktab ({}) va uning admini ({}) yaratildi.').format(
+                    school.name, admin_user.username
+                ),
+            )
+            messages.success(request, _('Maktab va admin yaratildi!'))
+
+            # Pass credentials to template for display
+            return render(
+                request,
+                'frontend/admin/school_created.html',
+                {
+                    'school': school,
+                    'admin_username': admin_username,
+                    'admin_password': admin_password,
+                },
+            )
 
     else:
         form = UnifiedSchoolForm()
