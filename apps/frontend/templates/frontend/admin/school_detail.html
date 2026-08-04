@@ -31,11 +31,17 @@
                 <div class="text-muted text-sm mb-xs">{% trans "Maktab Admini" %}</div>
                 {% if school_admin %}
                 <div class="text-semibold text-md mb-sm">{{ school_admin.get_full_name|default:school_admin.username }}</div>
-                <div class="text-muted text-sm d-flex gap-md flex-wrap">
+                <div class="text-muted text-sm d-flex gap-md flex-wrap align-center">
                     <span><i class="fas fa-user-shield text-primary"></i> {{ school_admin.username }}</span>
                     <span>
                         <i class="fas fa-key text-primary"></i>
-                        <span class="text-main" style="letter-spacing: 2px;">••••••••</span>
+                        <span class="admin-pass text-main password-mask" id="detail-pass-{{ school.id }}" style="letter-spacing: 2px;">
+                            {% if admin_password %}{{ admin_password|truncatechars:8 }}{% else %}••••••••{% endif %}
+                        </span>
+                        <span class="admin-pass-full d-none text-main" id="detail-pass-full-{{ school.id }}">
+                            {% if admin_password %}{{ admin_password }}{% else %}••••••••{% endif %}
+                        </span>
+                        <i class="fas fa-eye toggle-detail-pass cursor-pointer text-primary ml-xs" data-id="{{ school.id }}" style="font-size: 0.7rem;" title="{% trans 'Parolni ko\'rsatish' %}"></i>
                     </span>
                 </div>
                 {% else %}
@@ -124,6 +130,27 @@
 </div>
 
 <script>
+// Password toggle
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('.toggle-detail-pass');
+    if (!target) return;
+    const id = target.dataset.id;
+    const hidden = document.getElementById('detail-pass-' + id);
+    const visible = document.getElementById('detail-pass-full-' + id);
+    if (visible.classList.contains('d-none')) {
+        visible.classList.remove('d-none');
+        hidden.classList.add('d-none');
+        target.classList.remove('fa-eye');
+        target.classList.add('fa-eye-slash');
+    } else {
+        visible.classList.add('d-none');
+        hidden.classList.remove('d-none');
+        target.classList.remove('fa-eye-slash');
+        target.classList.add('fa-eye');
+    }
+});
+
+// Grade accordion
 document.querySelectorAll('.grade-header').forEach(function(header) {
     header.addEventListener('click', function() {
         const body = this.nextElementSibling;

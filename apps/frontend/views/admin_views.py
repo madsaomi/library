@@ -597,7 +597,8 @@ def school_detail(request, pk):
         'issued_count': BookIssue.objects.select_related('book', 'user')
         .filter(book__school=school, is_returned=False)
         .count(),
-        'school_admin': CustomUser.objects.filter(school=school, role='school_admin').first(),
+        'school_admin': school_admin,
+        'admin_password': admin_password,
         'grades': grades,
         'grade_counts': grade_counts,
         'books': Book.objects.select_related('school', 'category').filter(school=school).order_by('-id')[:20],
