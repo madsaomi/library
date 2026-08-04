@@ -136,7 +136,11 @@ class MyBooksViewSet(viewsets.ViewSet):
 class BookDetailViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsStudentOrTeacher]
     serializer_class = BookSerializer
-    queryset = Book.objects.select_related('category', 'school').all()
+
+    def get_queryset(self):
+        if not self.request.user.school:
+            return Book.objects.none()
+        return Book.objects.select_related('category', 'school').filter(school=self.request.user.school)
 
     @action(detail=True, methods=['post'])
     def reserve(self, request, pk=None):

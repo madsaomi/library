@@ -242,7 +242,7 @@ def books_list(request):
     if query:
         from books.search import search_books
 
-        books = search_books(books, query, fields=('title',))
+        books = search_books(books, query)
 
     if category_id:
         books = books.filter(category_id=category_id)

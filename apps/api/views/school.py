@@ -253,6 +253,8 @@ class QrProcessView(viewsets.ViewSet):
             return Response({'detail': 'Token is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         book_request = get_object_or_404(BookRequest, qr_token=token, status='approved')
+        if book_request.book.school != request.user.school:
+            return Response({'detail': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
 
         if book_request.book.available_count < 1:
             book_request.status = 'pending'
@@ -411,19 +413,19 @@ class CsvExportView(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def students(self, request):
         school = request.user.school
-        students = CustomUser.objects.filter(school=school, role='student')
+        students = CustomUser.objects.filter(school=school, role='student', is_archived=False, is_deleted=False)
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="students.csv"'
         writer = csv.writer(response)
-        writer.writerow(['Username', 'First Name', 'Last Name', 'Grade', 'Password'])
+        writer.writerow(['Username', 'First Name', 'Last Name', 'Grade'])
         for s in students:
-            writer.writerow([s.username, s.first_name, s.last_name, s.grade, s.raw_password or ''])
+            writer.writerow([s.username, s.first_name, s.last_name, s.grade or ''])
         return response
 
     @action(detail=False, methods=['get'])
     def books(self, request):
         school = request.user.school
-        books = Book.objects.filter(school=school).select_related('category')
+        books = Book.objects.filter(school=school, is_deleted=False).select_related('category')
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="books.csv"'
         writer = csv.writer(response)
@@ -444,7 +446,7 @@ class CsvExportView(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def issues(self, request):
         school = request.user.school
-        issues = BookIssue.objects.filter(book__school=school).select_related('book', 'user')
+        issues = BookIssue.objects.filter(book__school=school, is_deleted=False).select_related('book', 'user')
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="issues.csv"'
         writer = csv.writer(response)

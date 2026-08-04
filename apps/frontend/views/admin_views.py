@@ -166,7 +166,7 @@ def check_username(request):
 @login_required(login_url='login')
 @superuser_required
 def muassasalar_list(request):
-    institutions = Institution.objects.all().order_by('-id')
+    institutions = Institution.objects.filter(is_deleted=False).order_by('-id')
     return render(request, 'frontend/admin/muassasalar.html', {'institutions': institutions})
 
 
@@ -175,7 +175,7 @@ def muassasalar_list(request):
 def districts_list(request):
     from django.db.models import Count, Q
 
-    districts = District.objects.annotate(
+    districts = District.objects.filter(is_deleted=False).annotate(
         school_count=Count('schools', filter=Q(schools__customuser__role='school_admin'))
     ).order_by('name')
     total_schools = sum(d.school_count for d in districts)
@@ -189,8 +189,6 @@ def districts_list(request):
     )
 
 
-@login_required(login_url='login')
-@superuser_required
 @login_required(login_url='login')
 @superuser_required
 def statistics(request):
@@ -497,7 +495,7 @@ def user_detail(request, pk):
 @login_required(login_url='login')
 @superuser_required
 def all_books_list(request):
-    books = Book.objects.select_related('school', 'category').all().select_related('school', 'category').order_by('-id')
+    books = Book.objects.filter(is_deleted=False).select_related('school', 'category').order_by('-id')
 
     q = request.GET.get('q')
     if q:
@@ -998,7 +996,6 @@ def change_password(request):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
-            update_session_auth_hash(request, user)
             messages.success(request, _("Parolingiz muvaffaqiyatli o'zgartirildi!"))
             return redirect('frontend:profile')
     else:
@@ -1010,8 +1007,6 @@ def change_password(request):
 @login_required(login_url='login')
 @superuser_required
 def news_list(request):
-    if not request.user.is_superuser:
-        return redirect('login')
     news = News.objects.filter(school__isnull=True).order_by('-created_at')
     published_count = news.filter(is_published=True).count()
     draft_count = news.filter(is_published=False).count()
@@ -1029,8 +1024,6 @@ def news_list(request):
 @login_required(login_url='login')
 @superuser_required
 def news_add(request):
-    if not request.user.is_superuser:
-        return redirect('login')
     if request.method == 'POST':
         form = NewsForm(request.POST, request.FILES)
         if form.is_valid():
@@ -1046,8 +1039,6 @@ def news_add(request):
 @login_required(login_url='login')
 @superuser_required
 def news_edit(request, pk):
-    if not request.user.is_superuser:
-        return redirect('login')
     news = get_object_or_404(News, pk=pk, school__isnull=True)
     if request.method == 'POST':
         form = NewsForm(request.POST, request.FILES, instance=news)
@@ -1062,8 +1053,6 @@ def news_edit(request, pk):
 @login_required(login_url='login')
 @superuser_required
 def news_delete(request, pk):
-    if not request.user.is_superuser:
-        return redirect('login')
     news = get_object_or_404(News, pk=pk, school__isnull=True)
     if request.method == 'POST':
         news.delete()
