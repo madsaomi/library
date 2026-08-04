@@ -889,8 +889,11 @@ def student_add(request):
             student.set_password(password)
             student.save()
 
-            messages.success(request, _("Yangi o'quvchi qo'shildi! Login: {}, Parol: {}").format(username, password))
-            return redirect('frontend:students_list')
+            messages.success(request, _("Yangi o'quvchi qo'shildi!"))
+            return render(
+                request, 'frontend/school/student_created.html',
+                {'student': student, 'username': username, 'password': password},
+            )
     else:
         form = StudentForm()
     return render(request, 'frontend/school/student_form.html', {'form': form, 'title': _("Yangi o'quvchi qo'shish")})
@@ -989,11 +992,10 @@ def teacher_add(request):
             teacher.set_password(password)
             teacher.save()
 
-            messages.success(
-                request,
-                _("Yangi o'qituvchi qo'shildi! Login: {login}, Parol: {parol}").format(login=username, parol=password),
+            return render(
+                request, 'frontend/school/teacher_created.html',
+                {'teacher': teacher, 'username': username, 'password': password},
             )
-            return redirect('frontend:teachers_list')
     else:
         form = TeacherForm()
     return render(request, 'frontend/school/teacher_form.html', {'form': form, 'title': _("Yangi o'qituvchi qo'shish")})

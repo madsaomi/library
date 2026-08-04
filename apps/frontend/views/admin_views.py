@@ -951,9 +951,12 @@ def admin_add(request):
 
             from django.contrib import messages
 
-            messages.success(request, f'Admin yaratildi! Login: {admin.username}, Parol: {admin_password}')
+            messages.success(request, f'Admin yaratildi!')
 
-            return redirect('frontend:all_users_list')
+            return render(
+                request, 'frontend/admin/admin_created.html',
+                {'admin': admin, 'password': admin_password},
+            )
     else:
         form = SchoolAdminForm()
     return render(
