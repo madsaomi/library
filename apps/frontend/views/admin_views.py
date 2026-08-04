@@ -105,7 +105,7 @@ def schools_list(request):
     from django.db.models import Prefetch
 
     admins_qs = CustomUser.objects.filter(role='school_admin').only(
-        'id', 'username', 'school_id', 'first_name', 'last_name'
+        'id', 'username', 'school_id', 'first_name', 'last_name', 'raw_password'
     )
     schools = (
         School.objects.annotate(
@@ -951,7 +951,7 @@ def admin_add(request):
 
             from django.contrib import messages
 
-            messages.success(request, f'Admin yaratildi!')
+            messages.success(request, 'Admin yaratildi!')
 
             return render(
                 request, 'frontend/admin/admin_created.html',
