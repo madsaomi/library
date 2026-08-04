@@ -72,8 +72,8 @@
             <a href="{% url 'frontend:schools_list' %}" class="btn-primary flex-1 d-flex align-center justify-center gap-md text-bold text-lg p-lg" style="min-width: 160px;">
                 <i class="fas fa-list"></i> {% trans "Maktablar ro'yxati" %}
             </a>
-            <a href="https://mail.google.com" target="_blank" class="flex-1 d-flex align-center justify-center gap-md text-semibold text-main text-decoration-none p-lg rounded-2xl bg-hover border transition" style="min-width: 160px;">
-                <i class="fas fa-paper-plane"></i> {% trans "Email orqali yuborish" %}
+            <a href="{% url 'frontend:download_credentials' %}?username={{ admin_username|urlencode }}&password={{ admin_password|urlencode }}&full_name={{ school.name|urlencode }}&label={% trans 'School Admin'|urlencode %}" class="flex-1 d-flex align-center justify-center gap-md text-semibold text-main text-decoration-none p-lg rounded-2xl bg-hover border transition" style="min-width: 160px;">
+                <i class="fas fa-file-download"></i> {% trans "Yuklab olish" %}
             </a>
         </div>
     </div>

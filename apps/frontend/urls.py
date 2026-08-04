@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import admin_views, dispatch, school_views, user_views
+from .views import admin_views, credentials, dispatch, school_views, user_views
 
 app_name = 'frontend'
 
@@ -37,6 +37,7 @@ urlpatterns = [
     path('admin/stats/news/', admin_views.create_stats_news, name='create_stats_news'),
     path('admin/check-health/', admin_views.admin_health, name='admin_health'),
     path('admin/global-search/', admin_views.admin_global_search, name='admin_global_search'),
+    path('download/credentials/', credentials.download_credentials, name='download_credentials'),
     # Profile (shared, role-aware)
     path('profile/', dispatch.profile, name='profile'),
     path('profile/edit/', user_views.profile_edit, name='profile_edit'),
