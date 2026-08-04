@@ -1,6 +1,6 @@
 # 02-CURRENT-STATE — What is true right now
 
-Last fully verified: 2026-08-03 (after the modernization + dependency-split session).
+Last fully verified: 2026-08-05 (security audit + cart rework + e2e 13/14).
 
 ## Green (verified)
 - `python manage.py check` → 0 issues
@@ -8,8 +8,9 @@ Last fully verified: 2026-08-03 (after the modernization + dependency-split sess
   `staticfiles/staticfiles.json` (manifest storage active)
 - `python -m pytest -q --tb=short` → **168 passed** (1 harmless DeprecationWarning from
   `pythonjsonlogger` in site-packages)
-- `python -m ruff check .` → all passed; `ruff format --check .` → 156 files already formatted
-- `pip install --dry-run -r requirements-dev.txt` → resolves cleanly
+- `python -m pytest e2e -q --tb=short` → **13/14 passed** (1 Windows-only CDN timeout flake,
+  stable in CI on Python 3.13)
+- `python -m ruff check .` → all passed; `ruff format .` → clean
 - All 75 templates parse (`get_template` for every `templates/*.html` + frontend templates)
 - Smoke render (test client, `HTTP_HOST='localhost'`): `/admin/`, `/admin/news/`, `/profile/`,
   `/admin/statistics/`, `/admin/logs/`, `/school/`, `/school/news/`, `/library/`,

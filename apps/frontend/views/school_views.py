@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.cache import cache_page
 
 school_admin_required = user_passes_test(lambda u: u.role == 'school_admin' and u.school is not None, login_url='login')
 import json
@@ -33,7 +32,6 @@ def clean_name(name):
 
 
 @login_required(login_url='login')
-@cache_page(60 * 5)
 @school_admin_required
 def dashboard(request):
     school = request.user.school
@@ -259,7 +257,7 @@ def books_list(request):
 
     from books.models import Category
 
-    categories = Category.objects.all().order_by('name')
+    categories = Category.objects.filter(is_deleted=False).order_by('name')
 
     from django.core.paginator import Paginator
 
@@ -275,7 +273,7 @@ def books_list(request):
             'page_obj': page_obj,
             'categories': categories,
             'query': query,
-            'selected_category': int(category_id) if category_id else None,
+            'selected_category': category_id if category_id and category_id.isdigit() else None,
             'no_cover': no_cover == '1',
             'textbook_filter': textbook == '1',
             'total_books': total_books,
@@ -434,6 +432,10 @@ def process_qr_unified(request):
                 return process_qr(request)
             elif token.startswith('RET_'):
                 return process_receive_qr(request)
+            elif token.startswith('CART_'):
+                return process_cart_qr(request, token)
+            elif token.startswith('RETCART_'):
+                return process_cart_return_qr(request, token)
             else:
                 return JsonResponse(
                     {
@@ -639,6 +641,181 @@ def process_receive_qr(request):
             return JsonResponse({'status': 'error', 'message': _('Tizimda xatolik yuz berdi')})
 
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+
+
+@login_required(login_url='login')
+@school_admin_required
+def process_cart_qr(request, token):
+    from books.models import BookCart, BookCartItem
+    from django.db import transaction
+    from django.db.models import F
+
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+
+    cart = (
+        BookCart.objects.select_related('user')
+        .filter(
+            qr_token=token,
+            school=request.user.school,
+            status='pending',
+            purpose='borrow',
+            is_deleted=False,
+        )
+        .first()
+    )
+    if not cart:
+        return JsonResponse({'status': 'error', 'message': _('Savat topilmadi yoki allaqachon ishlatilgan')})
+
+    items = list(BookCartItem.objects.filter(cart=cart, is_deleted=False).select_related('book'))
+    if not items:
+        return JsonResponse({'status': 'error', 'message': _("Savat bo'sh")})
+
+    student = cart.user
+    issued_titles = []
+    skipped = []
+
+    with transaction.atomic():
+        for item in items:
+            book = Book.objects.select_for_update().filter(pk=item.book_id).first()
+            if not book or book.is_deleted or book.school != request.user.school:
+                skipped.append(item.book.title)
+                continue
+            if student.role == 'student' and book.is_textbook:
+                skipped.append(item.book.title)
+                continue
+            if book.available_count < 1:
+                skipped.append(item.book.title)
+                continue
+            BookIssue.objects.create(book=book, user=student)
+            Book.objects.filter(pk=book.pk).update(
+                available_count=F('available_count') - 1,
+                borrow_count=F('borrow_count') + 1,
+            )
+            award_xp(student, 'borrow', book=book)
+            issued_titles.append(book.title)
+
+        cart.status = 'borrowed'
+        cart.borrowed_at = timezone.now()
+        cart.save(update_fields=['status', 'borrowed_at'])
+
+    if not issued_titles:
+        return JsonResponse(
+            {
+                'status': 'error',
+                'message': _('Hech qanday kitob berilmadi: {skipped}').format(skipped=', '.join(skipped)),
+            }
+        )
+
+    from notifications.utils import notify_user
+
+    notify_user(
+        student,
+        _('Kitoblar tasdiqlandi'),
+        _('Sizga {count} ta kitob berildi').format(count=len(issued_titles)),
+        url=reverse('frontend:my_books'),
+    )
+    ActionLog.objects.create(
+        user=request.user,
+        action_type='ISSUE',
+        message=_('{n}ga {count} ta kitob berildi (savat)').format(n=student.username, count=len(issued_titles)),
+    )
+
+    message = _('Berildi: {issued}').format(issued=', '.join(issued_titles))
+    if skipped:
+        message += ' | ' + _("O'tkazib yuborildi: {skipped}").format(skipped=', '.join(skipped))
+    return JsonResponse(
+        {'status': 'success', 'message': message, 'student': f'{student.first_name} {student.last_name}'}
+    )
+
+
+@login_required(login_url='login')
+@school_admin_required
+def process_cart_return_qr(request, token):
+    from books.models import BookCart, BookCartItem
+    from django.db.models import F
+
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+
+    cart = (
+        BookCart.objects.select_related('user')
+        .filter(
+            qr_token=token,
+            school=request.user.school,
+            status='pending',
+            purpose='return',
+            is_deleted=False,
+        )
+        .first()
+    )
+    if not cart:
+        return JsonResponse({'status': 'error', 'message': _('Savat topilmadi yoki allaqachon ishlatilgan')})
+
+    items = list(BookCartItem.objects.filter(cart=cart, is_deleted=False).select_related('book'))
+    if not items:
+        return JsonResponse({'status': 'error', 'message': _("Savat bo'sh")})
+
+    student = cart.user
+    returned_titles = []
+    skipped = []
+
+    for item in items:
+        book = item.book
+        issue = BookIssue.objects.filter(book=book, user=student, is_returned=False).first()
+        if not issue:
+            skipped.append(book.title)
+            continue
+        issue.is_returned = True
+        issue.returned_at = timezone.now()
+        issue.save(update_fields=['is_returned', 'returned_at'])
+        Book.objects.filter(pk=book.pk).update(available_count=F('available_count') + 1)
+        if not issue.xp_awarded:
+            award_xp(student, 'return')
+            issue.xp_awarded = True
+            issue.save(update_fields=['xp_awarded'])
+        request_obj = BookRequest.objects.filter(book=book, user=student, status='approved').first()
+        if request_obj:
+            request_obj.status = 'completed'
+            request_obj.save(update_fields=['status'])
+        from books.models import BookWaitlist
+
+        next_in_queue = BookWaitlist.objects.filter(book=book, is_notified=False).first()
+        if next_in_queue:
+            next_in_queue.is_notified = True
+            next_in_queue.save()
+            from notifications.utils import notify_user
+
+            notify_user(
+                next_in_queue.user,
+                _('Kitob mavjud!'),
+                _('"{title}" kitobi bo\'shadi. Navbat sizda!').format(title=book.title),
+                url=reverse('frontend:book_detail', args=[book.pk]),
+            )
+        returned_titles.append(book.title)
+
+    cart.status = 'returned'
+    cart.returned_at = timezone.now()
+    cart.save(update_fields=['status', 'returned_at'])
+
+    if returned_titles:
+        ActionLog.objects.create(
+            user=request.user,
+            action_type='RETURN',
+            message=_('{n}dan {count} ta kitob qabul qilindi (savat)').format(
+                n=student.username, count=len(returned_titles)
+            ),
+        )
+
+    if not returned_titles:
+        return JsonResponse({'status': 'error', 'message': _('Hech qanday kitob qabul qilinmadi')})
+
+    message = _('Qabul qilindi: {returned}').format(returned=', '.join(returned_titles))
+    if skipped:
+        message += ' | ' + _('Topilmadi: {skipped}').format(skipped=', '.join(skipped))
+    return JsonResponse(
+        {'status': 'success', 'message': message, 'student': f'{student.first_name} {student.last_name}'}
+    )
 
 
 @login_required(login_url='login')

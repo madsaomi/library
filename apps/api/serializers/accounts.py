@@ -31,6 +31,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'unlocked_icons',
         ]
         read_only_fields = [
+            'username',
+            'role',
+            'school',
+            'school_name',
             'xp_points',
             'level',
             'current_streak',
@@ -47,7 +51,7 @@ class CustomUserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = '__all__'
+        exclude = ['raw_password', 'password']
         read_only_fields = [
             'xp_points',
             'level',

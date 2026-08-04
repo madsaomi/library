@@ -339,12 +339,12 @@ class TestSchoolAPI:
         assert resp.status_code == 400
 
     def test_school_qr_issue(self, school_admin, book_request):
+        from accounts.utils import generate_dynamic_token
+
         client = APIClient()
         client.force_authenticate(user=school_admin)
-        book_request.status = 'approved'
-        book_request.qr_token = 'test-issue-qr'
-        book_request.save()
-        resp = client.post('/api/v1/school/qr/issue/', {'token': 'test-issue-qr'}, format='json')
+        token = generate_dynamic_token('REQ', book_request.id)
+        resp = client.post('/api/v1/school/qr/issue/', {'token': token}, format='json')
         assert resp.status_code == 200
 
     def test_school_qr_return_missing_params(self, school_admin):
@@ -366,22 +366,22 @@ class TestSchoolAPI:
         assert resp.status_code == 400
 
     def test_school_qr_unified_request(self, school_admin, book_request):
+        from accounts.utils import generate_dynamic_token
+
         client = APIClient()
         client.force_authenticate(user=school_admin)
-        book_request.status = 'approved'
-        book_request.qr_token = f'qr-{book_request.id}'
-        book_request.save()
-        token = f'request_{book_request.id}:x'
+        token = generate_dynamic_token('REQ', book_request.id)
         resp = client.post('/api/v1/school/qr/unified/', {'token': token}, format='json')
         assert resp.status_code == 200
 
     def test_school_qr_unified_issue_return(self, school_admin, book_issue):
+        from accounts.utils import generate_dynamic_token
+
         client = APIClient()
         client.force_authenticate(user=school_admin)
-        token = f'issue_{book_issue.id}:x'
         book_issue.is_returned = False
-        book_issue.qr_token = token
         book_issue.save()
+        token = generate_dynamic_token('RET', book_issue.id)
         resp = client.post('/api/v1/school/qr/unified/', {'token': token}, format='json')
         assert resp.status_code == 200
 
@@ -565,12 +565,16 @@ class TestUserAPI:
         assert resp.status_code == 200
 
     def test_join_waitlist(self, student, book):
+        book.available_count = 0
+        book.save()
         client = APIClient()
         client.force_authenticate(user=student)
         resp = client.post(f'/api/v1/library/books/{book.id}/join_waitlist/')
         assert resp.status_code == 200
 
     def test_leave_waitlist(self, student, book):
+        book.available_count = 0
+        book.save()
         client = APIClient()
         client.force_authenticate(user=student)
         client.post(f'/api/v1/library/books/{book.id}/join_waitlist/')

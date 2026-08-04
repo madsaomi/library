@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('books', '0014_alter_achievement_is_deleted_alter_book_is_deleted_and_more'),
         ('schools', '0010_historicalschool'),
@@ -18,14 +17,34 @@ class Migration(migrations.Migration):
             name='BookCart',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('pending', 'Kutilmoqda'), ('borrowed', 'Olingan'), ('returned', 'Qaytgan')], default='pending', max_length=20, verbose_name='Holat')),
+                (
+                    'status',
+                    models.CharField(
+                        choices=[('pending', 'Kutilmoqda'), ('borrowed', 'Olingan'), ('returned', 'Qaytgan')],
+                        default='pending',
+                        max_length=20,
+                        verbose_name='Holat',
+                    ),
+                ),
                 ('qr_token', models.CharField(max_length=255, unique=True, verbose_name='QR kod')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Yaratilgan vaqt')),
                 ('borrowed_at', models.DateTimeField(blank=True, null=True, verbose_name='Olingan vaqt')),
                 ('returned_at', models.DateTimeField(blank=True, null=True, verbose_name='Qaytgan vaqt')),
                 ('is_deleted', models.BooleanField(default=False, verbose_name="O'chirilgan")),
-                ('school', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='schools.school', verbose_name='Maktab')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Foydalanuvchi')),
+                (
+                    'school',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to='schools.school', verbose_name='Maktab'
+                    ),
+                ),
+                (
+                    'user',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name='Foydalanuvchi',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Kitoblar savati',
@@ -38,8 +57,21 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name="Qo'shilgan vaqt")),
                 ('is_deleted', models.BooleanField(default=False, verbose_name="O'chirilgan")),
-                ('book', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='books.book', verbose_name='Kitob')),
-                ('cart', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='books.bookcart', verbose_name='Savat')),
+                (
+                    'book',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to='books.book', verbose_name='Kitob'
+                    ),
+                ),
+                (
+                    'cart',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='items',
+                        to='books.bookcart',
+                        verbose_name='Savat',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Savat kitobi',

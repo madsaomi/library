@@ -7,14 +7,15 @@ from accounts.models import CustomUser
 from books.achievements import award_xp
 from books.models import Book, BookIssue, BookRequest, Category, TextbookLoan
 from books.search import search_books
-from django.db import connection
-from django.db.models import Count, Q, Sum
+from django.db import connection, transaction
+from django.db.models import Count, F, Q, Sum
 from django.db.models.functions import TruncMonth
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from stats.models import ActionLog
 
@@ -70,7 +71,9 @@ class SchoolStudentViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserCreateSerializer
 
     def get_queryset(self):
-        qs = CustomUser.objects.filter(school=self.request.user.school, role='student', is_archived=False)
+        qs = CustomUser.objects.filter(
+            school=self.request.user.school, role='student', is_archived=False, is_deleted=False
+        )
         q = self.request.query_params.get('q')
         grade = self.request.query_params.get('grade')
         if q:
@@ -84,6 +87,9 @@ class SchoolStudentViewSet(viewsets.ModelViewSet):
         ActionLog.objects.create(
             user=self.request.user, action_type='CREATE', message=f'Added student: {serializer.instance.username}'
         )
+
+    def perform_update(self, serializer):
+        serializer.save(school=self.request.user.school, role='student')
 
     def perform_destroy(self, instance):
         ActionLog.objects.create(
@@ -110,7 +116,9 @@ class SchoolTeacherViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserCreateSerializer
 
     def get_queryset(self):
-        qs = CustomUser.objects.filter(school=self.request.user.school, role='teacher', is_archived=False)
+        qs = CustomUser.objects.filter(
+            school=self.request.user.school, role='teacher', is_archived=False, is_deleted=False
+        )
         q = self.request.query_params.get('q')
         if q:
             qs = qs.filter(Q(username__icontains=q) | Q(first_name__icontains=q) | Q(last_name__icontains=q))
@@ -121,6 +129,9 @@ class SchoolTeacherViewSet(viewsets.ModelViewSet):
         ActionLog.objects.create(
             user=self.request.user, action_type='CREATE', message=f'Added teacher: {serializer.instance.username}'
         )
+
+    def perform_update(self, serializer):
+        serializer.save(school=self.request.user.school, role='teacher')
 
     def perform_destroy(self, instance):
         ActionLog.objects.create(
@@ -135,7 +146,7 @@ class SchoolBookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
 
     def get_queryset(self):
-        qs = Book.objects.filter(school=self.request.user.school).select_related('category')
+        qs = Book.objects.filter(school=self.request.user.school, is_deleted=False).select_related('category')
         q = self.request.query_params.get('q')
         category_id = self.request.query_params.get('category')
         textbook = self.request.query_params.get('textbook')
@@ -154,6 +165,9 @@ class SchoolBookViewSet(viewsets.ModelViewSet):
         ActionLog.objects.create(
             user=self.request.user, action_type='CREATE', message=f'Added book: {serializer.instance.title}'
         )
+
+    def perform_update(self, serializer):
+        serializer.save(school=self.request.user.school)
 
     def perform_destroy(self, instance):
         ActionLog.objects.create(
@@ -179,6 +193,22 @@ class SchoolIssueViewSet(viewsets.ModelViewSet):
                 Q(book__title__icontains=q) | Q(user__username__icontains=q) | Q(user__first_name__icontains=q)
             )
         return qs.order_by('-issued_at')
+
+    def perform_create(self, serializer):
+        self._validate_school(serializer)
+        serializer.save()
+
+    def perform_update(self, serializer):
+        self._validate_school(serializer)
+        serializer.save()
+
+    def _validate_school(self, serializer):
+        book = serializer.validated_data.get('book')
+        user = serializer.validated_data.get('user')
+        if book is not None and book.school != self.request.user.school:
+            raise PermissionDenied('Book belongs to another school.')
+        if user is not None and user.school != self.request.user.school:
+            raise PermissionDenied('User belongs to another school.')
 
 
 class SchoolHistoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -246,29 +276,50 @@ class QrProcessView(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'])
     def issue(self, request):
-        from books.models import BookRequest
+
+        from accounts.utils import verify_dynamic_token
 
         token = request.data.get('token')
         if not token:
             return Response({'detail': 'Token is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        book_request = get_object_or_404(BookRequest, qr_token=token, status='approved')
+        request_id = verify_dynamic_token(token, 'REQ')
+        if request_id:
+            book_request = (
+                BookRequest.objects.select_related('book', 'user')
+                .filter(id=request_id, status='pending', is_deleted=False)
+                .first()
+            )
+        else:
+            book_request = (
+                BookRequest.objects.select_related('book', 'user')
+                .filter(qr_token=token, status='pending', is_deleted=False)
+                .first()
+            )
+
+        if not book_request:
+            return Response({'detail': 'Request not found or already processed.'}, status=status.HTTP_400_BAD_REQUEST)
         if book_request.book.school != request.user.school:
             return Response({'detail': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
+        if book_request.user.role == 'student' and book_request.book.is_textbook:
+            return Response({'detail': 'Students cannot borrow textbooks.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if book_request.book.available_count < 1:
-            book_request.status = 'pending'
-            book_request.save()
-            return Response({'detail': 'No copies available.'}, status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            updated = (
+                Book.objects.select_for_update()
+                .filter(pk=book_request.book_id, available_count__gt=0)
+                .update(available_count=F('available_count') - 1, borrow_count=F('borrow_count') + 1)
+            )
+            if not updated:
+                book_request.status = 'pending'
+                book_request.save(update_fields=['status'])
+                return Response({'detail': 'No copies available.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        issue = BookIssue.objects.create(book=book_request.book, user=book_request.user)
-        book_request.book.available_count -= 1
-        book_request.book.borrow_count += 1
-        book_request.book.save()
-        book_request.status = 'completed'
-        book_request.save()
+            issue = BookIssue.objects.create(book=book_request.book, user=book_request.user)
+            book_request.status = 'approved'
+            book_request.save(update_fields=['status'])
 
-        award_xp(book_request.user, 10)
+        award_xp(book_request.user, 'borrow', book=book_request.book)
 
         ActionLog.objects.create(
             user=request.user,
@@ -279,32 +330,39 @@ class QrProcessView(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'])
     def return_book(self, request):
+        from accounts.utils import verify_dynamic_token
+
         token = request.data.get('token')
         issue_id = request.data.get('issue_id')
 
-        if token and not issue_id:
-            try:
-                real_token = request.data.get('token')
-                issue = BookIssue.objects.get(qr_token=real_token, is_returned=False)
-                issue_id = issue.id
-            except BookIssue.DoesNotExist:
+        if issue_id:
+            issue = get_object_or_404(BookIssue, id=issue_id, book__school=request.user.school, is_returned=False)
+        elif token:
+            issue_pk = verify_dynamic_token(token, 'RET')
+            if issue_pk:
+                issue = BookIssue.objects.filter(
+                    id=issue_pk, book__school=request.user.school, is_returned=False
+                ).first()
+            else:
+                issue = BookIssue.objects.filter(
+                    qr_token=token, book__school=request.user.school, is_returned=False
+                ).first()
+            if not issue:
                 return Response({'detail': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not issue_id:
+        else:
             return Response({'detail': 'Token or issue_id required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        issue = get_object_or_404(BookIssue, id=issue_id, book__school=request.user.school, is_returned=False)
         issue.is_returned = True
         issue.returned_at = timezone.now()
-        issue.save()
+        issue.save(update_fields=['is_returned', 'returned_at'])
 
-        issue.book.available_count += 1
-        issue.book.save()
+        issue.book.available_count = F('available_count') + 1
+        issue.book.save(update_fields=['available_count'])
 
         if not issue.xp_awarded:
-            award_xp(issue.user, 5)
+            award_xp(issue.user, 'return')
             issue.xp_awarded = True
-            issue.save()
+            issue.save(update_fields=['xp_awarded'])
 
         ActionLog.objects.create(
             user=request.user, action_type='RETURN', message=f'Returned {issue.book.title} from {issue.user.username}'
@@ -317,21 +375,11 @@ class QrProcessView(viewsets.ViewSet):
         if not token:
             return Response({'detail': 'Token is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        parts = token.split(':')
-        if len(parts) == 2:
-            payload, _ = parts
-            if payload.startswith('issue_'):
-                return self.return_book(request)
-            elif payload.startswith('request_'):
-                request_id = payload.replace('request_', '')
-                try:
-                    book_request = BookRequest.objects.get(id=request_id, status='approved')
-                    request.data['token'] = book_request.qr_token
-                    return self.issue(request)
-                except BookRequest.DoesNotExist:
-                    return Response({'detail': 'Invalid request.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        return self.issue(request)
+        if token.startswith('REQ_'):
+            return self.issue(request)
+        if token.startswith('RET_'):
+            return self.return_book(request)
+        return Response({'detail': 'Unrecognized QR type.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TextbookLoanViewSet(viewsets.ModelViewSet):
@@ -339,7 +387,9 @@ class TextbookLoanViewSet(viewsets.ModelViewSet):
     serializer_class = TextbookLoanSerializer
 
     def get_queryset(self):
-        qs = TextbookLoan.objects.filter(book__school=self.request.user.school).select_related('book', 'student')
+        qs = TextbookLoan.objects.filter(book__school=self.request.user.school, is_deleted=False).select_related(
+            'book', 'student'
+        )
         returned = self.request.query_params.get('returned')
         if returned == '1':
             qs = qs.filter(returned_at__isnull=False)
@@ -348,7 +398,20 @@ class TextbookLoanViewSet(viewsets.ModelViewSet):
         return qs.order_by('-issued_at')
 
     def perform_create(self, serializer):
+        self._validate_school(serializer)
         serializer.save()
+
+    def perform_update(self, serializer):
+        self._validate_school(serializer)
+        serializer.save()
+
+    def _validate_school(self, serializer):
+        book = serializer.validated_data.get('book')
+        student = serializer.validated_data.get('student')
+        if book is not None and book.school != self.request.user.school:
+            raise PermissionDenied('Book belongs to another school.')
+        if student is not None and student.school != self.request.user.school:
+            raise PermissionDenied('Student belongs to another school.')
 
     @action(detail=False, methods=['post'])
     def distribute(self, request):
@@ -358,21 +421,40 @@ class TextbookLoanViewSet(viewsets.ModelViewSet):
         academic_year = request.data.get('academic_year')
         condition = request.data.get('condition', 'new')
 
-        book = get_object_or_404(Book, id=book_id, school=request.user.school, is_textbook=True)
-        created = []
-        for sid in student_ids:
-            student = get_object_or_404(CustomUser, id=sid, school=request.user.school, role='student')
-            loan, was_created = TextbookLoan.objects.get_or_create(
-                book=book,
-                student=student,
-                academic_year=academic_year,
-                defaults={'due_date': due_date, 'condition_on_issue': condition},
-            )
-            if was_created:
-                book.available_count -= 1
-                created.append(TextbookLoanSerializer(loan).data)
+        if not due_date:
+            return Response({'detail': 'due_date is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        book.save()
+        book = get_object_or_404(
+            Book.objects.select_for_update(),
+            id=book_id,
+            school=request.user.school,
+            is_textbook=True,
+            is_deleted=False,
+        )
+        created = []
+        with transaction.atomic():
+            for sid in student_ids:
+                student = get_object_or_404(
+                    CustomUser,
+                    id=sid,
+                    school=request.user.school,
+                    role='student',
+                    is_deleted=False,
+                )
+                if book.available_count < 1:
+                    return Response({'detail': 'No copies available.'}, status=status.HTTP_400_BAD_REQUEST)
+                loan, was_created = TextbookLoan.objects.get_or_create(
+                    book=book,
+                    student=student,
+                    academic_year=academic_year,
+                    defaults={'due_date': due_date, 'condition_on_issue': condition},
+                )
+                if was_created:
+                    book.available_count = F('available_count') - 1
+                    book.save(update_fields=['available_count'])
+                    book.refresh_from_db()
+                    created.append(TextbookLoanSerializer(loan).data)
+
         return Response({'created': created})
 
     @action(detail=False, methods=['post'])
@@ -381,7 +463,12 @@ class TextbookLoanViewSet(viewsets.ModelViewSet):
         condition = request.data.get('condition')
         notes = request.data.get('notes', '')
 
-        loan = get_object_or_404(TextbookLoan, id=loan_id, book__school=request.user.school)
+        loan = get_object_or_404(
+            TextbookLoan,
+            id=loan_id,
+            book__school=request.user.school,
+            returned_at__isnull=True,
+        )
         loan.returned_at = timezone.now().date()
         if condition:
             loan.condition_on_return = condition
@@ -389,8 +476,8 @@ class TextbookLoanViewSet(viewsets.ModelViewSet):
             loan.notes = notes
         loan.save()
 
-        loan.book.available_count += 1
-        loan.book.save()
+        loan.book.available_count = F('available_count') + 1
+        loan.book.save(update_fields=['available_count'])
 
         return Response(TextbookLoanSerializer(loan).data)
 

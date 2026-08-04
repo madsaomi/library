@@ -78,13 +78,13 @@
 
 <script>
 function removeCartItem(itemId) {
-    if (!confirm('{% trans "Bu kitobni savatdan o'chirmoqchimisiz?" %}')) return;
+    if (!confirm('{% trans "Bu kitobni savatdan o\'chirmoqchimisiz?" %}')) return;
     fetch(`/library/cart/remove/${itemId}/`, {
         method: 'POST',
         headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
     }).then(r => r.json()).then(data => {
         if (data.success) location.reload();
-        else alert(data.error || '{% trans "Xato bo'ldi" %}');
+        else alert(data.error || '{% trans "Xato bo\'ldi" %}');
     }).catch(() => alert('{% trans "Xatolik yuz berdi" %}'));
 }
 
@@ -95,39 +95,12 @@ function clearCart() {
         headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
     }).then(r => r.json()).then(data => {
         if (data.success) location.reload();
-        else alert(data.error || '{% trans "Xato bo'ldi" %}');
+        else alert(data.error || '{% trans "Xato bo\'ldi" %}');
     }).catch(() => alert('{% trans "Xatolik yuz berdi" %}'));
 }
 
 function generateCartQR() {
-    fetch('/library/cart/qr/', {
-        method: 'GET',
-        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-    }).then(r => r.text()).then(html => {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        const qrContent = tempDiv.querySelector('#qrContent');
-        if (qrContent) showModal(qrContent.innerHTML);
-        else alert('{% trans "QR kod yaratishda xato" %}');
-    }).catch(() => alert('{% trans "Xatolik yuz berdi" %}'));
-}
-
-function showModal(content) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-sm';
-    modal.innerHTML = `
-        <div class="glass-panel rounded-2xl p-xl max-w-lg w-full animate-fade" style="max-height: 90vh; overflow-y: auto;">
-            <div class="d-flex align-center justify-between mb-xl">
-                <h3 class="text-xl font-bold"><i class="fas fa-qrcode text-primary"></i> {% trans "Kitoblar QR kodi" %}</h3>
-                <button type="button" onclick="this.closest('.fixed').remove()" class="btn btn-sm btn-light"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="text-center mb-xl">${content}</div>
-            <div class="d-flex gap-md justify-center">
-                <button type="button" onclick="this.closest('.fixed').remove()" class="btn btn-primary">{% trans "Yopish" %}</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
+    window.open('/library/cart/qr/', '_blank', 'width=440,height=620');
 }
 </script>
 

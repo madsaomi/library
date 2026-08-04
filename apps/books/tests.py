@@ -94,7 +94,7 @@ class TestAchievements:
 
         info = get_level_info(1)
         assert info['level'] == 1
-        assert info['title'] == 'Boshlang\'ich'
+        assert info['title'] == "Boshlang'ich"
 
     def test_get_level_info_invalid(self):
         from books.achievements import get_level_info
@@ -142,9 +142,9 @@ class TestAchievements:
         assert student.longest_streak == 1
 
     def test_update_streak_same_day(self, student):
-        from datetime import date
 
         from django.utils import timezone
+
         from books.achievements import update_streak
 
         student.last_activity_date = timezone.now().date()

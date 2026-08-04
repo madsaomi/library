@@ -6,6 +6,7 @@ from .accounts import (
 )
 from .books import (
     AchievementSerializer,
+    BookIssuePublicSerializer,
     BookIssueSerializer,
     BookListSerializer,
     BookRequestSerializer,
@@ -25,6 +26,7 @@ from .stats import ActionLogSerializer
 __all__ = [
     'AchievementSerializer',
     'ActionLogSerializer',
+    'BookIssuePublicSerializer',
     'BookIssueSerializer',
     'BookListSerializer',
     'BookRequestSerializer',

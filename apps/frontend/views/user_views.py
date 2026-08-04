@@ -16,8 +16,29 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 
-def generate_cart_token():
-    return f'CART_{uuid.uuid4().hex[:12]}'
+def generate_cart_token(purpose='borrow'):
+    prefix = 'CART' if purpose == 'borrow' else 'RETCART'
+    return f'{prefix}_{uuid.uuid4().hex[:12]}'
+
+
+def _get_pending_cart(user, purpose):
+    cart, _ = BookCart.objects.get_or_create(
+        user=user,
+        school=user.school,
+        status='pending',
+        purpose=purpose,
+        is_deleted=False,
+        defaults={'qr_token': generate_cart_token(purpose)},
+    )
+    return cart
+
+
+def _cart_qr_url(cart):
+    from accounts.utils import generate_qr_code
+    from django.conf import settings
+
+    rel = generate_qr_code(cart.qr_token, f'cart_{cart.id}.png')
+    return f'{settings.MEDIA_URL}{rel}'
 
 
 @login_required(login_url='login')
@@ -63,14 +84,13 @@ def library(request):
     except EmptyPage:
         books_page = paginator.page(paginator.num_pages)
 
-    categories = Category.objects.all()
+    categories = Category.objects.filter(is_deleted=False).order_by('name')
 
     from schools.models import News
 
     latest_news = News.objects.filter(school=request.user.school, is_published=True).order_by('-created_at')[:3]
 
     from books.models import BookIssue, ReaderOfMonth
-    from django.utils import timezone
     from stats.models import ActionLog
 
     reader_cache_key = f'reader_month_{request.user.school_id}_{timezone.now().month}'
@@ -162,11 +182,9 @@ def profile(request):
         return redirect('frontend:profile')
 
     import json
-    from datetime import timedelta
 
     from books.models import Achievement, BookIssue, UserAchievement
     from django.db.models import Count
-    from django.utils import timezone
 
     user = request.user
     level_info = get_level_info(user.level)
@@ -175,14 +193,13 @@ def profile(request):
     current_xp = user.xp_points or 0
 
     # Books by month chart
+    from frontend.utils import month_bounds
+
     months_uz = ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyun', 'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek']
+    today = timezone.now().date()
     monthly_data = []
     for i in range(11, -1, -1):
-        month_start = timezone.now().replace(day=1) - timedelta(days=30 * i)
-        if month_start.month == 12:
-            month_end = month_start.replace(year=month_start.year + 1, month=1)
-        else:
-            month_end = month_start.replace(month=month_start.month + 1)
+        month_start, month_end = month_bounds(today, i)
         count = (
             BookIssue.objects.select_related('book', 'user')
             .filter(user=user, issued_at__gte=month_start, issued_at__lt=month_end)
@@ -454,6 +471,7 @@ def leaderboard(request):
 @login_required(login_url='login')
 def my_class(request):
     from books.models import BookIssue, UserAchievement
+    from django.db.models import Count, Q
 
     user = request.user
     if user.role != 'student' or not user.grade or not user.school:
@@ -462,22 +480,26 @@ def my_class(request):
     classmates = (
         user.__class__.objects.filter(school=user.school, role='student', grade=user.grade)
         .exclude(pk=user.pk)
+        .annotate(
+            active_loans=Count(
+                'bookissue',
+                filter=Q(bookissue__is_returned=False),
+                distinct=True,
+            ),
+            achievements_count=Count('achievements', distinct=True),
+        )
         .order_by('-xp_points')
     )
 
-    class_data = []
-    for c in classmates:
-        active_loans = BookIssue.objects.select_related('book', 'user').filter(user=c, is_returned=False).count()
-        total_read = c.total_books_read or 0
-        ach_count = UserAchievement.objects.filter(user=c).count()
-        class_data.append(
-            {
-                'student': c,
-                'active_loans': active_loans,
-                'total_read': total_read,
-                'achievements': ach_count,
-            }
-        )
+    class_data = [
+        {
+            'student': c,
+            'active_loans': c.active_loans,
+            'total_read': c.total_books_read or 0,
+            'achievements': c.achievements_count,
+        }
+        for c in classmates
+    ]
 
     # My own stats for comparison
     my_active = BookIssue.objects.select_related('book', 'user').filter(user=user, is_returned=False).count()
@@ -499,7 +521,6 @@ def my_class(request):
 @login_required(login_url='login')
 def challenges(request):
     from books.models import Challenge, UserChallenge
-    from django.utils import timezone
 
     user = request.user
     now = timezone.now()
@@ -560,9 +581,7 @@ def leave_waitlist(request, book_pk):
 def cart_list(request):
     from django.core.paginator import Paginator
 
-    cart, created = BookCart.objects.get_or_create(
-        user=request.user, school=request.user.school, status='pending', defaults={'qr_token': generate_cart_token()}
-    )
+    cart = _get_pending_cart(request.user, 'borrow')
 
     items = BookCartItem.objects.filter(cart=cart, is_deleted=False).select_related('book')
     paginator = Paginator(items, 12)
@@ -582,12 +601,13 @@ def cart_list(request):
 
 @login_required(login_url='login')
 def cart_add(request, book_pk):
-    from books.models import Book
-
     book = get_object_or_404(Book, pk=book_pk, school=request.user.school)
-    cart, _ = BookCart.objects.get_or_create(
-        user=request.user, school=request.user.school, status='pending', defaults={'qr_token': generate_cart_token()}
-    )
+    if request.user.role == 'student' and book.is_textbook:
+        messages.error(
+            request, _("Darsliklarni o'quvchilar bron qila olmaydi. Darsliklar o'quv yili boshida tarqatiladi.")
+        )
+        return redirect('frontend:book_detail', pk=book.pk)
+    cart = _get_pending_cart(request.user, 'borrow')
 
     item, created = BookCartItem.objects.get_or_create(cart=cart, book=book)
     if not created:
@@ -598,36 +618,39 @@ def cart_add(request, book_pk):
 
 @login_required(login_url='login')
 def cart_remove(request, item_pk):
-
+    if request.method != 'POST':
+        return JsonResponse({'error': _('Method not allowed')}, status=405)
     item = get_object_or_404(BookCartItem, pk=item_pk, cart__user=request.user)
     item.hard_delete()
-    messages.success(request, _("Kitob savatdan o'chirildi"))
-    return redirect('frontend:cart_list')
+    return JsonResponse({'success': True})
 
 
 @login_required(login_url='login')
 def cart_clear(request):
-
-    cart = BookCart.objects.filter(user=request.user, school=request.user.school, status='pending').first()
+    if request.method != 'POST':
+        return JsonResponse({'error': _('Method not allowed')}, status=405)
+    cart = BookCart.objects.filter(
+        user=request.user, school=request.user.school, status='pending', purpose='borrow', is_deleted=False
+    ).first()
     if cart:
-        BookCartItem.objects.filter(cart=cart).hard_delete()
-        cart.delete()
+        BookCartItem.objects.filter(cart=cart).delete()
+        cart.hard_delete()
+    return JsonResponse({'success': True})
 
-    messages.success(request, _('Savat tozalandi'))
-    return redirect('frontend:library')
+
+@login_required(login_url='login')
+def cart_badge(request):
+    cart = BookCart.objects.filter(
+        user=request.user, school=request.user.school, status='pending', purpose='borrow', is_deleted=False
+    ).first()
+    count = BookCartItem.objects.filter(cart=cart, is_deleted=False).count() if cart else 0
+    return JsonResponse({'count': count})
 
 
 @login_required(login_url='login')
 def cart_generate_qr(request):
-    import uuid
-
-    cart = BookCart.objects.filter(user=request.user, school=request.user.school, status='pending').first()
-
-    if not cart:
-        messages.error(request, _("Savat bo'sh"))
-        return redirect('frontend:cart_list')
-
-    cart.qr_token = f'CART_{uuid.uuid4().hex[:12]}'
+    cart = _get_pending_cart(request.user, 'borrow')
+    cart.qr_token = generate_cart_token('borrow')
     cart.save()
 
     items = BookCartItem.objects.filter(cart=cart, is_deleted=False)
@@ -638,48 +661,20 @@ def cart_generate_qr(request):
         {
             'cart': cart,
             'items': items,
+            'qr_url': _cart_qr_url(cart),
         },
     )
 
 
 @login_required(login_url='login')
-def cart_borrow_confirm(request):
+def cart_return_list(request):
     from books.models import BookIssue
 
-    cart = get_object_or_404(BookCart, qr_token=request.POST.get('cart_token'), user=request.user)
-
-    if cart.status != 'pending':
-        messages.error(request, _('Bu QR allaqachon ishlatilgan'))
-        return redirect('frontend:cart_list')
-
-    items = BookCartItem.objects.filter(cart=cart, is_deleted=False)
-    for item in items:
-        book = item.book
-        if book.available_count > 0:
-            BookIssue.objects.create(
-                book=book,
-                user=request.user,
-                issued_at=timezone.now(),
-            )
-            book.available_count = (book.available_count or 0) - 1
-            book.save()
-
-    cart.status = 'borrowed'
-    cart.borrowed_at = timezone.now()
-    cart.save()
-
-    messages.success(request, _('Kitoblar muvaffaqiyatli olingan'))
-    return redirect('frontend:library')
-
-
-@login_required(login_url='login')
-def cart_return_list(request):
-
-    cart, created = BookCart.objects.get_or_create(
-        user=request.user, school=request.user.school, status='pending', defaults={'qr_token': generate_cart_token()}
-    )
+    cart = _get_pending_cart(request.user, 'return')
 
     items = BookCartItem.objects.filter(cart=cart, is_deleted=False).select_related('book')
+    active_issues = BookIssue.objects.filter(user=request.user, is_returned=False).select_related('book')
+    in_cart_ids = set(items.values_list('book_id', flat=True))
 
     return render(
         request,
@@ -687,6 +682,8 @@ def cart_return_list(request):
         {
             'cart': cart,
             'items': items,
+            'active_issues': active_issues,
+            'in_cart_ids': in_cart_ids,
         },
     )
 
@@ -696,9 +693,7 @@ def cart_return_add(request, issue_pk):
     from books.models import BookIssue
 
     issue = get_object_or_404(BookIssue, pk=issue_pk, user=request.user, is_returned=False)
-    cart, _ = BookCart.objects.get_or_create(
-        user=request.user, school=request.user.school, status='pending', defaults={'qr_token': generate_cart_token()}
-    )
+    cart = _get_pending_cart(request.user, 'return')
 
     item, created = BookCartItem.objects.get_or_create(cart=cart, book=issue.book)
     if not created:
@@ -708,9 +703,33 @@ def cart_return_add(request, issue_pk):
 
 
 @login_required(login_url='login')
-def cart_return_qr(request):
+def cart_return_remove(request, item_pk):
+    if request.method != 'POST':
+        return JsonResponse({'error': _('Method not allowed')}, status=405)
+    item = get_object_or_404(BookCartItem, pk=item_pk, cart__user=request.user)
+    item.hard_delete()
+    return JsonResponse({'success': True})
 
-    cart = get_object_or_404(BookCart, qr_token=request.GET.get('cart_token'), user=request.user)
+
+@login_required(login_url='login')
+def cart_return_clear(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': _('Method not allowed')}, status=405)
+    cart = BookCart.objects.filter(
+        user=request.user, school=request.user.school, status='pending', purpose='return', is_deleted=False
+    ).first()
+    if cart:
+        BookCartItem.objects.filter(cart=cart).delete()
+        cart.hard_delete()
+    return JsonResponse({'success': True})
+
+
+@login_required(login_url='login')
+def cart_return_qr(request):
+    cart = _get_pending_cart(request.user, 'return')
+    cart.qr_token = generate_cart_token('return')
+    cart.save()
+
     items = BookCartItem.objects.filter(cart=cart, is_deleted=False)
 
     return render(
@@ -719,35 +738,6 @@ def cart_return_qr(request):
         {
             'cart': cart,
             'items': items,
+            'qr_url': _cart_qr_url(cart),
         },
     )
-
-
-@login_required(login_url='login')
-def cart_return_confirm(request):
-    from books.models import BookIssue
-
-    cart = get_object_or_404(BookCart, qr_token=request.POST.get('cart_token'), user=request.user)
-
-    if cart.status != 'pending':
-        messages.error(request, _('Bu QR allaqachon ishlatilgan'))
-        return redirect('frontend:cart_return_list')
-
-    items = BookCartItem.objects.filter(cart=cart, is_deleted=False)
-    for item in items:
-        issue = BookIssue.objects.filter(book=item.book, user=request.user, is_returned=False).first()
-        if issue:
-            issue.is_returned = True
-            issue.returned_at = timezone.now()
-            issue.save()
-
-            book = item.book
-            book.available_count = (book.available_count or 0) + 1
-            book.save()
-
-    cart.status = 'returned'
-    cart.returned_at = timezone.now()
-    cart.save()
-
-    messages.success(request, _('Kitoblar muvaffaqiyatli qaytarildi'))
-    return redirect('frontend:library')

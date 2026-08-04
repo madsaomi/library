@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.cache import cache_page
 
 superuser_required = user_passes_test(lambda u: u.is_superuser, login_url='login')
 
@@ -22,15 +21,15 @@ def clean_name(name):
 
 
 @login_required(login_url='login')
-@cache_page(60 * 5)
 @superuser_required
 def dashboard(request):
-    from datetime import timedelta
 
     from accounts.models import CustomUser
     from django.db.models import Count, Exists, OuterRef
     from django.utils import timezone
     from stats.models import ActionLog
+
+    from frontend.utils import month_bounds
 
     active_schools_query = School.objects.annotate(
         has_admin=Exists(CustomUser.objects.filter(school=OuterRef('pk'), role='school_admin'))
@@ -54,12 +53,9 @@ def dashboard(request):
         _('Dek'),
     ]
     monthly_issues = []
+    today = timezone.now().date()
     for i in range(11, -1, -1):
-        month_start = timezone.now().replace(day=1) - timedelta(days=30 * i)
-        if month_start.month == 12:
-            month_end = month_start.replace(year=month_start.year + 1, month=1)
-        else:
-            month_end = month_start.replace(month=month_start.month + 1)
+        month_start, month_end = month_bounds(today, i)
         count = (
             BookIssue.objects.select_related('book', 'user')
             .filter(issued_at__gte=month_start, issued_at__lt=month_end)
@@ -175,9 +171,11 @@ def muassasalar_list(request):
 def districts_list(request):
     from django.db.models import Count, Q
 
-    districts = District.objects.filter(is_deleted=False).annotate(
-        school_count=Count('schools', filter=Q(schools__customuser__role='school_admin'))
-    ).order_by('name')
+    districts = (
+        District.objects.filter(is_deleted=False)
+        .annotate(school_count=Count('schools', filter=Q(schools__customuser__role='school_admin')))
+        .order_by('name')
+    )
     total_schools = sum(d.school_count for d in districts)
     return render(
         request,
@@ -218,7 +216,7 @@ def statistics(request):
         user_counts.append(CustomUser.objects.filter(date_joined__date=day).count())
 
     # Category distribution (books)
-    cat_stats = Category.objects.annotate(count=Count('book')).values('name', 'count')
+    cat_stats = Category.objects.filter(is_deleted=False).annotate(count=Count('book')).values('name', 'count')
     cat_labels = [item['name'] for item in cat_stats]
     cat_data = [item['count'] for item in cat_stats]
 

@@ -6,11 +6,11 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 LEVEL_TABLE = [
-    (1, _('Boshlang\'ich'), 0),
+    (1, _("Boshlang'ich"), 0),
     (2, _('Kitobxon'), 30),
     (3, _('Kitobsevar'), 80),
-    (4, _('Ko\'p o\'qigan'), 150),
-    (5, _('Kitob g\'irti'), 250),
+    (4, _("Ko'p o'qigan"), 150),
+    (5, _("Kitob g'irti"), 250),
     (6, _('Bilimdon'), 400),
     (7, _('Intellektual'), 600),
     (8, _('Professor'), 850),
@@ -23,7 +23,7 @@ def get_level_info(level):
     for lvl, title, xp in LEVEL_TABLE:
         if lvl == level:
             return {'level': lvl, 'title': title, 'xp_required': xp}
-    return {'level': level, 'title': _('Boshlang\'ich'), 'xp_required': 0}
+    return {'level': level, 'title': _("Boshlang'ich"), 'xp_required': 0}
 
 
 def get_next_level_info(level):

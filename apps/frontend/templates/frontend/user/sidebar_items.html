@@ -32,4 +32,15 @@
 <a href="{% url 'frontend:user_news_list' %}" class="nav-link {% if request.resolver_match.url_name == 'user_news_list' %}active{% endif %}" data-name="yangiliklar news" {% if request.resolver_match.url_name == 'user_news_list' %}aria-current="page"{% endif %}>
     <i class="fas fa-newspaper"></i> <span>{% trans "Yangiliklar" %}</span>
 </a>
+<script>
+(function() {
+    fetch('/library/cart/badge/')
+        .then(r => r.json())
+        .then(d => {
+            const badge = document.getElementById('cartBadge');
+            if (badge) badge.textContent = d.count;
+        })
+        .catch(() => {});
+})();
+</script>
 {% endblock %}

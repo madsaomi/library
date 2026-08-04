@@ -170,3 +170,55 @@ ews_list: added early guard for
 - **pps/books/admin.py**: Registered models for admin panel.
 - **Migration**:  015_bookcart_bookcartitem.py created and applied.
 
+
+## Session: security audit + cart rework (2026-08-05)
+- **Critical security fixes (escalation of privilege)**:
+  - `CustomUserSerializer` (`apps/api/serializers/accounts.py`): `role`, `school`, `username`
+    now `read_only` - students could previously PATCH their own `role` to `superuser`
+    (`update_profile` applies `serializer.save()` directly to `request.user`).
+  - `SchoolStudentViewSet` / `SchoolTeacherViewSet` (`apps/api/views/school.py`): added
+    `perform_update` forcing `school=request.user.school` + `role` (school admin could previously
+    raise a created user's role to `superuser` via PUT). Added `is_deleted=False` to querysets.
+  - `CustomUserDetailSerializer`: `fields='__all__'` -> `exclude=['raw_password', 'password']`
+    (raw passwords were being serialized to API clients).
+- **Caching**: removed `@cache_page(60*5)` from admin and school `dashboard` (personalized/cross-school
+  data leak - one school's dashboard could be served to another admin).
+- **API QR flow rewritten** (`apps/api/views/school.py` `QrProcessView`): now uses the same HMAC
+  rotating tokens as the frontend (`REQ_<id>_<hash>` / `RET_<id>_<hash>` via `verify_dynamic_token`),
+  `transaction.atomic` + `select_for_update` for `available_count`, textbook ban for students,
+  `award_xp(user, 'borrow'/'return')` with correct args, `ActionLog` entries.
+- **`award_xp` call sites fixed**: `QrProcessView.issue` `award_xp(..., 10)` ->
+  `award_xp(user, 'borrow', book=...)`; `return_book` `award_xp(..., 5)` -> `award_xp(user, 'return')`.
+- **Cross-school writes blocked**: `SchoolIssueViewSet`, `TextbookLoanViewSet`, `SchoolBookViewSet`
+  now validate `book`/`user`/`student` belong to the admin's school in `perform_create`/`perform_update`.
+- **TextbookLoan**: `distribute` now requires `due_date` + uses `select_for_update`/`transaction.atomic`
+  with `F()` decrement; `collect` only matches loans with `returned_at__isnull=True` (was double-returning).
+- **API user fixes** (`apps/api/views/user.py`): `reserve` blocks textbooks for students and blocks
+  when the user already has an active copy; `join_waitlist` blocks when copies are available;
+  `categories` filters `is_deleted=False`; `active_reads` now uses new `BookIssuePublicSerializer`
+  (no QR tokens leaked); `my_rank` is now a single count query instead of looping.
+- **Cart rework (was broken)**:
+  - `BookCart.purpose` field added (`borrow`/`return`) + migration `0016`; borrow and return carts
+    are now separate (`CART_*` vs `RETCART_*` tokens).
+  - `cart_remove`/`cart_clear`/`cart_return_remove`/`cart_return_clear` now return JSON (the JS
+    expects `{success:true}`); `cart_clear` fixed `hard_delete` bug; removed dead/broken
+    `cart_borrow_confirm`/`cart_return_confirm` views + URLs.
+  - QR pages now generate the PNG server-side (`generate_qr_code`), replacing the broken client-side
+    qrcodejs fetch/modal that never rendered. `cart_generate_qr`/`cart_return_qr` return a page that
+    the JS opens in a new window.
+  - School scanner (`process_qr_unified`) now handles `CART_*`/`RETCART_*`: `process_cart_qr`
+    issues books atomically (textbook ban, availability, XP, notification, ActionLog);
+    `process_cart_return_qr` returns them (XP, completes request, notifies next waitlist).
+  - `cart_return_list` shows active issues with "add to return cart" buttons; `cart_add` blocks
+    textbooks for students; added `cart_badge` JSON endpoint + sidebar badge JS; removed cart link
+    from the school sidebar (student-only feature).
+- **Profile routing** (`apps/frontend/views/dispatch.py`): `frontend:profile` / `frontend:change_password`
+  are now role-aware dispatchers - school admins/students no longer get bounced to login by
+  `@superuser_required`.
+- **Misc**: Postgres search uses `Coalesce` (books with NULL author no longer crash search);
+  `month_bounds()` helper in `apps/frontend/utils.py` fixes calendar-month chart math in
+  `user_views.profile` + admin dashboard; `my_class` N+1 eliminated via `annotate`;
+  `category_id` parsing hardened; PIL `Image`/buffer closed in `Book.save`; `Category.objects`
+  filtered by `is_deleted=False` in library/school/admin lists.
+- **Verification**: `manage.py check` 0 issues; `ruff check .` + `ruff format .` clean;
+  **168 unit tests PASS**; e2e 13/14 on Windows (1 CDN timeout flake, stable in CI).

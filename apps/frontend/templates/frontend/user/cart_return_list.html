@@ -66,25 +66,73 @@
                 <i class="fas fa-reply text-5xl opacity-20"></i>
             </div>
             <h4 class="mb-md">{% trans "Qaytarish uchun kitoblar yo'q" %}</h4>
-            <p class="mb-xl">{% trans "Qaytarmoqchi bo'lgan kitoblarni tanlang" %}</p>
-            <a href="{% url 'frontend:my_books' %}" class="btn btn-primary">
-                <i class="fas fa-book"></i>
-                {% trans "Olingan kitoblar" %}
-            </a>
+            <p class="mb-xl">{% trans "Quyidagi ro'yxatdan qaytarmoqchi bo'lgan kitoblaringizni tanlang" %}</p>
         </div>
+        {% endif %}
+    </div>
+
+    <div class="glass-panel p-xl">
+        <div class="d-flex align-center justify-between mb-lg">
+            <h3>
+                <i class="fas fa-book-open text-primary"></i>
+                {% trans "Olingan kitoblar" %}
+            </h3>
+        </div>
+
+        {% if active_issues %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{% trans "Kitob" %}</th>
+                        <th>{% trans "Olingan sana" %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for issue in active_issues %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-center gap-md">
+                                <i class="fas fa-book text-primary"></i>
+                                <div>
+                                    <strong>{{ issue.book.title }}</strong>
+                                    {% if issue.book.author %}
+                                    <br><small class="text-muted">{{ issue.book.author }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-muted">{{ issue.issued_at|date:"d.m.Y" }}</td>
+                        <td class="text-end">
+                            {% if issue.book_id in in_cart_ids %}
+                            <span class="badge bg-success">{% trans "Savatda" %}</span>
+                            {% else %}
+                            <a href="{% url 'frontend:cart_return_add' issue.pk %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus"></i> {% trans "Qo'shish" %}
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-xl">{% trans "Sizda hozircha olingan kitoblar yo'q" %}</p>
         {% endif %}
     </div>
 </div>
 
 <script>
 function removeReturnItem(itemId) {
-    if (!confirm('{% trans "Bu kitobni qaytarish savatidan o'chirmoqchimisiz?" %}')) return;
-    fetch(`/library/cart/return/add/${itemId}/`, {
-        method: 'DELETE',
+    if (!confirm('{% trans "Bu kitobni qaytarish savatidan o\'chirmoqchimisiz?" %}')) return;
+    fetch(`/library/cart/return/remove/${itemId}/`, {
+        method: 'POST',
         headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
     }).then(r => r.json()).then(data => {
         if (data.success) location.reload();
-        else alert(data.error || '{% trans "Xato bo'ldi" %}');
+        else alert(data.error || '{% trans "Xato bo\'ldi" %}');
     }).catch(() => alert('{% trans "Xatolik yuz berdi" %}'));
 }
 
@@ -95,39 +143,12 @@ function clearReturnCart() {
         headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
     }).then(r => r.json()).then(data => {
         if (data.success) location.reload();
-        else alert(data.error || '{% trans "Xato bo'ldi" %}');
+        else alert(data.error || '{% trans "Xato bo\'ldi" %}');
     }).catch(() => alert('{% trans "Xatolik yuz berdi" %}'));
 }
 
 function generateReturnQR() {
-    fetch('/library/cart/return/qr/', {
-        method: 'GET',
-        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-    }).then(r => r.text()).then(html => {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        const qrContent = tempDiv.querySelector('#qrContent');
-        if (qrContent) showModal(qrContent.innerHTML);
-        else alert('{% trans "QR kod yaratishda xato" %}');
-    }).catch(() => alert('{% trans "Xatolik yuz berdi" %}'));
-}
-
-function showModal(content) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-sm';
-    modal.innerHTML = `
-        <div class="glass-panel rounded-2xl p-xl max-w-lg w-full animate-fade" style="max-height: 90vh; overflow-y: auto;">
-            <div class="d-flex align-center justify-between mb-xl">
-                <h3 class="text-xl font-bold"><i class="fas fa-qrcode text-primary"></i> {% trans "Qaytarish QR kodi" %}</h3>
-                <button type="button" onclick="this.closest('.fixed').remove()" class="btn btn-sm btn-light"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="text-center mb-xl">${content}</div>
-            <div class="d-flex gap-md justify-center">
-                <button type="button" onclick="this.closest('.fixed').remove()" class="btn btn-primary">{% trans "Yopish" %}</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
+    window.open('/library/cart/return/qr/', '_blank', 'width=440,height=620');
 }
 </script>
 

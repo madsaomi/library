@@ -84,6 +84,9 @@
                 <a href="{% url 'frontend:reserve_book' book.pk %}" class="btn-primary text-decoration-none d-flex align-center justify-center gap-sm rounded-lg flex-1" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px;">
                     <i class="fas fa-plus-circle"></i> {% trans "Kitobni bron qilish" %}
                 </a>
+                <a href="{% url 'frontend:cart_add' book.pk %}" class="btn-primary text-decoration-none d-flex align-center justify-center gap-sm rounded-lg flex-1" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px; background: linear-gradient(135deg, var(--secondary), #7c3aed);">
+                    <i class="fas fa-cart-plus"></i> {% trans "Savatga qo'shish" %}
+                </a>
                 {% else %}
                 <button class="btn-primary d-flex align-center justify-center gap-sm rounded-lg flex-1 border-none" style="padding: 14px 28px; font-size: 0.95rem; background: #374151; cursor: not-allowed; min-width: 200px; color: #94a3b8;" disabled>
                     <i class="fas fa-clock"></i> {% trans "Navbatga turish" %}

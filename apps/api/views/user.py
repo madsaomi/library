@@ -25,6 +25,7 @@ from schools.models import News
 from api.permissions import IsStudent, IsStudentOrTeacher
 from api.serializers import (
     AchievementSerializer,
+    BookIssuePublicSerializer,
     BookIssueSerializer,
     BookListSerializer,
     BookRequestSerializer,
@@ -66,7 +67,9 @@ class CatalogViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['get'])
     def categories(self, request):
-        return Response([{'id': c.id, 'name': c.name} for c in Category.objects.all()])
+        return Response(
+            [{'id': c.id, 'name': c.name} for c in Category.objects.filter(is_deleted=False).order_by('name')]
+        )
 
     @action(detail=False, methods=['get'])
     def reader_of_month(self, request):
@@ -95,7 +98,7 @@ class CatalogViewSet(viewsets.ReadOnlyModelViewSet):
             .select_related('user', 'book')
             .order_by('-issued_at')[:10]
         )
-        return Response(BookIssueSerializer(reads, many=True).data)
+        return Response(BookIssuePublicSerializer(reads, many=True).data)
 
 
 class MyBooksViewSet(viewsets.ViewSet):
@@ -145,6 +148,10 @@ class BookDetailViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['post'])
     def reserve(self, request, pk=None):
         book = self.get_object()
+        if request.user.role == 'student' and book.is_textbook:
+            return Response({'detail': 'Students cannot borrow textbooks.'}, status=status.HTTP_400_BAD_REQUEST)
+        if BookIssue.objects.filter(user=request.user, book=book, is_returned=False).exists():
+            return Response({'detail': 'You already have this book.'}, status=status.HTTP_400_BAD_REQUEST)
         if book.available_count <= 0:
             return Response({'detail': 'No copies available.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -153,14 +160,14 @@ class BookDetailViewSet(viewsets.ReadOnlyModelViewSet):
         if existing:
             return Response(BookRequestSerializer(existing).data)
 
-        book_request = BookRequest.objects.create(
-            book=book, user=request.user, status='pending'
-        )
+        book_request = BookRequest.objects.create(book=book, user=request.user, status='pending')
         return Response(BookRequestSerializer(book_request).data)
 
     @action(detail=True, methods=['post'])
     def join_waitlist(self, request, pk=None):
         book = self.get_object()
+        if book.available_count > 0:
+            return Response({'detail': 'Book is available, you can reserve it.'}, status=status.HTTP_400_BAD_REQUEST)
         _, created = BookWaitlist.objects.get_or_create(book=book, user=request.user)
         if created:
             return Response({'detail': 'Added to waitlist.'})
@@ -284,16 +291,14 @@ class LeaderboardView(viewsets.ViewSet):
         school = request.user.school
         period = request.query_params.get('period', 'all_time')
         if period == 'monthly':
-            all_users = CustomUser.objects.filter(school=school, role='student').order_by('-monthly_books_read')
+            value = request.user.monthly_books_read or 0
+            rank = CustomUser.objects.filter(school=school, role='student', monthly_books_read__gt=value).count() + 1
+            total = CustomUser.objects.filter(school=school, role='student').count()
         else:
-            all_users = CustomUser.objects.filter(school=school, role='student').order_by('-xp_points')
-
-        rank = 1
-        for u in all_users:
-            if u.id == request.user.id:
-                break
-            rank += 1
-        return Response({'rank': rank, 'total': all_users.count()})
+            value = request.user.xp_points or 0
+            rank = CustomUser.objects.filter(school=school, role='student', xp_points__gt=value).count() + 1
+            total = CustomUser.objects.filter(school=school, role='student').count()
+        return Response({'rank': rank, 'total': total})
 
 
 class WaitlistViewSet(viewsets.ViewSet):

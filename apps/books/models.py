@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from django.db import models
+from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -10,11 +11,11 @@ logger = logging.getLogger(__name__)
 
 def book_search_vector():
     return models.Func(
-        models.F('title'),
+        Coalesce(models.F('title'), models.Value('')),
         models.Value('A'),
-        models.F('author'),
+        Coalesce(models.F('author'), models.Value('')),
         models.Value('B'),
-        models.F('description'),
+        Coalesce(models.F('description'), models.Value('')),
         models.Value('C'),
         function='to_tsvector',
         template="%(function)s('simple', %(expressions)s)",
@@ -91,20 +92,24 @@ class Book(models.Model):
                     from PIL import Image
 
                     img = Image.open(self.cover)
-                    if img.mode != 'RGB':
-                        img = img.convert('RGB')
+                    try:
+                        if img.mode != 'RGB':
+                            img = img.convert('RGB')
 
-                    MAX_SIZE = (800, 1200)
-                    if img.height > MAX_SIZE[1] or img.width > MAX_SIZE[0]:
-                        img.thumbnail(MAX_SIZE, Image.Resampling.LANCZOS)
+                        MAX_SIZE = (800, 1200)
+                        if img.height > MAX_SIZE[1] or img.width > MAX_SIZE[0]:
+                            img.thumbnail(MAX_SIZE, Image.Resampling.LANCZOS)
 
-                    buffer = BytesIO()
-                    img.save(buffer, format='JPEG', quality=75, optimize=True)
+                        buffer = BytesIO()
+                        img.save(buffer, format='JPEG', quality=75, optimize=True)
 
-                    filename = os.path.basename(self.cover.name)
-                    # Use a unique name if necessary, but here we just want to avoid
-                    # the infinite loop/duplicate issue on every model save
-                    self.cover.save(filename, ContentFile(buffer.getvalue()), save=False)
+                        filename = os.path.basename(self.cover.name)
+                        # Use a unique name if necessary, but here we just want to avoid
+                        # the infinite loop/duplicate issue on every model save
+                        self.cover.save(filename, ContentFile(buffer.getvalue()), save=False)
+                        buffer.close()
+                    finally:
+                        img.close()
             except Exception as e:
                 logger.warning('Image optimization failed: %s', e)
 
@@ -387,9 +392,14 @@ class BookCart(models.Model):
         ('borrowed', _('Olingan')),
         ('returned', _('Qaytgan')),
     )
+    PURPOSE_CHOICES = (
+        ('borrow', _('Olish')),
+        ('return', _('Qaytarish')),
+    )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('Foydalanuvchi'))
     school = models.ForeignKey('schools.School', on_delete=models.CASCADE, verbose_name=_('Maktab'))
     status = models.CharField(_('Holat'), max_length=20, choices=STATUS_CHOICES, default='pending')
+    purpose = models.CharField(_('Maqsad'), max_length=10, choices=PURPOSE_CHOICES, default='borrow', db_index=True)
     qr_token = models.CharField(_('QR kod'), max_length=255, unique=True)
     created_at = models.DateTimeField(_('Yaratilgan vaqt'), auto_now_add=True)
     borrowed_at = models.DateTimeField(_('Olingan vaqt'), null=True, blank=True)
@@ -404,7 +414,7 @@ class BookCart(models.Model):
         return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
-        verbose_name = _("Kitoblar savati")
+        verbose_name = _('Kitoblar savati')
         verbose_name_plural = _('Kitoblar savatlari')
 
     def __str__(self):
@@ -414,7 +424,7 @@ class BookCart(models.Model):
 class BookCartItem(models.Model):
     cart = models.ForeignKey(BookCart, on_delete=models.CASCADE, related_name='items', verbose_name=_('Savat'))
     book = models.ForeignKey(Book, on_delete=models.CASCADE, verbose_name=_('Kitob'))
-    created_at = models.DateTimeField(_('Qo\'shilgan vaqt'), auto_now_add=True)
+    created_at = models.DateTimeField(_("Qo'shilgan vaqt"), auto_now_add=True)
     is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
 
     def delete(self, using=None, keep_parents=False):
@@ -425,7 +435,7 @@ class BookCartItem(models.Model):
         return super().delete(using=using, keep_parents=keep_parents)
 
     class Meta:
-        verbose_name = _("Savat kitobi")
+        verbose_name = _('Savat kitobi')
         verbose_name_plural = _('Savat kitoblari')
         unique_together = ['cart', 'book']
 

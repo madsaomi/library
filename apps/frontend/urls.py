@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import admin_views, school_views, user_views
+from .views import admin_views, dispatch, school_views, user_views
 
 app_name = 'frontend'
 
@@ -37,10 +37,10 @@ urlpatterns = [
     path('admin/stats/news/', admin_views.create_stats_news, name='create_stats_news'),
     path('admin/check-health/', admin_views.admin_health, name='admin_health'),
     path('admin/global-search/', admin_views.admin_global_search, name='admin_global_search'),
-    # Profile (shared)
-    path('profile/', admin_views.profile, name='profile'),
+    # Profile (shared, role-aware)
+    path('profile/', dispatch.profile, name='profile'),
     path('profile/edit/', user_views.profile_edit, name='profile_edit'),
-    path('profile/password/', admin_views.change_password, name='change_password'),
+    path('profile/password/', dispatch.change_password, name='change_password'),
     # School panel
     path('school/', school_views.dashboard, name='school_dashboard'),
     path('school/students/', school_views.students_list, name='students_list'),
@@ -98,10 +98,11 @@ urlpatterns = [
     path('library/cart/add/<int:book_pk>/', user_views.cart_add, name='cart_add'),
     path('library/cart/remove/<int:item_pk>/', user_views.cart_remove, name='cart_remove'),
     path('library/cart/clear/', user_views.cart_clear, name='cart_clear'),
+    path('library/cart/badge/', user_views.cart_badge, name='cart_badge'),
     path('library/cart/qr/', user_views.cart_generate_qr, name='cart_generate_qr'),
-    path('library/cart/borrow/confirm/', user_views.cart_borrow_confirm, name='cart_borrow_confirm'),
     path('library/cart/return/', user_views.cart_return_list, name='cart_return_list'),
     path('library/cart/return/add/<int:issue_pk>/', user_views.cart_return_add, name='cart_return_add'),
+    path('library/cart/return/remove/<int:item_pk>/', user_views.cart_return_remove, name='cart_return_remove'),
+    path('library/cart/return/clear/', user_views.cart_return_clear, name='cart_return_clear'),
     path('library/cart/return/qr/', user_views.cart_return_qr, name='cart_return_qr'),
-    path('library/cart/return/confirm/', user_views.cart_return_confirm, name='cart_return_confirm'),
 ]

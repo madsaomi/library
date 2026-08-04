@@ -23,7 +23,11 @@ class IsTeacher(BasePermission):
 
 class IsStudentOrTeacher(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ('student', 'teacher') and request.user.school is not None
+        return (
+            request.user.is_authenticated
+            and request.user.role in ('student', 'teacher')
+            and request.user.school is not None
+        )
 
 
 class IsSchoolStaff(BasePermission):

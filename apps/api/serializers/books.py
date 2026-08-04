@@ -67,6 +67,31 @@ class BookIssueSerializer(serializers.ModelSerializer):
         return f'{obj.user.first_name} {obj.user.last_name}'.strip()
 
 
+class BookIssuePublicSerializer(serializers.ModelSerializer):
+    book_title = serializers.CharField(source='book.title', read_only=True)
+    book_author = serializers.CharField(source='book.author', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    user_full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BookIssue
+        fields = [
+            'id',
+            'book',
+            'book_title',
+            'book_author',
+            'user',
+            'username',
+            'user_full_name',
+            'issued_at',
+            'returned_at',
+            'is_returned',
+        ]
+
+    def get_user_full_name(self, obj):
+        return f'{obj.user.first_name} {obj.user.last_name}'.strip()
+
+
 class BookRequestSerializer(serializers.ModelSerializer):
     book_title = serializers.CharField(source='book.title', read_only=True)
     book_author = serializers.CharField(source='book.author', read_only=True)
