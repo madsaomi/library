@@ -13,17 +13,17 @@ class IsSchoolAdmin(BasePermission):
 
 class IsStudent(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'student'
+        return request.user.is_authenticated and request.user.role == 'student' and request.user.school is not None
 
 
 class IsTeacher(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'teacher'
+        return request.user.is_authenticated and request.user.role == 'teacher' and request.user.school is not None
 
 
 class IsStudentOrTeacher(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ('student', 'teacher')
+        return request.user.is_authenticated and request.user.role in ('student', 'teacher') and request.user.school is not None
 
 
 class IsSchoolStaff(BasePermission):

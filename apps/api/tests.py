@@ -66,12 +66,12 @@ class TestAuth:
     def test_login_superuser_redirect(self, superuser):
         client = APIClient()
         resp = client.post('/api/auth/login/', {'username': 'admin', 'password': 'admin123'}, format='json')
-        assert resp.data['redirect'] == '/admin-panel/'
+        assert resp.data['redirect'] == '/admin/'
 
     def test_login_school_admin_redirect(self, school_admin):
         client = APIClient()
         resp = client.post('/api/auth/login/', {'username': 'school_admin', 'password': 'admin123'}, format='json')
-        assert resp.data['redirect'] == '/school-panel/'
+        assert resp.data['redirect'] == '/school/'
 
 
 class TestAdminAPI:

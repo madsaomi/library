@@ -38,8 +38,6 @@ class GradePromotionMiddleware:
                         num = int(parts[0])
                     except ValueError:
                         continue
-                    except IndexError:
-                        continue
                     num += 1
                     if num > 11:
                         student.is_archived = True

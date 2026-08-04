@@ -94,7 +94,7 @@ class TestAchievements:
 
         info = get_level_info(1)
         assert info['level'] == 1
-        assert info['title'] == 'Новичок'
+        assert info['title'] == 'Boshlang\'ich'
 
     def test_get_level_info_invalid(self):
         from books.achievements import get_level_info

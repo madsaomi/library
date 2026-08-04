@@ -1,10 +1,16 @@
+import sys
+
 import pytest
 from django.contrib.auth import get_user_model
-from django.core.management import call_command
+
+if sys.platform == 'win32':
+    import asyncio
+
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 
-@pytest.fixture(scope='session')
-def django_db_setup(django_db_setup, django_db_blocker):
+@pytest.fixture
+def transactional_db(transactional_db, django_db_blocker):
     with django_db_blocker.unblock():
         User = get_user_model()
         if not User.objects.filter(username='admin').exists():

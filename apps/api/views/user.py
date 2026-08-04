@@ -44,6 +44,8 @@ class CatalogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = BookListSerializer
 
     def get_queryset(self):
+        if not self.request.user.school:
+            return Book.objects.none()
         query = self.request.query_params.get('q')
         category_id = self.request.query_params.get('category')
         textbook = self.request.query_params.get('textbook')
@@ -69,19 +71,19 @@ class CatalogViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     def reader_of_month(self, request):
         school = request.user.school
+        if not school:
+            return Response(None)
         now = timezone.now()
         cache_key = f'reader_month_{school.id}_{now.month}'
         reader = cache.get(cache_key)
         if reader is None:
-            try:
-                reader = (
-                    ReaderOfMonth.objects.filter(school=school, month=now.month, year=now.year)
-                    .select_related('user')
-                    .first()
-                )
+            reader = (
+                ReaderOfMonth.objects.filter(school=school, month=now.month, year=now.year)
+                .select_related('user')
+                .first()
+            )
+            if reader:
                 cache.set(cache_key, reader, 3600)
-            except ReaderOfMonth.DoesNotExist:
-                reader = None
         if reader:
             return Response(ReaderOfMonthSerializer(reader).data)
         return Response(None)
@@ -139,13 +141,18 @@ class BookDetailViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['post'])
     def reserve(self, request, pk=None):
         book = self.get_object()
-        if book.available_count > 0:
-            qr_token = f'request_{book.id}_{timezone.now().timestamp()}'
-            book_request = BookRequest.objects.create(
-                book=book, user=request.user, status='approved', qr_token=qr_token
-            )
-            return Response(BookRequestSerializer(book_request).data)
-        return Response({'detail': 'No copies available.'}, status=status.HTTP_400_BAD_REQUEST)
+        if book.available_count <= 0:
+            return Response({'detail': 'No copies available.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if already requested
+        existing = BookRequest.objects.filter(user=request.user, book=book, status='pending').first()
+        if existing:
+            return Response(BookRequestSerializer(existing).data)
+
+        book_request = BookRequest.objects.create(
+            book=book, user=request.user, status='pending'
+        )
+        return Response(BookRequestSerializer(book_request).data)
 
     @action(detail=True, methods=['post'])
     def join_waitlist(self, request, pk=None):

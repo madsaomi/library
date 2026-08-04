@@ -92,3 +92,64 @@ Celery+Beat, jazzmin. Replace obsolete pieces:
   description || 'C')`; `SearchRank` path compiles; fresh `migrate` from scratch on SQLite applies all
   migrations; `makemigrations --check` → no changes; ruff clean; books+api+core tests 158 passed.
 - CI runs 2026-07-27 + 08-03 were failing for this reason; `e2e`/`test` should now go green.
+
+## Session: fix e2e login root cause (2026-08-04)
+- **Root cause of e2e failures (CI red since e2e were added)**: e2e/conftest.py created the test
+  superuser dmin in a **session-scoped** `django_db_setup` override. pytest-django runs
+  `live_server` tests inside `TransactionTestCase` (`transactional_db` is auto-requested), and
+  `TransactionTestCase` **flushes the whole DB after every test** — so after the first e2e test the
+  admin user was gone. Every subsequent `login` fixture timed out waiting for `**/admin/**` and
+  AXES logged "New login failure". Reproduced locally: `ADMIN USER COUNT: 0` in the second test.
+- **Fix**: moved user creation to a **function-scoped** `transactional_db` override
+  (documented pytest-django pattern for data visible to `live_server`). Admin is (re)created at the
+  start of every e2e test and cleaned up by the flush. Verified locally: all **14 e2e tests pass**,
+  all **168 unit tests pass**, `ruff check` clean.
+- Also removed the unused `from django.core.management import call_command` import from
+  `e2e/conftest.py`; kept the `sys.platform == 'win32'` asyncio Proactor policy guard (local-only,
+  inert on Linux CI).
+
+## Session: clean up minor issues in modules (2026-08-04)
+- **pps/books/achievements.py**: LEVEL_TABLE + fallback had hardcoded Russian level titles
+  ('Новичок'…'Легенда') — project default language is uz. Replaced with Uzbek names wrapped in
+  gettext_lazy so they can be translated if locale files are added later.
+- **pps/books/models.py**: Book.save() caught image-optimization errors with a bare
+  print(...) — silently lost from logging. Swapped to logger.warning(...) (added
+  logging.getLogger(__name__)).
+- **core/middleware.py**: GradePromotionMiddleware had an unreachable
+  except IndexError: continue after parts[0] — already guarded by if not student.grade /
+  parts[0] index access. Removed the dead clause.
+- **pps/books/tests.py**: Updated 	est_get_level_info to assert 'Boshlang\'ich' instead of
+  'Новичок' (reflects the i18n change).
+- **Verified**: 168 unit tests green; uff check clean.
+
+
+## Session: deeper logic review — school/user views (2026-08-04)
+- **pps/frontend/views/school_views.py** dashboard: removed dead or request.user.is_superuser
+  clause in the news filter. The view is already decorated with @school_admin_required (checks
+  ole == 'school_admin' and school is not None), so a superuser could never reach this code path.
+- **pps/frontend/views/user_views.py** library + 
+ews_list: added early guard for
+  equest.user.school is None. Previously a user without a school (e.g. a newly-created teacher)
+  would silently see an empty library or empty news list instead of an error message. Now redirects
+  to /login/ with a clear Uzbek error.
+- **Verified**: 168 unit tests green; uff check clean.
+
+
+## Session: deeper API + permissions review (2026-08-04)
+- **pps/api/permissions.py**: IsStudent, IsTeacher, IsStudentOrTeacher did NOT check
+  school is not None, unlike IsSchoolAdmin. Users without a school would reach views that
+  access equest.user.school and silently get empty results instead of being rejected.
+  Added nd request.user.school is not None to all three.
+- **pps/api/views/user.py** CatalogViewSet.get_queryset: added guard
+  if not self.request.user.school: return Book.objects.none() — prevents querying without a
+  school.
+- **pps/api/views/user.py** CatalogViewSet.reader_of_month: fixed two bugs —
+  (a) removed dead except ReaderOfMonth.DoesNotExist (.first() never raises it),
+  (b) don't cache None for 3600s (only cache when a reader is found).
+- **pps/api/views/user.py** BookDetailViewSet.reserve: was auto-approving
+  (status='approved') which bypassed the school admin approval flow. Changed to create a
+  status='pending' request (matching the frontend eserve_book behavior). Also skips
+  creating a duplicate request if one already exists.
+- **pps/api/tests.py**: updated 	est_catalog_reader_of_month to also verify None is
+  returned when no reader is set (the fix now doesn't crash).
+

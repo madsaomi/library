@@ -18,7 +18,10 @@ Ordered by priority. Nothing here blocks the current green state; all items are 
    further progressive-enhancement is optional.
 
 ## Cannot be done in this environment
-- E2E tests (`pytest -m e2e`, 14 Playwright tests) — need Playwright + Python 3.13; run only in CI.
+- E2E tests (`pytest -m e2e`, 14 Playwright tests) — now **green locally and fixed for CI**:
+  root cause was the session-scoped `django_db_setup` admin user being wiped by `TransactionTestCase`
+  flush; fixed via a function-scoped `transactional_db` override in `e2e/conftest.py`.
+  Local run needs Playwright installed + `DJANGO_ALLOW_ASYNC_UNSAFE=true`.
 - Any Node/uv-based frontend pipeline — no Node.js installed locally.
 
 ## How to keep this folder useful

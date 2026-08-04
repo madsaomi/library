@@ -1,7 +1,11 @@
+import logging
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
+
+logger = logging.getLogger(__name__)
 
 
 def book_search_vector():
@@ -102,7 +106,7 @@ class Book(models.Model):
                     # the infinite loop/duplicate issue on every model save
                     self.cover.save(filename, ContentFile(buffer.getvalue()), save=False)
             except Exception as e:
-                print(f'Error optimizing image: {e}')
+                logger.warning('Image optimization failed: %s', e)
 
         super().save(*args, **kwargs)
 

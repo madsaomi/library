@@ -44,7 +44,9 @@ Last fully verified: 2026-08-03 (after the modernization + dependency-split sess
 - CI (.github/workflows/tests.yml): lint+test on Python 3.14, e2e on Python 3.13, Postgres 16 service.
 - Env vars needed for any Django command locally:
   `$env:SECRET_KEY="django-insecure-test-key-not-for-production-environment-only"; $env:DEBUG="True"`
-- E2E (`pytest -m e2e`, 14 tests) requires Playwright + Python 3.13 — cannot run locally.
+- E2E (`pytest -m e2e`, 14 tests) runs in CI on Python 3.13. Can also run locally (Playwright
+  installed, Python 3.12) with `DJANGO_ALLOW_ASYNC_UNSAFE=true` (sqlite in-memory + live_server threads);
+  `e2e/conftest.py` guards the Windows asyncio Proactor policy behind `sys.platform == 'win32'`.
 
 ## Known gotchas (important)
 - URL names are prefixed: `frontend:admin_news_list` / `frontend:school_news_list` /

@@ -15,6 +15,10 @@ from django.utils.translation import gettext as _
 
 @login_required(login_url='login')
 def library(request):
+    if not request.user.school:
+        from django.contrib import messages
+        messages.error(request, _('Sizda maktab topilmadi. Iltimos, administrator bilan bog\'laning.'))
+        return redirect('login')
     query = request.GET.get('q')
     page = request.GET.get('page', 1)
     if not query:
@@ -131,6 +135,10 @@ def my_books(request):
 
 @login_required(login_url='login')
 def news_list(request):
+    if not request.user.school:
+        from django.contrib import messages
+        messages.error(request, _('Sizda maktab topilmadi. Iltimos, administrator bilan bog\'laning.'))
+        return redirect('login')
     from schools.models import News
 
     news = News.objects.filter(school=request.user.school, is_published=True).order_by('-created_at')

@@ -36,8 +36,6 @@ def clean_name(name):
 @cache_page(60 * 5)
 @school_admin_required
 def dashboard(request):
-    if request.user.role != 'school_admin':
-        return redirect('frontend:library')
     school = request.user.school
     context = {}
     if school:
@@ -54,8 +52,6 @@ def dashboard(request):
 
         # Base news filter: current school's news
         news_filter = Q(school=school)
-        if request.user.role == 'school_admin' or request.user.is_superuser:
-            news_filter |= Q(school__isnull=True)
 
         # Monthly issues for chart
         today = timezone.now()

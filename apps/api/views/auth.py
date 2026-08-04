@@ -30,8 +30,8 @@ def LoginView(request):
 
     refresh = RefreshToken.for_user(user)
     redirect_map = {
-        'superuser': '/admin-panel/',
-        'school_admin': '/school-panel/',
+        'superuser': '/admin/',
+        'school_admin': '/school/',
         'student': '/library/',
         'teacher': '/library/',
     }

@@ -1,19 +1,21 @@
 import random
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.db.models import F
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 LEVEL_TABLE = [
-    (1, 'Новичок', 0),
-    (2, 'Читатель', 30),
-    (3, 'Книголюб', 80),
-    (4, 'Начитанный', 150),
-    (5, 'Книжный червь', 250),
-    (6, 'Эрудит', 400),
-    (7, 'Интеллектуал', 600),
-    (8, 'Профессор', 850),
-    (9, 'Мудрец', 1200),
-    (10, 'Легенда', 2000),
+    (1, _('Boshlang\'ich'), 0),
+    (2, _('Kitobxon'), 30),
+    (3, _('Kitobsevar'), 80),
+    (4, _('Ko\'p o\'qigan'), 150),
+    (5, _('Kitob g\'irti'), 250),
+    (6, _('Bilimdon'), 400),
+    (7, _('Intellektual'), 600),
+    (8, _('Professor'), 850),
+    (9, _('Donishmand'), 1200),
+    (10, _('Afsonaviy'), 2000),
 ]
 
 
@@ -21,7 +23,7 @@ def get_level_info(level):
     for lvl, title, xp in LEVEL_TABLE:
         if lvl == level:
             return {'level': lvl, 'title': title, 'xp_required': xp}
-    return {'level': level, 'title': 'Новичок', 'xp_required': 0}
+    return {'level': level, 'title': _('Boshlang\'ich'), 'xp_required': 0}
 
 
 def get_next_level_info(level):
@@ -93,7 +95,7 @@ def check_achievements(user):
 
 
 def update_streak(user):
-    today = date.today()
+    today = timezone.now().date()
     if user.last_activity_date:
         delta = (today - user.last_activity_date).days
         if delta == 0:
