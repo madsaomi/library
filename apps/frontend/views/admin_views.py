@@ -760,7 +760,6 @@ def school_add(request):
 
             # Auto-generate credentials if not provided
             if not admin_username:
-                district_part = district_id or 'no_district'
                 school_part = school.name.replace(' ', '_')[:20]
                 random_part = secrets.token_hex(3)
                 admin_username = f'admin_{school_part}_{random_part}'
