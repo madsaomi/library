@@ -776,6 +776,7 @@ def school_add(request):
                 first_name='Admin',
                 last_name=school.name,
             )
+            admin_user.raw_password = admin_password
             admin_user.save()
 
             # Log action
