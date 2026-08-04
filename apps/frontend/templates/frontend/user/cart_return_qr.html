@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "QR kod" %} | {% trans "Kitoblar qaytarish" %}{% endblock %}
+
+{% block content %}
+<div class="animate-fade text-center py-xl">
+    <div class="glass-panel p-xl max-w-md mx-auto">
+        <h3 class="mb-xl">
+            <i class="fas fa-qrcode text-primary"></i>
+            {% trans "Qaytarish QR kodi" %}
+        </h3>
+        
+        <div class="d-flex justify-center mb-xl" id="qrContent">
+            <canvas id="qrCanvas" width="240" height="240"></canvas>
+        </div>
+        
+        <p class="text-sm text-muted mb-xl">
+            <i class="fas fa-info-circle"></i>
+            {% trans "Biблиотекарь buni skanerlashi kerak" %}
+        </p>
+        
+        <div class="d-flex gap-md justify-center">
+            <button type="button" onclick="window.close()" class="btn btn-secondary">{% trans "Yopish" %}</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cartData = {
+        type: 'cart_return',
+        cart_id: '{{ cart.qr_token }}',
+        items: [
+            {% for item in items %}
+            {book_id: {{ item.book.id }}, title: '{{ item.book.title|escapejs }}'},
+            {% endfor %}
+        ]
+    };
+    
+    const qrContainer = document.getElementById('qrCanvas');
+    qrContainer.innerHTML = '';
+    new QRCode(qrContainer, {
+        text: JSON.stringify(cartData),
+        width: 240,
+        height: 240,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+});
+</script>
+{% endblock %}
