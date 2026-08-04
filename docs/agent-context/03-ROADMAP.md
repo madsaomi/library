@@ -54,4 +54,5 @@ Ordered by priority. Nothing here blocks the current green state; all items are 
 - ~~Medium: category_id parsing hardened (isdigit)~~
 - ~~Medium: added cart_badge endpoint + sidebar badge JS; removed cart link from school sidebar~~
 - ~~Medium: tests updated (QR HMAC, join_waitlist, etc.)~~
-- Verification: manage.py check 0 issues; uff check/format clean; **168 unit tests PASS**; e2e 13/14 on Windows (CDN flake, stable in CI).
+- Verification: manage.py check 0 issues; ruff check/format clean; **169 unit tests PASS**; e2e 13/14 on Windows (CDN flake, stable in CI).
+
