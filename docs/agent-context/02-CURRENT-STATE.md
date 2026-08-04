@@ -72,3 +72,23 @@ Last fully verified: 2026-08-05 (security audit + cart rework + e2e 13/14).
 - `pyproject.toml` (testpaths + core; per-file-ignores cleanup), `AGENTS.md`, `docs/REQS.md`
 - `Makefile`, `tasks.ps1`, `.github/workflows/tests.yml` (install `requirements-dev.txt`)
 - `README.md`, `docs/CHANGELOG.md`, `docs/agent-context/`
+
+### 2026-08-05 security audit + cart rework
+- `apps/api/serializers/accounts.py` (read_only: role/school/username, exclude raw_password+password)
+- `apps/api/serializers/books.py` (new BookIssuePublicSerializer)
+- `apps/api/views/school.py` (HMAC QR, perform_create/update for school enforcement, distribute/collect fixes)
+- `apps/api/views/user.py` (textbook ban, categories filter, public serializer, my_rank fix)
+- `apps/api/tests.py` (QR/HMAC tests, waitlist test)
+- `apps/books/models.py` (BookCart.purpose field, PIL close, Coalesce in search vector)
+- `apps/books/migrations/0016_bookcart_purpose.py` (new migration)
+- `apps/frontend/views/dispatch.py` (new — profile/password dispatch)
+- `apps/frontend/views/user_views.py` (cart rework, month_bounds, N+1 fix, cart_badge)
+- `apps/frontend/views/school_views.py` (process_cart_qr, process_cart_return_qr, Category filter, category_id safe parse)
+- `apps/frontend/views/admin_views.py` (Category filter, month_bounds)
+- `apps/frontend/urls.py` (cart URLs: add/remove/clear/badge/qr/return/*)
+- `apps/frontend/templates/frontend/user/cart_*.html` (server-side QR, JSON JS)
+- `apps/frontend/templates/frontend/user/sidebar_items.html` (badge JS)
+- `apps/frontend/templates/frontend/school/sidebar_items.html` (removed cart link)
+- `apps/frontend/templates/frontend/user/book_detail.html` (cart button)
+- `apps/frontend/utils.py` (month_bounds helper)
+- `docs/agent-context/01-HISTORY.md`, `02-CURRENT-STATE.md`, `03-ROADMAP.md`

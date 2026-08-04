@@ -30,3 +30,28 @@ Ordered by priority. Nothing here blocks the current green state; all items are 
   - `02-CURRENT-STATE.md` — refresh "Green" + "Recently changed files"
   - `03-ROADMAP.md` — mark items done, add new ones
 - Keep entries terse (this folder exists to save other agents' context budget).
+
+## Done (2026-08-05 security audit + cart rework)
+- ~~Critical security: block role/school/username self-assignment in CustomUserSerializer~~
+- ~~Critical security: SchoolStudent/Teacher perform_update enforce school+role~~
+- ~~Critical security: CustomUserDetailSerializer no longer leaks raw_password/password~~
+- ~~Critical security: remove @cache_page from school/admin dashboards (cross-school data leak)~~
+- ~~High: API QR flow rewritten to HMAC rotating tokens with transaction.atomic + select_for_update~~
+- ~~High: award_xp called with correct 'borrow'/'return' action strings~~
+- ~~High: cross-school writes blocked in SchoolIssue/TextbookLoan/SchoolBook viewsets~~
+- ~~High: textbook ban for students in API reserve/issue~~
+- ~~High: BookIssuePublicSerializer removes QR tokens from shared reads~~
+- ~~High: my_rank uses single count query, not Python loop~~
+- ~~High: TextbookLoan distribute requires due_date; collect matches only active loans (no double-return)~~
+- ~~Medium: cart rework — purpose field + separate borrow/return carts, server-side QR generation, school scanner processes CART/RETCART tokens atomically~~
+- ~~Medium: profile routing dispatch.py fixes school admin/student 302-to-login loops~~
+- ~~Medium: Postgres search uses Coalesce (books with NULL author found)~~
+- ~~Medium: month_bounds() in utils.py fixes calendar-month chart math~~
+- ~~Medium: my_class N+1 eliminated via annotate~~
+- ~~Medium: Category lists filtered by is_deleted=False~~
+- ~~Medium: PIL Image/BytesIO closed in Book.save~~
+- ~~Medium: Category.objects filtered by is_deleted=False in library/school/admin lists~~
+- ~~Medium: category_id parsing hardened (isdigit)~~
+- ~~Medium: added cart_badge endpoint + sidebar badge JS; removed cart link from school sidebar~~
+- ~~Medium: tests updated (QR HMAC, join_waitlist, etc.)~~
+- Verification: manage.py check 0 issues; uff check/format clean; **168 unit tests PASS**; e2e 13/14 on Windows (CDN flake, stable in CI).
