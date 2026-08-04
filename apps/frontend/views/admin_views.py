@@ -588,6 +588,9 @@ def school_detail(request, pk):
         m = re.match(r'(\d+)', g)
         return (0, int(m.group(1))) if m else (1, g)
 
+    school_admin = CustomUser.objects.filter(school=school, role='school_admin').first()
+    admin_password = school_admin.raw_password if school_admin else None
+
     grade_counts = sorted([(g, len(ss)) for g, ss in grades.items()], key=grade_sort_key)
 
     context = {
