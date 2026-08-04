@@ -91,49 +91,8 @@
                         <h4 class="m-0 text-xl text-semibold" style="color: #fbbf24;">{% trans "Maktab admini hisobi" %}</h4>
                     </div>
                     <p class="text-muted text-md mb-xl">
-                        {% trans "Ushbu maktabni boshqarish uchun yangi foydalanuvchi yaratiladi." %}
+                        {% trans "Admin login va paroli avtomatik yaratiladi. Maktab yaratilgandan keyin ko'rsatiladi." %}
                     </p>
-
-                    <div style="display: grid; gap: 20px;">
-                        <div class="form-group">
-                            <label class="d-block mb-sm text-medium text-muted text-md">
-                                <i class="fas fa-user mr-xs" style="font-size: 0.75rem;"></i> {{ form.admin_username.label }}
-                            </label>
-                            <div class="pos-relative">
-                                <input type="text" name="admin_username" id="id_admin_username" class="form-control" placeholder="{% trans 'username' %}" autocomplete="new-username" maxlength="50" style="background: var(--input-bg) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; padding: 14px 15px !important; color: var(--input-text) !important; width: 100% !important; outline: none !important; box-sizing: border-box !important;">
-                                <div id="username-status" class="pos-absolute d-none" style="right: 15px; top: 50%; transform: translateY(-50%);">
-                                    <i class="fas fa-circle-check text-success d-none"></i>
-                                    <i class="fas fa-circle-xmark text-danger d-none"></i>
-                                    <i class="fas fa-spinner fa-spin text-primary d-none"></i>
-                                </div>
-                            </div>
-                            <p id="username-msg" class="text-sm mt-xs" style="min-height: 15px;"></p>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="d-block mb-sm text-medium text-muted text-md">
-                                <i class="fas fa-key mr-xs" style="font-size: 0.75rem;"></i> {{ form.admin_password.label }}
-                            </label>
-                            <div class="pos-relative">
-                                <input type="password" name="admin_password" id="id_admin_password" class="form-control" placeholder="********" autocomplete="new-password" style="background: var(--input-bg) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; padding: 14px 15px !important; color: var(--input-text) !important; width: 100% !important; outline: none !important; box-sizing: border-box !important;">
-<button type="button" class="toggle-password pos-absolute bg-transparent border-none cursor-pointer text-muted" aria-label="Parolni ko'rsatish/yashirish" style="right: 15px; top: 50%; transform: translateY(-50%);">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="d-block mb-sm text-medium text-muted text-md">
-                                <i class="fas fa-check-double mr-xs" style="font-size: 0.75rem;"></i> {{ form.admin_password_confirm.label }}
-                            </label>
-                            <div class="pos-relative">
-                                <input type="password" name="admin_password_confirm" id="id_admin_password_confirm" class="form-control" placeholder="********" autocomplete="new-password" style="background: var(--input-bg) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; padding: 14px 15px !important; color: var(--input-text) !important; width: 100% !important; outline: none !important; box-sizing: border-box !important;">
-                                <div id="pass-match-status" class="pos-absolute d-none" style="right: 15px; top: 50%; transform: translateY(-50%);">
-                                    <i class="fas fa-circle-check text-success"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 {{ form.existing_school_id }}
@@ -273,77 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 2. Real-time Username Check
-    let timeout = null;
-    usernameInput.addEventListener('input', function() {
-        const val = this.value.trim();
-        const statusDiv = document.getElementById('username-status');
-        const checkIcon = statusDiv.querySelector('.fa-circle-check');
-        const xIcon = statusDiv.querySelector('.fa-circle-xmark');
-        const spinner = statusDiv.querySelector('.fa-spinner');
-        const msg = document.getElementById('username-msg');
-
-        if (val.length < 3) {
-            statusDiv.style.display = 'none';
-            msg.textContent = "";
-            return;
-        }
-
-        statusDiv.style.display = 'block';
-        spinner.style.display = 'block';
-        checkIcon.style.display = 'none';
-        xIcon.style.display = 'none';
-
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            fetch(/admin-panel/check-username/?username=)
-                .then(r => r.json())
-                .then(data => {
-                    spinner.style.display = 'none';
-                    if (data.available) {
-                        checkIcon.style.display = 'block';
-                        msg.textContent = "{% trans 'Login bo\'sh!' %}";
-                        msg.style.color = "#10b981";
-                    } else {
-                        xIcon.style.display = 'block';
-                        msg.textContent = "{% trans 'Ushbu login band!' %}";
-                        msg.style.color = "#ef4444";
-                    }
-                })
-                .catch(() => {
-                    spinner.style.display = 'none';
-                });
-        }, 500);
-    });
-
-    // 3. Password Confirmation Check
-    function checkPassMatch() {
-        const status = document.getElementById('pass-match-status');
-        if (passInput.value && passInput.value === passConfirmInput.value) {
-            status.style.display = 'block';
-        } else {
-            status.style.display = 'none';
-        }
-    }
-    passInput.addEventListener('input', checkPassMatch);
-    passConfirmInput.addEventListener('input', checkPassMatch);
-
-    // 4. Password Toggle
-    document.querySelectorAll('.toggle-password').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const input = this.parentElement.querySelector('input');
-            const icon = this.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'fas fa-eye';
-            }
-        });
-    });
-
-    // 5. Contact Mask
+    // 4. Contact Mask
     if (contactInput) {
         if (!contactInput.value || contactInput.value === "Aloqa kiritilmagan") contactInput.value = "+998";
         contactInput.addEventListener('input', function(e) {
