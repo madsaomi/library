@@ -233,3 +233,10 @@ ews_list: added early guard for
 - **L11**: Removed `unique=True` from `BookCart.qr_token` (prevents race-condition unique violations)
 - **L12**: `SuperUserStatsView.list` filters `is_deleted=False` on all model queries
 - **Tests**: 169 passed (+1 new streak test), ruff clean
+
+## Session: auto-generate school admin credentials (2026-08-05)
+- **school_add view**: auto-generates admin_username (dmin_{school_name}_{random_hex}) and
+  admin_password (14-char random string) when fields are left empty
+- **New template school_created.html**: shows credentials with copy-to-clipboard and
+  toggle-password buttons, warns user to save securely
+- **Python**: 169 tests PASS, ruff clean
