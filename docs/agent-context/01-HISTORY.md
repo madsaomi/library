@@ -222,3 +222,14 @@ ews_list: added early guard for
   filtered by `is_deleted=False` in library/school/admin lists.
 - **Verification**: `manage.py check` 0 issues; `ruff check .` + `ruff format .` clean;
   **168 unit tests PASS**; e2e 13/14 on Windows (1 CDN timeout flake, stable in CI).
+
+## Session: remaining audit fixes (2026-08-05)
+- **M1**: CSV import APIs now return `credentials: [{username, password}]` for each imported student
+- **L6**: Removed duplicate `GraduateViewSet`; kept `SchoolStudentViewSet.graduates` action
+- **M5**: `check_achievements` bulk-fetches earned IDs + pre-computes all aggregates in 2 queries (was O(N×2))
+- **M8**: `WaitlistSerializer.get_position` uses `Window(RowNumber())` (single query, no N+1)
+- **L9**: `update_streak` now counts consecutive days (delta==1 → +1 streak) instead of ISO weeks
+- **L10**: `Book.save()` enforces `0 <= available_count <= total_count` for plain int values
+- **L11**: Removed `unique=True` from `BookCart.qr_token` (prevents race-condition unique violations)
+- **L12**: `SuperUserStatsView.list` filters `is_deleted=False` on all model queries
+- **Tests**: 169 passed (+1 new streak test), ruff clean
