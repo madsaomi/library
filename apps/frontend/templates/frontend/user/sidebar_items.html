@@ -2,6 +2,15 @@
 {% load i18n %}
 
 {% block sidebar_content %}
+<!-- Cart section - prominent for all roles -->
+<div class="sidebar-section-label" style="margin-top: 12px;">{% trans "Savat" %}</div>
+<a href="{% url 'frontend:cart_list' %}" class="nav-link {% if 'cart' in request.resolver_match.url_name %}active{% endif %}" data-name="savat cart books" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; font-weight: 600; border-radius: 12px;">
+    <i class="fas fa-shopping-cart"></i>
+    <span>{% trans "Kitoblar savati" %}</span>
+    <span id="cartBadge" class="badge bg-white text-dark ms-auto" style="border-radius: 20px; padding: 2px 8px; font-size: 0.75rem;">0</span>
+</a>
+
+<div class="sidebar-section-label">{% trans "Asosiy" %}</div>
 <a href="{% url 'frontend:library' %}" class="nav-link {% if request.resolver_match.url_name == 'library' %}active{% endif %}" data-name="kutubxona library" {% if request.resolver_match.url_name == 'library' %}aria-current="page"{% endif %}>
     <i class="fas fa-home"></i> <span>{% trans "Kutubxona" %}</span>
 </a>

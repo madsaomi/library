@@ -1,5 +1,7 @@
+import uuid
+
 from books.achievements import get_level_info, get_next_level_info
-from books.models import Book, Category
+from books.models import Book, BookCart, BookCartItem, Category
 from books.search import search_books
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
@@ -10,14 +12,20 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.translation import gettext as _
+
+
+def generate_cart_token():
+    return f'CART_{uuid.uuid4().hex[:12]}'
 
 
 @login_required(login_url='login')
 def library(request):
     if not request.user.school:
         from django.contrib import messages
-        messages.error(request, _('Sizda maktab topilmadi. Iltimos, administrator bilan bog\'laning.'))
+
+        messages.error(request, _("Sizda maktab topilmadi. Iltimos, administrator bilan bog'laning."))
         return redirect('login')
     query = request.GET.get('q')
     page = request.GET.get('page', 1)
@@ -137,7 +145,8 @@ def my_books(request):
 def news_list(request):
     if not request.user.school:
         from django.contrib import messages
-        messages.error(request, _('Sizda maktab topilmadi. Iltimos, administrator bilan bog\'laning.'))
+
+        messages.error(request, _("Sizda maktab topilmadi. Iltimos, administrator bilan bog'laning."))
         return redirect('login')
     from schools.models import News
 
@@ -545,3 +554,200 @@ def leave_waitlist(request, book_pk):
     if deleted:
         messages.success(request, _('Siz navbatdan chiqdingiz'))
     return redirect('frontend:book_detail', pk=book.pk)
+
+
+@login_required(login_url='login')
+def cart_list(request):
+    from django.core.paginator import Paginator
+
+    cart, created = BookCart.objects.get_or_create(
+        user=request.user, school=request.user.school, status='pending', defaults={'qr_token': generate_cart_token()}
+    )
+
+    items = BookCartItem.objects.filter(cart=cart, is_deleted=False).select_related('book')
+    paginator = Paginator(items, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        'frontend/user/cart_list.html',
+        {
+            'cart': cart,
+            'items': page_obj,
+            'page_obj': page_obj,
+        },
+    )
+
+
+@login_required(login_url='login')
+def cart_add(request, book_pk):
+    from books.models import Book
+
+    book = get_object_or_404(Book, pk=book_pk, school=request.user.school)
+    cart, _ = BookCart.objects.get_or_create(
+        user=request.user, school=request.user.school, status='pending', defaults={'qr_token': generate_cart_token()}
+    )
+
+    item, created = BookCartItem.objects.get_or_create(cart=cart, book=book)
+    if not created:
+        messages.info(request, _('Bu kitob allaqachon savatda'))
+
+    return redirect('frontend:cart_list')
+
+
+@login_required(login_url='login')
+def cart_remove(request, item_pk):
+
+    item = get_object_or_404(BookCartItem, pk=item_pk, cart__user=request.user)
+    item.hard_delete()
+    messages.success(request, _("Kitob savatdan o'chirildi"))
+    return redirect('frontend:cart_list')
+
+
+@login_required(login_url='login')
+def cart_clear(request):
+
+    cart = BookCart.objects.filter(user=request.user, school=request.user.school, status='pending').first()
+    if cart:
+        BookCartItem.objects.filter(cart=cart).hard_delete()
+        cart.delete()
+
+    messages.success(request, _('Savat tozalandi'))
+    return redirect('frontend:library')
+
+
+@login_required(login_url='login')
+def cart_generate_qr(request):
+    import uuid
+
+    cart = BookCart.objects.filter(user=request.user, school=request.user.school, status='pending').first()
+
+    if not cart:
+        messages.error(request, _("Savat bo'sh"))
+        return redirect('frontend:cart_list')
+
+    cart.qr_token = f'CART_{uuid.uuid4().hex[:12]}'
+    cart.save()
+
+    items = BookCartItem.objects.filter(cart=cart, is_deleted=False)
+
+    return render(
+        request,
+        'frontend/user/cart_qr.html',
+        {
+            'cart': cart,
+            'items': items,
+        },
+    )
+
+
+@login_required(login_url='login')
+def cart_borrow_confirm(request):
+    from books.models import BookIssue
+
+    cart = get_object_or_404(BookCart, qr_token=request.POST.get('cart_token'), user=request.user)
+
+    if cart.status != 'pending':
+        messages.error(request, _('Bu QR allaqachon ishlatilgan'))
+        return redirect('frontend:cart_list')
+
+    items = BookCartItem.objects.filter(cart=cart, is_deleted=False)
+    for item in items:
+        book = item.book
+        if book.available_count > 0:
+            BookIssue.objects.create(
+                book=book,
+                user=request.user,
+                issued_at=timezone.now(),
+            )
+            book.available_count = (book.available_count or 0) - 1
+            book.save()
+
+    cart.status = 'borrowed'
+    cart.borrowed_at = timezone.now()
+    cart.save()
+
+    messages.success(request, _('Kitoblar muvaffaqiyatli olingan'))
+    return redirect('frontend:library')
+
+
+@login_required(login_url='login')
+def cart_return_list(request):
+
+    cart, created = BookCart.objects.get_or_create(
+        user=request.user, school=request.user.school, status='pending', defaults={'qr_token': generate_cart_token()}
+    )
+
+    items = BookCartItem.objects.filter(cart=cart, is_deleted=False).select_related('book')
+
+    return render(
+        request,
+        'frontend/user/cart_return_list.html',
+        {
+            'cart': cart,
+            'items': items,
+        },
+    )
+
+
+@login_required(login_url='login')
+def cart_return_add(request, issue_pk):
+    from books.models import BookIssue
+
+    issue = get_object_or_404(BookIssue, pk=issue_pk, user=request.user, is_returned=False)
+    cart, _ = BookCart.objects.get_or_create(
+        user=request.user, school=request.user.school, status='pending', defaults={'qr_token': generate_cart_token()}
+    )
+
+    item, created = BookCartItem.objects.get_or_create(cart=cart, book=issue.book)
+    if not created:
+        messages.info(request, _('Bu kitob allaqachon qaytarish uchun tanlangan'))
+
+    return redirect('frontend:cart_return_list')
+
+
+@login_required(login_url='login')
+def cart_return_qr(request):
+
+    cart = get_object_or_404(BookCart, qr_token=request.GET.get('cart_token'), user=request.user)
+    items = BookCartItem.objects.filter(cart=cart, is_deleted=False)
+
+    return render(
+        request,
+        'frontend/user/cart_return_qr.html',
+        {
+            'cart': cart,
+            'items': items,
+        },
+    )
+
+
+@login_required(login_url='login')
+def cart_return_confirm(request):
+    from books.models import BookIssue
+
+    cart = get_object_or_404(BookCart, qr_token=request.POST.get('cart_token'), user=request.user)
+
+    if cart.status != 'pending':
+        messages.error(request, _('Bu QR allaqachon ishlatilgan'))
+        return redirect('frontend:cart_return_list')
+
+    items = BookCartItem.objects.filter(cart=cart, is_deleted=False)
+    for item in items:
+        issue = BookIssue.objects.filter(book=item.book, user=request.user, is_returned=False).first()
+        if issue:
+            issue.is_returned = True
+            issue.returned_at = timezone.now()
+            issue.save()
+
+            book = item.book
+            book.available_count = (book.available_count or 0) + 1
+            book.save()
+
+    cart.status = 'returned'
+    cart.returned_at = timezone.now()
+    cart.save()
+
+    messages.success(request, _('Kitoblar muvaffaqiyatli qaytarildi'))
+    return redirect('frontend:library')

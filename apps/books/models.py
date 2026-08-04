@@ -379,3 +379,55 @@ class ReaderOfMonth(models.Model):
 
     def __str__(self):
         return f'{self.user.username} - {self.month}/{self.year} ({self.books_count} books)'
+
+
+class BookCart(models.Model):
+    STATUS_CHOICES = (
+        ('pending', _('Kutilmoqda')),
+        ('borrowed', _('Olingan')),
+        ('returned', _('Qaytgan')),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('Foydalanuvchi'))
+    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, verbose_name=_('Maktab'))
+    status = models.CharField(_('Holat'), max_length=20, choices=STATUS_CHOICES, default='pending')
+    qr_token = models.CharField(_('QR kod'), max_length=255, unique=True)
+    created_at = models.DateTimeField(_('Yaratilgan vaqt'), auto_now_add=True)
+    borrowed_at = models.DateTimeField(_('Olingan vaqt'), null=True, blank=True)
+    returned_at = models.DateTimeField(_('Qaytgan vaqt'), null=True, blank=True)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
+
+    class Meta:
+        verbose_name = _("Kitoblar savati")
+        verbose_name_plural = _('Kitoblar savatlari')
+
+    def __str__(self):
+        return f'Savat #{self.id} - {self.user.username} - {self.status}'
+
+
+class BookCartItem(models.Model):
+    cart = models.ForeignKey(BookCart, on_delete=models.CASCADE, related_name='items', verbose_name=_('Savat'))
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, verbose_name=_('Kitob'))
+    created_at = models.DateTimeField(_('Qo\'shilgan vaqt'), auto_now_add=True)
+    is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
+
+    class Meta:
+        verbose_name = _("Savat kitobi")
+        verbose_name_plural = _('Savat kitoblari')
+        unique_together = ['cart', 'book']
+
+    def __str__(self):
+        return f'{self.cart.user.username}: {self.book.title}'

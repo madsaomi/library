@@ -3,6 +3,8 @@ from django.contrib import admin
 from .models import (
     Achievement,
     Book,
+    BookCart,
+    BookCartItem,
     BookIssue,
     BookRequest,
     BookWaitlist,
@@ -58,6 +60,23 @@ class BookWaitlistAdmin(admin.ModelAdmin):
     list_display = ('book', 'user', 'created_at', 'is_notified')
     list_filter = ('is_notified', 'book__school')
     search_fields = ('book__title', 'user__username')
+    date_hierarchy = 'created_at'
+
+
+@admin.register(BookCart)
+class BookCartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'school', 'status', 'created_at', 'borrowed_at', 'returned_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('user__username', 'qr_token')
+    date_hierarchy = 'created_at'
+
+
+@admin.register(BookCartItem)
+class BookCartItemAdmin(admin.ModelAdmin):
+    list_display = ('cart', 'book', 'created_at')
+    list_filter = ('cart__user', 'book__school')
+    search_fields = ('cart__user__username', 'book__title')
+    date_hierarchy = 'created_at'
 
 
 @admin.register(Achievement)

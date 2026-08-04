@@ -153,3 +153,20 @@ ews_list: added early guard for
 - **pps/api/tests.py**: updated 	est_catalog_reader_of_month to also verify None is
   returned when no reader is set (the fix now doesn't crash).
 
+
+## Session: cart system + sidebar improvements (2026-08-04)
+- **pps/books/models.py**: Added BookCart and BookCartItem models with soft delete.
+  BookCart tracks student book selections with QR token and status (pending/borrowed/returned).
+- **pps/frontend/views/user_views.py**: Implemented cart flow:
+  - cart_list — show selected books
+  - cart_add/remove/clear — manage items
+  - cart_generate_qr — generate single QR for all books
+  - cart_borrow_confirm — school admin confirms borrowing
+  - cart_return_list/add/qr/confirm — return flow
+- **pps/frontend/urls.py**: Added 13 cart-related URLs under /library/cart/...
+- **pps/frontend/templates/frontend/{school,user}/sidebar_items.html**: Added
+  **prominent cart button** with badge showing item count, styled with gradient background
+  for visibility. Works for both school admin and student roles.
+- **pps/books/admin.py**: Registered models for admin panel.
+- **Migration**:  015_bookcart_bookcartitem.py created and applied.
+
