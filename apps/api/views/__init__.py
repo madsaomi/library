@@ -14,7 +14,6 @@ from .reports import ReportViewSet
 from .school import (
     CsvExportView,
     CsvImportView,
-    GraduateViewSet,
     QrProcessView,
     SchoolBookViewSet,
     SchoolDashboardView,
@@ -50,7 +49,6 @@ __all__ = [
     'CsvExportView',
     'CsvImportView',
     'DistrictViewSet',
-    'GraduateViewSet',
     'InstitutionViewSet',
     'LeaderboardView',
     'LoginView',

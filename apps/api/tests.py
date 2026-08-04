@@ -326,10 +326,12 @@ class TestSchoolAPI:
         resp = client.get('/api/v1/school/textbooks/')
         assert resp.status_code == 200
 
-    def test_school_graduates(self, school_admin):
+    def test_school_graduates(self, school_admin, student):
+        student.is_archived = True
+        student.save()
         client = APIClient()
         client.force_authenticate(user=school_admin)
-        resp = client.get('/api/v1/school/graduates/')
+        resp = client.get('/api/v1/school/students/graduates/')
         assert resp.status_code == 200
 
     def test_school_qr_issue_missing_token(self, school_admin):

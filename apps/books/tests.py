@@ -153,14 +153,29 @@ class TestAchievements:
         assert student.current_streak == 5
 
     def test_update_streak_too_long(self, student):
-        from datetime import date, timedelta
+        from datetime import timedelta
+
+        from django.utils import timezone
 
         from books.achievements import update_streak
 
-        student.last_activity_date = date.today() - timedelta(days=10)
+        student.last_activity_date = timezone.now().date() - timedelta(days=10)
         student.current_streak = 5
         update_streak(student)
         assert student.current_streak == 0
+
+    def test_update_streak_consecutive_day(self, student):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from books.achievements import update_streak
+
+        student.last_activity_date = timezone.now().date() - timedelta(days=1)
+        student.current_streak = 5
+        update_streak(student)
+        assert student.current_streak == 6
+        assert student.longest_streak == 6
 
     def test_award_borrow_xp(self, student, monkeypatch):
         from books.achievements import award_xp

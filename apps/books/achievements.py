@@ -48,42 +48,40 @@ def check_level_up(user):
 def check_achievements(user):
     from .models import Achievement, BookIssue, Category, UserAchievement
 
+    earned_ids = set(UserAchievement.objects.filter(user=user).values_list('achievement_id', flat=True))
+    books_count = user.total_books_read or 0
+    longest_streak = user.longest_streak or 0
+    cats_read = (
+        BookIssue.objects.filter(user=user, is_returned=True, book__category__isnull=False)
+        .values('book__category')
+        .distinct()
+        .count()
+    )
+    speed_returns = BookIssue.objects.filter(
+        user=user, is_returned=True, returned_at__lte=F('issued_at') + timedelta(days=3)
+    ).count()
+    all_cats = Category.objects.filter(book__school=user.school).count()
+
     earned = []
     for ach in Achievement.objects.all():
-        if UserAchievement.objects.filter(user=user, achievement=ach).exists():
+        if ach.id in earned_ids:
             continue
 
         achieved = False
 
         if ach.condition_type == 'books_count':
-            achieved = user.total_books_read >= ach.condition_value
+            achieved = books_count >= ach.condition_value
 
         elif ach.condition_type == 'categories':
-            cats_read = (
-                BookIssue.objects.filter(user=user, is_returned=True, book__category__isnull=False)
-                .values('book__category')
-                .distinct()
-                .count()
-            )
             achieved = cats_read >= ach.condition_value
 
         elif ach.condition_type == 'all_categories':
-            all_cats = Category.objects.filter(book__school=user.school).count()
-            cats_read = (
-                BookIssue.objects.filter(user=user, is_returned=True, book__category__isnull=False)
-                .values('book__category')
-                .distinct()
-                .count()
-            )
             achieved = all_cats > 0 and cats_read >= all_cats
 
         elif ach.condition_type == 'streak':
-            achieved = (user.longest_streak or 0) >= ach.condition_value
+            achieved = longest_streak >= ach.condition_value
 
         elif ach.condition_type == 'speed_return':
-            speed_returns = BookIssue.objects.filter(
-                user=user, is_returned=True, returned_at__lte=F('issued_at') + timedelta(days=3)
-            ).count()
             achieved = speed_returns >= ach.condition_value
 
         if achieved:
@@ -98,13 +96,12 @@ def update_streak(user):
     today = timezone.now().date()
     if user.last_activity_date:
         delta = (today - user.last_activity_date).days
-        if delta == 0:
-            pass
-        elif 1 <= delta <= 7:
-            if user.last_activity_date.isocalendar()[1] != today.isocalendar()[1]:
-                user.current_streak += 1
+        if delta == 1:
+            user.current_streak = (user.current_streak or 0) + 1
+        elif delta == 0:
+            pass  # same day, streak unchanged
         else:
-            user.current_streak = 0
+            user.current_streak = 0  # skipped day(s), reset
     else:
         user.current_streak = 1
     user.longest_streak = max(user.longest_streak or 0, user.current_streak or 0)

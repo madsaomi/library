@@ -112,7 +112,9 @@ class BookWaitlistSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_position(self, obj):
-        return BookWaitlist.objects.filter(book=obj.book, created_at__lt=obj.created_at).count() + 1
+        if hasattr(obj, 'position'):
+            return obj.position
+        return BookWaitlist.objects.filter(book=obj.book, created_at__lt=obj.created_at, is_deleted=False).count() + 1
 
 
 class TextbookLoanSerializer(serializers.ModelSerializer):

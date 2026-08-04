@@ -77,6 +77,15 @@ class Book(models.Model):
         return self.total_count - self.available_count
 
     def save(self, *args, **kwargs):
+        # Ensure available_count stays within valid bounds (only for plain int values)
+        if (
+            self.total_count is not None
+            and self.available_count is not None
+            and type(self.total_count) is int
+            and type(self.available_count) is int
+        ):
+            self.available_count = max(0, min(self.available_count, self.total_count))
+
         # Image optimization: resize and compress cover only if it's new or changed
         if self.cover:
             try:
@@ -400,7 +409,7 @@ class BookCart(models.Model):
     school = models.ForeignKey('schools.School', on_delete=models.CASCADE, verbose_name=_('Maktab'))
     status = models.CharField(_('Holat'), max_length=20, choices=STATUS_CHOICES, default='pending')
     purpose = models.CharField(_('Maqsad'), max_length=10, choices=PURPOSE_CHOICES, default='borrow', db_index=True)
-    qr_token = models.CharField(_('QR kod'), max_length=255, unique=True)
+    qr_token = models.CharField(_('QR kod'), max_length=255)
     created_at = models.DateTimeField(_('Yaratilgan vaqt'), auto_now_add=True)
     borrowed_at = models.DateTimeField(_('Olingan vaqt'), null=True, blank=True)
     returned_at = models.DateTimeField(_('Qaytgan vaqt'), null=True, blank=True)

@@ -1621,6 +1621,7 @@ def import_students_csv(request):
     reader = csv.DictReader(decoded.splitlines())
     created = 0
     errors = []
+    credentials = []
     for row_num, row in enumerate(reader, 2):
         first_name = row.get('first_name', '').strip()
         last_name = row.get('last_name', '').strip()
@@ -1648,13 +1649,21 @@ def import_students_csv(request):
             student.set_password(password)
             student.save()
             created += 1
+            credentials.append({'username': student.username, 'password': password})
         except Exception as e:
             errors.append(_('Qator {}: {}').format(row_num, str(e)))
     if created:
         messages.success(request, _("{} ta o'quvchi muvaffaqiyatli import qilindi.").format(created))
     if errors:
         messages.warning(request, _('Importda {} ta xatolik yuz berdi.').format(len(errors)))
-    return JsonResponse({'success': True, 'created': created, 'errors': errors})
+    return JsonResponse(
+        {
+            'success': True,
+            'created': created,
+            'errors': errors,
+            'credentials': credentials,
+        }
+    )
 
 
 @login_required(login_url='login')

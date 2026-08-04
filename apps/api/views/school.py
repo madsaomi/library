@@ -482,18 +482,6 @@ class TextbookLoanViewSet(viewsets.ModelViewSet):
         return Response(TextbookLoanSerializer(loan).data)
 
 
-class GraduateViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [IsSchoolAdmin]
-    serializer_class = CustomUserSerializer
-
-    def get_queryset(self):
-        return (
-            CustomUser.objects.filter(school=self.request.user.school, role='student', is_archived=True)
-            .select_related('school')
-            .order_by('-date_joined')
-        )
-
-
 class CsvExportView(viewsets.ViewSet):
     permission_classes = [IsSchoolAdmin]
 
@@ -563,6 +551,7 @@ class CsvImportView(viewsets.ViewSet):
         reader = csv.DictReader(io.StringIO(decoded))
         imported = 0
         errors = []
+        credentials = []
         for i, row in enumerate(reader, 1):
             try:
                 username = row.get('Username', '').strip()
@@ -584,9 +573,16 @@ class CsvImportView(viewsets.ViewSet):
                 user.set_password(password)
                 user.save()
                 imported += 1
+                credentials.append({'username': user.username, 'password': password})
             except Exception as e:
                 errors.append(f'Row {i}: {str(e)}')
-        return Response({'imported': imported, 'errors': errors})
+        return Response(
+            {
+                'imported': imported,
+                'errors': errors,
+                'credentials': credentials,
+            }
+        )
 
     @action(detail=False, methods=['post'])
     def books(self, request):

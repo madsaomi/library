@@ -177,7 +177,7 @@ class SuperUserStatsView(viewsets.ViewSet):
     def list(self, request):
         active_schools = School.objects.annotate(
             has_admin=Exists(CustomUser.objects.filter(school=OuterRef('pk'), role='school_admin'))
-        ).filter(has_admin=True)
+        ).filter(has_admin=True, is_deleted=False)
 
         monthly_issues = []
         for i in range(11, -1, -1):
@@ -186,19 +186,19 @@ class SuperUserStatsView(viewsets.ViewSet):
                 month_end = month_start.replace(year=month_start.year + 1, month=1)
             else:
                 month_end = month_start.replace(month=month_start.month + 1)
-            count = BookIssue.objects.filter(issued_at__gte=month_start, issued_at__lt=month_end).count()
+            count = BookIssue.objects.filter(issued_at__gte=month_start, issued_at__lt=month_end, is_deleted=False).count()
             monthly_issues.append(count)
 
-        top_books = list(Book.objects.order_by('-borrow_count')[:10].values('title', 'borrow_count'))
-        roles = CustomUser.objects.values('role').annotate(count=Count('id'))
+        top_books = list(Book.objects.filter(is_deleted=False).order_by('-borrow_count')[:10].values('title', 'borrow_count'))
+        roles = CustomUser.objects.filter(is_deleted=False).values('role').annotate(count=Count('id'))
 
         return Response(
             {
                 'school_count': active_schools.count(),
-                'user_count': CustomUser.objects.count(),
-                'total_books': Book.objects.count(),
-                'active_loans': BookIssue.objects.filter(is_returned=False).count(),
-                'institutions_count': Institution.objects.count(),
+                'user_count': CustomUser.objects.filter(is_deleted=False).count(),
+                'total_books': Book.objects.filter(is_deleted=False).count(),
+                'active_loans': BookIssue.objects.filter(is_returned=False, is_deleted=False).count(),
+                'institutions_count': Institution.objects.filter(is_deleted=False).count(),
                 'monthly_issues': monthly_issues,
                 'top_books': top_books,
                 'roles': {r['role']: r['count'] for r in roles},

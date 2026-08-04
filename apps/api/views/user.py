@@ -305,7 +305,15 @@ class WaitlistViewSet(viewsets.ViewSet):
     permission_classes = [IsStudentOrTeacher]
 
     def list(self, request):
-        waitlist = BookWaitlist.objects.filter(user=request.user).select_related('book')
+        from django.db.models import Window
+        from django.db.models.functions import RowNumber
+
+        waitlist = (
+            BookWaitlist.objects.filter(user=request.user, is_deleted=False)
+            .select_related('book')
+            .annotate(position=Window(expression=RowNumber()))
+            .order_by('created_at')
+        )
         return Response(BookWaitlistSerializer(waitlist, many=True).data)
 
     @action(detail=False, methods=['delete'])

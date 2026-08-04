@@ -45,10 +45,41 @@ document.getElementById('csv-import-form').addEventListener('submit', function(e
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
-        if (data.success) {
-            window.location.href = '{{ redirect_url|escapejs }}';
+        if (data.success && data.credentials && data.credentials.length > 0) {
+            var html = '<div class="glass-card p-lg rounded mt-md" style="background: var(--accent-bg, #f0f9ff); border: 1px solid var(--accent, #3b82f6);">';
+            html += '<h4 class="mb-md"><i class="fas fa-key text-primary"></i> {% trans "Kirish ma\'lumotlari" %}</h4>';
+            html += '<p class="text-sm text-muted mb-md">{% trans "Iltimos, bu ma\'lumotlarni saqlang. Parolni keyin o\'zgartirish mumkin." %}</p>';
+            html += '<table class="table table-sm">';
+            html += '<thead><tr><th>{% trans "Login" %}</th><th>{% trans "Parol" %}</th></tr></thead>';
+            html += '<tbody>';
+            data.credentials.forEach(function(c) {
+                html += '<tr><td>' + c.username + '</td><td><code>' + c.password + '</code></tr>';
+            });
+            html += '</tbody></table>';
+            html += '</div>';
+            statusDiv.innerHTML = html;
+            if (data.errors && data.errors.length > 0) {
+                statusDiv.innerHTML += '<div class="glass-card p-md rounded bg-warning text-warning text-sm mt-md">';
+                statusDiv.innerHTML += '<i class="fas fa-exclamation-triangle"></i> ';
+                statusDiv.innerHTML += data.errors.join('<br>');
+                statusDiv.innerHTML += '</div>';
+            }
+            setTimeout(function() {
+                window.location.href = '{{ redirect_url|escapejs }}';
+            }, 15000);
+        } else if (data.success) {
+            if (data.errors && data.errors.length > 0) {
+                var html = '<div class="glass-card p-md rounded bg-warning text-warning text-sm mt-md">';
+                html += '<i class="fas fa-exclamation-triangle"></i> ';
+                html += data.errors.join('<br>');
+                html += '</div>';
+                statusDiv.innerHTML = html;
+            }
+            setTimeout(function() {
+                window.location.href = '{{ redirect_url|escapejs }}';
+            }, 2000);
         } else {
-            var html = '<div class="glass-card p-md rounded bg-danger text-danger text-sm">';
+            var html = '<div class="glass-card p-md rounded bg-danger text-danger text-sm mt-md">';
             html += '<i class="fas fa-exclamation-circle"></i> ';
             html += (data.errors || ['{% trans "Xatolik yuz berdi" %}']).join('<br>');
             html += '</div>';
@@ -56,7 +87,7 @@ document.getElementById('csv-import-form').addEventListener('submit', function(e
         }
     })
     .catch(function() {
-        statusDiv.innerHTML = '<div class="glass-card p-md rounded bg-danger text-danger text-sm"><i class="fas fa-exclamation-circle"></i> {% trans "Xatolik yuz berdi" %}</div>';
+        statusDiv.innerHTML = '<div class="glass-card p-md rounded bg-danger text-danger text-sm mt-md"><i class="fas fa-exclamation-circle"></i> {% trans "Xatolik yuz berdi" %}</div>';
     });
 });
 </script>

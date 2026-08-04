@@ -23,7 +23,6 @@ from .views import (
     CsvExportView,
     CsvImportView,
     DistrictViewSet,
-    GraduateViewSet,
     InstitutionViewSet,
     LeaderboardView,
     # Auth
@@ -79,7 +78,6 @@ router.register(r'school/qr', QrProcessView, basename='school-qr')
 router.register(r'school/textbooks', TextbookLoanViewSet, basename='school-textbooks')
 router.register(r'school/export', CsvExportView, basename='school-export')
 router.register(r'school/import', CsvImportView, basename='school-import')
-router.register(r'school/graduates', GraduateViewSet, basename='school-graduates')
 router.register(r'school/reports', ReportViewSet, basename='school-reports')
 
 # User (student/teacher)
