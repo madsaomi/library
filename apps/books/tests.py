@@ -144,9 +144,10 @@ class TestAchievements:
     def test_update_streak_same_day(self, student):
         from datetime import date
 
+        from django.utils import timezone
         from books.achievements import update_streak
 
-        student.last_activity_date = date.today()
+        student.last_activity_date = timezone.now().date()
         student.current_streak = 5
         update_streak(student)
         assert student.current_streak == 5
