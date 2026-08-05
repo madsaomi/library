@@ -7,6 +7,27 @@ Ordered by priority. Nothing here blocks the current green state; all items are 
 - ~~Update `docs/CHANGELOG.md`~~ — done: `v1.1.0 (2026-08-03)` covers refactor + modernization.
 - ~~Update `README.md` project structure~~ — done (requirements files + `docs/agent-context/`).
 
+## Done (2026-08-05 admin/school panel polish + QR automation)
+- ~~Schools list: table redesign, filters, no passwords shown~~
+- ~~School detail: password removed, address + issued count~~
+- ~~Secure credential download by user_id~~
+- ~~Masked passwords + download buttons on all *_created pages~~
+- ~~School admin profile redesign (hero, 8 stats, quick actions, chart, school info, recent issues)~~
+- ~~Books page: sort, progress bar, live search, per-book QR buttons~~
+- ~~pagination.html preserves filters via {% querystring %}~~
+- ~~Automated QR issue/return: static BOOK_/STU_ HMAC tokens, auto issue/return pairing, student search/pick in scanner, QR PNG endpoints~~
+- ~~seed_demo_data management command~~
+- Verification: manage.py check 0; ruff clean; **169 unit tests PASS**; automated QR flow E2E verified.
+
+## Remaining (from this session's discussion — not started)
+- **Reader card / library card**: printable student card with their STU_ QR (currently only a QR
+  PNG button; a print-ready card layout is the natural next step).
+- **Print modal for book QR**: currently QR opens as raw PNG in a new tab; a styled print page
+  (label size, book title + author under code) would be nicer.
+- **Schools list pagination** (renders all schools at once today) + column sorting.
+- **e2e tests for the new automated QR flow** (BOOK_/STU_ pairing, student search).
+- **CI verification** for the new views (they run on Postgres in CI; only SQLite-verified locally).
+
 ## Remaining (small, safe)
 1. **`docs/REQS.md`** is a historical spec and partly stale — consider rewriting or archiving.
 
