@@ -317,3 +317,23 @@ ews_list: added early guard for
 - **Verified**: 169 unit tests PASS; 3 new e2e tests PASS locally (total 17 e2e); ruff clean;
   `manage.py check` 0; schools sorts + card + label all render 200.
 
+## Session: school admin tooling — block, reset password, CSV, QR batch, duplicate (2026-08-05)
+- **School blocking**: `School.is_active` field (default True) + migration `schools/0011`; login
+  blocked in `accounts/views.py` login_view for school admins of inactive/deleted schools;
+  `school_admin_required` decorator also rejects inactive schools (kicks out already-logged-in
+  admins). Toggle view `school_toggle_active` + "Bloklash/Faollashtirish" button + status badge on
+  school detail + list.
+- **Reset admin password**: `school_reset_admin_password` view — random 14-char password, stored in
+  `raw_password`, shown once in a success message ("Parolni almashtirish" button on school detail).
+- **CSV export**: `schools_export_csv` view (`/admin/schools/export/`) — ID/name/district/address/
+  contact/admin/students/books/status; "CSV" button in schools list toolbar.
+- **QR batch print**: `qr_labels_batch` view + `qr_labels_batch.html` (`/school/qr/labels-batch/`)
+  — grid of all book or student QR stickers (4-per-row in print), toggle kind (books/students),
+  print button; sidebar "QR yorliqlar" link.
+- **Duplicate school**: `school_duplicate` view + `school_duplicate.html` — POST copies
+  address/contact/district under a new name (auto-suffixed if taken), generates fresh admin
+  username + password (raw_password saved), no books/students; "Nusxa" button on school detail.
+- **Verified**: 169 unit tests PASS; ruff clean; `manage.py check` 0; E2E smoke — block/login-reject/
+  re-enable, reset password (raw_password set), CSV 200 text/csv, duplicate creates school+admin,
+  QR batch renders 38 book + 2 student labels.
+

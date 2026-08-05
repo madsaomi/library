@@ -30,6 +30,13 @@ Ordered by priority. Nothing here blocks the current green state; all items are 
 - **CI verification** for the new views (run on Postgres in CI; only SQLite-verified locally —
   Docker not available in this environment). Watch the next `push`/PR on GitHub Actions.
 
+## Done (2026-08-05 school admin tooling)
+- ~~School block/unblock (`School.is_active` + login rejection + decorator)~~
+- ~~Reset school admin password from school card~~
+- ~~CSV export of schools~~
+- ~~Printable batch QR labels (books + students)~~
+- ~~Duplicate school (new name/admin, empty data)~~
+
 ## Remaining (small, safe)
 1. **`docs/REQS.md`** is a historical spec and partly stale — consider rewriting or archiving.
 

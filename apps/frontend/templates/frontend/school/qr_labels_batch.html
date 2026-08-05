@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "QR yorliqlar" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "QR yorliqlar (chop etish)" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="glass-panel p-xl">
+        <div class="d-flex flex-between flex-wrap gap-md align-center mb-lg">
+            <p class="text-muted text-sm m-0">
+                {% trans "Barcha yorliqlarni chop eting. Print dialogida o'lchamni sozlang." %}
+            </p>
+            <div class="d-flex gap-sm align-center">
+                <a href="?kind=books" class="glass-card border rounded text-sm text-decoration-none py-sm px-lg {% if kind == 'books' %}bg-primary text-white{% else %}text-muted{% endif %}" style="{% if kind != 'books' %}border-color: var(--border);{% endif %}">
+                    <i class="fas fa-book"></i> {% trans "Kitoblar" %} ({{ books_count|default:items|length }})
+                </a>
+                <a href="?kind=students" class="glass-card border rounded text-sm text-decoration-none py-sm px-lg {% if kind == 'students' %}bg-primary text-white{% else %}text-muted{% endif %}">
+                    <i class="fas fa-user-graduate"></i> {% trans "O'quvchilar" %}
+                </a>
+                <button class="btn-primary d-flex align-center gap-sm rounded-md text-sm" style="padding: 8px 16px;" onclick="window.print()">
+                    <i class="fas fa-print"></i> {% trans "Chop etish" %}
+                </button>
+            </div>
+        </div>
+
+        <!-- Batch labels grid -->
+        <div id="labels-grid" class="d-grid gap-md" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+            {% for item in items %}
+            <div class="label-sticker" style="background: #fff; border: 1px solid #e2e2e2; border-radius: 10px; padding: 10px; text-align: center; color: #111;">
+                <img src="{% if kind == 'students' %}{% url 'frontend:student_qr_image' item.pk %}{% else %}{% url 'frontend:book_qr_image' item.pk %}{% endif %}"
+                     alt="QR" style="width: 88px; height: 88px; border-radius: 6px; margin-bottom: 6px;">
+                <div class="text-bold text-truncate" style="font-size: 0.7rem;" title="{% if kind == 'students' %}{{ item.get_full_name }}{% else %}{{ item.title }}{% endif %}">
+                    {% if kind == 'students' %}{{ item.get_full_name|default:item.username }}{% else %}{{ item.title }}{% endif %}
+                </div>
+                <div class="text-truncate" style="font-size: 0.6rem; color: #666;">
+                    {% if kind == 'students' %}{{ item.grade|default:"" }} · @{{ item.username }}{% else %}{{ item.author|default:item.category.name|default:"" }}{% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state text-center p-3xl">
+                <i class="fas fa-qrcode text-4xl text-primary" style="opacity: 0.4;"></i>
+                <h4 class="text-lg font-semibold mb-xs">{% trans "Yorliqlar topilmadi" %}</h4>
+                <p class="text-muted text-sm">{% trans "Hozircha hech narsa yo'q" %}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    body { background: #fff !important; }
+    .sidebar, .topbar, .glass-panel .d-flex, .no-print { display: none !important; }
+    .glass-panel { background: transparent !important; border: none !important; padding: 0 !important; box-shadow: none !important; }
+    #labels-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important; }
+    .label-sticker { border: 1px solid #ddd !important; }
+}
+</style>
+{% endblock %}

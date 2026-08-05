@@ -12,8 +12,17 @@ def login_view(request):
         p = request.POST.get('password')
         user = authenticate(request, username=u, password=p)
         if user is not None:
-            login(request, user)
-            return redirect_role_based(user)
+            if (
+                user.role == 'school_admin'
+                and user.school is not None
+                and (not user.school.is_active or user.school.is_deleted)
+            ):
+                from django.utils.translation import gettext as _
+
+                error = _("Maktab faol emas yoki bloklangan. Administrator bilan bog'laning.")
+            else:
+                login(request, user)
+                return redirect_role_based(user)
         else:
             from django.utils.translation import gettext as _
 

@@ -34,6 +34,7 @@ class School(models.Model):
     district = models.ForeignKey(
         District, on_delete=models.SET_NULL, null=True, blank=True, related_name='schools', verbose_name=_('Tuman')
     )
+    is_active = models.BooleanField(_('Faol'), default=True, help_text=_('Agar o\'chirilsa, maktab admini kira olmaydi'))
     is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
     history = HistoricalRecords()
 

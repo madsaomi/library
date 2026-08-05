@@ -947,6 +947,158 @@ def school_delete(request, pk):
     return render(request, 'frontend/admin/confirm_delete.html', {'object': school, 'type': _('maktabni')})
 
 
+@login_required(login_url='login')
+@superuser_required
+def school_toggle_active(request, pk):
+    """Block/unblock a school. Blocked school admins cannot log in."""
+    school = get_object_or_404(School, pk=pk)
+    if request.method == 'POST':
+        school.is_active = not school.is_active
+        school.save(update_fields=['is_active'])
+        from django.contrib import messages
+
+        if school.is_active:
+            messages.success(request, _("Maktab faollashtirildi: {}").format(school.name))
+        else:
+            messages.warning(request, _("Maktab bloklandi: {}").format(school.name))
+
+        from stats.models import ActionLog
+
+        ActionLog.objects.create(
+            user=request.user,
+            action_type='UPDATE',
+            message=_('Maktab holati o\'zgartirildi: {} → {}').format(
+                school.name, _('faol') if school.is_active else _('bloklangan')
+            ),
+        )
+        return redirect('frontend:school_detail', pk=school.pk)
+    return redirect('frontend:school_detail', pk=school.pk)
+
+
+@login_required(login_url='login')
+@superuser_required
+def school_reset_admin_password(request, pk):
+    """Reset the school admin's password to a random one, show it once."""
+    import secrets
+    import string
+
+    school = get_object_or_404(School, pk=pk)
+    admin = CustomUser.objects.filter(school=school, role='school_admin').first()
+    if not admin:
+        from django.contrib import messages
+
+        messages.error(request, _("Bu maktabda admin topilmadi."))
+        return redirect('frontend:school_detail', pk=school.pk)
+
+    alphabet = string.ascii_letters + string.digits
+    new_password = ''.join(secrets.choice(alphabet) for _ in range(14))
+    admin.set_password(new_password)
+    admin.raw_password = new_password
+    admin.save()
+
+    from django.contrib import messages
+
+    messages.success(
+        request,
+        _("Yangi parol: {password} (maktab adminiga yetkazing)").format(password=new_password),
+    )
+    return redirect('frontend:school_detail', pk=school.pk)
+
+
+@login_required(login_url='login')
+@superuser_required
+def school_duplicate(request, pk):
+    """Duplicate a school: new name, new auto admin, empty books/students."""
+    import secrets
+    import string
+
+    school = get_object_or_404(School, pk=pk)
+
+    if request.method == 'POST':
+        new_name = request.POST.get('name', '').strip()
+        if not new_name:
+            new_name = f"{school.name} — nusxa"
+
+        import re
+
+        base = re.sub(r'[^a-z0-9]+', '_', new_name.lower()).strip('_') or 'school'
+        if School.objects.filter(name=new_name).exists():
+            new_name = f'{new_name} {School.objects.filter(name__icontains=new_name).count() + 1}'
+
+        new_school = School.objects.create(
+            name=new_name,
+            address=school.address,
+            contact=school.contact,
+            district=school.district,
+        )
+
+        # Auto-generate school admin with credentials
+        admin_username = f'admin_{base}_{secrets.token_hex(4)}'
+        alphabet = string.ascii_letters + string.digits
+        admin_password = ''.join(secrets.choice(alphabet) for _ in range(14))
+        admin = CustomUser(
+            username=admin_username,
+            role='school_admin',
+            school=new_school,
+            first_name='Admin',
+            last_name=new_school.name,
+        )
+        admin.set_password(admin_password)
+        admin.raw_password = admin_password
+        admin.save()
+
+        from django.contrib import messages
+
+        messages.success(
+            request,
+            _("Maktab nusxasi yaratildi: {name}. Admin: {login} / {password}").format(
+                name=new_school.name, login=admin_username, password=admin_password
+            ),
+        )
+        return redirect('frontend:school_detail', pk=new_school.pk)
+
+    return render(request, 'frontend/admin/school_duplicate.html', {'school': school})
+
+
+@login_required(login_url='login')
+@superuser_required
+def schools_export_csv(request):
+    """Export schools list to CSV."""
+    import csv
+    import io
+
+    from django.db.models import Count
+    from django.http import HttpResponse
+    from django.utils import timezone
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Nomi', 'Tuman', 'Manzil', 'Kontakt', 'Admin', 'O\'quvchilar', 'Kitoblar', 'Holat'])
+
+    for school in School.objects.select_related('district').annotate(
+        student_count=Count('customuser', filter=Q(customuser__role='student')),
+        book_count=Count('book', distinct=True),
+    ):
+        admin = CustomUser.objects.filter(school=school, role='school_admin').first()
+        writer.writerow(
+            [
+                school.id,
+                school.name,
+                school.district.name if school.district else '',
+                school.address,
+                school.contact,
+                admin.username if admin else '',
+                school.student_count,
+                school.book_count,
+                _('faol') if school.is_active else _('bloklangan'),
+            ]
+        )
+
+    response = HttpResponse(output.getvalue(), content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="schools_{timezone.now().strftime("%Y%m%d")}.csv"'
+    return response
+
+
 from frontend.forms import SchoolAdminForm
 
 

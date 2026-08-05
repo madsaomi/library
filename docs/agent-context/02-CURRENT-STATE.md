@@ -136,3 +136,18 @@ Last fully verified: 2026-08-05 (admin polish + QR automation + 169 tests).
 - `apps/frontend/templates/frontend/admin/schools.html` (sortable headers, pagination include)
 - `e2e/test_qr_flow.py` (new — 3 automated-QR e2e tests)
 - `docs/agent-context/01-HISTORY.md`, `02-CURRENT-STATE.md`
+
+### 2026-08-05 school admin tooling — block, reset password, CSV, QR batch, duplicate
+- `apps/schools/models.py` (School.is_active field)
+- `apps/schools/migrations/0011_historicalschool_is_active_school_is_active.py` (new)
+- `apps/accounts/views.py` (login blocks school admins of inactive/deleted schools)
+- `apps/frontend/views/admin_views.py` (school_toggle_active, school_reset_admin_password,
+  schools_export_csv, school_duplicate)
+- `apps/frontend/views/school_views.py` (school_admin_required rejects inactive; qr_labels_batch)
+- `apps/frontend/views/admin_views.py` school list/detail templates (block/reset/duplicate buttons,
+  status badge, CSV button)
+- `apps/frontend/templates/frontend/admin/school_duplicate.html` (new)
+- `apps/frontend/templates/frontend/school/qr_labels_batch.html` (new)
+- `apps/frontend/templates/frontend/school/sidebar_items.html` (QR yorliqlar link)
+- `apps/frontend/urls.py` (toggle-active, reset-admin-password, duplicate, schools/export, labels-batch)
+- `docs/agent-context/01-HISTORY.md`, `02-CURRENT-STATE.md`

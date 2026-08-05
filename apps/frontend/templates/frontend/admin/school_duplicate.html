@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Maktab nusxasi" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Maktab nusxasini yaratish" %}{% endblock %}
+
+{% block content %}
+<div class="mw-500 mx-auto">
+    <div class="glass-panel animate-fade p-3xl">
+        <div class="d-flex align-center gap-md mb-lg">
+            <div class="flex-center rounded-lg" style="width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                <i class="fas fa-copy text-white"></i>
+            </div>
+            <div>
+                <h3 class="m-0 text-lg text-semibold">{% trans "Maktab nusxasi" %}</h3>
+                <p class="text-muted text-sm m-0">{{ school.name }}</p>
+            </div>
+        </div>
+
+        <div class="glass-card p-lg mb-xl" style="border-left: 4px solid var(--primary);">
+            <p class="text-sm text-muted m-0">
+                <i class="fas fa-info-circle text-primary"></i>
+                {% blocktrans %}Nusxa: bir xil manzil va kontakt, yangi nom va avtomatik admin. Kitoblar va o'quvchilar bo'sh boshlanadi.{% endblocktrans %}
+            </p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group mb-lg">
+                <label class="d-block mb-sm text-medium text-muted text-md">{% trans "Yangi nom" %}</label>
+                <input type="text" name="name" value="{{ school.name }} — nusxa" class="w-full"
+                       style="background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); padding: 12px 14px; border-radius: 10px; font-size: 0.95rem; outline: none;">
+                <span class="text-xs text-muted mt-xs d-block">{% trans "Bo'sh qoldirilsa, avtomatik nom beriladi" %}</span>
+            </div>
+            <div class="d-flex gap-md">
+                <button type="submit" class="btn-primary flex-1 p-md text-md">{% trans "Nusxa olish" %}</button>
+                <a href="{% url 'frontend:school_detail' school.pk %}" class="glass-card flex-1 p-md text-center text-decoration-none text-muted text-md border">{% trans "Bekor qilish" %}</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

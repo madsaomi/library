@@ -16,9 +16,14 @@
                 <i class="fas fa-school text-xl text-white"></i>
             </div>
             <div class="text-bold text-center" style="font-size: 1.05rem;">{{ school.name }}</div>
-            <div class="text-muted mt-xs" style="font-size: 0.78rem;">
-                <i class="fas fa-map-marker-alt" style="font-size: 0.6rem;"></i>
-                {% if school.district %}{{ school.district.name }}{% else %}—{% endif %}
+            <div class="mt-xs d-flex gap-sm align-center flex-wrap justify-center">
+                <span class="badge p-sm rounded-sm text-xs text-nowrap d-inline-flex align-center gap-xs" style="background: {% if school.is_active %}rgba(16,185,129,0.12); color: #10b981;{% else %}rgba(239,68,68,0.12); color: #ef4444;{% endif %}">
+                    {% if school.is_active %}<i class="fas fa-circle" style="font-size: 0.4rem;"></i> {% trans "Faol" %}{% else %}<i class="fas fa-ban" style="font-size: 0.6rem;"></i> {% trans "Bloklangan" %}{% endif %}
+                </span>
+                <span class="text-muted" style="font-size: 0.78rem;">
+                    <i class="fas fa-map-marker-alt" style="font-size: 0.6rem;"></i>
+                    {% if school.district %}{{ school.district.name }}{% else %}—{% endif %}
+                </span>
             </div>
         </div>
 
@@ -47,9 +52,21 @@
             </div>
         </div>
 
-        <div class="d-flex gap-sm">
-            <a href="{% url 'frontend:school_edit' school.pk %}" class="btn-primary flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs"><i class="fas fa-edit"></i> {% trans "Tahrirlash" %}</a>
-            <a href="{% url 'frontend:school_delete' school.pk %}" class="btn-primary flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs" style="background: #ef4444; box-shadow: 0 4px 12px rgba(239,68,68,0.25);"><i class="fas fa-trash"></i> {% trans "O'chirish" %}</a>
+        <div class="d-flex flex-column gap-sm">
+            <a href="{% url 'frontend:school_edit' school.pk %}" class="btn-primary py-md text-decoration-none text-md d-flex align-center justify-center gap-xs"><i class="fas fa-edit"></i> {% trans "Tahrirlash" %}</a>
+            <div class="d-flex gap-sm">
+                <form method="post" action="{% url 'frontend:school_toggle_active' school.pk %}" class="flex-1 m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full py-md text-md d-flex align-center justify-center gap-xs rounded-md text-decoration-none text-main border" style="{% if school.is_active %}background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.3);{% else %}background: rgba(16,185,129,0.12); color: #10b981; border-color: rgba(16,185,129,0.3);{% endif %}">
+                        {% if school.is_active %}<i class="fas fa-ban"></i> {% trans "Bloklash" %}{% else %}<i class="fas fa-check-circle"></i> {% trans "Faollashtirish" %}{% endif %}
+                    </button>
+                </form>
+                <a href="{% url 'frontend:school_duplicate' school.pk %}" class="glass-card flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs border" style="color: var(--accent);"><i class="fas fa-copy"></i> {% trans "Nusxa" %}</a>
+            </div>
+            <div class="d-flex gap-sm">
+                <a href="{% url 'frontend:school_reset_admin_password' school.pk %}" class="glass-card flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs border" style="color: var(--secondary);"><i class="fas fa-key"></i> {% trans "Parolni almashtirish" %}</a>
+                <a href="{% url 'frontend:school_delete' school.pk %}" class="flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs rounded-md" style="background: #ef4444; box-shadow: 0 4px 12px rgba(239,68,68,0.25);"><i class="fas fa-trash"></i> {% trans "O'chirish" %}</a>
+            </div>
         </div>
     </div>
 

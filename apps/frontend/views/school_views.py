@@ -2,7 +2,13 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-school_admin_required = user_passes_test(lambda u: u.role == 'school_admin' and u.school is not None, login_url='login')
+school_admin_required = user_passes_test(
+    lambda u: u.role == 'school_admin'
+    and u.school is not None
+    and u.school.is_active
+    and not u.school.is_deleted,
+    login_url='login',
+)
 import json
 import logging
 import secrets
@@ -882,6 +888,33 @@ def book_qr_label(request, pk):
 
         raise Http404
     return render(request, 'frontend/school/book_qr_label.html', {'book': book})
+
+
+@login_required(login_url='login')
+@school_admin_required
+def qr_labels_batch(request):
+    """Printable batch of QR labels for all books and/or students."""
+    school = request.user.school
+    kind = request.GET.get('kind', 'books')
+
+    if kind == 'students':
+        items = (
+            CustomUser.objects.filter(school=school, role='student')
+            .exclude(is_archived=True)
+            .order_by('last_name', 'first_name')
+        )
+    else:
+        items = (
+            Book.objects.select_related('school', 'category')
+            .filter(school=school, is_deleted=False)
+            .order_by('title')
+        )
+
+    return render(
+        request,
+        'frontend/school/qr_labels_batch.html',
+        {'kind': kind, 'items': items},
+    )
 
 
 @login_required(login_url='login')
