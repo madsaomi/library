@@ -40,7 +40,8 @@ def generate_qr_code(data, filename):
     path = os.path.join(settings.MEDIA_ROOT, 'qr', filename)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     img.save(path)
-    return os.path.join('qr', filename)
+    # Normalize to forward slashes so the media URL works on Windows too
+    return os.path.join('qr', filename).replace(os.sep, '/')
 
 
 def generate_dynamic_token(prefix, obj_id):
