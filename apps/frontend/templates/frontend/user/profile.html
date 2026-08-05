@@ -4,168 +4,104 @@
 {% load frontend_tags %}
 
 {% block title %}{% trans "Profil" %} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}{% trans "Mening profilim" %}{% endblock %}
+{% block page_title %}{% trans "Profil" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/user/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade mw-800 mx-auto">
-    <div class="glass-panel p-2xl mb-xl" style="border-radius: 20px;">
-        <div class="d-flex align-center gap-xl flex-wrap">
-            <div class="flex-center rounded-full flex-shrink-0" style="width: 80px; height: 80px; background: var(--hover-bg); border: 1px solid var(--border);">
-                <i class="fas {{ user.selected_icon|default:'fa-book' }} text-xl text-primary"></i>
-            </div>
-            <div class="flex-1" style="min-width: 200px;">
-                <h2 class="m-0 mb-xs">{{ user.first_name }} {{ user.last_name }}</h2>
-                <p class="text-muted m-0 mb-sm">
-                    <span class="text-primary text-semibold">{{ level_info.title }}</span>
-                    {% if user.role == 'student' %} · {{ user.grade }} {% trans "sinf" %}{% endif %}
-                </p>
-                <div class="d-flex gap-lg flex-wrap text-sm text-muted">
-                    <span><i class="fas fa-book"></i> {{ user.total_books_read }}</span>
-                    <span><i class="fas fa-fire"></i> {{ user.current_streak }} {% trans "hafta" %}</span>
-                </div>
-            </div>
+<div class="animate-fade mw-600 mx-auto">
+    <div class="glass-panel p-2xl mb-xl text-center" style="border-radius: 20px;">
+        <div class="flex-center rounded-full mx-auto mb-lg" style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary), #a855f7);">
+            <i class="fas {{ user.selected_icon|default:'fa-user' }} text-3xl text-white"></i>
         </div>
-        <div class="mt-lg">
-            <div class="d-flex justify-between mb-xs text-sm">
-                <span class="text-muted">{% trans "XP" %}</span>
-                <span class="text-primary text-semibold">{{ user.xp_points }} / {{ next_xp }}</span>
+        <h2 class="m-0 mb-xs">{{ user.first_name }} {{ user.last_name }}</h2>
+        <p class="text-muted m-0 mb-md">
+            {{ level_info.title }}{% if user.role == 'student' and user.grade %} · {{ user.grade }} {% trans "sinf" %}{% endif %}
+        </p>
+        <div class="d-flex justify-center gap-xl text-center">
+            <div>
+                <div class="text-xl text-semibold text-primary">{{ user.total_books_read }}</div>
+                <div class="text-xs text-muted">{% trans "kitob" %}</div>
             </div>
-            <div style="height: 6px; background: var(--hover-bg); border-radius: 3px; overflow: hidden;">
-                <div id="xpBar" style="width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: width 1s ease;"></div>
+            <div>
+                <div class="text-xl text-semibold">{{ user.xp_points }}</div>
+                <div class="text-xs text-muted">XP</div>
+            </div>
+            <div>
+                <div class="text-xl text-semibold">{{ user.current_streak }}</div>
+                <div class="text-xs text-muted">{% trans "streak" %}</div>
             </div>
         </div>
     </div>
 
-    <div class="d-grid gap-md mb-xl" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
-        <div class="glass-panel p-lg text-center" style="border-radius: 16px;">
-            <div class="text-lg text-semibold text-main">{{ user.username }}</div>
-            <div class="text-xs text-muted mt-xs">{% trans "Login" %}</div>
+    <div class="glass-panel p-lg mb-xl" style="border-radius: 16px;">
+        <div class="flex-between mb-sm">
+            <span class="text-sm text-muted">{% trans "Keyingi daraja" %}</span>
+            <span class="text-sm text-semibold">{{ user.xp_points }} / {{ next_xp }} XP</span>
         </div>
-        <div class="glass-panel p-lg text-center" style="border-radius: 16px;">
-            <div class="text-lg text-semibold text-main">#{{ user.id|stringformat:"05d" }}</div>
-            <div class="text-xs text-muted mt-xs">{% trans "ID" %}</div>
-        </div>
-        <div class="glass-panel p-lg text-center" style="border-radius: 16px;">
-            <div class="text-lg text-semibold text-main">{{ user.date_joined|date:"d.m.Y" }}</div>
-            <div class="text-xs text-muted mt-xs">{% trans "A'zo bo'lgan" %}</div>
-        </div>
-        <div class="glass-panel p-lg text-center" style="border-radius: 16px;">
-            <div class="text-lg text-semibold text-main">{{ user.longest_streak }}</div>
-            <div class="text-xs text-muted mt-xs">{% trans "Eng uzun streak" %}</div>
+        <div style="height: 8px; background: var(--hover-bg); border-radius: 4px; overflow: hidden;">
+            <div id="xpBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), #a855f7); border-radius: 4px; transition: width 1s ease;"></div>
         </div>
     </div>
 
-    <div class="glass-panel p-xl mb-xl" style="border-radius: 20px;">
-        <h4 class="m-0 mb-lg">{% trans "Oylik kitoblar" %}</h4>
-        <div style="height: 180px;">
-            <canvas id="booksByMonth"></canvas>
-        </div>
-        <div id="noBooksChart" class="d-none text-center py-xl text-muted">
-            <i class="fas fa-chart-bar text-2xl mb-sm" style="opacity: 0.3;"></i>
-            <p class="text-sm">{% trans "Hali kitob o'qilmagan" %}</p>
-        </div>
-    </div>
-
-    <h3 class="mb-lg text-semibold">{% trans "Yutuqlar" %}</h3>
-    <div class="d-grid gap-md mb-xl" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
-        {% for ach in all_achievements|slice:":6" %}
-        {% if earned_achievement_ids %}
-        <div class="glass-panel p-md text-center" style="border-radius: 14px; {% if ach.id not in earned_achievement_ids %}opacity: 0.4; filter: grayscale(1);{% endif %}">
-            <i class="fas {{ ach.icon }} text-lg mb-xs" style="color: {% if ach.id in earned_achievement_ids %}#fbbf24{% else %}var(--text-muted){% endif %};"></i>
-            <div class="text-xs text-semibold">{{ ach|ach_name }}</div>
-        </div>
-        {% endif %}
-        {% empty %}
-        <div class="text-muted text-sm">{% trans "Hali yutuqlar yo'q" %}</div>
-        {% endfor %}
-        <a href="{% url 'frontend:achievements' %}" class="glass-panel p-md text-center text-decoration-none" style="border-radius: 14px; border: 1px dashed var(--border);">
-            <span class="text-xs text-muted">{% trans "Barchasi" %} →</span>
-        </a>
-    </div>
-
-    <h3 class="mb-lg text-semibold">{% trans "O'qilgan kitoblar" %}</h3>
-    <div class="d-grid gap-sm mb-xl" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
-        {% for issue in user.bookissue_set.all|dictsortreversed:"issued_at"|slice:":12" %}
+    <div class="glass-panel p-xl mb-xl" style="border-radius: 16px;">
+        <h4 class="m-0 mb-lg text-semibold">{% trans "O'qilgan kitoblar" %}</h4>
+        {% for issue in user.bookissue_set.all|dictsortreversed:"issued_at"|slice:":8" %}
         {% if issue.is_returned %}
-        <div class="pos-relative overflow-hidden" style="border-radius: 10px; aspect-ratio: 3/4; background: var(--hover-bg);">
-            {% if issue.book.cover %}
-            <img src="{{ issue.book.cover.url }}" alt="{{ issue.book.title }}" class="w-full h-full object-cover">
-            {% else %}
-            <div class="w-full h-full d-flex align-center justify-center">
-                <i class="fas fa-book text-xl text-muted" style="opacity: 0.3;"></i>
+        <div class="d-flex align-center gap-md mb-md pb-md {% if not forloop.last %}border-bottom{% endif %}">
+            <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 40px; height: 55px; background: var(--hover-bg);">
+                {% if issue.book.cover %}
+                <img src="{{ issue.book.cover.url }}" alt="" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.4;"></i></div>
+                {% endif %}
             </div>
-            {% endif %}
-            <div class="pos-absolute bottom-0 left-0 right-0 p-xs" style="background: linear-gradient(transparent, rgba(0,0,0,0.7));">
-                <div class="text-white text-xs text-semibold text-truncate">{{ issue.book.title }}</div>
+            <div class="flex-1" style="min-width: 0;">
+                <div class="text-sm text-semibold text-truncate">{{ issue.book.title }}</div>
+                <div class="text-xs text-muted">{{ issue.returned_at|date:"d.m.Y" }}</div>
             </div>
         </div>
         {% endif %}
         {% empty %}
-        <div class="text-muted text-sm" style="grid-column: 1 / -1;">{% trans "Hali kitob o'qilmagan" %}</div>
+        <div class="text-center py-lg text-muted text-sm">
+            {% trans "Hali kitob o'qilmagan" %}
+        </div>
         {% endfor %}
     </div>
 
-    <div class="d-flex gap-md justify-center flex-wrap">
-        <a href="{% url 'frontend:profile_edit' %}" class="btn-primary text-decoration-none" style="padding: 10px 24px; border-radius: 12px; border: none;">
+    <div class="glass-panel p-xl mb-xl" style="border-radius: 16px;">
+        <div class="flex-between align-center mb-lg">
+            <h4 class="m-0 text-semibold">{% trans "Yutuqlar" %}</h4>
+            <span class="text-xs text-muted">{{ earned_achievement_ids|length }}/{{ all_achievements|length }}</span>
+        </div>
+        <div class="d-flex gap-md flex-wrap">
+            {% for ach in all_achievements|slice:":6" %}
+            <div class="text-center" style="width: 50px; {% if ach.id not in earned_achievement_ids %}opacity: 0.3;{% endif %}">
+                <i class="fas {{ ach.icon }} text-lg" style="color: {% if ach.id in earned_achievement_ids %}#fbbf24{% else %}var(--text-muted){% endif %};"></i>
+            </div>
+            {% endfor %}
+            <a href="{% url 'frontend:achievements' %}" class="text-decoration-none d-flex align-center justify-center" style="width: 50px;">
+                <i class="fas fa-arrow-right text-muted"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="d-flex gap-md">
+        <a href="{% url 'frontend:profile_edit' %}" class="btn-primary text-decoration-none text-center flex-1" style="padding: 12px; border-radius: 12px; border: none;">
             {% trans "Tahrirlash" %}
         </a>
-        <a href="{% url 'frontend:change_password' %}" class="text-decoration-none text-muted" style="padding: 10px 24px; border-radius: 12px; border: 1px solid var(--border);">
-            {% trans "Parolni o'zgartirish" %}
+        <a href="{% url 'frontend:change_password' %}" class="text-decoration-none text-center flex-1" style="padding: 12px; border-radius: 12px; border: 1px solid var(--border); color: var(--text-muted);">
+            {% trans "Parol" %}
         </a>
     </div>
 </div>
 
-<script src="{% static 'js/chart.umd.min.js' %}"></script>
 <script>
-(function() {
-    var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-    var txtColor = isDark ? '#fef3c7' : '#1f2937';
-    var gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.15)';
-    var font = { size: 11, weight: '500', family: 'Inter,system-ui,sans-serif' };
-    var barColor = isDark ? 'rgba(99, 102, 241, 0.6)' : 'rgba(79, 70, 229, 0.7)';
-    var barBorder = isDark ? '#818cf8' : '#6366f1';
-
-    var monthlyData = {{ monthly_data|escapejs }};
-    var hasBooks = monthlyData.some(function(v) { return v > 0; });
-
-    if (hasBooks) {
-        document.getElementById('noBooksChart').style.display = 'none';
-        window._chartInstances = window._chartInstances || [];
-        window._chartInstances.push(new Chart(document.getElementById('booksByMonth'), {
-            type: 'bar',
-            data: {
-                labels: {{ monthly_labels|escapejs }},
-                datasets: [{
-                    data: monthlyData,
-                    backgroundColor: barColor,
-                    borderColor: barBorder,
-                    borderWidth: 1,
-                    borderRadius: 4,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: gridC }, ticks: { color: txtColor, stepSize: 1, font: font } },
-                    x: { grid: { display: false }, ticks: { color: txtColor, font: font } }
-                }
-            }
-        }));
-    } else {
-        document.getElementById('noBooksChart').style.display = 'block';
-        document.getElementById('booksByMonth').style.display = 'none';
-    }
-
-    setTimeout(function() {
-        var bar = document.getElementById('xpBar');
-        if (bar) bar.style.width = '{{ xp_percent }}%';
-    }, 300);
-})();
+setTimeout(function() {
+    var bar = document.getElementById('xpBar');
+    if (bar) bar.style.width = '{{ xp_percent }}%';
+}, 200);
 </script>
 {% endblock %}
