@@ -337,3 +337,21 @@ ews_list: added early guard for
   re-enable, reset password (raw_password set), CSV 200 text/csv, duplicate creates school+admin,
   QR batch renders 38 book + 2 student labels.
 
+## Session: minimal student panel redesign (2026-08-05)
+- **`user-panel` body class**: base.html adds it for student/teacher roles; `static/css/style.css`
+  gains a "STUDENT MODE" block — flat cards (no heavy shadow/glow), subtle rounded pills
+  (`.pill-subtle`, `.pill-available`, `.pill-unavailable`), quiet stat tiles (`.user-stat`),
+  clean section titles (`.user-section-title`), calmer sidebar + nav-link.
+- **Catalog** (`library.html`): removed news ticker animation, "So'nggi faoliyat" log feed, and
+  reader-of-month banner; now a clean grid with one compact news strip, search + category chips
+  (`.filter-chip`), muted availability pills instead of 3-count stat boxes / star ratings.
+- **Sidebar** (`sidebar_items.html`): removed search box, replaced gradient cart button with calm
+  `.sidebar-cart-link`, clearer 3 sections (Asosiy / Faoliyat / Ma'lumot).
+- **my_books**: dropped loud XP badges (10 XP/5 XP) and neon colors; consistent empty states.
+- **profile / achievements**: no purple gradients or glow, flat XP bar, `user-stat` tiles.
+- **leaderboard**: table → quiet `.leader-row` list with rank medals + `.is-me` highlight.
+- **challenges / my_class / news / book_detail / cart_list / cart_return_list**: consistent
+  minimal styling, removed `btn-danger`, `badge bg-success`, bold colored icons.
+- **Verified**: 169 unit tests + 17 e2e PASS; all student pages render 200; ruff clean.
+
+
