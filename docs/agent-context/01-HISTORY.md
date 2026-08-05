@@ -235,8 +235,63 @@ ews_list: added early guard for
 - **Tests**: 169 passed (+1 new streak test), ruff clean
 
 ## Session: auto-generate school admin credentials (2026-08-05)
-- **school_add view**: auto-generates admin_username (dmin_{school_name}_{random_hex}) and
+- **school_add view**: auto-generates admin_username (admin_{school_name}_{random_hex}) and
   admin_password (14-char random string) when fields are left empty
 - **New template school_created.html**: shows credentials with copy-to-clipboard and
   toggle-password buttons, warns user to save securely
 - **Python**: 169 tests PASS, ruff clean
+
+## Session: admin panel polish (2026-08-05)
+- **Schools list** (`schools.html`): redesigned from cards to a table (like `all_users.html`) —
+  stat row (schools/students/books/districts), server + client search, district filter dropdown,
+  admin column with eye-toggle password (later removed), action icons; view passes `school_count`.
+- **School detail** (`school_detail.html`): removed password + eye toggle, added "Manzil" card and
+  "Tarqatilgan kitoblar" (issued) stat; removed unused `admin_password` from view context.
+- **Passwords removed everywhere in admin UI**: `schools.html` list no longer shows admin passwords;
+  only usernames. Downloads moved to secure endpoint (see below).
+- **Credential download** (`credentials.py`): `download_credentials` rewritten to take `user_id`
+  (looks up `raw_password` from DB instead of passing it through the URL), permission checks
+  (superuser or same-school school_admin). Views now store `raw_password` on create for
+  student/teacher/admin too. All four `*_created.html` pages show a masked password + a
+  "Parolni yuklab olish" button (no more on-screen password/eye toggle).
+
+## Session: school admin profile redesign (2026-08-05)
+- **`school/profile.html`** fully rewritten: gradient hero card (avatar, name, role, school,
+  district, change-password button), 4 quick-action dashed buttons (add student/teacher, manage
+  books, QR scanner), 8 stat cards (students/teachers/books/copies/active issues/overdue/issued
+  today/returned today — clickable), monthly activity bar chart (Chart.js), school info block
+  (district/contact/address), recent issues table, recent activity feed.
+- **`school_views.profile`**: added `available_copies`, `active_issues`, `overdue_issues`
+  (>30 days unreturned), `issued_today`/`returned_today`, `recent_issues`, monthly chart data.
+
+## Session: books page improvements (2026-08-05)
+- **`school/books.html`**: added 5th stat (textbook count), sort dropdown (title A-Z/Z-A, most
+  read, availability, newest), availability progress bar on each card, borrow-count number next to
+  stars, live client-side search (title/author/category), click-on-card opens edit, accent "Yangi
+  kitob" button, QR button per card.
+- **`school_views.books_list`**: added `sort` param + `textbook_count`.
+- **`templates/pagination.html`**: rewritten to use Django 5.1+ `{% querystring page=N %}` so all
+  GET filters (q/sort/category/textbook) survive page navigation (previously only `q` did).
+
+## Session: automated QR issue/return system (2026-08-05)
+- **Static HMAC tokens** (`accounts/utils.py`): `generate_static_token(prefix, id)` /
+  `verify_static_token(token, prefix)` → `BOOK_<id>_<hash>` and `STU_<id>_<hash>` (no expiry, for
+  printed labels).
+- **Auto issue/return pairing** (`school_views.py`): scanning a `BOOK_` then a `STU_` token (either
+  order) auto-decides: if the student already holds the book → auto-return, else auto-issue
+  (availability check, textbook ban for students, XP award, notification, ActionLog, waitlist
+  notify on return). Session stores `qr_pending_book_id` / `qr_pending_student_id`.
+- **New views**: `qr_book_scanned`, `qr_student_scanned`, `qr_search_students` (JSON),
+  `qr_pick_student`, `qr_clear_pending`, `qr_state`, `book_qr_image` / `student_qr_image`
+  (PNG generated on the fly). New URLs under `/school/qr/`.
+- **`qr_unified.html`**: pending-pairing panel ("Jarayon" showing book + student), handles `info`
+  responses, "O'quvchini qidirish" modal with debounced JSON search, clear/reset button,
+  auto-refresh state on load.
+- **QR buttons**: green QR button on every book card (`book_qr_image`) + QR button in student
+  detail hero (`student_qr_image`) — open printable PNG in new tab.
+- **`seed_demo_data` command** (`core/management/commands/seed_demo_data.py`): creates 7 categories,
+  32 regular books (Uzbek classics), 5 textbooks, 12 book issues, 3 news per school; idempotent
+  via get_or_create; `--school-id` / `--force` flags. Ran for school "1 1-sonli maktab" (id 5).
+- **Verified**: 169 unit tests PASS, ruff clean, `manage.py check` 0, full E2E scan flow
+  (book→student issue, book→student return, student search/pick, clear, state) all green.
+

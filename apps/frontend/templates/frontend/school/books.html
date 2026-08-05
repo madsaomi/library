@@ -10,7 +10,7 @@
 
 {% block content %}
 <div class="animate-fade">
-    <div class="grid-4 stat-grid mb-xl">
+    <div class="grid-5 stat-grid mb-xl">
         <div class="glass-card stat-card p-md cursor-default">
             <div class="stat-value text-xl" style="color: #f59e0b;">{{ total_books|default:"0" }}</div>
             <div class="stat-label text-xs">{% trans "Kitoblar" %}</div>
@@ -27,14 +27,18 @@
             <div class="stat-value text-xl" style="color: #6366f1;">{{ issued_count|default:"0" }}</div>
             <div class="stat-label text-xs">{% trans "Berilgan" %}</div>
         </div>
+        <div class="glass-card stat-card p-md cursor-default">
+            <div class="stat-value text-xl" style="color: var(--secondary);">{{ textbook_count|default:"0" }}</div>
+            <div class="stat-label text-xs">{% trans "Darsliklar" %}</div>
+        </div>
     </div>
 
     <div class="glass-panel p-xl">
         <div class="d-flex flex-between flex-wrap gap-md mb-lg">
             <div class="d-flex align-center flex-wrap gap-sm">
                 <div class="pos-relative">
-                    <input type="text" id="search-input" aria-label="{% trans 'Kitob nomi...' %}" placeholder="{% trans 'Kitob nomi...' %}"
-                           class="border rounded text-sm" style="padding: 8px 14px 8px 36px; background: var(--input-bg); color: var(--input-text); outline: none; width: 200px;">
+                    <input type="text" id="search-input" aria-label="{% trans 'Kitob nomi...' %}" placeholder="{% trans 'Kitob nomi yoki muallif...' %}"
+                           class="border rounded text-sm" style="padding: 8px 14px 8px 36px; background: var(--input-bg); color: var(--input-text); outline: none; width: 220px;">
                     <i class="fas fa-search pos-absolute text-muted text-sm" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
                 <select id="category-filter" onchange="applyFilters()"
@@ -43,6 +47,14 @@
                     {% for cat in categories %}
                     <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>{{ cat.name }}</option>
                     {% endfor %}
+                </select>
+                <select id="sort-select" onchange="applyFilters()"
+                        class="border rounded text-sm" style="padding: 8px 14px; background: var(--input-bg); color: var(--input-text); outline: none;">
+                    <option value="title" {% if sort == 'title' %}selected{% endif %}>{% trans "Nomi (A-Z)" %}</option>
+                    <option value="-title" {% if sort == '-title' %}selected{% endif %}>{% trans "Nomi (Z-A)" %}</option>
+                    <option value="borrow" {% if sort == 'borrow' %}selected{% endif %}>{% trans "Eng ko'p o'qilgan" %}</option>
+                    <option value="available" {% if sort == 'available' %}selected{% endif %}>{% trans "Mavjudligi" %}</option>
+                    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>{% trans "Eng yangi" %}</option>
                 </select>
                 <label class="glass-card d-flex align-center gap-xs cursor-pointer border text-sm text-nowrap py-sm px-md">
                     <input type="checkbox" id="no-cover-filter" {% if no_cover %}checked{% endif %} onchange="applyFilters()" class="cursor-pointer" style="accent-color: var(--accent); width: 14px; height: 14px;">
@@ -58,20 +70,24 @@
                 </a>
                 {% endif %}
             </div>
-            <a href="{% url 'frontend:import_books_csv' %}" class="glass-card d-flex align-center gap-sm rounded text-sm text-decoration-none py-sm px-lg" style="color: var(--accent); border: 1px dashed var(--accent);">
-                <i class="fas fa-file-csv"></i> {% trans "Import CSV" %}
-            </a>
-            <a href="{% url 'frontend:book_add' %}" class="glass-card d-flex align-center gap-sm rounded text-sm text-decoration-none py-sm px-lg" style="color: var(--accent); border: 1px dashed var(--accent);">
-                <i class="fas fa-plus"></i> {% trans "Yangi kitob" %}
-            </a>
-            <a href="{% url 'frontend:export_books_csv' %}" class="glass-card d-flex align-center gap-xs rounded text-sm text-decoration-none text-muted border py-sm px-md">
-                <i class="fas fa-download"></i> CSV
-            </a>
+            <div class="d-flex align-center flex-wrap gap-sm">
+                <a href="{% url 'frontend:import_books_csv' %}" class="glass-card d-flex align-center gap-sm rounded text-sm text-decoration-none py-sm px-lg" style="color: var(--accent); border: 1px dashed var(--accent);">
+                    <i class="fas fa-file-csv"></i> {% trans "Import CSV" %}
+                </a>
+                <a href="{% url 'frontend:export_books_csv' %}" class="glass-card d-flex align-center gap-xs rounded text-sm text-decoration-none text-muted border py-sm px-md">
+                    <i class="fas fa-download"></i> CSV
+                </a>
+                <a href="{% url 'frontend:book_add' %}" class="btn-primary d-flex align-center gap-sm rounded text-sm text-decoration-none py-sm px-lg">
+                    <i class="fas fa-plus"></i> {% trans "Yangi kitob" %}
+                </a>
+            </div>
         </div>
 
         <div id="book-grid" class="animate-group" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px;">
             {% for book in books %}
-            <div class="glass-card book-card rounded-xl overflow-hidden transition p-0 animate-item">
+            <div class="glass-card book-card rounded-xl overflow-hidden transition p-0 animate-item cursor-pointer"
+                 data-search="{{ book.title|lower }} {{ book.author|lower }} {{ book.category.name|default:''|lower }}"
+                 onclick="window.location='{% url 'frontend:book_edit' book.pk %}'">
                 <div class="pos-relative overflow-hidden img-zoom" style="height: 180px; background: linear-gradient(135deg, #451a03, #92400e);">
                     {% if book.cover %}
                     <img src="{{ book.cover.url }}" alt="{{ book.title }}" loading="lazy" class="w-full h-full object-cover">
@@ -89,10 +105,11 @@
                         {{ book.category.name|default:_("Umumiy") }}
                     </div>
                     {% if book.borrow_count > 0 %}
-                    <div class="pos-absolute d-flex align-center gap-xs rounded" style="bottom: 8px; left: 8px; background: rgba(0,0,0,0.5); padding: 3px 8px; font-size: 0.55rem; color: #fbbf24;">
+                    <div class="pos-absolute d-flex align-center gap-xs rounded" style="bottom: 8px; left: 8px; background: rgba(0,0,0,0.5); padding: 3px 8px; font-size: 0.55rem; color: #fbbf24;" title="{{ book.borrow_count }} marta o'qilgan">
                         {% if book.borrow_count > 50 %}<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                         {% elif book.borrow_count > 20 %}<i class="fas fa-star"></i><i class="fas fa-star"></i>
                         {% else %}<i class="fas fa-star"></i>{% endif %}
+                        <span>{{ book.borrow_count }}</span>
                     </div>
                     {% endif %}
                 </div>
@@ -101,13 +118,17 @@
                     {% if book.author %}
                     <div class="text-xs text-muted mb-sm"><i class="fas fa-user"></i> {{ book.author|truncatechars:25 }}</div>
                     {% endif %}
-                    <div class="d-flex align-center gap-xs text-xs">
+                    <div class="d-flex align-center gap-xs text-xs mb-sm">
                         <span class="text-muted">{% trans "Jami" %}: <strong>{{ book.total_count }}</strong></span>
                         <span class="text-success">· {% trans "Mavjud" %}: <strong>{{ book.available_count }}</strong></span>
                         <span class="text-primary">· {% trans "Berilgan" %}: <strong>{{ book.currently_reading_count }}</strong></span>
                     </div>
-                    <div class="d-flex mt-sm gap-xs">
-                        <a href="{% url 'frontend:book_edit' book.pk %}" aria-label="Tahrirlash" class="glass-card flex-1 rounded text-center text-decoration-none p-xs text-xs" style="color: var(--accent);"><i class="fas fa-edit"></i></a>
+                    <div class="overflow-hidden" style="height: 5px; background: var(--hover-bg); border-radius: 3px;">
+                        <div style="width: {% widthratio book.currently_reading_count book.total_count 100 %}%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px;"></div>
+                    </div>
+                    <div class="d-flex mt-sm gap-xs" onclick="event.stopPropagation()">
+                        <a href="{% url 'frontend:book_qr_image' book.pk %}" target="_blank" aria-label="QR" class="glass-card d-flex align-center justify-center rounded p-xs text-xs gap-xs text-decoration-none" style="color: #10b981; border-color: rgba(16,185,129,0.3);" title="{% trans 'QR kod (print uchun)' %}"><i class="fas fa-qrcode"></i></a>
+                        <a href="{% url 'frontend:book_edit' book.pk %}" aria-label="Tahrirlash" class="glass-card flex-1 rounded text-center text-decoration-none p-xs text-xs" style="color: var(--accent);"><i class="fas fa-edit"></i> {% trans "Tahrirlash" %}</a>
                         <a href="{% url 'frontend:book_delete' book.pk %}" aria-label="O'chirish" class="glass-card flex-1 rounded text-center text-decoration-none p-xs text-xs" style="color: #ef4444;"><i class="fas fa-trash"></i></a>
                     </div>
                 </div>
@@ -138,6 +159,7 @@
     <input type="hidden" name="category" id="filter-category">
     <input type="hidden" name="no_cover" id="filter-no-cover">
     <input type="hidden" name="textbook" id="filter-textbook">
+    <input type="hidden" name="sort" id="filter-sort">
 </form>
 
 <script>
@@ -146,10 +168,12 @@ function applyFilters() {
     const category = document.getElementById('category-filter').value;
     const noCover = document.getElementById('no-cover-filter').checked ? '1' : '';
     const textbook = document.getElementById('textbook-filter').checked ? '1' : '';
+    const sort = document.getElementById('sort-select').value;
     document.getElementById('filter-q').value = q;
     document.getElementById('filter-category').value = category;
     document.getElementById('filter-no-cover').value = noCover;
     document.getElementById('filter-textbook').value = textbook;
+    document.getElementById('filter-sort').value = sort;
     document.getElementById('filter-form').submit();
 }
 
@@ -164,6 +188,26 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             applyFilters();
         }
+    });
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        if (!query) {
+            bookCards.forEach(card => card.style.display = '');
+            noResults.style.display = 'none';
+            return;
+        }
+        let found = 0;
+        bookCards.forEach(card => {
+            const searchText = card.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                card.style.display = '';
+                found++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        noResults.style.display = (found === 0) ? '' : 'none';
     });
 });
 </script>

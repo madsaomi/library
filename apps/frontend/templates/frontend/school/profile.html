@@ -1,86 +1,271 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 {% load frontend_tags %}
 
 {% block title %}{% trans "Profil" %} | {% trans "Online Kutibxona" %}{% endblock %}
 {% block page_title %}{% trans "Mening profilim" %}{% endblock %}
 
 {% block content %}
-<div class="mw-600 mx-auto">
-    <div class="glass-panel animate-fade p-3xl">
-        <div class="text-center mb-2xl">
-            <div class="avatar-circle d-inline-flex flex-center" style="width: 72px; height: 72px; background: linear-gradient(135deg, var(--secondary), #7c3aed); box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);">
-                <span class="avatar-initials text-2xl">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
-            </div>
-            <h2 class="mt-sm mb-xs text-lg">{{ user.get_full_name|default:user.username }}</h2>
-            <p class="text-muted m-xs text-md">{{ user.get_role_display }} · {{ user.school.name|default:_("Maktab biriktirilmagan") }}</p>
-        </div>
+<style>
+.profile-hero { background: linear-gradient(135deg, var(--primary), #7c3aed); border-radius: 16px; padding: 28px; position: relative; overflow: hidden; }
+.profile-hero::before { content: ''; position: absolute; inset: 0; background: url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\"); opacity: 0.4; }
+</style>
 
-        <div class="grid-4 mb-2xl">
-            <a href="{% url 'frontend:students_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-md">
-                <div class="text-lg text-bold text-primary">{{ total_students|default:"0" }}</div>
-                <div class="text-xs text-muted">{% trans "O'quvchilar" %}</div>
-            </a>
-            <a href="{% url 'frontend:teachers_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-md">
-                <div class="text-lg text-bold" style="color: var(--secondary);">{{ total_teachers|default:"0" }}</div>
-                <div class="text-xs text-muted">{% trans "O'qituvchilar" %}</div>
-            </a>
-            <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-md">
-                <div class="text-lg text-bold" style="color: #f59e0b;">{{ total_books|default:"0" }}</div>
-                <div class="text-xs text-muted">{% trans "Kitoblar" %}</div>
-            </a>
-            <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-md">
-                <div class="text-lg text-bold text-success">{{ total_copies|default:"0" }}</div>
-                <div class="text-xs text-muted">{% trans "Nusxalar" %}</div>
-            </a>
-        </div>
+<div class="animate-fade mw-900 mx-auto d-flex flex-column gap-2xl">
 
-        <div class="info-grid gap-xs">
-            <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
-                <span class="info-label text-xs">{% trans "Login" %}</span>
-                <span class="info-value text-md">{{ user.username }}</span>
+    <!-- Hero -->
+    <div class="profile-hero">
+        <div class="pos-relative z-10 d-flex align-center gap-xl flex-wrap">
+            <div class="d-flex align-center justify-center flex-shrink-0" style="width: 80px; height: 80px; border-radius: 20px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 2px solid rgba(255,255,255,0.2);">
+                <span class="text-extrabold text-white" style="font-size: 1.7rem;">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
             </div>
-            <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
-                <span class="info-label text-xs">{% trans "Maktab" %}</span>
-                <span class="info-value text-md">{{ user.school.name|default:"—" }}</span>
-            </div>
-            <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
-                <span class="info-label text-xs">{% trans "ID" %}</span>
-                <span class="info-value text-md">#{{ user.id|stringformat:"05d" }}</span>
-            </div>
-            <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
-                <span class="info-label text-xs">{% trans "A'zo bo'lgan" %}</span>
-                <span class="info-value text-md">{{ user.date_joined|date:"d.m.Y" }}</span>
-            </div>
-            <div class="info-row py-sm bg-transparent" style="border-radius: 0;">
-                <span class="info-label text-xs">{% trans "Oxirgi kirish" %}</span>
-                <span class="info-value text-md">{{ user.last_login|date:"d.m.Y H:i"|default:"—" }}</span>
-            </div>
-        </div>
-
-        {% if recent_activity %}
-        <div class="mt-2xl pt-xl border-top">
-            <h3 class="m-xs mb-md text-md text-muted d-flex align-center gap-xs">
-                <i class="fas fa-history text-xs"></i> {% trans "So'nggi amallar" %}
-            </h3>
-            <div class="activity-list overflow-y-auto" style="max-height: 240px;">
-                {% for log in recent_activity %}
-                <div class="d-flex align-center border-bottom p-xs gap-xs">
-                    <span class="flex-shrink-0 rounded-full" style="width: 6px; height: 6px; background: {% if log.action_type == 'ISSUE' %}#6366f1{% elif log.action_type == 'RETURN' %}#10b981{% elif log.action_type == 'CREATE' %}#d97706{% elif log.action_type == 'LOGIN' %}#a855f7{% else %}var(--text-muted){% endif %};"></span>
-                    <div class="flex-1" style="min-width: 0;">
-                        <div class="text-xs">{{ log.message|truncatechars:50 }}</div>
-                        <div class="text-xs text-muted mt-xs"><i class="far fa-clock"></i> {{ log.created_at|timesince }} {% trans "oldin" %}</div>
-                    </div>
-                    <span class="text-xs text-bold text-muted" style="opacity: 0.6;">{{ log.action_type|action_name }}</span>
+            <div class="flex-1" style="min-width: 220px;">
+                <div class="text-xl text-bold text-white">{{ user.get_full_name|default:user.username }}</div>
+                <div class="text-sm d-flex align-center gap-md mt-xs flex-wrap" style="color: rgba(255,255,255,0.75);">
+                    <span><i class="fas fa-user-shield" style="font-size: 0.6rem;"></i> {{ user.get_role_display }}</span>
+                    <span><i class="fas fa-school" style="font-size: 0.6rem;"></i> {{ user.school.name|default:_("Maktab biriktirilmagan") }}</span>
+                    {% if user.school.district %}
+                    <span><i class="fas fa-map-marker-alt" style="font-size: 0.6rem;"></i> {{ user.school.district.name }}</span>
+                    {% endif %}
+                    <span><i class="fas fa-user" style="font-size: 0.6rem;"></i> @{{ user.username }}</span>
                 </div>
-                {% endfor %}
             </div>
+            <a href="{% url 'frontend:change_password' %}" class="d-flex align-center text-white text-semibold text-sm" style="padding: 10px 18px; border-radius: 10px; text-decoration: none; gap: 7px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); transition: 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.28)'" onmouseleave="this.style.background='rgba(255,255,255,0.15)'">
+                <i class="fas fa-key"></i> {% trans "Parolni o'zgartirish" %}
+            </a>
         </div>
-        {% endif %}
+    </div>
 
-        <a href="{% url 'frontend:change_password' %}" class="btn-primary d-flex flex-center text-decoration-none text-md w-full mt-2xl p-lg gap-sm" style="border-radius: 10px;">
-            <i class="fas fa-key"></i> {% trans "Parolni o'zgartirish" %}
+    <!-- Quick actions -->
+    <div class="grid-4">
+        <a href="{% url 'frontend:student_add' %}" class="glass-card d-flex align-center justify-center gap-xs text-decoration-none p-lg rounded-2xl transition text-main" style="border: 1px dashed var(--primary);" onmouseover="this.style.borderColor='var(--primary)'; this.style.background='var(--hover-bg)'" onmouseout="this.style.borderColor='var(--border)'">
+            <i class="fas fa-user-plus text-primary"></i>
+            <span class="text-sm text-medium">{% trans "O'quvchi qo'shish" %}</span>
+        </a>
+        <a href="{% url 'frontend:teacher_add' %}" class="glass-card d-flex align-center justify-center gap-xs text-decoration-none p-lg rounded-2xl transition text-main" style="border: 1px dashed var(--secondary);" onmouseover="this.style.borderColor='var(--secondary)'; this.style.background='var(--hover-bg)'" onmouseout="this.style.borderColor='var(--border)'">
+            <i class="fas fa-chalkboard-teacher" style="color: var(--secondary);"></i>
+            <span class="text-sm text-medium">{% trans "O'qituvchi qo'shish" %}</span>
+        </a>
+        <a href="{% url 'frontend:school_books_list' %}" class="glass-card d-flex align-center justify-center gap-xs text-decoration-none p-lg rounded-2xl transition text-main" style="border: 1px dashed #f59e0b;" onmouseover="this.style.borderColor='#f59e0b'; this.style.background='var(--hover-bg)'" onmouseout="this.style.borderColor='var(--border)'">
+            <i class="fas fa-book-medical" style="color: #f59e0b;"></i>
+            <span class="text-sm text-medium">{% trans "Kitob boshqarish" %}</span>
+        </a>
+        <a href="{% url 'frontend:qr_scanner' %}" class="glass-card d-flex align-center justify-center gap-xs text-decoration-none p-lg rounded-2xl transition text-main" style="border: 1px dashed #10b981;" onmouseover="this.style.borderColor='#10b981'; this.style.background='var(--hover-bg)'" onmouseout="this.style.borderColor='var(--border)'">
+            <i class="fas fa-qrcode" style="color: #10b981;"></i>
+            <span class="text-sm text-medium">{% trans "QR skaner" %}</span>
         </a>
     </div>
+
+    <!-- Stats -->
+    <div class="grid-4 stat-grid">
+        <a href="{% url 'frontend:students_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-lg hover-lift">
+            <div class="stat-value" style="font-size: 1.4rem; color: var(--primary);">{{ total_students|default:"0" }}</div>
+            <div class="stat-label text-sm">{% trans "O'quvchilar" %}</div>
+        </a>
+        <a href="{% url 'frontend:teachers_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-lg hover-lift">
+            <div class="stat-value" style="font-size: 1.4rem; color: var(--secondary);">{{ total_teachers|default:"0" }}</div>
+            <div class="stat-label text-sm">{% trans "O'qituvchilar" %}</div>
+        </a>
+        <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-lg hover-lift">
+            <div class="stat-value" style="font-size: 1.4rem; color: #f59e0b;">{{ total_books|default:"0" }}</div>
+            <div class="stat-label text-sm">{% trans "Kitob nomlari" %}</div>
+        </a>
+        <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-lg hover-lift">
+            <div class="stat-value" style="font-size: 1.4rem; color: #6366f1;">{{ total_copies|default:"0" }}</div>
+            <div class="stat-label text-sm">{% trans "Nusxalar" %}</div>
+        </a>
+        <a href="{% url 'frontend:issued_books_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-lg hover-lift">
+            <div class="stat-value" style="font-size: 1.4rem; color: #10b981;">{{ active_issues|default:"0" }}</div>
+            <div class="stat-label text-sm">{% trans "O'qilayotganlar" %}</div>
+        </a>
+        <a href="{% url 'frontend:issued_books_list' %}" class="glass-card stat-card d-block text-center text-decoration-none p-lg hover-lift">
+            <div class="stat-value" style="font-size: 1.4rem; color: #ef4444;">{{ overdue_issues|default:"0" }}</div>
+            <div class="stat-label text-sm">{% trans "Muddati o'tgan" %}</div>
+        </a>
+        <div class="glass-card stat-card p-lg cursor-default">
+            <div class="stat-value" style="font-size: 1.4rem; color: #a855f7;">{{ issued_today|default:"0" }}</div>
+            <div class="stat-label text-sm">{% trans "Bugun berilgan" %}</div>
+        </div>
+        <div class="glass-card stat-card p-lg cursor-default">
+            <div class="stat-value" style="font-size: 1.4rem; color: #22c55e;">{{ returned_today|default:"0" }}</div>
+            <div class="stat-label text-sm">{% trans "Bugun qaytarilgan" %}</div>
+        </div>
+    </div>
+
+    <!-- Activity chart + info -->
+    <div class="responsive-grid-2 gap-xl" style="align-items: start;">
+        <div class="glass-panel p-xl">
+            <h4 class="section-title text-md mb-lg">
+                <i class="fas fa-chart-line text-primary" style="font-size: 0.8rem;"></i> {% trans "Faoliyat (oylik berilgan kitoblar)" %}
+            </h4>
+            <div class="pos-relative" style="height: 200px;">
+                <canvas id="profileChart" class="w-full h-full"></canvas>
+            </div>
+            <div id="noChart" class="d-none text-center py-3xl text-muted text-md">
+                <i class="fas fa-chart-bar text-2xl" style="opacity: 0.3; margin-bottom: 10px;"></i>
+                <p>{% trans "Hali ma'lumot yo'q" %}</p>
+            </div>
+        </div>
+
+        <div class="glass-panel p-xl">
+            <h4 class="section-title text-md mb-lg">
+                <i class="fas fa-info-circle text-primary" style="font-size: 0.8rem;"></i> {% trans "Maktab ma'lumotlari" %}
+            </h4>
+            <div class="info-grid gap-xs">
+                <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                    <span class="info-label text-xs">{% trans "Maktab" %}</span>
+                    <span class="info-value text-md">{{ user.school.name|default:"—" }}</span>
+                </div>
+                <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                    <span class="info-label text-xs">{% trans "Tuman" %}</span>
+                    <span class="info-value text-md">{{ user.school.district.name|default:"—" }}</span>
+                </div>
+                <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                    <span class="info-label text-xs">{% trans "Kontakt" %}</span>
+                    <span class="info-value text-md">{{ user.school.contact|default:"—" }}</span>
+                </div>
+                <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                    <span class="info-label text-xs">{% trans "Manzil" %}</span>
+                    <span class="info-value text-md">{{ user.school.address|default:"—" }}</span>
+                </div>
+                <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                    <span class="info-label text-xs">{% trans "Login" %}</span>
+                    <span class="info-value text-md">{{ user.username }}</span>
+                </div>
+                <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                    <span class="info-label text-xs">{% trans "ID" %}</span>
+                    <span class="info-value text-md">#{{ user.id|stringformat:"05d" }}</span>
+                </div>
+                <div class="info-row border-bottom py-sm bg-transparent" style="border-radius: 0;">
+                    <span class="info-label text-xs">{% trans "A'zo bo'lgan" %}</span>
+                    <span class="info-value text-md">{{ user.date_joined|date:"d.m.Y" }}</span>
+                </div>
+                <div class="info-row py-sm bg-transparent" style="border-radius: 0;">
+                    <span class="info-label text-xs">{% trans "Oxirgi kirish" %}</span>
+                    <span class="info-value text-md">{{ user.last_login|date:"d.m.Y H:i"|default:"—" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent issues -->
+    <div class="glass-panel p-xl">
+        <h4 class="section-title text-md mb-lg">
+            <i class="fas fa-hand-holding-heart text-success" style="font-size: 0.8rem;"></i> {% trans "Oxirgi berilgan kitoblar" %}
+        </h4>
+        <div class="table-container overflow-x-auto">
+            <table class="w-full text-md" style="border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr class="border-bottom">
+                        <th class="text-muted text-medium p-md" style="padding: 8px 12px;">{% trans "Kitob" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 8px 12px;">{% trans "O'quvchi" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 8px 12px;">{% trans "Berilgan" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 8px 12px;">{% trans "Holat" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for issue in recent_issues %}
+                    <tr class="border-bottom" style="transition: 0.15s;">
+                        <td class="p-md text-sm" style="padding: 8px 12px;">
+                            <span class="d-flex align-center gap-sm">
+                                <i class="fas fa-book text-primary" style="font-size: 0.7rem;"></i> {{ issue.book.title|truncatechars:35 }}
+                            </span>
+                        </td>
+                        <td class="p-md text-sm" style="padding: 8px 12px;">{{ issue.user.get_full_name|default:issue.user.username }}</td>
+                        <td class="p-md text-sm text-muted" style="padding: 8px 12px;">{{ issue.issued_at|date:"d.m.Y H:i" }}</td>
+                        <td class="p-md" style="padding: 8px 12px;">
+                            {% if issue.is_returned %}
+                            <span class="badge text-success p-sm rounded-sm text-nowrap" style="background: rgba(16,185,129,0.1);">
+                                <i class="fas fa-check-circle" style="font-size: 0.6rem;"></i> {% trans "Qaytarilgan" %}
+                            </span>
+                            {% else %}
+                            <span class="badge text-primary p-sm rounded-sm text-nowrap" style="background: rgba(99,102,241,0.1);">
+                                <i class="fas fa-hourglass-half" style="font-size: 0.6rem;"></i> {% trans "O'qilmoqda" %}
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted text-sm p-3xl">{% trans "Hozircha berilgan kitoblar yo'q" %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recent activity -->
+    {% if recent_activity %}
+    <div class="glass-panel p-xl">
+        <h4 class="section-title text-md mb-lg">
+            <i class="fas fa-history text-muted" style="font-size: 0.8rem;"></i> {% trans "So'nggi amallar" %}
+        </h4>
+        <div class="activity-list overflow-y-auto" style="max-height: 240px;">
+            {% for log in recent_activity %}
+            <div class="d-flex align-center border-bottom p-xs gap-xs">
+                <span class="flex-shrink-0 rounded-full" style="width: 6px; height: 6px; background: {% if log.action_type == 'ISSUE' %}#6366f1{% elif log.action_type == 'RETURN' %}#10b981{% elif log.action_type == 'CREATE' %}#d97706{% elif log.action_type == 'LOGIN' %}#a855f7{% else %}var(--text-muted){% endif %};"></span>
+                <div class="flex-1" style="min-width: 0;">
+                    <div class="text-xs">{{ log.message|truncatechars:50 }}</div>
+                    <div class="text-xs text-muted mt-xs"><i class="far fa-clock"></i> {{ log.created_at|timesince }} {% trans "oldin" %}</div>
+                </div>
+                <span class="text-xs text-bold text-muted" style="opacity: 0.6;">{{ log.action_type|action_name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+<script src="{% static 'js/chart.umd.min.js' %}"></script>
+<script>
+function initProfileChart() {
+    var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    var txtColor = isDark ? '#fef3c7' : '#000';
+    var gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.2)';
+    var font = { size: 12, weight: '600', family: 'Inter,system-ui,sans-serif' };
+    var bar1 = isDark ? 'rgba(99, 102, 241, 0.5)' : 'rgba(79, 70, 229, 0.7)';
+    var bar1b = isDark ? '#6366f1' : '#4f46e5';
+
+    var labels = {{ month_labels|escapejs }};
+    var data = {{ monthly_data|escapejs }};
+    var hasData = data.some(function(v) { return v > 0; });
+    if (!hasData) {
+        document.getElementById('noChart').style.display = 'block';
+        return;
+    }
+    var ctx = document.getElementById('profileChart');
+    if (ctx) {
+        window._chartInstances.push(new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '{% trans "Kitoblar" %}',
+                    data: data,
+                    backgroundColor: bar1,
+                    borderColor: bar1b,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: gridC }, ticks: { color: txtColor, stepSize: 1, font: font } },
+                    x: { grid: { display: false }, ticks: { color: txtColor, font: font } }
+                }
+            }
+        }));
+    }
+}
+document.addEventListener('DOMContentLoaded', initProfileChart);
+document.addEventListener('themechange', function() {
+    while(window._chartInstances.length) window._chartInstances.pop().destroy();
+    initProfileChart();
+});
+</script>
 {% endblock %}

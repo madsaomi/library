@@ -1,21 +1,26 @@
 # 02-CURRENT-STATE — What is true right now
 
-Last fully verified: 2026-08-05 (security audit + cart rework + e2e 13/14).
+Last fully verified: 2026-08-05 (admin polish + QR automation + 169 tests).
 
 ## Green (verified)
 - `python manage.py check` → 0 issues
 - `python manage.py collectstatic --noinput --clear` → works, 281 files, hashed names via
   `staticfiles/staticfiles.json` (manifest storage active)
-- `python -m pytest -q --tb=short` → **168 passed** (1 harmless DeprecationWarning from
+- `python -m pytest -q --tb=short` → **169 passed** (1 harmless DeprecationWarning from
   `pythonjsonlogger` in site-packages)
 - `python -m pytest e2e -q --tb=short` → **13/14 passed** (1 Windows-only CDN timeout flake,
   stable in CI on Python 3.13)
 - `python -m ruff check .` → all passed; `ruff format .` → clean
-- All 75 templates parse (`get_template` for every `templates/*.html` + frontend templates)
-- Smoke render (test client, `HTTP_HOST='localhost'`): `/admin/`, `/admin/news/`, `/profile/`,
-  `/admin/statistics/`, `/admin/logs/`, `/school/`, `/school/news/`, `/library/`,
-  `/library/news/`, `/library/my-books/` all 200. Student hitting `/profile/` gets 302 (intended —
-  that view is `@superuser_required`)
+- Smoke render (test client, `HTTP_HOST='localhost'`): `/admin/schools/`, `/admin/schools/<id>/`,
+  `/school/books/`, `/school/qr/`, `/profile/` (school_admin) all 200
+- **Automated QR flow E2E verified**: static BOOK_/STU_ token gen + QR PNGs (200 image/png),
+  scan book→scan student = auto issue, scan again = auto return (available_count tracked),
+  student search/pick, clear, state endpoints all green
+- **Postgres search path fixed** (2026-08-03): `book_search_vector()` restored in
+  `books/models.py`; `books/migrations/0012` GIN index SQL valid + import restored. Compiles to
+  `to_tsvector('simple', title || 'A' || author || 'B' || description || 'C')`. Fresh SQLite
+  `migrate` from scratch OK; `makemigrations --check` → no changes. This was the CI "Run
+  migrations" failure on Postgres (CI red since `3433ecc`).
 - **Postgres search path fixed** (2026-08-03): `book_search_vector()` restored in
   `books/models.py`; `books/migrations/0012` GIN index SQL valid + import restored. Compiles to
   `to_tsvector('simple', title || 'A' || author || 'B' || description || 'C')`. Fresh SQLite
@@ -92,3 +97,30 @@ Last fully verified: 2026-08-05 (security audit + cart rework + e2e 13/14).
 - `apps/frontend/templates/frontend/user/book_detail.html` (cart button)
 - `apps/frontend/utils.py` (month_bounds helper)
 - `docs/agent-context/01-HISTORY.md`, `02-CURRENT-STATE.md`, `03-ROADMAP.md`
+
+### 2026-08-05 admin panel polish + credentials download
+- `apps/frontend/templates/frontend/admin/schools.html` (table redesign, no passwords, filters)
+- `apps/frontend/templates/frontend/admin/school_detail.html` (password removed, Manzil + issued stat)
+- `apps/frontend/views/admin_views.py` (school_count for list; no admin_password for detail)
+- `apps/frontend/views/credentials.py` (download by user_id, permission checks)
+- `apps/frontend/views/school_views.py` (store raw_password on student/teacher create)
+- `apps/frontend/templates/frontend/{admin,school}/*_created.html` (masked password + download button)
+
+### 2026-08-05 school admin profile redesign
+- `apps/frontend/templates/frontend/school/profile.html` (hero, 8 stats, quick actions, chart, school info, recent issues)
+- `apps/frontend/views/school_views.py` (profile context: available/active/overdue/today + monthly chart)
+
+### 2026-08-05 books page improvements
+- `apps/frontend/templates/frontend/school/books.html` (sort, progress bar, live search, QR buttons)
+- `apps/frontend/views/school_views.py` (sort param, textbook_count)
+- `templates/pagination.html` ({% querystring page=N %} preserves filters)
+
+### 2026-08-05 automated QR issue/return system
+- `apps/accounts/utils.py` (generate/verify_static_token for BOOK_/STU_)
+- `apps/frontend/views/school_views.py` (qr_book_scanned, qr_student_scanned, _pair_result,
+  qr_search_students, qr_pick_student, qr_clear_pending, qr_state, book_qr_image, student_qr_image)
+- `apps/frontend/urls.py` (6 new /school/qr/ URLs)
+- `apps/frontend/templates/frontend/school/qr_unified.html` (pending panel, student search modal)
+- `apps/frontend/templates/frontend/school/books.html` + `student_detail.html` (QR buttons)
+- `core/management/commands/seed_demo_data.py` (new — demo categories/books/textbooks/issues/news)
+- `docs/agent-context/01-HISTORY.md`, `02-CURRENT-STATE.md`

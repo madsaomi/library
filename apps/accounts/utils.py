@@ -72,3 +72,28 @@ def verify_dynamic_token(token, expected_prefix):
         if hmac.compare_digest(received_hash.upper(), expected_hash):
             return obj_id
     return None
+
+
+def generate_static_token(prefix, obj_id):
+    """Static (non-expiring) HMAC-signed token: {prefix}_{id}_{hash}."""
+    secret = settings.SECRET_KEY.encode()
+    message = f'{prefix}{obj_id}'.encode()
+    h = hmac.new(secret, message, hashlib.sha256).hexdigest()[:10].upper()
+    return f'{prefix}_{obj_id}_{h}'
+
+
+def verify_static_token(token, expected_prefix):
+    """Verify a static token, returning obj_id or None."""
+    if not token:
+        return None
+    parts = token.split('_')
+    if len(parts) < 3 or parts[0] != expected_prefix:
+        return None
+    obj_id = parts[1]
+    received_hash = parts[2]
+    secret = settings.SECRET_KEY.encode()
+    message = f'{expected_prefix}{obj_id}'.encode()
+    expected_hash = hmac.new(secret, message, hashlib.sha256).hexdigest()[:10].upper()
+    if hmac.compare_digest(received_hash.upper(), expected_hash):
+        return obj_id
+    return None

@@ -4,32 +4,6 @@
 {% block title %}{% trans "QR Skaner" %} | {% trans "Online Kutibxona" %}{% endblock %}
 {% block page_title %}{% trans "QR Skaner" %}{% endblock %}
 
-{% block extra_head %}
-<script src="https://unpkg.com/html5-qrcode"></script>
-<style>
-    #reader { width: 100%; border-radius: 14px; overflow: hidden; border: none !important; }
-    #reader__dashboard_section_csr button {
-        background: var(--primary) !important; color: white !important; border: none !important;
-        padding: 10px 20px !important; border-radius: 8px !important; cursor: pointer !important;
-        font-weight: 600 !important; transition: 0.3s !important;
-    }
-    #reader__dashboard_section_csr button:hover { filter: brightness(1.2); transform: translateY(-1px); }
-    .qr-modal-overlay {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-        display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px;
-        opacity: 0; transition: opacity 0.3s ease;
-    }
-    .qr-modal-overlay.active { display: flex; opacity: 1; }
-    .qr-modal-content {
-        background: var(--modal-bg); border: 1px solid var(--modal-border); border-radius: 20px;
-        padding: 28px; width: 100%; max-width: 380px;
-        box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-        transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
-    }
-    .qr-modal-overlay.active .qr-modal-content { transform: translateY(0); }
-</style>
-{% endblock %}
-
 {% block sidebar_nav %}
 {% include 'frontend/school/sidebar_items.html' %}
 {% endblock %}
@@ -56,7 +30,38 @@
             <i class="fas fa-camera text-2xl text-primary"></i>
         </div>
         <h3 class="mb-xs" style="font-size: 1.1rem;">{% trans "Kitob berish yoki qabul qilish" %}</h3>
-        <p class="text-muted text-sm mb-xl">{% trans "O'quvchi telefonidagi QR-kodni skanerlang" %}</p>
+        <p class="text-muted text-sm mb-xl">{% trans "Kitob QR-kodini yoki o'quvchi QR-kodini skanerlang — hammasi avtomatik" %}</p>
+
+        <!-- Pending pairing panel -->
+        <div id="pending-panel" class="d-none mb-xl text-left glass-card p-lg rounded-lg" style="border-left: 4px solid var(--primary);">
+            <div class="d-flex align-center justify-between mb-md">
+                <span class="text-sm text-bold text-primary d-flex align-center gap-xs">
+                    <i class="fas fa-link"></i> {% trans "Jarayon" %}
+                </span>
+                <button id="clear-pending-btn" type="button" onclick="clearPending()" class="cursor-pointer text-sm text-danger" style="background:none;border:none;">
+                    <i class="fas fa-times-circle"></i> {% trans "Bekor qilish" %}
+                </button>
+            </div>
+            <div id="pending-book-box" class="d-none d-flex align-center gap-md p-sm rounded" style="background: rgba(99,102,241,0.08);">
+                <i class="fas fa-book text-primary"></i>
+                <div class="flex-1" style="min-width:0;">
+                    <div class="text-xs text-muted">{% trans "Kitob" %}</div>
+                    <div id="pending-book-title" class="text-sm text-bold text-truncate">—</div>
+                </div>
+                <span id="pending-book-avail" class="text-xs text-success text-nowrap"></span>
+            </div>
+            <div id="pending-student-box" class="d-none d-flex align-center gap-md p-sm rounded mt-xs" style="background: rgba(16,185,129,0.08);">
+                <i class="fas fa-user-graduate text-success"></i>
+                <div class="flex-1" style="min-width:0;">
+                    <div class="text-xs text-muted">{% trans "O'quvchi" %}</div>
+                    <div id="pending-student-name" class="text-sm text-bold text-truncate">—</div>
+                </div>
+                <span id="pending-student-grade" class="text-xs text-muted text-nowrap"></span>
+            </div>
+            <div id="pending-hint" class="text-xs text-muted mt-sm">
+                <i class="fas fa-info-circle"></i> <span id="pending-hint-text"></span>
+            </div>
+        </div>
 
         <div id="reader-container" class="d-none mb-xl">
             <div id="reader"></div>
@@ -92,10 +97,13 @@
             <button id="manual-entry-btn" class="glass-card w-full mw-300 border d-flex align-center justify-center gap-sm rounded-md cursor-pointer text-md" style="padding: 10px 0;" onclick="showManualModal()">
                 <i class="fas fa-keyboard text-primary"></i> {% trans "Kod orqali kiritish" %}
             </button>
+            <button id="student-search-btn" class="glass-card w-full mw-300 border d-flex align-center justify-center gap-sm rounded-md cursor-pointer text-md" style="padding: 10px 0; border-color: rgba(16,185,129,0.3);" onclick="showStudentSearch()">
+                <i class="fas fa-user-graduate text-success"></i> {% trans "O'quvchini qidirish" %}
+            </button>
         </div>
 
         <div class="mt-2xl">
-            <a href="{% url 'frontend:dashboard' %}" class="text-muted text-decoration-none text-sm transition" style="opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+            <a href="{% url 'frontend:school_dashboard' %}" class="text-muted text-decoration-none text-sm transition" style="opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
                 <i class="fas fa-arrow-left"></i> {% trans "Orqaga qaytish" %}
             </a>
         </div>
@@ -124,9 +132,28 @@
     </div>
 </div>
 
+<!-- Student search modal -->
+<div id="student-search-modal" class="qr-modal-overlay">
+    <div class="qr-modal-content" style="max-width: 420px;">
+        <div class="text-center mb-lg">
+            <h4 class="mb-xs">{% trans "O'quvchini qidirish" %}</h4>
+            <p class="text-muted text-sm" style="margin: 0;">{% trans "Ism yoki login kiriting" %}</p>
+        </div>
+        <div class="pos-relative mb-lg">
+            <input type="text" id="student-search-input" class="w-full" style="background: var(--input-bg); border: 1px solid var(--border); color: var(--input-text); padding: 12px 12px 12px 38px; border-radius: 10px; font-size: 0.95rem; outline: none;" placeholder="{% trans 'Qidirish...' %}">
+            <i class="fas fa-search pos-absolute text-muted" style="left: 14px; top: 50%; transform: translateY(-50%); font-size: 0.8rem;"></i>
+        </div>
+        <div id="student-search-results" class="d-flex flex-column gap-xs" style="max-height: 300px; overflow-y: auto;"></div>
+        <div class="d-flex gap-sm mt-lg">
+            <button class="glass-card flex-1 rounded cursor-pointer border text-sm" style="padding: 10px;" onclick="document.getElementById('student-search-modal').classList.remove('active')">{% trans "Bekor qilish" %}</button>
+        </div>
+    </div>
+</div>
+
 <script>
 var modalEl = document.getElementById('manual-modal');
 var QR_currentPrefix = 'REQ_';
+var CSRF = '{{ csrf_token }}';
 
 function showManualModal() {
     if (!modalEl || !document.body.contains(modalEl)) return;
@@ -162,16 +189,87 @@ function submitManualToken() {
     if (val.length > 0) { closeManualModal(); processToken(QR_currentPrefix + val); }
 }
 
+function showPendingPanel() {
+    var panel = document.getElementById('pending-panel');
+    if (panel) panel.classList.remove('d-none');
+}
+
+function updatePendingState(state) {
+    var bookBox = document.getElementById('pending-book-box');
+    var studentBox = document.getElementById('pending-student-box');
+    var hint = document.getElementById('pending-hint-text');
+    var panel = document.getElementById('pending-panel');
+
+    if (state.book) {
+        bookBox.classList.remove('d-none');
+        document.getElementById('pending-book-title').textContent = state.book.title;
+        document.getElementById('pending-book-avail').textContent = state.book.available + ' / ' + state.book.total;
+    } else {
+        bookBox.classList.add('d-none');
+    }
+
+    if (state.student) {
+        studentBox.classList.remove('d-none');
+        document.getElementById('pending-student-name').textContent = state.student.name;
+        document.getElementById('pending-student-grade').textContent = state.student.grade || '';
+    } else {
+        studentBox.classList.add('d-none');
+    }
+
+    if (state.book && !state.student) {
+        hint.textContent = "{% trans 'Endi o\'quvchi QR-kodini skanerlang yoki qidiring' %}";
+        showPendingPanel();
+    } else if (state.student && !state.book) {
+        hint.textContent = "{% trans 'Endi kitob QR-kodini skanerlang' %}";
+        showPendingPanel();
+    } else if (state.book && state.student) {
+        hint.textContent = "";
+    }
+}
+
+function refreshState() {
+    fetch("{% url 'frontend:qr_state' %}", {
+        method: 'GET',
+        headers: { 'X-CSRFToken': CSRF }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.status === 'success') updatePendingState(data);
+    })
+    .catch(function() {});
+}
+
+function clearPending() {
+    fetch("{% url 'frontend:qr_clear_pending' %}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+        body: JSON.stringify({})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function() {
+        var panel = document.getElementById('pending-panel');
+        if (panel) panel.classList.add('d-none');
+        document.getElementById('pending-book-box').classList.add('d-none');
+        document.getElementById('pending-student-box').classList.add('d-none');
+        hideResult();
+    })
+    .catch(function() {});
+}
+
+function hideResult() {
+    var rm = document.getElementById('result-message');
+    if (rm) rm.style.display = 'none';
+}
+
 function processToken(token) {
     var resultMsg = document.getElementById('result-message');
     var resStatus = document.getElementById('res-status');
     var resText = document.getElementById('res-text');
-    var resIconBg = document.getElementById('res-icon-bg');
     var resIcon = document.getElementById('res-icon');
 
     fetch("{% url 'frontend:process_qr_unified' %}", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
         body: JSON.stringify({ token: token })
     })
     .then(function(r) { return r.json(); })
@@ -180,22 +278,34 @@ function processToken(token) {
         document.getElementById('start-btn').disabled = false;
         document.getElementById('start-btn').style.opacity = '1';
 
-        if (data.status === 'success') {
-            var isIssue = token.startsWith('REQ_');
-            var themeColor = isIssue ? 'var(--primary)' : '#10b981';
+        if (data.status === 'info') {
+            resStatus.innerText = "{% trans 'Qo\'shimcha amal kerak' %}";
+            resStatus.style.color = 'var(--primary)';
+            resultMsg.style.borderLeftColor = 'var(--primary)';
+            resultMsg.querySelector('.rounded-full').style.background = 'var(--primary)';
+            resIcon.className = 'fas fa-arrow-right';
+            resText.innerText = data.message || '';
+            updatePendingState(data);
+            refreshState();
+        } else if (data.status === 'success') {
+            var isReturn = data.action === 'return';
+            var themeColor = isReturn ? '#10b981' : 'var(--primary)';
             resStatus.innerText = "{% trans 'Muvaffaqiyatli!' %}";
             resStatus.style.color = themeColor;
             resultMsg.style.borderLeftColor = themeColor;
-            resIconBg.style.background = themeColor;
-            resIcon.className = isIssue ? 'fas fa-book-reader' : 'fas fa-check';
-            resText.innerHTML = '<strong></strong><br><span style="opacity:0.8">{% trans "Foydalanuvchi" %}: <span id="res-student-name"></span></span>';
-            if (data.student) document.getElementById('res-student-name').textContent = data.student;
-            if (data.message) resText.querySelector('strong').textContent = data.message;
+            resultMsg.querySelector('.rounded-full').style.background = themeColor;
+            resIcon.className = isReturn ? 'fas fa-undo-alt' : 'fas fa-book-reader';
+            var extra = data.student ? ('<br><span style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>') : '';
+            if (data.xp_earned) {
+                extra += '<br><span style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
+            }
+            resText.innerHTML = (data.message || '') + extra;
+            refreshState();
         } else {
             resStatus.innerText = "{% trans 'Xatolik!' %}";
             resStatus.style.color = "#ef4444";
             resultMsg.style.borderLeftColor = "#ef4444";
-            resIconBg.style.background = "#ef4444";
+            resultMsg.querySelector('.rounded-full').style.background = "#ef4444";
             resIcon.className = 'fas fa-times';
             resText.innerText = data.message;
         }
@@ -208,16 +318,131 @@ function processToken(token) {
     });
 }
 
+// Student search
+var searchTimer = null;
+function showStudentSearch() {
+    document.getElementById('student-search-modal').classList.add('active');
+    var input = document.getElementById('student-search-input');
+    input.value = '';
+    document.getElementById('student-search-results').innerHTML = '';
+    setTimeout(function() { input.focus(); }, 300);
+    doStudentSearch();
+}
+
+function doStudentSearch() {
+    var q = document.getElementById('student-search-input').value.trim();
+    fetch("{% url 'frontend:qr_search_students' %}?q=" + encodeURIComponent(q))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        var box = document.getElementById('student-search-results');
+        box.innerHTML = '';
+        if (!data.students || data.students.length === 0) {
+            box.innerHTML = '<div class="text-center text-muted text-sm p-3xl">{% trans "Topilmadi" %}</div>';
+            return;
+        }
+        data.students.forEach(function(s) {
+            var row = document.createElement('button');
+            row.type = 'button';
+            row.className = 'glass-card d-flex align-center gap-md text-left cursor-pointer p-md rounded-lg border transition';
+            row.onclick = function() { pickStudent(s.id); };
+            row.innerHTML = '<div class="flex-center rounded-full" style="width:32px;height:32px;background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff;font-weight:700;font-size:0.75rem;">' + (s.name.charAt(0) || '?').toUpperCase() + '</div>' +
+                '<div class="flex-1" style="min-width:0;"><div class="text-sm text-bold text-truncate">' + s.name + '</div><div class="text-xs text-muted">' + (s.grade || '') + ' · @' + s.username + '</div></div>' +
+                '<i class="fas fa-chevron-right text-muted" style="font-size:0.7rem;"></i>';
+            box.appendChild(row);
+        });
+    })
+    .catch(function() {});
+}
+
+function pickStudent(studentId) {
+    document.getElementById('student-search-modal').classList.remove('active');
+    fetch("{% url 'frontend:qr_pick_student' %}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+        body: JSON.stringify({ student_id: studentId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.status === 'success') {
+            showResultAsSuccess(data);
+            refreshState();
+        } else if (data.status === 'info') {
+            processTokenDisplay(data);
+            updatePendingState(data);
+            refreshState();
+        } else {
+            showError(data.message);
+        }
+    })
+    .catch(function() {});
+}
+
+function processTokenDisplay(data) {
+    var resultMsg = document.getElementById('result-message');
+    var resStatus = document.getElementById('res-status');
+    var resText = document.getElementById('res-text');
+    var resIcon = document.getElementById('res-icon');
+    resultMsg.style.display = 'block';
+    resStatus.innerText = "{% trans 'Qo\'shimcha amal kerak' %}";
+    resStatus.style.color = 'var(--primary)';
+    resultMsg.style.borderLeftColor = 'var(--primary)';
+    resultMsg.querySelector('.rounded-full').style.background = 'var(--primary)';
+    resIcon.className = 'fas fa-arrow-right';
+    resText.innerText = data.message || '';
+}
+
+function showResultAsSuccess(data) {
+    var resultMsg = document.getElementById('result-message');
+    var resStatus = document.getElementById('res-status');
+    var resText = document.getElementById('res-text');
+    var resIcon = document.getElementById('res-icon');
+    resultMsg.style.display = 'block';
+    var isReturn = data.action === 'return';
+    var themeColor = isReturn ? '#10b981' : 'var(--primary)';
+    resStatus.innerText = "{% trans 'Muvaffaqiyatli!' %}";
+    resStatus.style.color = themeColor;
+    resultMsg.style.borderLeftColor = themeColor;
+    resultMsg.querySelector('.rounded-full').style.background = themeColor;
+    resIcon.className = isReturn ? 'fas fa-undo-alt' : 'fas fa-book-reader';
+    var extra = data.student ? ('<br><span style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>') : '';
+    if (data.xp_earned) extra += '<br><span style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
+    resText.innerHTML = (data.message || '') + extra;
+}
+
+function showError(msg) {
+    var resultMsg = document.getElementById('result-message');
+    var resStatus = document.getElementById('res-status');
+    var resText = document.getElementById('res-text');
+    var resIcon = document.getElementById('res-icon');
+    resultMsg.style.display = 'block';
+    resStatus.innerText = "{% trans 'Xatolik!' %}";
+    resStatus.style.color = "#ef4444";
+    resultMsg.style.borderLeftColor = "#ef4444";
+    resultMsg.querySelector('.rounded-full').style.background = "#ef4444";
+    resIcon.className = 'fas fa-times';
+    resText.innerText = msg;
+}
+
 document.getElementById('manual-token').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') submitManualToken();
+});
+
+document.getElementById('student-search-input').addEventListener('input', function() {
+    clearTimeout(searchTimer);
+    var self = this;
+    searchTimer = setTimeout(function() { doStudentSearch(); }, 300);
 });
 
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         var m = document.getElementById('manual-modal');
         if (m.classList.contains('active')) m.classList.remove('active');
+        var sm = document.getElementById('student-search-modal');
+        if (sm.classList.contains('active')) sm.classList.remove('active');
     }
 });
+
+document.addEventListener('DOMContentLoaded', refreshState);
 </script>
 
 <script>

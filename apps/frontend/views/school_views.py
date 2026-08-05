@@ -253,7 +253,15 @@ def books_list(request):
     if textbook == '1':
         books = books.filter(is_textbook=True)
 
-    books = books.order_by('title')
+    sort = request.GET.get('sort', 'title')
+    sort_map = {
+        'title': 'title',
+        '-title': '-title',
+        'borrow': '-borrow_count',
+        'available': 'available_count',
+        'newest': '-id',
+    }
+    books = books.order_by(sort_map.get(sort, 'title'))
 
     from books.models import Category
 
@@ -276,10 +284,12 @@ def books_list(request):
             'selected_category': category_id if category_id and category_id.isdigit() else None,
             'no_cover': no_cover == '1',
             'textbook_filter': textbook == '1',
+            'sort': sort,
             'total_books': total_books,
             'total_copies': stats['total_copies'] or 0,
             'available_copies': stats['available_copies'] or 0,
             'issued_count': issued_count,
+            'textbook_count': all_books.filter(is_textbook=True).count(),
         },
     )
 
@@ -436,6 +446,10 @@ def process_qr_unified(request):
                 return process_cart_qr(request, token)
             elif token.startswith('RETCART_'):
                 return process_cart_return_qr(request, token)
+            elif token.startswith('BOOK_'):
+                return qr_book_scanned(request, token)
+            elif token.startswith('STU_'):
+                return qr_student_scanned(request, token)
             else:
                 return JsonResponse(
                     {
@@ -449,6 +463,427 @@ def process_qr_unified(request):
             logger.error(f'process_qr_unified error: {e}', exc_info=True)
             return JsonResponse({'status': 'error', 'message': _('Tizimda xatolik yuz berdi')})
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+
+
+def _reset_pending_qr(request):
+    request.session.pop('qr_pending_book_id', None)
+    request.session.pop('qr_pending_student_id', None)
+
+
+def _pair_result(request, book, student):
+    """Auto issue or auto return based on whether the student already holds this book."""
+    from accounts.utils import verify_dynamic_token  # noqa: F401
+    from django.db.models import F
+    from stats.models import ActionLog
+
+    active = (
+        BookIssue.objects.select_related('book', 'user')
+        .filter(book=book, user=student, is_returned=False, is_deleted=False)
+        .first()
+    )
+
+    if active:
+        # AUTO RETURN
+        active.is_returned = True
+        active.returned_at = timezone.now()
+        active.save(update_fields=['is_returned', 'returned_at'])
+
+        book.available_count = F('available_count') + 1
+        book.save(update_fields=['available_count'])
+        book.refresh_from_db()
+
+        request_obj = (
+            BookRequest.objects.select_related('book', 'user')
+            .filter(book=book, user=student, status='approved')
+            .first()
+        )
+        if request_obj:
+            request_obj.status = 'completed'
+            request_obj.save(update_fields=['status'])
+
+        from books.models import BookWaitlist
+
+        next_in_queue = BookWaitlist.objects.filter(book=book, is_notified=False).first()
+        if next_in_queue:
+            next_in_queue.is_notified = True
+            next_in_queue.save(update_fields=['is_notified'])
+            from notifications.utils import notify_user
+
+            notify_user(
+                next_in_queue.user,
+                _('Kitob mavjud!'),
+                _('"{title}" kitobi bo\'shadi. Navbat sizda!').format(title=book.title),
+                url=reverse('frontend:book_detail', args=[book.pk]),
+            )
+
+        ActionLog.objects.create(
+            user=request.user,
+            action_type='RETURN',
+            message=_("{}dan '{}' kitobi qabul qilindi").format(student.username, book.title),
+        )
+
+        xp_result = award_xp(student, 'return')
+        from notifications.utils import notify_user
+
+        notify_user(
+            student,
+            _('Kitob qaytarildi'),
+            _('"{title}" kitobi qabul qilindi').format(title=book.title),
+            url=reverse('frontend:my_books'),
+        )
+
+        _reset_pending_qr(request)
+        return JsonResponse(
+            {
+                'status': 'success',
+                'action': 'return',
+                'message': _('Qaytarildi: "{title}"').format(title=book.title),
+                'student': f'{student.first_name} {student.last_name}',
+                'grade': student.grade or '',
+                'xp_earned': xp_result['xp_earned'],
+                'leveled_up': xp_result['leveled_up'],
+                'new_level': xp_result['new_level'],
+                'new_achievements': xp_result['new_achievements'],
+            }
+        )
+
+    # AUTO ISSUE
+    if student.role == 'student' and book.is_textbook:
+        return JsonResponse(
+            {
+                'status': 'error',
+                'message': _("Darsliklarni o'quvchilar ololmaydi. Darsliklar o'quv yili boshida tarqatiladi."),
+            }
+        )
+
+    if book.available_count <= 0:
+        return JsonResponse({'status': 'error', 'message': _('Kitob qolmagan: "{title}"').format(title=book.title)})
+
+    BookIssue.objects.create(book=book, user=student)
+
+    book.available_count = F('available_count') - 1
+    book.borrow_count = F('borrow_count') + 1
+    book.save(update_fields=['available_count', 'borrow_count'])
+    book.refresh_from_db()
+
+    ActionLog.objects.create(
+        user=request.user,
+        action_type='ISSUE',
+        message=_("{}ga '{}' kitobi berildi").format(student.username, book.title),
+    )
+
+    xp_result = award_xp(student, 'borrow', book=book)
+    from notifications.utils import notify_user
+
+    notify_user(
+        student,
+        _('Kitob berildi'),
+        _('"{title}" kitobi sizga berildi').format(title=book.title),
+        url=reverse('frontend:my_books'),
+    )
+
+    _reset_pending_qr(request)
+    return JsonResponse(
+        {
+            'status': 'success',
+            'action': 'issue',
+            'message': _('Berildi: "{title}"').format(title=book.title),
+            'student': f'{student.first_name} {student.last_name}',
+            'grade': student.grade or '',
+            'xp_earned': xp_result['xp_earned'],
+            'lucky_bonus': xp_result['lucky_bonus'],
+            'leveled_up': xp_result['leveled_up'],
+            'new_level': xp_result['new_level'],
+            'new_achievements': xp_result['new_achievements'],
+        }
+    )
+
+
+@login_required(login_url='login')
+@school_admin_required
+def qr_book_scanned(request, token):
+    """Handle a scanned static BOOK_ token. Pairs with a pending student for auto action."""
+    from accounts.utils import verify_static_token
+
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+
+    book_id = verify_static_token(token, 'BOOK')
+    if not book_id:
+        return JsonResponse({'status': 'error', 'message': _("Noto'g'ri kitob QR-kodi")})
+
+    book = (
+        Book.objects.select_related('school', 'category')
+        .filter(id=book_id, school=request.user.school, is_deleted=False)
+        .first()
+    )
+    if not book:
+        return JsonResponse({'status': 'error', 'message': _('Kitob topilmadi yoki boshqa maktabga tegishli')})
+
+    request.session['qr_pending_book_id'] = book.id
+
+    student_id = request.session.get('qr_pending_student_id')
+    if student_id:
+        student = (
+            CustomUser.objects.filter(id=student_id, school=request.user.school, role='student')
+            .exclude(is_archived=True)
+            .first()
+        )
+        if student:
+            return _pair_result(request, book, student)
+
+    return JsonResponse(
+        {
+            'status': 'info',
+            'pending': 'book',
+            'book': {
+                'id': book.id,
+                'title': book.title,
+                'author': book.author or '',
+                'category': book.category.name if book.category else '',
+                'available': book.available_count,
+                'total': book.total_count,
+                'textbook': book.is_textbook,
+                'grade': book.grade,
+            },
+            'message': _('Kitob: "{title}" (mavjud {available}/{total}). Endi o\'quvchi QR-kodini skanerlang yoki qidiring.').format(
+                title=book.title, available=book.available_count, total=book.total_count
+            ),
+        }
+    )
+
+
+@login_required(login_url='login')
+@school_admin_required
+def qr_student_scanned(request, token):
+    """Handle a scanned static STU_ token. Pairs with a pending book for auto action."""
+    from accounts.utils import verify_static_token
+
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+
+    student_id = verify_static_token(token, 'STU')
+    if not student_id:
+        return JsonResponse({'status': 'error', 'message': _("Noto'g'ri o'quvchi QR-kodi")})
+
+    student = (
+        CustomUser.objects.filter(id=student_id, school=request.user.school, role='student')
+        .exclude(is_archived=True)
+        .first()
+    )
+    if not student:
+        return JsonResponse({'status': 'error', 'message': _("O'quvchi topilmadi yoki boshqa maktabga tegishli")})
+
+    request.session['qr_pending_student_id'] = student.id
+
+    book_id = request.session.get('qr_pending_book_id')
+    if book_id:
+        book = (
+            Book.objects.select_related('school', 'category')
+            .filter(id=book_id, school=request.user.school, is_deleted=False)
+            .first()
+        )
+        if book:
+            return _pair_result(request, book, student)
+
+    return JsonResponse(
+        {
+            'status': 'info',
+            'pending': 'student',
+            'student': {
+                'id': student.id,
+                'name': f'{student.first_name} {student.last_name}',
+                'username': student.username,
+                'grade': student.grade or '',
+            },
+            'message': _("O'quvchi: {name} ({grade}). Endi kitob QR-kodini skanerlang.").format(
+                name=f'{student.first_name} {student.last_name}'.strip(), grade=student.grade or ''
+            ),
+        }
+    )
+
+
+@login_required(login_url='login')
+@school_admin_required
+def qr_search_students(request):
+    """JSON search endpoint for the scanner's student-picker fallback."""
+    from django.contrib.postgres.search import SearchQuery, SearchVector  # noqa: F401
+
+    q = request.GET.get('q', '').strip()
+    school = request.user.school
+    students = (
+        CustomUser.objects.filter(school=school, role='student')
+        .exclude(is_archived=True)
+        .order_by('last_name', 'first_name')
+    )
+    if q:
+        students = students.filter(
+            Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(username__icontains=q)
+        )
+    students = students[:20]
+    return JsonResponse(
+        {
+            'students': [
+                {
+                    'id': s.id,
+                    'name': f'{s.first_name} {s.last_name}'.strip(),
+                    'username': s.username,
+                    'grade': s.grade or '',
+                }
+                for s in students
+            ]
+        }
+    )
+
+
+@login_required(login_url='login')
+@school_admin_required
+def qr_pick_student(request):
+    """Set the pending student from a manual pick, then pair with pending book if any."""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+    try:
+        data = json.loads(request.body)
+        student_id = data.get('student_id')
+    except (json.JSONDecodeError, TypeError):
+        return JsonResponse({'status': 'error', 'message': "Noto'g'ri so'rov"})
+
+    student = (
+        CustomUser.objects.filter(id=student_id, school=request.user.school, role='student')
+        .exclude(is_archived=True)
+        .first()
+    )
+    if not student:
+        return JsonResponse({'status': 'error', 'message': _("O'quvchi topilmadi")})
+
+    request.session['qr_pending_student_id'] = student.id
+
+    book_id = request.session.get('qr_pending_book_id')
+    if book_id:
+        book = (
+            Book.objects.select_related('school', 'category')
+            .filter(id=book_id, school=request.user.school, is_deleted=False)
+            .first()
+        )
+        if book:
+            return _pair_result(request, book, student)
+
+    return JsonResponse(
+        {
+            'status': 'info',
+            'pending': 'student',
+            'student': {
+                'id': student.id,
+                'name': f'{student.first_name} {student.last_name}',
+                'grade': student.grade or '',
+            },
+            'message': _("O'quvchi tanlandi: {name} ({grade}). Endi kitob QR-kodini skanerlang.").format(
+                name=f'{student.first_name} {student.last_name}'.strip(), grade=student.grade or ''
+            ),
+        }
+    )
+
+
+@login_required(login_url='login')
+@school_admin_required
+def qr_clear_pending(request):
+    """Reset any pending book/student pairing."""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+    _reset_pending_qr(request)
+    return JsonResponse({'status': 'success', 'message': _("Boshlang'ich holatga qaytarildi")})
+
+
+@login_required(login_url='login')
+@school_admin_required
+def qr_state(request):
+    """Return current pending pairing state (for page load / refresh)."""
+    book_id = request.session.get('qr_pending_book_id')
+    student_id = request.session.get('qr_pending_student_id')
+    data = {'status': 'success', 'book': None, 'student': None}
+
+    if book_id:
+        book = (
+            Book.objects.select_related('category').filter(id=book_id, school=request.user.school).first()
+        )
+        if book:
+            data['book'] = {
+                'id': book.id,
+                'title': book.title,
+                'author': book.author or '',
+                'available': book.available_count,
+                'total': book.total_count,
+            }
+    if student_id:
+        student = (
+            CustomUser.objects.filter(id=student_id, school=request.user.school, role='student').first()
+        )
+        if student:
+            data['student'] = {
+                'id': student.id,
+                'name': f'{student.first_name} {student.last_name}',
+                'grade': student.grade or '',
+            }
+    return JsonResponse(data)
+
+
+def _qr_image_response(token):
+    """Generate and return a QR PNG image for the given token."""
+    import io
+
+    import qrcode as qrcode_lib
+
+    qr = qrcode_lib.QRCode(
+        version=1,
+        error_correction=qrcode_lib.constants.ERROR_CORRECT_M,
+        box_size=8,
+        border=3,
+    )
+    qr.add_data(token)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color='black', back_color='white')
+
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
+
+    from django.http import HttpResponse
+
+    return HttpResponse(buffer.getvalue(), content_type='image/png')
+
+
+@login_required(login_url='login')
+@school_admin_required
+def book_qr_image(request, pk):
+    """Render the printable static QR for a book."""
+    from accounts.utils import generate_static_token
+
+    book = (
+        Book.objects.select_related('school', 'category')
+        .filter(id=pk, school=request.user.school, is_deleted=False)
+        .first()
+    )
+    if not book:
+        return JsonResponse({'status': 'error', 'message': _('Kitob topilmadi')}, status=404)
+    token = generate_static_token('BOOK', book.id)
+    return _qr_image_response(token)
+
+
+@login_required(login_url='login')
+@school_admin_required
+def student_qr_image(request, pk):
+    """Render the printable static QR for a student."""
+    from accounts.utils import generate_static_token
+
+    student = (
+        CustomUser.objects.filter(id=pk, school=request.user.school, role='student')
+        .exclude(is_archived=True)
+        .first()
+    )
+    if not student:
+        return JsonResponse({'status': 'error', 'message': _("O'quvchi topilmadi")}, status=404)
+    token = generate_static_token('STU', student.id)
+    return _qr_image_response(token)
 
 
 @login_required(login_url='login')
@@ -887,6 +1322,7 @@ def student_add(request):
                 password = ''.join(secrets.choice(alphabet) for i in range(12))
 
             student.set_password(password)
+            student.raw_password = password
             student.save()
 
             messages.success(request, _("Yangi o'quvchi qo'shildi!"))
@@ -990,6 +1426,7 @@ def teacher_add(request):
                 password = ''.join(secrets.choice(alphabet) for i in range(12))
 
             teacher.set_password(password)
+            teacher.raw_password = password
             teacher.save()
 
             return render(
@@ -1073,24 +1510,71 @@ def profile(request):
         return redirect('frontend:library')
     school = request.user.school
     recent_activity = ActionLog.objects.filter(user=request.user).order_by('-created_at')[:10]
-    from django.db.models import Sum
+    from django.db.models import Count, Sum
+    from django.db.models.functions import TruncMonth
 
     stats = (
         Book.objects.select_related('school', 'category')
         .filter(school=school)
         .aggregate(
             total_copies=Sum('total_count'),
+            available_copies=Sum('available_count'),
         )
     )
+
+    issue_qs = BookIssue.objects.select_related('book', 'user').filter(
+        book__school=school, is_returned=False
+    )
+    today = timezone.now().date()
+    recent_issues = (
+        BookIssue.objects.select_related('book', 'user')
+        .filter(book__school=school)
+        .order_by('-issued_at')[:8]
+    )
+
+    # Monthly issues for chart (last 6 months)
+    six_months_ago = timezone.now() - timezone.timedelta(days=180)
+    monthly_qs = (
+        BookIssue.objects.select_related('book', 'user')
+        .filter(book__school=school, issued_at__gte=six_months_ago)
+        .annotate(month=TruncMonth('issued_at'))
+        .values('month')
+        .annotate(count=Count('id'))
+        .order_by('month')
+    )
+    month_labels = []
+    monthly_data = []
+    months_uz = [
+        _('Yan'), _('Fev'), _('Mar'), _('Apr'), _('May'), _('Iyun'),
+        _('Iyl'), _('Avg'), _('Sen'), _('Okt'), _('Noy'), _('Dek'),
+    ]
+    for entry in monthly_qs:
+        if entry['month']:
+            m = entry['month'].month - 1
+            month_labels.append(months_uz[m] if m < len(months_uz) else str(entry['month'].month))
+            monthly_data.append(entry['count'])
+
     return render(
         request,
         'frontend/school/profile.html',
         {
             'recent_activity': recent_activity,
+            'recent_issues': recent_issues,
             'total_books': Book.objects.select_related('school', 'category').filter(school=school).count(),
             'total_copies': stats['total_copies'] or 0,
+            'available_copies': stats['available_copies'] or 0,
             'total_students': CustomUser.objects.filter(school=school, role='student').count(),
             'total_teachers': CustomUser.objects.filter(school=school, role='teacher').count(),
+            'active_issues': issue_qs.count(),
+            'overdue_issues': issue_qs.filter(issued_at__lt=timezone.now() - timezone.timedelta(days=30)).count(),
+            'issued_today': BookIssue.objects.filter(
+                book__school=school, issued_at__date=today
+            ).count(),
+            'returned_today': BookIssue.objects.filter(
+                book__school=school, returned_at__date=today, is_returned=True
+            ).count(),
+            'month_labels': month_labels,
+            'monthly_data': monthly_data,
         },
     )
 

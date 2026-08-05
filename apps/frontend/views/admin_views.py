@@ -125,6 +125,7 @@ def schools_list(request):
         schools = schools.filter(district_id=district_id)
 
     schools = schools.order_by('-id')
+    school_count = schools.count()
     districts = District.objects.annotate(
         school_count=Count('schools', filter=Q(schools__customuser__role='school_admin'))
     ).order_by('name')
@@ -136,6 +137,7 @@ def schools_list(request):
         'frontend/admin/schools.html',
         {
             'schools': schools,
+            'school_count': school_count,
             'districts': districts,
             'current_district': district_id,
             'current_query': q or '',
@@ -589,7 +591,6 @@ def school_detail(request, pk):
         return (0, int(m.group(1))) if m else (1, g)
 
     school_admin = CustomUser.objects.filter(school=school, role='school_admin').first()
-    admin_password = school_admin.raw_password if school_admin else None
 
     grade_counts = sorted([(g, len(ss)) for g, ss in grades.items()], key=grade_sort_key)
 
@@ -601,7 +602,6 @@ def school_detail(request, pk):
         .filter(book__school=school, is_returned=False)
         .count(),
         'school_admin': school_admin,
-        'admin_password': admin_password,
         'grades': grades,
         'grade_counts': grade_counts,
         'books': Book.objects.select_related('school', 'category').filter(school=school).order_by('-id')[:20],
@@ -803,6 +803,7 @@ def school_add(request):
                     'school': school,
                     'admin_username': admin_username,
                     'admin_password': admin_password,
+                    'admin_id': admin_user.pk,
                 },
             )
 
@@ -952,6 +953,7 @@ def admin_add(request):
                 admin_password = ''.join(secrets.choice(alphabet) for i in range(12))
                 admin.set_password(admin_password)
 
+            admin.raw_password = admin_password
             admin.save()
 
             from django.contrib import messages

@@ -10,10 +10,11 @@
 
 {% block content %}
 <div class="animate-fade">
+    <!-- Stat cards -->
     <div class="grid-4 stat-grid mb-xl">
         <div class="glass-card stat-card p-lg cursor-default">
-            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ schools|length }}</div>
-            <div class="stat-label text-sm">{% trans "Jami maktablar" %}</div>
+            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ school_count }}</div>
+            <div class="stat-label text-sm">{% trans "Maktablar" %}</div>
         </div>
         <div class="glass-card stat-card p-lg cursor-default">
             <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ total_students|default:"0" }}</div>
@@ -30,120 +31,147 @@
     </div>
 
     <div class="glass-panel p-xl">
+        <!-- Toolbar -->
         <div class="flex-between mb-lg gap-lg flex-wrap">
-            <div class="d-flex gap-xs align-center flex-wrap">
+            <form method="get" class="d-flex gap-xs align-center flex-wrap" id="filter-form">
+                <div class="pos-relative">
+                    <input type="text" name="q" value="{{ current_query }}" id="search-input"
+                           aria-label="{% trans 'Qidirish...' %}" placeholder="{% trans 'Maktab nomi yoki manzil...' %}"
+                           class="text-md" style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none; width: 220px;">
+                    <i class="fas fa-search pos-absolute text-muted text-md" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
+                </div>
                 <span class="text-sm text-muted text-medium">{% trans "Tuman" %}:</span>
-                <form method="get" id="filter-form" class="d-inline">
-                    <select name="district" onchange="this.form.submit()" class="text-md" style="background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; outline: none; cursor: pointer;">
-                        <option value="">{% trans "Barchasi" %}</option>
-                        {% for d in districts %}
-                        <option value="{{ d.id }}" {% if current_district == d.id|stringformat:"i" %}selected{% endif %}>{{ d.name }}</option>
-                        {% endfor %}
-                    </select>
-                </form>
-                {% if current_district %}
+                <select name="district" onchange="this.form.submit()" class="text-md" style="background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; outline: none; cursor: pointer;">
+                    <option value="">{% trans "Barchasi" %}</option>
+                    {% for d in districts %}
+                    <option value="{{ d.id }}" {% if current_district == d.id|stringformat:"i" %}selected{% endif %}>{{ d.name }}</option>
+                    {% endfor %}
+                </select>
+                {% if current_district or current_query %}
                 <a href="{% url 'frontend:schools_list' %}" class="d-flex align-center gap-xs text-sm text-decoration-none" style="color: #ef4444;">
                     <i class="fas fa-times"></i> {% trans "Tozalash" %}
                 </a>
                 {% endif %}
-            </div>
-            <a href="{% url 'frontend:school_add' %}" class="btn-primary text-nowrap text-sm" style="padding: 8px 16px; text-decoration: none;">
+            </form>
+            <a href="{% url 'frontend:school_add' %}" class="btn-primary text-nowrap text-sm d-flex align-center gap-xs" style="padding: 9px 16px; text-decoration: none;">
                 <i class="fas fa-plus"></i> {% trans "Maktab qo'shish" %}
             </a>
         </div>
 
-        <style>
-            .school-card { padding: 18px; cursor: pointer; transition: 0.25s; }
-            .school-card:hover { border-color: var(--primary) !important; }
-        </style>
-
-        <div class="animate-group" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px;">
-            {% for school in schools %}
-            <div class="glass-card school-card animate-item hover-lift" onclick="window.location={% url 'frontend:school_detail' school.pk %}">
-                <div class="flex-between align-start mb-md">
-                    <div>
-                        <div class="text-semibold" style="font-size: 0.9rem;">{{ school.name }}</div>
-                        <div class="text-muted mt-xs" style="font-size: 0.72rem;">
-                            <i class="fas fa-map-marker-alt" style="font-size: 0.6rem;"></i>
-                            {% if school.district %}{{ school.district.name }}{% else %}—{% endif %}
-                        </div>
-                    </div>
-                    <div class="d-flex gap-xs" onclick="event.stopPropagation()">
-<a href="{% url 'frontend:school_edit' school.pk %}" aria-label="Tahrirlash" class="text-muted p-xs" style="font-size: 0.85rem;" title="{% trans 'Tahrirlash' %}">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="{% url 'frontend:school_delete' school.pk %}" aria-label="O'chirish" class="p-xs" style="color: #ef4444; font-size: 0.85rem;" title="{% trans "O'chirish" %}">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="d-flex gap-sm mb-md">
-                    <span class="text-sm d-flex align-center gap-xs p-sm rounded-sm bg-glass border" style="color: var(--accent);">
-                        <i class="fas fa-book" style="font-size: 0.6rem;"></i> {{ school.book_count }}
-                    </span>
-                    <span class="text-sm text-success d-flex align-center gap-xs p-sm rounded-sm bg-glass border">
-                        <i class="fas fa-users" style="font-size: 0.6rem;"></i> {{ school.student_count|default:"0" }}
-                    </span>
-                </div>
-
-                {% with admin=school.admins|first %}
-                {% if admin %}
-                <div class="bg-glass p-md rounded-md border border-primary mb-md">
-                    <div class="flex-between align-center text-sm">
-                        <span><i class="fas fa-user-shield text-primary" style="font-size: 0.65rem;"></i> {{ admin.username }}</span>
-                        <span>
-                            <span class="admin-pass text-muted" id="ap-{{ school.id }}">
-                                {% if admin.raw_password %}{{ admin.raw_password|truncatechars:8 }}{% else %}••••••••{% endif %}
+        <!-- Table -->
+        <div class="table-container overflow-x-auto">
+            <table class="w-full text-md" style="border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr class="border-bottom">
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Maktab" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Tuman" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Admin" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "O'quvchilar" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Kitoblar" %}</th>
+                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Amallar" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="animate-group">
+                    {% for school in schools %}
+                    <tr class="school-row animate-item cursor-pointer border-bottom" data-search="{{ school.name|lower }} {{ school.district.name|default:''|lower }} {{ school.address|default:''|lower }} {{ school.admins.0.username|default:''|lower }}"
+                        onclick="window.location='{% url 'frontend:school_detail' school.pk %}'" style="transition: 0.15s;">
+                        <td class="p-md" style="padding: 10px 12px;">
+                            <div class="d-flex align-center gap-md">
+                                <div class="flex-center rounded-lg" style="width: 36px; height: 36px; min-width: 36px; background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                                    <i class="fas fa-school text-white" style="font-size: 0.85rem;"></i>
+                                </div>
+                                <div>
+                                    <div class="text-semibold text-main" style="font-size: 0.82rem;">{{ school.name }}</div>
+                                    {% if school.address %}<div class="text-muted text-xs">{{ school.address|truncatechars:30 }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-muted text-sm p-md" style="padding: 10px 12px;">
+                            <span class="badge text-muted p-sm rounded-sm text-nowrap" style="background: rgba(99,102,241,0.1);">
+                                <i class="fas fa-map-marker-alt mr-xs" style="font-size: 0.6rem;"></i> {{ school.district.name|default:"—" }}
                             </span>
-                            <span class="admin-pass-val d-none text-muted" id="apv-{{ school.id }}">
-                                {% if admin.raw_password %}{{ admin.raw_password }}{% else %}••••••••{% endif %}
+                        </td>
+                        <td class="p-md" style="padding: 10px 12px;">
+                            {% with admin=school.admins|first %}
+                            {% if admin %}
+                            <div class="d-flex align-center gap-sm">
+                                <span class="text-sm d-flex align-center gap-xs">
+                                    <i class="fas fa-user-shield text-primary" style="font-size: 0.65rem;"></i> {{ admin.username }}
+                                </span>
+                            </div>
+                            {% else %}
+                            <span class="text-muted text-sm">{% trans "Admin yo'q" %}</span>
+                            {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td class="p-md" style="padding: 10px 12px;">
+                            <span class="d-flex align-center gap-xs text-sm text-success">
+                                <i class="fas fa-users" style="font-size: 0.65rem;"></i> {{ school.student_count|default:"0" }}
                             </span>
-                            <i class="fas fa-eye toggle-admin-pass cursor-pointer text-primary ml-xs" data-id="{{ school.id }}" style="font-size: 0.7rem;" title="{% trans 'Show password' %}"></i>
-                        </span>
-                    </div>
-                </div>
-                {% endif %}
-                {% endwith %}
-
-                <div class="flex-between align-center">
-                    <span class="text-primary text-sm d-flex align-center gap-xs">
-                        {% trans "Batafsil" %} <i class="fas fa-arrow-right" style="font-size: 0.6rem;"></i>
-                    </span>
-                </div>
-            </div>
-            {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-building text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Muassasalar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+                        </td>
+                        <td class="p-md" style="padding: 10px 12px;">
+                            <span class="d-flex align-center gap-xs text-sm" style="color: var(--accent);">
+                                <i class="fas fa-book" style="font-size: 0.65rem;"></i> {{ school.book_count }}
+                            </span>
+                        </td>
+                        <td class="p-md" style="padding: 10px 12px;">
+                            <div class="d-flex gap-xs" onclick="event.stopPropagation()">
+                                <a href="{% url 'frontend:school_detail' school.pk %}" aria-label="Batafsil" class="text-primary p-xs" style="font-size: 0.85rem;" title="{% trans 'Batafsil' %}">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'frontend:school_edit' school.pk %}" aria-label="Tahrirlash" class="text-muted p-xs" style="font-size: 0.85rem;" title="{% trans 'Tahrirlash' %}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'frontend:school_delete' school.pk %}" aria-label="O'chirish" class="p-xs" style="color: #ef4444; font-size: 0.85rem;" title="{% trans "O'chirish" %}">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center p-xl border-none">
+                            <div class="empty-state text-center p-3xl animate-fade">
+                                <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
+                                    <i class="fas fa-school text-4xl text-primary"></i>
+                                </div>
+                                <h4 class="text-lg font-semibold mb-xs">{% trans "Maktablar topilmadi" %}</h4>
+                                <p class="text-muted text-sm">{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="no-results" class="d-none">
+                        <td colspan="6" class="text-center text-muted text-md p-3xl">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('click', function(e) {
-    const target = e.target.closest('.toggle-admin-pass');
-    if (!target) return;
-    const id = target.dataset.id;
-    const hidden = document.getElementById('ap-' + id);
-    const visible = document.getElementById('apv-' + id);
-    if (visible.classList.contains('d-none')) {
-        visible.classList.remove('d-none');
-        hidden.classList.add('d-none');
-        target.classList.remove('fa-eye');
-        target.classList.add('fa-eye-slash');
-    } else {
-        visible.classList.add('d-none');
-        hidden.classList.remove('d-none');
-        target.classList.remove('fa-eye-slash');
-        target.classList.add('fa-eye');
-    }
+// Live client-side search (in addition to server-side q filter)
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const rows = document.querySelectorAll('.school-row');
+    const noResults = document.getElementById('no-results');
+    if (!searchInput || rows.length === 0) return;
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = 0;
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search');
+            if (searchText.includes(query)) {
+                row.style.display = '';
+                found++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        noResults.style.display = (found === 0) ? '' : 'none';
+    });
 });
 </script>
 {% endblock %}
