@@ -9,232 +9,163 @@
 {% block sidebar_nav %}
 {% include 'frontend/user/sidebar_items.html' %}
 {% endblock %}
+
 {% block content %}
 <div class="animate-fade mw-800 mx-auto">
-    <!-- Avatar & Level Card -->
-    <div class="glass-panel profile-hero mb-2xl">
-        <div class="pos-relative flex-shrink-0">
-            <div class="flex-center rounded-full" style="width: 84px; height: 84px; background: var(--hover-bg); border: 1px solid var(--border);">
-                <i class="fas {{ user.selected_icon|default:'fa-book' }} text-2xl text-primary"></i>
+    <div class="glass-panel p-2xl mb-xl" style="border-radius: 20px;">
+        <div class="d-flex align-center gap-xl flex-wrap">
+            <div class="flex-center rounded-full flex-shrink-0" style="width: 80px; height: 80px; background: var(--hover-bg); border: 1px solid var(--border);">
+                <i class="fas {{ user.selected_icon|default:'fa-book' }} text-xl text-primary"></i>
             </div>
-        </div>
-        <div class="flex-1" style="min-width: 220px;">
-            <h2 class="mb-xs">{{ user.first_name }} {{ user.last_name }}</h2>
-            <p class="text-muted mb-xs">
-                <span class="text-primary text-bold">{{ level_info.title }}</span>
-                {% if user.role == 'student' %} · {{ user.grade }} {% trans "sinf" %}{% endif %}
-            </p>
-            <p class="text-muted text-md">
-                <i class="fas fa-book"></i> {{ user.total_books_read }} {% trans "kitob" %}
-                · <i class="fas fa-fire"></i> {{ user.current_streak }} {% trans "haftalik streak" %}
-            </p>
-            <!-- XP Bar -->
-            <div class="mt-md">
-                <div class="flex-between mb-xs text-sm">
-                    <span class="text-muted">{% trans "XP" %}</span>
-                    <span class="text-primary text-bold">{{ user.xp_points }} / {{ next_xp }}</span>
-                </div>
-                <div class="overflow-hidden" style="height: 8px; background: var(--hover-bg); border-radius: 4px;">
-                    <div id="xpBar" style="width: 0%; height: 100%; background: var(--primary); border-radius: 4px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+            <div class="flex-1" style="min-width: 200px;">
+                <h2 class="m-0 mb-xs">{{ user.first_name }} {{ user.last_name }}</h2>
+                <p class="text-muted m-0 mb-sm">
+                    <span class="text-primary text-semibold">{{ level_info.title }}</span>
+                    {% if user.role == 'student' %} · {{ user.grade }} {% trans "sinf" %}{% endif %}
+                </p>
+                <div class="d-flex gap-lg flex-wrap text-sm text-muted">
+                    <span><i class="fas fa-book"></i> {{ user.total_books_read }}</span>
+                    <span><i class="fas fa-fire"></i> {{ user.current_streak }} {% trans "hafta" %}</span>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Info Cards -->
-    <div class="responsive-grid-2 mb-2xl">
-        <div class="glass-card p-xl">
-            <p class="text-muted text-sm mb-xs">{% trans "Login" %}</p>
-            <p class="text-semibold">{{ user.username }}</p>
-        </div>
-        <div class="glass-card p-xl">
-            <p class="text-muted text-sm mb-xs">{% trans "ID raqam" %}</p>
-            <p class="text-semibold">#{{ user.id|stringformat:"05d" }}</p>
-        </div>
-        <div class="glass-card p-xl">
-            <p class="text-muted text-sm mb-xs">{% trans "A'zo bo'lgan sana" %}</p>
-            <p class="text-semibold">{{ user.date_joined|date:"d.m.Y" }}</p>
-        </div>
-        <div class="glass-card p-xl">
-            <p class="text-muted text-sm mb-xs">{% trans "Eng uzun streak" %}</p>
-            <p class="text-semibold"><i class="fas fa-fire" style="color: #f97316;"></i> {{ user.longest_streak }} {% trans "hafta" %}</p>
-        </div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="responsive-grid-2 mb-2xl">
-        <div class="glass-panel p-xl">
-            <h4 class="mb-lg">{% trans "Oylik kitoblar" %}</h4>
-            <div class="pos-relative" style="height: 200px;">
-                <canvas id="booksByMonth" class="w-full h-full"></canvas>
+        <div class="mt-lg">
+            <div class="d-flex justify-between mb-xs text-sm">
+                <span class="text-muted">{% trans "XP" %}</span>
+                <span class="text-primary text-semibold">{{ user.xp_points }} / {{ next_xp }}</span>
             </div>
-            <div id="noBooksChart" class="d-none text-center py-3xl text-muted text-md">
-                <i class="fas fa-chart-bar text-2xl" style="opacity: 0.3; margin-bottom: 10px;"></i>
-                <p>{% trans "Hali kitob o'qilmagan" %}</p>
-            </div>
-        </div>
-        <div class="glass-panel p-xl">
-            <h4 class="mb-lg">{% trans "Kategoriyalar" %}</h4>
-            <div class="pos-relative" style="height: 200px;">
-                <canvas id="categoryPie" class="w-full h-full"></canvas>
-            </div>
-            <div id="noCatChart" class="d-none text-center py-3xl text-muted text-md">
-                <i class="fas fa-pie-chart text-2xl" style="opacity: 0.3; margin-bottom: 10px;"></i>
-                <p>{% trans "Hali kategoriyalar bo'yicha ma'lumot yo'q" %}</p>
+            <div style="height: 6px; background: var(--hover-bg); border-radius: 3px; overflow: hidden;">
+                <div id="xpBar" style="width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: width 1s ease;"></div>
             </div>
         </div>
     </div>
 
-    <!-- Achievements Grid -->
-    <h2 class="mt-2xl mb-xl">{% trans "Yutuqlar" %} 🏆</h2>
-    <div class="responsive-grid-3 mb-2xl">
+    <div class="d-grid gap-md mb-xl" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+        <div class="glass-panel p-lg text-center" style="border-radius: 16px;">
+            <div class="text-lg text-semibold text-main">{{ user.username }}</div>
+            <div class="text-xs text-muted mt-xs">{% trans "Login" %}</div>
+        </div>
+        <div class="glass-panel p-lg text-center" style="border-radius: 16px;">
+            <div class="text-lg text-semibold text-main">#{{ user.id|stringformat:"05d" }}</div>
+            <div class="text-xs text-muted mt-xs">{% trans "ID" %}</div>
+        </div>
+        <div class="glass-panel p-lg text-center" style="border-radius: 16px;">
+            <div class="text-lg text-semibold text-main">{{ user.date_joined|date:"d.m.Y" }}</div>
+            <div class="text-xs text-muted mt-xs">{% trans "A'zo bo'lgan" %}</div>
+        </div>
+        <div class="glass-panel p-lg text-center" style="border-radius: 16px;">
+            <div class="text-lg text-semibold text-main">{{ user.longest_streak }}</div>
+            <div class="text-xs text-muted mt-xs">{% trans "Eng uzun streak" %}</div>
+        </div>
+    </div>
+
+    <div class="glass-panel p-xl mb-xl" style="border-radius: 20px;">
+        <h4 class="m-0 mb-lg">{% trans "Oylik kitoblar" %}</h4>
+        <div style="height: 180px;">
+            <canvas id="booksByMonth"></canvas>
+        </div>
+        <div id="noBooksChart" class="d-none text-center py-xl text-muted">
+            <i class="fas fa-chart-bar text-2xl mb-sm" style="opacity: 0.3;"></i>
+            <p class="text-sm">{% trans "Hali kitob o'qilmagan" %}</p>
+        </div>
+    </div>
+
+    <h3 class="mb-lg text-semibold">{% trans "Yutuqlar" %}</h3>
+    <div class="d-grid gap-md mb-xl" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
         {% for ach in all_achievements|slice:":6" %}
         {% if earned_achievement_ids %}
-        <div class="glass-card p-lg text-center" {% if ach.id in earned_achievement_ids %}style="border-color: rgba(251,191,36,0.3)"{% else %}style="opacity:0.5;filter:grayscale(1)"{% endif %}>
-            <div class="text-2xl mb-sm">
-                <i class="fas {{ ach.icon }}" {% if ach.id in earned_achievement_ids %}style="color:#fbbf24"{% else %}class="text-muted"{% endif %}></i>
-            </div>
-            <h5 class="text-md">{{ ach|ach_name }}</h5>
+        <div class="glass-panel p-md text-center" style="border-radius: 14px; {% if ach.id not in earned_achievement_ids %}opacity: 0.4; filter: grayscale(1);{% endif %}">
+            <i class="fas {{ ach.icon }} text-lg mb-xs" style="color: {% if ach.id in earned_achievement_ids %}#fbbf24{% else %}var(--text-muted){% endif %};"></i>
+            <div class="text-xs text-semibold">{{ ach|ach_name }}</div>
         </div>
         {% endif %}
+        {% empty %}
+        <div class="text-muted text-sm">{% trans "Hali yutuqlar yo'q" %}</div>
         {% endfor %}
-        <a href="{% url 'frontend:achievements' %}" class="glass-card p-lg text-center d-flex align-center justify-center text-decoration-none border-dashed" style="border: 1px dashed var(--border);">
-            <span class="text-muted">{% trans "Barcha yutuqlar" %} →</span>
+        <a href="{% url 'frontend:achievements' %}" class="glass-panel p-md text-center text-decoration-none" style="border-radius: 14px; border: 1px dashed var(--border);">
+            <span class="text-xs text-muted">{% trans "Barchasi" %} →</span>
         </a>
     </div>
 
-    <!-- Book Shelf -->
-    <h2 class="mt-2xl mb-xl">{% trans "O'qilgan kitoblar" %} 📚</h2>
-    <div class="book-shelf" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px;">
-    {% for issue in user.bookissue_set.all|dictsortreversed:"issued_at"|slice:":12" %}
+    <h3 class="mb-lg text-semibold">{% trans "O'qilgan kitoblar" %}</h3>
+    <div class="d-grid gap-sm mb-xl" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
+        {% for issue in user.bookissue_set.all|dictsortreversed:"issued_at"|slice:":12" %}
         {% if issue.is_returned %}
-        <div class="shelf-item pos-relative overflow-hidden cursor-pointer transition" style="border-radius: 10px; aspect-ratio: 3/4; background: var(--hover-bg);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div class="pos-relative overflow-hidden" style="border-radius: 10px; aspect-ratio: 3/4; background: var(--hover-bg);">
             {% if issue.book.cover %}
             <img src="{{ issue.book.cover.url }}" alt="{{ issue.book.title }}" class="w-full h-full object-cover">
             {% else %}
-            <div class="w-full h-full d-flex align-center justify-center p-sm text-center">
-                <div>
-                    <i class="fas fa-book text-2xl text-muted mb-xs"></i>
-                    <div class="text-xs text-muted">{{ issue.book.title|truncatechars:30 }}</div>
-                </div>
+            <div class="w-full h-full d-flex align-center justify-center">
+                <i class="fas fa-book text-xl text-muted" style="opacity: 0.3;"></i>
             </div>
             {% endif %}
-            <div class="pos-absolute bottom-0 left-0 right-0 p-sm" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
-                <div class="text-white text-xs text-semibold">{{ issue.book.title|truncatechars:25 }}</div>
+            <div class="pos-absolute bottom-0 left-0 right-0 p-xs" style="background: linear-gradient(transparent, rgba(0,0,0,0.7));">
+                <div class="text-white text-xs text-semibold text-truncate">{{ issue.book.title }}</div>
             </div>
         </div>
         {% endif %}
         {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
+        <div class="text-muted text-sm" style="grid-column: 1 / -1;">{% trans "Hali kitob o'qilmagan" %}</div>
         {% endfor %}
     </div>
 
-    <!-- Actions -->
-    <div class="mt-3xl d-flex gap-lg justify-center flex-wrap">
-        <a href="{% url 'frontend:profile_edit' %}" class="btn-primary text-decoration-none flex-1" style="padding: 12px 30px; max-width: 250px;">
-            <i class="fas fa-user-edit mr-sm"></i> {% trans "Ma'lumotlarni tahrirlash" %}
+    <div class="d-flex gap-md justify-center flex-wrap">
+        <a href="{% url 'frontend:profile_edit' %}" class="btn-primary text-decoration-none" style="padding: 10px 24px; border-radius: 12px; border: none;">
+            {% trans "Tahrirlash" %}
         </a>
-        <a href="{% url 'frontend:change_password' %}" class="glass-card text-decoration-none flex-1 d-flex align-center justify-center border rounded-lg transition" style="padding: 12px 30px; max-width: 250px;" onmouseover="this.style.background='rgba(255,255,255,0.05)';" onmouseout="this.style.background='transparent';">
-            <i class="fas fa-key mr-sm text-primary"></i> {% trans "Parolni o'zgartirish" %}
+        <a href="{% url 'frontend:change_password' %}" class="text-decoration-none text-muted" style="padding: 10px 24px; border-radius: 12px; border: 1px solid var(--border);">
+            {% trans "Parolni o'zgartirish" %}
         </a>
     </div>
 </div>
 
 <script src="{% static 'js/chart.umd.min.js' %}"></script>
 <script>
-function initProfileCharts() {
+(function() {
     var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-    var txtColor = isDark ? '#fef3c7' : '#000';
-    var gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.2)';
-    var font = { size: 12, weight: '600', family: 'Inter,system-ui,sans-serif' };
-    var bar1 = isDark ? 'rgba(99, 102, 241, 0.5)' : 'rgba(79, 70, 229, 0.7)';
-    var bar1b = isDark ? '#6366f1' : '#4f46e5';
-    var pieColors = isDark
-        ? ['#818cf8','#c084fc','#f472b6','#fb923c','#34d399','#22d3ee','#facc15','#f87171']
-        : ['#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#ca8a04','#dc2626'];
+    var txtColor = isDark ? '#fef3c7' : '#1f2937';
+    var gridC = isDark ? 'rgba(217,119,6,0.12)' : 'rgba(217,119,6,0.15)';
+    var font = { size: 11, weight: '500', family: 'Inter,system-ui,sans-serif' };
+    var barColor = isDark ? 'rgba(99, 102, 241, 0.6)' : 'rgba(79, 70, 229, 0.7)';
+    var barBorder = isDark ? '#818cf8' : '#6366f1';
 
-    document.getElementById('noBooksChart').style.display = 'none';
-    document.getElementById('noCatChart').style.display = 'none';
+    var monthlyData = {{ monthly_data|escapejs }};
+    var hasBooks = monthlyData.some(function(v) { return v > 0; });
 
-    // Books by Month Chart
-    var monthsCtx = document.getElementById('booksByMonth');
-    if (monthsCtx) {
-        var monthlyData = {{ monthly_data|escapejs }};
-        var hasBooks = monthlyData.some(function(v) { return v > 0; });
-        if (hasBooks) {
-            window._chartInstances.push(new Chart(monthsCtx, {
-                type: 'bar',
-                data: {
-                    labels: {{ monthly_labels|escapejs }},
-                    datasets: [{
-                        label: '{% trans "Kitoblar" %}',
-                        data: monthlyData,
-                        backgroundColor: bar1,
-                        borderColor: bar1b,
-                        borderWidth: 2,
-                        borderRadius: 6,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: gridC }, ticks: { color: txtColor, stepSize: 1, font: font } },
-                        x: { grid: { display: false }, ticks: { color: txtColor, font: font } }
-                    }
+    if (hasBooks) {
+        document.getElementById('noBooksChart').style.display = 'none';
+        window._chartInstances = window._chartInstances || [];
+        window._chartInstances.push(new Chart(document.getElementById('booksByMonth'), {
+            type: 'bar',
+            data: {
+                labels: {{ monthly_labels|escapejs }},
+                datasets: [{
+                    data: monthlyData,
+                    backgroundColor: barColor,
+                    borderColor: barBorder,
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: gridC }, ticks: { color: txtColor, stepSize: 1, font: font } },
+                    x: { grid: { display: false }, ticks: { color: txtColor, font: font } }
                 }
-            }));
-        } else {
-            document.getElementById('noBooksChart').style.display = 'block';
-        }
+            }
+        }));
+    } else {
+        document.getElementById('noBooksChart').style.display = 'block';
+        document.getElementById('booksByMonth').style.display = 'none';
     }
 
-    // Category Pie Chart
-    var catCtx = document.getElementById('categoryPie');
-    if (catCtx) {
-        var catLabels = {{ cat_labels|escapejs }};
-        var catData = {{ cat_data|escapejs }};
-        if (catLabels.length > 0) {
-            window._chartInstances.push(new Chart(catCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: catLabels,
-                    datasets: [{
-                        data: catData,
-                        backgroundColor: pieColors.slice(0, catData.length),
-                        borderWidth: 0,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: txtColor, padding: 14, font: font, boxWidth: 14, usePointStyle: true } } }
-                }
-            }));
-        } else {
-            document.getElementById('noCatChart').style.display = 'block';
-        }
-    }
-
-    // Animate XP bar
     setTimeout(function() {
         var bar = document.getElementById('xpBar');
         if (bar) bar.style.width = '{{ xp_percent }}%';
-    }, 500);
-}
-function initPage() { initProfileCharts(); }
-document.addEventListener('DOMContentLoaded', initProfileCharts);
-document.addEventListener('themechange', function() {
-    while(window._chartInstances.length) window._chartInstances.pop().destroy();
-    initProfileCharts();
-});
+    }, 300);
+})();
 </script>
 {% endblock %}
