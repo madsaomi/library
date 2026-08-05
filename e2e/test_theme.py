@@ -5,7 +5,7 @@ THEME_ICONS = ['fa-moon', 'fa-sun', 'fa-leaf', 'fa-snowflake']
 
 
 @pytest.mark.e2e
-@pytest.mark.parametrize('theme,icon', zip(THEMES, THEME_ICONS))
+@pytest.mark.parametrize('theme,icon', list(zip(THEMES, THEME_ICONS)))
 def test_theme_cycle(page, login, theme, icon):
     theme_btn = page.locator('#themeToggle')
     current = page.locator('html').get_attribute('data-theme') or 'dark'

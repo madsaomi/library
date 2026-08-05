@@ -1,4 +1,3 @@
-from datetime import date
 
 
 def month_bounds(ref_date, months_back):
@@ -15,4 +14,10 @@ def month_bounds(ref_date, months_back):
     else:
         next_year = year
         next_month = month + 1
-    return date(year, month, 1), date(next_year, next_month, 1)
+    from datetime import datetime
+
+    from django.utils import timezone
+
+    start = datetime(year, month, 1)
+    end = datetime(next_year, next_month, 1)
+    return timezone.make_aware(start), timezone.make_aware(end)

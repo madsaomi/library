@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Sinfni ko'chirish" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Sinfni ko'chirish (Mass Promote)" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="glass-panel p-3xl mw-500 mx-auto">
+        <h3 class="mb-lg"><i class="fas fa-level-up-alt text-primary"></i> {% trans "O'quvchilarni yangi sinfga o'tkazish" %}</h3>
+        <p class="text-muted text-sm mb-xl">{% trans "Ushbu amal orqali bir sinfdagi barcha o'quvchilarni boshqa sinfga o'tkazishingiz mumkin. Masalan, 1A sinfini 2A sinfiga." %}</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-md">
+                <label class="d-block mb-sm text-md text-semibold">{% trans "Qaysi sinfdan" %}</label>
+                <select name="from_grade" class="form-control w-full" required>
+                    <option value="">--- {% trans "Tanlang" %} ---</option>
+                    {% for g in grades_list %}
+                    <option value="{{ g }}">{{ g }} {% trans "sinf" %}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-xl">
+                <label class="d-block mb-sm text-md text-semibold">{% trans "Qaysi sinfga" %}</label>
+                <input type="text" name="to_grade" class="form-control w-full" placeholder="Masalan: 2A" required>
+            </div>
+            
+            <div class="d-flex gap-md">
+                <button type="submit" class="btn-primary py-sm px-xl rounded-md flex-1">
+                    <i class="fas fa-check"></i> {% trans "O'tkazish" %}
+                </button>
+                <a href="{% url 'frontend:students_list' %}" class="glass-card py-sm px-xl rounded-md text-decoration-none text-center flex-1">
+                    {% trans "Bekor qilish" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -103,28 +103,10 @@ class BookForm(forms.ModelForm):
 
 class StudentForm(forms.ModelForm):
     GRADE_NUMBERS = [(str(i), str(i)) for i in range(1, 12)]
-    GRADE_LETTERS = [
-        ('A', 'A'),
-        ('B', 'B'),
-        ('V', 'V'),
-        ('G', 'G'),
-        ('D', 'D'),
-        ('E', 'E'),
-        ('F', 'F'),
-        ('I', 'I'),
-        ('J', 'J'),
-        ('K', 'K'),
-        ('L', 'L'),
-        ('M', 'M'),
-        ('N', 'N'),
-        ('O', 'O'),
-        ('P', 'P'),
-        ('R', 'R'),
-        ('S', 'S'),
-        ('T', 'T'),
-        ('U', 'U'),
-        ('X', 'X'),
-    ]
+
+    import string
+
+    GRADE_LETTERS = [(char, char) for char in string.ascii_uppercase]
 
     grade_number = forms.ChoiceField(
         choices=GRADE_NUMBERS, label=_('Sinf'), widget=forms.Select(attrs={'class': 'form-control'})

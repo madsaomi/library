@@ -354,4 +354,11 @@ ews_list: added early guard for
   minimal styling, removed `btn-danger`, `badge bg-success`, bold colored icons.
 - **Verified**: 169 unit tests + 17 e2e PASS; all student pages render 200; ruff clean.
 
+## Session: dynamic backgrounds & glassmorphism polish for auth and error pages (2026-08-05)
+- **Dynamic background system** (`static/css/style.css`): `.auth-bg-layer`, `.error-bg-layer`, `.bg-orb` (`bg-orb-1`, `bg-orb-2`, `bg-orb-3`), `.dynamic-canvas`, `.error-watermark`, `.auth-card-premium`, `.error-card-premium`. Keyframe animations for floating orbs, mesh pulse, and icon badges. Fully theme-aware (`dark`, `light`, `autumn`, `winter`).
+- **Auth pages** (`login.html`, `password_reset.html`, `password_reset_confirm.html`, `password_reset_done.html`, `password_reset_complete.html`): interactive Canvas particle system, glowing gradient background orbs, glassmorphic card, input icon indicators, smooth theme & language controls.
+- **Error pages** (`404.html`, `500.html`, `403.html`, `400.html`, `403_csrf.html`, `axes_lockout.html`): customized background orb colors, watermark text ("404", "500", "403", "CSRF", "400", "LOCKED"), error icon badges, particle background, theme switch button.
+- **Verified**: `python manage.py collectstatic --noinput` (691 static files post-processed), `python -m pytest -q -n auto --tb=short` (169 passed in ~35s), `python -m ruff check .` (clean).
+
+
 

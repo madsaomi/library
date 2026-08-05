@@ -9,41 +9,40 @@
     <title>404 - {% trans "Sahifa topilmadi" %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-dark, #121212);
-        }
-        .error-container {
-            max-width: 500px;
-            width: 90%;
-            margin: 0 auto;
-            text-align: center;
-        }
-    </style>
 </head>
-<body>
-    <button class="pos-fixed bg-hover border text-muted rounded-md cursor-pointer d-flex flex-center transition" onclick="cycleTheme()" style="top: 20px; right: 20px; z-index: 999; width: 45px; height: 45px; backdrop-filter: blur(10px);">
-        <i id="themeIcon" class="fas fa-moon"></i>
-    </button>
-    <div class="error-container">
-        <div class="glass-panel animate-fade p-3xl">
-            <i class="fas fa-search d-block mx-auto mb-2xl" style="font-size: 5rem; color: var(--primary); opacity: 0.5;"></i>
-            <h2 class="mb-xl">{% trans "Afsuski, bunday sahifa mavjud emas" %}</h2>
-            <p class="text-muted mb-2xl lh-normal">
+<body class="overflow-hidden">
+    <div class="error-viewport">
+        <!-- Dynamic Background Layers -->
+        <div class="error-bg-layer"></div>
+        <div class="bg-orb bg-orb-1"></div>
+        <div class="bg-orb bg-orb-2"></div>
+        <div class="error-overlay"></div>
+        <div class="error-watermark">404</div>
+        <canvas id="errorCanvas" class="dynamic-canvas"></canvas>
+
+        <!-- Theme Toggle Button -->
+        <button class="pos-fixed bg-hover border text-muted rounded-md cursor-pointer d-flex flex-center transition shadow-sm" onclick="cycleTheme()" style="top: 20px; right: 20px; z-index: 999; width: 45px; height: 45px; backdrop-filter: blur(14px); border-radius: 14px;">
+            <i id="themeIcon" class="fas fa-moon"></i>
+        </button>
+
+        <!-- Error Card -->
+        <div class="error-card-premium text-center">
+            <div class="error-icon-badge">
+                <i class="fas fa-search-location text-primary"></i>
+            </div>
+            <h1 class="gradient-text text-3xl mb-md">404</h1>
+            <h2 class="text-xl mb-md font-weight-bold">{% trans "Afsuski, bunday sahifa mavjud emas" %}</h2>
+            <p class="text-muted text-sm mb-2xl lh-normal">
                 {% trans "Siz qidirayotgan sahifa o'chirilgan, nomi o'zgartirilgan yoki vaqtincha mavjud emas bo'lishi mumkin." %}
             </p>
-            <a href="/" class="btn-primary text-decoration-none d-inline-block" style="padding: 15px 40px;">
+            <a href="/" class="btn-primary text-decoration-none d-inline-flex align-center gap-2 py-md px-2xl font-weight-bold shadow-sm" style="border-radius: 12px;">
                 <i class="fas fa-home"></i> {% trans "Bosh sahifaga qaytish" %}
             </a>
         </div>
     </div>
+
+    <!-- Theme & Background Logic -->
     <script>
-        // Theme cycling: dark -> light -> autumn -> winter -> dark
         function cycleTheme() {
             const html = document.documentElement;
             const current = html.getAttribute('data-theme') || 'dark';
@@ -63,7 +62,6 @@
             icon.className = 'fas ' + (icons[theme] || 'fa-moon');
         }
 
-        // Apply saved theme on load
         (function() {
             const saved = localStorage.getItem('theme');
             const themes = ['dark', 'light', 'autumn', 'winter'];
@@ -75,6 +73,57 @@
             }
             updateThemeIcon();
         })();
+
+        /* Floating background particles */
+        (function() {
+            const canvas = document.getElementById('errorCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width, height, particles = [];
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            function getThemeColor() {
+                const style = getComputedStyle(document.documentElement);
+                return style.getPropertyValue('--primary').trim() || '#6366f1';
+            }
+
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 3 + 1,
+                    speedY: -Math.random() * 0.5 - 0.2,
+                    speedX: (Math.random() - 0.5) * 0.3,
+                    opacity: Math.random() * 0.5 + 0.1
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                const color = getThemeColor();
+                particles.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += p.speedX;
+                    if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
+                    if (p.x < 0 || p.x > width) p.speedX *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.globalAlpha = p.opacity;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
     </script>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block title %}{{ title }} | {% trans "Online Kutibxona" %}{% endblock %}
@@ -15,14 +15,14 @@
             {% csrf_token %}
             <div class="mb-xl">
                 <label class="d-block mb-sm text-md text-semibold">
-                    {% trans "CSV fayl" %}
+                    {% trans "Fayl (Excel yoki CSV)" %}
                 </label>
-                <input type="file" name="csv_file" accept=".csv" required
-                       class="w-full border rounded text-md"
-                       style="padding: 10px; background: var(--input-bg); color: var(--input-text);">
-                <div class="text-xs text-muted mt-xs">
-                    {% trans "Faqat .csv fayl yuklang" %}
+                <div class="border-dashed rounded p-2xl text-center cursor-pointer" style="border-width: 2px; border-color: var(--primary);" onclick="document.getElementById('file-input').click()">
+                    <i class="fas fa-cloud-upload-alt text-primary mb-sm" style="font-size: 2.5rem;"></i>
+                    <h4 class="text-md mb-xs">Faylni shu yerga tashlang yoki tanlang</h4>
+                    <p class="text-sm text-muted">.xlsx yoki .csv formatida</p>
                 </div>
+                <input type="file" id="file-input" name="csv_file" accept=".csv,.xlsx" required class="d-none">
             </div>
             <button type="submit" class="glass-card d-flex align-center gap-sm border-none rounded bg-primary text-white text-md cursor-pointer" style="padding: 10px 24px;">
                 <i class="fas fa-upload"></i> {% trans "Import qilish" %}
@@ -32,6 +32,11 @@
     </div>
 </div>
 <script>
+document.getElementById('file-input').addEventListener('change', function(e) {
+    var fileName = e.target.files[0] ? e.target.files[0].name : 'Faylni shu yerga tashlang yoki tanlang';
+    this.previousElementSibling.querySelector('h4').textContent = fileName;
+});
+
 document.getElementById('csv-import-form').addEventListener('submit', function(e) {
     e.preventDefault();
     var form = this;

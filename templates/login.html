@@ -9,61 +9,6 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-            position: relative;
-            overflow: hidden;
-            padding: 20px;
-        }
-
-        .auth-bg {
-            position: absolute;
-            width: 120%;
-            height: 120%;
-            top: -10%;
-            left: -10%;
-            background: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
-            filter: brightness(0.4) saturate(1.2);
-            animation: ken-burns 60s infinite alternate linear;
-            z-index: 1;
-        }
-
-        @keyframes ken-burns {
-            0% { transform: scale(1) translate(0, 0); }
-            100% { transform: scale(1.2) translate(2%, -2%); }
-        }
-
-        .auth-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, transparent 0%, #000 100%);
-            z-index: 2;
-        }
-
-        .auth-card {
-            width: 100%;
-            max-width: 450px;
-            padding: 50px;
-            position: relative;
-            z-index: 10;
-            border-radius: 24px;
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .error-banner {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.2);
@@ -97,19 +42,30 @@
 </head>
 <body>
     <div class="auth-container">
-        <div class="auth-bg"></div>
+        <!-- Dynamic Background Layers -->
+        <div class="auth-bg-layer"></div>
+        <div class="bg-orb bg-orb-1"></div>
+        <div class="bg-orb bg-orb-2"></div>
+        <div class="bg-orb bg-orb-3"></div>
         <div class="auth-overlay"></div>
+        <canvas id="authCanvas" class="dynamic-canvas"></canvas>
 
-        <div class="auth-card">
+        <!-- Theme Toggle Button -->
+        <button onclick="cycleTheme()" class="pos-fixed bg-hover border text-muted rounded-md cursor-pointer d-flex flex-center transition shadow-sm" style="top: 20px; left: 20px; z-index: 999; width: 45px; height: 45px; backdrop-filter: blur(14px); border-radius: 14px;">
+            <i id="themeIcon" class="fas fa-moon"></i>
+        </button>
+
+        <!-- Auth Card -->
+        <div class="auth-card-premium">
             <!-- Language Selector for Login Page -->
-            <div class="pos-absolute" style="top: 15px; right: 15px; z-index: 100;">
+            <div class="pos-absolute" style="top: 18px; right: 18px; z-index: 100;">
                 <div class="language-selector-login pos-relative d-inline-block">
-                    <button type="button" onclick="toggleLangDropdown()" class="bg-hover border rounded-md cursor-pointer d-flex align-center text-main transition-fast" style="padding: 8px 12px; gap: 8px; font-size: 0.8rem;">
-                        <i class="fas fa-globe"></i>
+                    <button type="button" onclick="toggleLangDropdown()" class="bg-hover border rounded-md cursor-pointer d-flex align-center text-main transition-fast" style="padding: 8px 14px; gap: 8px; font-size: 0.8rem; border-radius: 10px; backdrop-filter: blur(10px);">
+                        <i class="fas fa-globe text-primary"></i>
                         {% get_current_language as LANGUAGE_CODE %}
-                        <span class="text-uppercase">{{ LANGUAGE_CODE }}</span>
+                        <span class="text-uppercase font-weight-bold">{{ LANGUAGE_CODE }}</span>
                     </button>
-                    <div id="login-lang-dropdown" class="d-none pos-absolute shadow-sm rounded-lg" style="top: 100%; right: 0; margin-top: 5px; background: var(--dropdown-bg); backdrop-filter: blur(10px); padding: 5px; min-width: 120px;">
+                    <div id="login-lang-dropdown" class="d-none pos-absolute shadow-md rounded-lg" style="top: 100%; right: 0; margin-top: 6px; background: var(--dropdown-bg); backdrop-filter: blur(16px); border: 1px solid var(--border); padding: 6px; min-width: 130px; border-radius: 12px;">
                         {% get_available_languages as LANGUAGES %}
                         {% get_language_info_list for LANGUAGES as languages %}
                         {% for language in languages %}
@@ -128,46 +84,52 @@
                 </form>
             </div>
 
-            <button onclick="cycleTheme()" class="pos-fixed bg-hover border text-muted rounded-md cursor-pointer d-flex flex-center transition" style="top: 20px; left: 20px; z-index: 999; width: 45px; height: 45px; backdrop-filter: blur(10px);">
-                <i id="themeIcon" class="fas fa-moon"></i>
-            </button>
-
-            <div class="text-center mb-2xl">
-                <h1 class="gradient-text text-3xl mb-sm">{% trans "Xush kelibsiz" %}</h1>
-                <p class="text-muted">{% trans "Online kutibxonaga kirish" %}</p>
+            <div class="text-center mb-2xl pt-xs">
+                <div class="d-inline-flex flex-center rounded-xl mb-md p-sm" style="width: 56px; height: 56px; background: var(--glass-strong); border: 1px solid var(--border);">
+                    <i class="fas fa-book-reader text-primary" style="font-size: 1.8rem;"></i>
+                </div>
+                <h1 class="gradient-text text-3xl mb-xs">{% trans "Xush kelibsiz" %}</h1>
+                <p class="text-muted text-sm">{% trans "Online kutibxonaga kirish" %}</p>
             </div>
 
             {% if error %}
             <div class="error-banner">
-                <i class="fas fa-exclamation-circle"></i> {{ error }}
+                <i class="fas fa-exclamation-circle mr-xs"></i> {{ error }}
             </div>
             {% endif %}
 
             <form method="post" action="{% url 'login' %}">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="username">{% trans "Login" %}</label>
-                    <input type="text" name="username" id="username" class="form-control" required>
+                <div class="form-group mb-lg">
+                    <label for="username" class="text-muted text-sm mb-xs d-block">{% trans "Login" %}</label>
+                    <div class="pos-relative">
+                        <input type="text" name="username" id="username" class="form-control" placeholder="{% trans "Foydalanuvchi nomi" %}" required style="padding-left: 42px;">
+                        <i class="fas fa-user pos-absolute text-muted" style="left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.6;"></i>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="password">{% trans "Parol" %}</label>
-                    <input type="password" name="password" id="password" class="form-control" required>
+                <div class="form-group mb-xl">
+                    <label for="password" class="text-muted text-sm mb-xs d-block">{% trans "Parol" %}</label>
+                    <div class="pos-relative">
+                        <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required style="padding-left: 42px;">
+                        <i class="fas fa-lock pos-absolute text-muted" style="left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.6;"></i>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn-primary w-full mt-md">
+                <button type="submit" class="btn-primary w-full py-md font-weight-bold transition shadow-sm" style="font-size: 1rem; border-radius: 12px;">
                     {% trans "Kirish" %} <i class="fas fa-arrow-right ml-xs"></i>
                 </button>
-                <div class="text-center mt-lg">
-                    <a href="{% url 'password_reset' %}" class="text-primary text-sm text-decoration-none transition-fast" style="opacity: 0.7;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.7'">
+                <div class="text-center mt-xl">
+                    <a href="{% url 'password_reset' %}" class="text-primary text-sm text-decoration-none transition-fast d-inline-flex align-center gap-2" style="opacity: 0.8;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.8'">
                         <i class="fas fa-key"></i> {% trans "Parolni unutdingizmi?" %}
                     </a>
                 </div>
             </form>
         </div>
     </div>
+
+    <!-- Theme & Background Canvas Logic -->
     <script>
-        // Theme cycling: dark -> light -> autumn -> winter -> dark
         function cycleTheme() {
             const html = document.documentElement;
             const current = html.getAttribute('data-theme') || 'dark';
@@ -177,6 +139,7 @@
             html.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
             updateThemeIcon();
+            if (window.initAuthCanvas) window.initAuthCanvas();
         }
 
         function updateThemeIcon() {
@@ -187,7 +150,6 @@
             icon.className = 'fas ' + (icons[theme] || 'fa-moon');
         }
 
-        // Apply saved theme on load
         (function() {
             const saved = localStorage.getItem('theme');
             const themes = ['dark', 'light', 'autumn', 'winter'];
@@ -202,7 +164,7 @@
 
         function toggleLangDropdown() {
             const dropdown = document.getElementById('login-lang-dropdown');
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            if (dropdown) dropdown.classList.toggle('d-none');
         }
 
         function changeLanguage(code) {
@@ -210,13 +172,93 @@
             document.getElementById('lang-form').submit();
         }
 
-        // Close dropdown when clicking outside
         window.onclick = function(event) {
             if (!event.target.closest('.language-selector-login')) {
                 const dropdown = document.getElementById('login-lang-dropdown');
-                if (dropdown) dropdown.style.display = 'none';
+                if (dropdown && !dropdown.classList.contains('d-none')) {
+                    dropdown.classList.add('d-none');
+                }
             }
-        }
+        };
+
+        /* Dynamic Particle Node Background */
+        (function() {
+            const canvas = document.getElementById('authCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width, height, particles = [];
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            function getThemeColor() {
+                const style = getComputedStyle(document.documentElement);
+                return style.getPropertyValue('--primary').trim() || '#6366f1';
+            }
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.4;
+                    this.vy = (Math.random() - 0.5) * 0.4;
+                    this.radius = Math.random() * 2 + 1;
+                    this.alpha = Math.random() * 0.4 + 0.1;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > width) this.vx *= -1;
+                    if (this.y < 0 || this.y > height) this.vy *= -1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = getThemeColor();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fill();
+                }
+            }
+
+            const count = Math.min(Math.floor((width * height) / 18000), 50);
+            particles = Array.from({ length: count }, () => new Particle());
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                const color = getThemeColor();
+
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = color;
+                            ctx.globalAlpha = (1 - dist / 120) * 0.15;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+            window.initAuthCanvas = () => {};
+        })();
     </script>
 </body>
 </html>
+

@@ -19,27 +19,23 @@ def download_credentials(request):
 
     # Only allow a superuser, or the school admin of the same school, to download
     if not (
-        request.user.is_superuser
-        or (
-            request.user.role == 'school_admin'
-            and user.school_id == request.user.school_id
-        )
+        request.user.is_superuser or (request.user.role == 'school_admin' and user.school_id == request.user.school_id)
     ):
-        return HttpResponseForbidden(_("Ruxsat berilmagan."))
+        return HttpResponseForbidden(_('Ruxsat berilmagan.'))
 
     password = user.raw_password or ''
     full_name = user.get_full_name() or user.username
 
     content = (
-        f"Login: {user.username}\n"
-        f"Password: {password}\n"
-        f"Full Name: {full_name}\n"
-        f"Generated: {timezone.now().strftime('%Y-%m-%d %H:%M')}\n"
-        f"Application: Online Kutibxona\n"
+        f'Login: {user.username}\n'
+        f'Password: {password}\n'
+        f'Full Name: {full_name}\n'
+        f'Generated: {timezone.now().strftime("%Y-%m-%d %H:%M")}\n'
+        f'Application: Online Kutibxona\n'
     )
 
     safe_label = ''.join(c if c.isalnum() or c in ('_', '-') else '_' for c in label)
-    filename = f"credentials_{safe_label.lower()}_{timezone.now().strftime('%Y%m%d')}.txt"
+    filename = f'credentials_{safe_label.lower()}_{timezone.now().strftime("%Y%m%d")}.txt'
     response = HttpResponse(content, content_type='text/plain; charset=utf-8')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response

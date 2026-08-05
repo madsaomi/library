@@ -819,9 +819,7 @@ def school_add(request):
             ActionLog.objects.create(
                 user=request.user,
                 action_type='CREATE',
-                message=_('Yangi maktab ({}) va uning admini ({}) yaratildi.').format(
-                    school.name, admin_user.username
-                ),
+                message=_('Yangi maktab ({}) va uning admini ({}) yaratildi.').format(school.name, admin_user.username),
             )
             messages.success(request, _('Maktab va admin yaratildi!'))
 
@@ -958,16 +956,16 @@ def school_toggle_active(request, pk):
         from django.contrib import messages
 
         if school.is_active:
-            messages.success(request, _("Maktab faollashtirildi: {}").format(school.name))
+            messages.success(request, _('Maktab faollashtirildi: {}').format(school.name))
         else:
-            messages.warning(request, _("Maktab bloklandi: {}").format(school.name))
+            messages.warning(request, _('Maktab bloklandi: {}').format(school.name))
 
         from stats.models import ActionLog
 
         ActionLog.objects.create(
             user=request.user,
             action_type='UPDATE',
-            message=_('Maktab holati o\'zgartirildi: {} → {}').format(
+            message=_("Maktab holati o'zgartirildi: {} → {}").format(
                 school.name, _('faol') if school.is_active else _('bloklangan')
             ),
         )
@@ -987,7 +985,7 @@ def school_reset_admin_password(request, pk):
     if not admin:
         from django.contrib import messages
 
-        messages.error(request, _("Bu maktabda admin topilmadi."))
+        messages.error(request, _('Bu maktabda admin topilmadi.'))
         return redirect('frontend:school_detail', pk=school.pk)
 
     alphabet = string.ascii_letters + string.digits
@@ -1000,7 +998,7 @@ def school_reset_admin_password(request, pk):
 
     messages.success(
         request,
-        _("Yangi parol: {password} (maktab adminiga yetkazing)").format(password=new_password),
+        _('Yangi parol: {password} (maktab adminiga yetkazing)').format(password=new_password),
     )
     return redirect('frontend:school_detail', pk=school.pk)
 
@@ -1017,7 +1015,7 @@ def school_duplicate(request, pk):
     if request.method == 'POST':
         new_name = request.POST.get('name', '').strip()
         if not new_name:
-            new_name = f"{school.name} — nusxa"
+            new_name = f'{school.name} — nusxa'
 
         import re
 
@@ -1051,7 +1049,7 @@ def school_duplicate(request, pk):
 
         messages.success(
             request,
-            _("Maktab nusxasi yaratildi: {name}. Admin: {login} / {password}").format(
+            _('Maktab nusxasi yaratildi: {name}. Admin: {login} / {password}').format(
                 name=new_school.name, login=admin_username, password=admin_password
             ),
         )
@@ -1073,7 +1071,7 @@ def schools_export_csv(request):
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['ID', 'Nomi', 'Tuman', 'Manzil', 'Kontakt', 'Admin', 'O\'quvchilar', 'Kitoblar', 'Holat'])
+    writer.writerow(['ID', 'Nomi', 'Tuman', 'Manzil', 'Kontakt', 'Admin', "O'quvchilar", 'Kitoblar', 'Holat'])
 
     for school in School.objects.select_related('district').annotate(
         student_count=Count('customuser', filter=Q(customuser__role='student')),
@@ -1143,7 +1141,8 @@ def admin_add(request):
             messages.success(request, 'Admin yaratildi!')
 
             return render(
-                request, 'frontend/admin/admin_created.html',
+                request,
+                'frontend/admin/admin_created.html',
                 {'admin': admin, 'password': admin_password},
             )
     else:
@@ -1329,7 +1328,7 @@ def admin_health(request):
     except Exception:
         pass
     try:
-        cache.set('_ health_check', 'ok', 5)
+        cache.set('_health_check', 'ok', 5)
         health['cache'] = True
     except Exception:
         pass

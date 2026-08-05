@@ -1,106 +1,56 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{{ title }} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}{{ title }}{% endblock %}
+{% block title %}{% trans "Ko'p kitob qo'shish" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Ko'p kitob qo'shish" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/school/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="mw-500 mx-auto">
-    <div class="glass-panel animate-fade p-3xl">
-        <form method="post" enctype="multipart/form-data" id="book-form">
-            {% csrf_token %}
+<div style="max-width: 900px; margin: 0 auto;">
 
-            <div class="d-flex flex-column gap-xl">
-                {% for field in form %}
-                <div>
-                    <label class="d-block mb-xs text-medium text-sm text-muted">
-                        {{ field.label }}
-                    </label>
-
-                    {% if field.name == 'cover' %}
-                    <div>
-                        <div class="d-flex gap-sm align-center">
-                            <div class="pos-relative overflow-hidden">
-                                <div id="fake-upload-btn" class="d-flex align-center gap-sm cursor-pointer border rounded-md text-sm" style="padding: 10px 18px; background: var(--input-bg);">
-                                    <i class="fas fa-upload text-primary"></i>
-                                    <span id="file-name-label">{% trans "Rasm tanlash" %}</span>
-                                </div>
-                                <input type="file" name="cover" accept="image/*" id="id_cover"
-                                       class="pos-absolute top-0 left-0 w-full h-full cursor-pointer"
-                                       style="opacity: 0;"
-                                       onchange="handleFileChange(this)">
-                            </div>
-                            {% if field.value %}
-<button type="button" onclick="showDeleteModal()" aria-label="O'chirish" class="bg-danger d-flex align-center justify-center rounded-md text-danger cursor-pointer" style="width: 38px; height: 38px; border: 1px solid rgba(239,68,68,0.2);">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                            <div class="d-none">
-                                <input type="checkbox" name="cover-clear" id="cover-clear_id">
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% if field.value %}
-                        <div id="current-cover-status" class="mt-sm text-sm d-flex align-center" style="color: var(--accent); gap: 6px;">
-                            <i class="fas fa-check-circle"></i> {% trans "Hozirda oblozhka mavjud" %}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    {% elif field.name == 'total_count' or field.name == 'available_count' %}
-                    <div class="d-flex gap-md">
-                        <input type="number" name="{{ field.name }}" id="id_{{ field.name }}"
-                               value="{{ field.value|default:'' }}"
-                               min="0"
-                               class="form-control border rounded-md"
-                               style="width: 100%; padding: 10px 14px; background: var(--input-bg); color: var(--input-text); outline: none; font-size: 0.85rem;">
-                    </div>
-
-                    {% else %}
-                    <div>
-                        {{ field }}
-                    </div>
-                    {% endif %}
-
-                    {% if field.errors %}
-                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                {% endfor %}
+    <!-- Counter header -->
+    <div class="glass-panel animate-fade mb-xl" style="padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-book" style="color: #fff; font-size: 1.1rem;"></i>
             </div>
-
-            <div class="mt-2xl d-flex gap-md">
-                <button type="submit" class="btn-primary text-md rounded-md" style="flex: 2; padding: 10px 0;">
-                    <i class="fas fa-save"></i> {% trans "Saqlash" %}
-                </button>
-                <a href="{% url 'frontend:school_books_list' %}" class="glass-card flex-1 rounded-md text-center text-decoration-none d-flex align-center justify-center border text-md" style="padding: 10px 0; gap: 6px;">
-                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
-                </a>
+            <div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">{% trans "Jami kitobling" %}</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary); line-height: 1;" id="book-counter">0</div>
             </div>
-        </form>
+        </div>
+        <button type="button" onclick="addBookCard()" class="btn-primary" style="padding: 10px 24px; border-radius: 10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-plus"></i> {% trans "Yangi kitob qo'shish" %}
+        </button>
     </div>
-</div>
 
-<!-- Delete Cover Modal -->
-<div id="confirm-modal" class="modal-overlay pos-fixed inset-0 z-9999 d-none" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); align-items: center; justify-content: center;">
-    <div class="rounded-3xl text-center" style="background: #1f2937; border: 1px solid rgba(255,255,255,0.1); max-width: 320px; padding: 28px;">
-        <div class="bg-danger text-danger rounded-full d-flex align-center justify-center mx-auto mb-md" style="width: 44px; height: 44px;">
-            <i class="fas fa-trash-alt"></i>
+    <form method="post" enctype="multipart/form-data" id="bulk-book-form">
+        {% csrf_token %}
+        <div id="books-container">
+            <!-- Cards added by JS -->
         </div>
-        <h4 class="mb-xs text-lg">{% trans "O'chirishni tasdiqlang" %}</h4>
-        <p class="text-sm mb-xl" style="color: #9ca3af;">{% trans "Oblozhkani o'chirib tashlamoqchimisiz?" %}</p>
-        <div class="d-flex gap-sm">
-            <button type="button" onclick="hideDeleteModal()" class="glass-card flex-1 rounded-md cursor-pointer text-sm" style="padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);">
-                {% trans "Bekor" %}
+
+        <div class="mt-2xl d-flex gap-md" id="form-footer" style="display: none !important;">
+            <button type="submit" class="btn-primary text-md rounded-md px-2xl">
+                <i class="fas fa-save"></i> {% trans "Barchasini Saqlash" %}
             </button>
-            <button type="button" onclick="performDelete()" class="flex-1 rounded-md border-none text-sm text-semibold cursor-pointer text-white" style="padding: 10px; background: #ef4444;">
-                {% trans "O'chirish" %}
-            </button>
+            <a href="{% url 'frontend:school_books_list' %}" class="btn btn-outline-secondary px-2xl d-flex align-center">
+                {% trans "Bekor qilish" %}
+            </a>
         </div>
-    </div>
+
+        <div class="mt-2xl d-flex gap-md" id="form-footer-visible">
+            <button type="submit" class="btn-primary text-md rounded-md px-2xl" id="save-all-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+                <i class="fas fa-save"></i> {% trans "Barchasini Saqlash" %}
+            </button>
+            <a href="{% url 'frontend:school_books_list' %}" class="btn btn-outline-secondary px-2xl d-flex align-center">
+                {% trans "Bekor qilish" %}
+            </a>
+        </div>
+    </form>
 </div>
 
 <datalist id="category-list">
@@ -116,71 +66,289 @@
 </datalist>
 
 <style>
-    .form-control { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--input-text); outline: none; font-size: 0.85rem; transition: 0.3s; box-sizing: border-box; }
-    .form-control:focus { border-color: var(--primary); }
-    .form-control[type="file"] { padding: 8px; }
-    #fake-upload-btn:hover { background: var(--hover-bg); }
-    .modal-overlay { animation: fadeIn 0.2s ease forwards; }
-    .modal-overlay.closing { animation: fadeOut 0.2s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    .book-card {
+        background: var(--glass-bg, rgba(255,255,255,0.05));
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        margin-bottom: 16px;
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+    }
+    .book-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .book-card-header {
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        background: var(--card-header-bg, rgba(255,255,255,0.03));
+        border-bottom: 1px solid var(--border);
+        user-select: none;
+    }
+    .book-card-header:hover {
+        background: var(--hover-bg, rgba(255,255,255,0.06));
+    }
+    .book-card-body {
+        padding: 20px;
+    }
+    .book-card-body.collapsed {
+        display: none;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+    .form-row.full {
+        grid-template-columns: 1fr;
+    }
+    .form-row.three {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .form-group label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 9px 12px;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--input-text);
+        outline: none;
+        font-size: 0.9rem;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: var(--primary);
+    }
+    .textbook-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    .book-number-badge {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    .collapse-icon {
+        transition: transform 0.25s;
+    }
+    .collapse-icon.open {
+        transform: rotate(180deg);
+    }
+    .upload-area {
+        border: 2px dashed var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+    .upload-area:hover {
+        border-color: var(--primary);
+        background: rgba(99,102,241,0.04);
+    }
+    .upload-area input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+    .upload-area .file-name {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
 </style>
-{% endblock %}
 
-{% block extra_scripts %}
 <script>
-    function showDeleteModal() {
-        const modal = document.getElementById('confirm-modal');
-        modal.classList.remove('closing');
-        modal.style.display = 'flex';
+let bookCount = 0;
+
+function updateCounter() {
+    const count = document.querySelectorAll('.book-card').length;
+    document.getElementById('book-counter').innerText = count;
+    const saveBtn = document.getElementById('save-all-btn');
+    if (count > 0) {
+        saveBtn.disabled = false;
+        saveBtn.style.opacity = '1';
+        saveBtn.style.cursor = 'pointer';
+    } else {
+        saveBtn.disabled = true;
+        saveBtn.style.opacity = '0.5';
+        saveBtn.style.cursor = 'not-allowed';
     }
-    function hideDeleteModal() {
-        const modal = document.getElementById('confirm-modal');
-        modal.classList.add('closing');
-        setTimeout(() => {
-            modal.style.display = 'none';
-            modal.classList.remove('closing');
-        }, 200);
+    // Update all badge numbers
+    document.querySelectorAll('.book-number-badge').forEach((badge, idx) => {
+        badge.innerText = idx + 1;
+    });
+}
+
+function toggleCard(header) {
+    const body = header.nextElementSibling;
+    const icon = header.querySelector('.collapse-icon');
+    body.classList.toggle('collapsed');
+    icon.classList.toggle('open');
+}
+
+function removeCard(btn) {
+    const card = btn.closest('.book-card');
+    card.remove();
+    updateCounter();
+}
+
+function handleFileChange(input, idx) {
+    const label = document.getElementById(`file-label-${idx}`);
+    if (input.files && input.files[0]) {
+        label.innerText = input.files[0].name;
+        label.style.color = '#10b981';
+    } else {
+        label.innerText = "{% trans 'Rasm tanlanmagan' %}";
+        label.style.color = '';
     }
-    function handleFileChange(input) {
-        if (input.files && input.files[0]) {
-            document.getElementById('file-name-label').innerText = input.files[0].name;
-            const btn = document.getElementById('fake-upload-btn');
-            btn.style.borderColor = '#10b981';
-            btn.style.background = 'rgba(16, 185, 129, 0.1)';
-            btn.querySelector('i').className = 'fas fa-check';
-            const status = document.getElementById('current-cover-status');
-            if (status) status.style.display = 'none';
-            const clearCheck = document.getElementById('cover-clear_id');
-            if (clearCheck) clearCheck.checked = false;
-        }
+}
+
+function addBookCard() {
+    bookCount++;
+    const idx = bookCount;
+    const container = document.getElementById('books-container');
+
+    const card = document.createElement('div');
+    card.className = 'book-card animate-fade';
+    card.innerHTML = `
+        <div class="book-card-header" onclick="toggleCard(this)">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="book-number-badge">${document.querySelectorAll('.book-card').length + 1}</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.95rem;" class="card-title-preview">{% trans "Yangi kitob" %}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);" class="card-author-preview"></div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button type="button" onclick="event.stopPropagation(); removeCard(this)"
+                        style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-trash" style="font-size:0.75rem;"></i>
+                </button>
+                <i class="fas fa-chevron-down collapse-icon open" style="color:var(--text-muted); font-size:0.85rem;"></i>
+            </div>
+        </div>
+        <div class="book-card-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>{% trans "Sarlavha" %} *</label>
+                    <input type="text" name="title" required maxlength="150" placeholder="{% trans 'Kitob nomi' %}"
+                           oninput="updateCardPreview(this, ${idx})">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Muallif" %}</label>
+                    <input type="text" name="author" maxlength="150" placeholder="{% trans 'Muallif ismi' %}"
+                           oninput="updateCardAuthor(this, ${idx})">
+                </div>
+            </div>
+            <div class="form-row full">
+                <div class="form-group">
+                    <label>{% trans "Tavsif" %}</label>
+                    <textarea name="description" rows="3" placeholder="{% trans 'Kitob haqida qisqacha...' %}"></textarea>
+                </div>
+            </div>
+            <div class="form-row three">
+                <div class="form-group">
+                    <label>{% trans "Jami soni" %} *</label>
+                    <input type="number" name="total_count" required min="1" value="1" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Mavjud soni" %}</label>
+                    <input type="number" name="available_count" min="0" value="1" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Sinf (uchlik)" %}</label>
+                    <input type="number" name="grade" min="1" max="11" placeholder="1-11">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>{% trans "Kategoriya" %}</label>
+                    <input type="text" name="category_name" list="category-list" placeholder="{% trans 'Kategoriya nomi' %}" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Fan" %}</label>
+                    <input type="text" name="subject" list="subject-list" placeholder="{% trans 'Fan nomi' %}" autocomplete="off">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>{% trans "Muqova rasmi" %}</label>
+                    <div class="upload-area">
+                        <input type="file" name="cover_${idx}" accept="image/*" onchange="handleFileChange(this, ${idx})">
+                        <i class="fas fa-cloud-upload-alt" style="font-size:1.4rem; color:var(--text-muted);"></i>
+                        <div id="file-label-${idx}" class="file-name">{% trans "Rasm tanlanmagan" %}</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Darslik?" %}</label>
+                    <label class="textbook-toggle">
+                        <input type="checkbox" name="is_textbook_${idx}" style="width: auto; accent-color: var(--primary);">
+                        <span>{% trans "Ha, bu darslik" %}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.appendChild(card);
+    updateCounter();
+}
+
+function updateCardPreview(input, idx) {
+    const card = input.closest('.book-card');
+    const preview = card.querySelector('.card-title-preview');
+    if (preview) {
+        preview.innerText = input.value || "{% trans 'Yangi kitob' %}";
     }
-    function performDelete() {
-        const input = document.getElementById('id_cover');
-        const clearCheck = document.getElementById('cover-clear_id');
-        const label = document.getElementById('file-name-label');
-        const btn = document.getElementById('fake-upload-btn');
-        const status = document.getElementById('current-cover-status');
-        if (input) input.value = '';
-        if (clearCheck) clearCheck.checked = true;
-        if (status) status.style.display = 'none';
-        if (label) label.innerText = "{% trans 'O\'chirildi' %}";
-        if (btn) {
-            btn.style.borderColor = '#ef4444';
-            btn.style.background = 'rgba(239, 68, 68, 0.05)';
-            const icon = btn.querySelector('i');
-            if (icon) icon.className = 'fas fa-trash-alt';
-        }
-        hideDeleteModal();
-        setTimeout(() => {
-            if (label) label.innerText = "{% trans 'Rasm tanlash' %}";
-            if (btn) {
-                btn.style.borderColor = 'var(--border)';
-                btn.style.background = 'rgba(255,255,255,0.05)';
-                const icon = btn.querySelector('i');
-                if (icon) icon.className = 'fas fa-upload';
-            }
-        }, 2000);
+}
+
+function updateCardAuthor(input, idx) {
+    const card = input.closest('.book-card');
+    const preview = card.querySelector('.card-author-preview');
+    if (preview) {
+        preview.innerText = input.value;
     }
+}
+
+// Add first card on load
+document.addEventListener('DOMContentLoaded', function() {
+    addBookCard();
+});
 </script>
 {% endblock %}

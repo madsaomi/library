@@ -3,10 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 school_admin_required = user_passes_test(
-    lambda u: u.role == 'school_admin'
-    and u.school is not None
-    and u.school.is_active
-    and not u.school.is_deleted,
+    lambda u: u.role == 'school_admin' and u.school is not None and u.school.is_active and not u.school.is_deleted,
     login_url='login',
 )
 import json
@@ -182,6 +179,85 @@ def students_list(request):
             'selected_grade': grade_filter,
         },
     )
+
+
+@login_required(login_url='login')
+@school_admin_required
+def students_promote(request):
+    school = request.user.school
+
+    # Get distinct grades for dropdowns
+    all_grades = (
+        CustomUser.objects.filter(school=school, role='student', is_archived=False)
+        .exclude(grade__isnull=True)
+        .exclude(grade='')
+        .values_list('grade', flat=True)
+        .distinct()
+    )
+
+    import re
+
+    def sort_grade(g):
+        m = re.match(r'(\d+)', g)
+        return int(m.group(1)) if m else 99
+
+    grades_list = sorted(all_grades, key=sort_grade)
+
+    if request.method == 'POST':
+        from_grade = request.POST.get('from_grade', '').strip()
+        to_grade = request.POST.get('to_grade', '').strip()
+        if from_grade and to_grade:
+            updated = CustomUser.objects.filter(
+                school=school, role='student', is_archived=False, grade=from_grade
+            ).update(grade=to_grade)
+            messages.success(
+                request,
+                _("{count} ta o'quvchi {from_grade} sinfidan {to_grade} sinfiga o'tkazildi.").format(
+                    count=updated, from_grade=from_grade, to_grade=to_grade
+                ),
+            )
+            return redirect('frontend:students_list')
+        else:
+            messages.error(request, _('Sinflarni tanlang.'))
+
+    return render(request, 'frontend/school/students_promote.html', {'grades_list': grades_list})
+
+
+@login_required(login_url='login')
+@school_admin_required
+def students_archive(request):
+    school = request.user.school
+
+    all_grades = (
+        CustomUser.objects.filter(school=school, role='student', is_archived=False)
+        .exclude(grade__isnull=True)
+        .exclude(grade='')
+        .values_list('grade', flat=True)
+        .distinct()
+    )
+
+    import re
+
+    def sort_grade(g):
+        m = re.match(r'(\d+)', g)
+        return int(m.group(1)) if m else 99
+
+    grades_list = sorted(all_grades, key=sort_grade)
+
+    if request.method == 'POST':
+        grade = request.POST.get('grade', '').strip()
+        if grade:
+            updated = CustomUser.objects.filter(school=school, role='student', is_archived=False, grade=grade).update(
+                is_archived=True
+            )
+            messages.success(
+                request, _("{count} ta o'quvchi {grade} sinfidan arxivlandi.").format(count=updated, grade=grade)
+            )
+            return redirect('frontend:graduates_list')
+        else:
+            messages.error(request, _('Sinfni tanlang.'))
+
+    return render(request, 'frontend/school/students_archive.html', {'grades_list': grades_list})
 
 
 @login_required(login_url='login')
@@ -652,9 +728,9 @@ def qr_book_scanned(request, token):
                 'textbook': book.is_textbook,
                 'grade': book.grade,
             },
-            'message': _('Kitob: "{title}" (mavjud {available}/{total}). Endi o\'quvchi QR-kodini skanerlang yoki qidiring.').format(
-                title=book.title, available=book.available_count, total=book.total_count
-            ),
+            'message': _(
+                'Kitob: "{title}" (mavjud {available}/{total}). Endi o\'quvchi QR-kodini skanerlang yoki qidiring.'
+            ).format(title=book.title, available=book.available_count, total=book.total_count),
         }
     )
 
@@ -721,9 +797,7 @@ def qr_search_students(request):
         .order_by('last_name', 'first_name')
     )
     if q:
-        students = students.filter(
-            Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(username__icontains=q)
-        )
+        students = students.filter(Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(username__icontains=q))
     students = students[:20]
     return JsonResponse(
         {
@@ -736,7 +810,7 @@ def qr_search_students(request):
                     'grade': s.grade or '',
                 }
                 for s in students
-            ]
+            ],
         }
     )
 
@@ -808,9 +882,7 @@ def qr_state(request):
     data = {'status': 'success', 'book': None, 'student': None}
 
     if book_id:
-        book = (
-            Book.objects.select_related('category').filter(id=book_id, school=request.user.school).first()
-        )
+        book = Book.objects.select_related('category').filter(id=book_id, school=request.user.school).first()
         if book:
             data['book'] = {
                 'id': book.id,
@@ -820,9 +892,7 @@ def qr_state(request):
                 'total': book.total_count,
             }
     if student_id:
-        student = (
-            CustomUser.objects.filter(id=student_id, school=request.user.school, role='student').first()
-        )
+        student = CustomUser.objects.filter(id=student_id, school=request.user.school, role='student').first()
         if student:
             data['student'] = {
                 'id': student.id,
@@ -905,9 +975,7 @@ def qr_labels_batch(request):
         )
     else:
         items = (
-            Book.objects.select_related('school', 'category')
-            .filter(school=school, is_deleted=False)
-            .order_by('title')
+            Book.objects.select_related('school', 'category').filter(school=school, is_deleted=False).order_by('title')
         )
 
     return render(
@@ -924,9 +992,7 @@ def student_qr_image(request, pk):
     from accounts.utils import generate_static_token
 
     student = (
-        CustomUser.objects.filter(id=pk, school=request.user.school, role='student')
-        .exclude(is_archived=True)
-        .first()
+        CustomUser.objects.filter(id=pk, school=request.user.school, role='student').exclude(is_archived=True).first()
     )
     if not student:
         return JsonResponse({'status': 'error', 'message': _("O'quvchi topilmadi")}, status=404)
@@ -1322,15 +1388,76 @@ def process_cart_return_qr(request, token):
 @school_admin_required
 def book_add(request):
     if request.method == 'POST':
-        form = BookForm(request.POST, request.FILES)
-        if form.is_valid():
-            book = form.save(commit=False)
-            book.school = request.user.school
+        from books.models import Category
+
+        titles = request.POST.getlist('title')
+        authors = request.POST.getlist('author')
+        descriptions = request.POST.getlist('description')
+        total_counts = request.POST.getlist('total_count')
+        available_counts = request.POST.getlist('available_count')
+        grades = request.POST.getlist('grade')
+        category_names = request.POST.getlist('category_name')
+        subjects = request.POST.getlist('subject')
+
+        created = 0
+        for i in range(len(titles)):
+            title = titles[i].strip()
+            if not title:
+                continue
+
+            # Get cover by dynamic name cover_{idx} — idx is 1-based bookCount
+            # We look through request.FILES to find cover at index i
+            cover_key = None
+            for key in request.FILES:
+                if key.startswith('cover_'):
+                    try:
+                        key_idx = int(key.split('_', 1)[1])
+                        if key_idx == i + 1:
+                            cover_key = key
+                            break
+                    except (ValueError, IndexError):
+                        pass
+
+            textbook_key = f'is_textbook_{i + 1}'
+
+            book = Book(
+                title=title,
+                author=authors[i].strip() if i < len(authors) else '',
+                description=descriptions[i].strip() if i < len(descriptions) else '',
+                total_count=int(total_counts[i]) if i < len(total_counts) and total_counts[i].strip() else 1,
+                available_count=int(available_counts[i])
+                if i < len(available_counts) and available_counts[i].strip()
+                else 1,
+                is_textbook=textbook_key in request.POST,
+                subject=subjects[i].strip() if i < len(subjects) else '',
+                school=request.user.school,
+            )
+
+            grade_val = grades[i].strip() if i < len(grades) else ''
+            if grade_val.isdigit():
+                book.grade = int(grade_val)
+
+            if cover_key and cover_key in request.FILES:
+                book.cover = request.FILES[cover_key]
+
             book.save()
-            return redirect('frontend:school_books_list')
+
+            cat_name = category_names[i].strip() if i < len(category_names) else ''
+            if cat_name:
+                category, _created = Category.objects.get_or_create(name=cat_name)
+                book.category = category
+                book.save(update_fields=['category'])
+
+            created += 1
+
+        if created:
+            messages.success(request, _(f"{created} ta kitob muvaffaqiyatli qo'shildi!"))
+        else:
+            messages.error(request, _("Hech qanday kitob qo'shilmadi."))
+        return redirect('frontend:school_books_list')
     else:
         form = BookForm()
-    return render(request, 'frontend/school/book_form.html', {'form': form, 'title': _("Yangi kitob qo'shish")})
+    return render(request, 'frontend/school/book_form.html', {'form': form, 'title': _("Ko'p kitob qo'shish")})
 
 
 @login_required(login_url='login')
@@ -1360,44 +1487,175 @@ def book_delete(request, pk):
 @login_required(login_url='login')
 @school_admin_required
 def student_add(request):
-    if request.method == 'POST':
-        form = StudentForm(request.POST)
-        if form.is_valid():
-            student = form.save(commit=False)
-            student.school = request.user.school
-            student.role = 'student'
+    import datetime
 
-            # 1. Save initially to get ID
+    if request.method == 'POST':
+        first_names = request.POST.getlist('first_name')
+        last_names = request.POST.getlist('last_name')
+        patronymics = request.POST.getlist('patronymic')
+        birth_dates = request.POST.getlist('birth_date')
+
+        # Global grade for all these students
+        g_num = request.POST.get('grade_number', '')
+        g_let = request.POST.get('grade_letter', '')
+
+        created_students = []
+
+        def translit_cyrillic(text):
+            if not text:
+                return ''
+            mapping = {
+                'а': 'a',
+                'б': 'b',
+                'в': 'v',
+                'г': 'g',
+                'д': 'd',
+                'е': 'e',
+                'ё': 'yo',
+                'ж': 'zh',
+                'з': 'z',
+                'и': 'i',
+                'й': 'y',
+                'к': 'k',
+                'л': 'l',
+                'м': 'm',
+                'н': 'n',
+                'о': 'o',
+                'п': 'p',
+                'р': 'r',
+                'с': 's',
+                'т': 't',
+                'у': 'u',
+                'ф': 'f',
+                'х': 'x',
+                'ц': 'ts',
+                'ч': 'ch',
+                'ш': 'sh',
+                'щ': 'shch',
+                'ъ': '',
+                'ы': 'y',
+                'ь': '',
+                'э': 'e',
+                'ю': 'yu',
+                'я': 'ya',
+                'ў': 'o',
+                'қ': 'q',
+                'ғ': 'g',
+                'ҳ': 'x',
+            }
+            return ''.join(mapping.get(c, c) for c in text.lower()).replace(' ', '')
+
+        for i in range(len(first_names)):
+            f_name = first_names[i].strip()
+            l_name = last_names[i].strip()
+            if not f_name or not l_name:
+                continue
+
+            patronymic = patronymics[i].strip() if i < len(patronymics) else ''
+            b_date_str = birth_dates[i] if i < len(birth_dates) else ''
+
+            full_first = f'{f_name} {patronymic}'.strip() if patronymic else f_name
+
+            # Create user instance
+            student = CustomUser(
+                first_name=full_first,
+                last_name=l_name,
+                role='student',
+                school=request.user.school,
+                grade=f'{g_num}-{g_let}' if g_num and g_let else None,
+            )
+
+            if b_date_str:
+                try:
+                    student.birth_date = datetime.datetime.strptime(b_date_str, '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+
+            # Temporary username
             student.username = f'temp_{secrets.token_hex(4)}'
             student.save()
 
-            # 2. Generate Smart Login: {district}_{school}_{id}
-            district_part = clean_name(
-                student.school.district.name if student.school and student.school.district else 'no'
-            )
-            school_part = clean_name(student.school.name if student.school else 'school')
+            # Generate Login and Password
+            first_lat = translit_cyrillic(f_name)
+            last_lat = translit_cyrillic(l_name)
 
-            username = f'{district_part}_{school_part}_{student.id}'
+            base_username = clean_name(f'{first_lat}_{last_lat}')
+            if not base_username:
+                base_username = f'student_{student.id}'
+
+            username = base_username
+            counter = 1
+            while CustomUser.objects.filter(username=username).exists():
+                username = f'{base_username}_{counter}'
+                counter += 1
+
             student.username = username
 
-            # 3. Generate Random Password (12 chars)
-            password = form.cleaned_data.get('password')
-            if not password:
+            if first_lat and last_lat:
+                password = f'{first_lat.capitalize()}{last_lat.capitalize()}!'
+            else:
                 alphabet = string.ascii_letters + string.digits
-                password = ''.join(secrets.choice(alphabet) for i in range(12))
+                password = ''.join(secrets.choice(alphabet) for _ in range(12))
 
             student.set_password(password)
             student.raw_password = password
             student.save()
 
-            messages.success(request, _("Yangi o'quvchi qo'shildi!"))
-            return render(
-                request, 'frontend/school/student_created.html',
-                {'student': student, 'username': username, 'password': password},
-            )
+            created_students.append(student.id)
+
+        if created_students:
+            request.session['bulk_created_students'] = created_students
+            messages.success(request, _(f"{len(created_students)} ta o'quvchi muvaffaqiyatli qo'shildi!"))
+            return redirect('frontend:bulk_credentials_prompt')
+        else:
+            messages.error(request, _("Hech qanday o'quvchi qo'shilmadi."))
+            return redirect('frontend:student_add')
+
     else:
         form = StudentForm()
-    return render(request, 'frontend/school/student_form.html', {'form': form, 'title': _("Yangi o'quvchi qo'shish")})
+    return render(
+        request, 'frontend/school/student_form.html', {'form': form, 'title': _("Ko'p o'quvchilarni qo'shish")}
+    )
+
+
+@login_required(login_url='login')
+@school_admin_required
+def bulk_credentials_prompt(request):
+    student_ids = request.session.get('bulk_created_students', [])
+    if not student_ids:
+        return redirect('frontend:students_list')
+
+    students = CustomUser.objects.filter(id__in=student_ids)
+    return render(request, 'frontend/school/bulk_credentials_prompt.html', {'students': students})
+
+
+@login_required(login_url='login')
+@school_admin_required
+def download_bulk_credentials_csv(request):
+    import csv
+
+    from django.http import HttpResponse
+
+    student_ids = request.session.get('bulk_created_students', [])
+    if not student_ids:
+        return redirect('frontend:students_list')
+
+    students = CustomUser.objects.filter(id__in=student_ids).order_by('grade', 'last_name', 'first_name')
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = (
+        f'attachment; filename="oquvchilar_parollari_{timezone.now().strftime("%Y%m%d_%H%M")}.csv"'
+    )
+
+    # Use utf-8-sig for proper excel opening with cyrillic
+    response.write('\ufeff'.encode('utf8'))
+    writer = csv.writer(response)
+    writer.writerow([_('Sinf'), _('Familiya'), _('Ism'), _('Login'), _('Parol')])
+
+    for s in students:
+        writer.writerow([s.grade or '-', s.last_name, s.first_name, s.username, s.raw_password or ''])
+
+    return response
 
 
 @login_required(login_url='login')
@@ -1464,43 +1722,175 @@ def student_delete(request, pk):
 @login_required(login_url='login')
 @school_admin_required
 def teacher_add(request):
-    if request.method == 'POST':
-        form = TeacherForm(request.POST)
-        if form.is_valid():
-            teacher = form.save(commit=False)
-            teacher.school = request.user.school
-            teacher.role = 'teacher'
+    import datetime
 
-            # 1. Save initially to get ID
+    if request.method == 'POST':
+        first_names = request.POST.getlist('first_name')
+        last_names = request.POST.getlist('last_name')
+        patronymics = request.POST.getlist('patronymic')
+        birth_dates = request.POST.getlist('birth_date')
+        subjects = request.POST.getlist('subject')
+        addresses = request.POST.getlist('address')
+
+        created_teachers = []
+
+        def translit_cyrillic(text):
+            if not text:
+                return ''
+            mapping = {
+                'а': 'a',
+                'б': 'b',
+                'в': 'v',
+                'г': 'g',
+                'д': 'd',
+                'е': 'e',
+                'ё': 'yo',
+                'ж': 'zh',
+                'з': 'z',
+                'и': 'i',
+                'й': 'y',
+                'к': 'k',
+                'л': 'l',
+                'м': 'm',
+                'н': 'n',
+                'о': 'o',
+                'п': 'p',
+                'р': 'r',
+                'с': 's',
+                'т': 't',
+                'у': 'u',
+                'ф': 'f',
+                'х': 'x',
+                'ц': 'ts',
+                'ч': 'ch',
+                'ш': 'sh',
+                'щ': 'shch',
+                'ъ': '',
+                'ы': 'y',
+                'ь': '',
+                'э': 'e',
+                'ю': 'yu',
+                'я': 'ya',
+                'ў': 'o',
+                'қ': 'q',
+                'ғ': 'g',
+                'ҳ': 'x',
+            }
+            return ''.join(mapping.get(c, c) for c in text.lower()).replace(' ', '')
+
+        for i in range(len(first_names)):
+            f_name = first_names[i].strip()
+            l_name = last_names[i].strip()
+            if not f_name or not l_name:
+                continue
+
+            patronymic = patronymics[i].strip() if i < len(patronymics) else ''
+            b_date_str = birth_dates[i] if i < len(birth_dates) else ''
+            subject = subjects[i].strip() if i < len(subjects) else ''
+            address = addresses[i].strip() if i < len(addresses) else ''
+
+            full_first = f'{f_name} {patronymic}'.strip() if patronymic else f_name
+
+            teacher = CustomUser(
+                first_name=full_first,
+                last_name=l_name,
+                role='teacher',
+                school=request.user.school,
+                subject=subject,
+                address=address,
+            )
+
+            if b_date_str:
+                try:
+                    teacher.birth_date = datetime.datetime.strptime(b_date_str, '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+
+            # Temporary username to save
             teacher.username = f'temp_t_{secrets.token_hex(4)}'
             teacher.save()
 
-            # 2. Generate Smart Login: {district}_{school}_{id}
-            district_part = clean_name(
-                teacher.school.district.name if teacher.school and teacher.school.district else 'no'
-            )
-            school_part = clean_name(teacher.school.name if teacher.school else 'school')
+            # Generate Login and Password
+            first_lat = translit_cyrillic(f_name)
+            last_lat = translit_cyrillic(l_name)
 
-            username = f'{district_part}_{school_part}_{teacher.id}'
+            base_username = clean_name(f'{first_lat}_{last_lat}')
+            if not base_username:
+                base_username = f'teacher_{teacher.id}'
+
+            username = base_username
+            counter = 1
+            while CustomUser.objects.filter(username=username).exists():
+                username = f'{base_username}_{counter}'
+                counter += 1
+
             teacher.username = username
 
-            # 3. Generate Random Password (12 chars)
-            password = form.cleaned_data.get('password')
-            if not password:
+            if first_lat and last_lat:
+                password = f'{first_lat.capitalize()}{last_lat.capitalize()}!'
+            else:
                 alphabet = string.ascii_letters + string.digits
-                password = ''.join(secrets.choice(alphabet) for i in range(12))
+                password = ''.join(secrets.choice(alphabet) for _ in range(12))
 
             teacher.set_password(password)
             teacher.raw_password = password
             teacher.save()
 
-            return render(
-                request, 'frontend/school/teacher_created.html',
-                {'teacher': teacher, 'username': username, 'password': password},
-            )
+            created_teachers.append(teacher.id)
+
+        if created_teachers:
+            request.session['bulk_created_teachers'] = created_teachers
+            messages.success(request, _(f"{len(created_teachers)} ta o'qituvchi muvaffaqiyatli qo'shildi!"))
+            return redirect('frontend:bulk_teacher_credentials_prompt')
+        else:
+            messages.error(request, _("Hech qanday o'qituvchi qo'shilmadi."))
+            return redirect('frontend:teacher_add')
+
     else:
         form = TeacherForm()
-    return render(request, 'frontend/school/teacher_form.html', {'form': form, 'title': _("Yangi o'qituvchi qo'shish")})
+    return render(
+        request, 'frontend/school/teacher_form.html', {'form': form, 'title': _("Ko'p o'qituvchilarni qo'shish")}
+    )
+
+
+@login_required(login_url='login')
+@school_admin_required
+def bulk_teacher_credentials_prompt(request):
+    teacher_ids = request.session.get('bulk_created_teachers', [])
+    if not teacher_ids:
+        return redirect('frontend:teachers_list')
+
+    teachers = CustomUser.objects.filter(id__in=teacher_ids)
+    return render(request, 'frontend/school/bulk_teacher_credentials_prompt.html', {'teachers': teachers})
+
+
+@login_required(login_url='login')
+@school_admin_required
+def download_bulk_teacher_credentials_csv(request):
+    import csv
+
+    from django.http import HttpResponse
+
+    teacher_ids = request.session.get('bulk_created_teachers', [])
+    if not teacher_ids:
+        return redirect('frontend:teachers_list')
+
+    teachers = CustomUser.objects.filter(id__in=teacher_ids).order_by('last_name', 'first_name')
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = (
+        f'attachment; filename="oqituvchilar_parollari_{timezone.now().strftime("%Y%m%d_%H%M")}.csv"'
+    )
+
+    # Use utf-8-sig for proper excel opening with cyrillic
+    response.write('\ufeff'.encode('utf8'))
+    writer = csv.writer(response)
+    writer.writerow([_('Familiya'), _('Ism'), _('Fan'), _('Login'), _('Parol')])
+
+    for t in teachers:
+        writer.writerow([t.last_name, t.first_name, t.subject, t.username, t.raw_password or ''])
+
+    return response
 
 
 @login_required(login_url='login')
@@ -1587,14 +1977,10 @@ def profile(request):
         )
     )
 
-    issue_qs = BookIssue.objects.select_related('book', 'user').filter(
-        book__school=school, is_returned=False
-    )
+    issue_qs = BookIssue.objects.select_related('book', 'user').filter(book__school=school, is_returned=False)
     today = timezone.now().date()
     recent_issues = (
-        BookIssue.objects.select_related('book', 'user')
-        .filter(book__school=school)
-        .order_by('-issued_at')[:8]
+        BookIssue.objects.select_related('book', 'user').filter(book__school=school).order_by('-issued_at')[:8]
     )
 
     # Monthly issues for chart (last 6 months)
@@ -1610,8 +1996,18 @@ def profile(request):
     month_labels = []
     monthly_data = []
     months_uz = [
-        _('Yan'), _('Fev'), _('Mar'), _('Apr'), _('May'), _('Iyun'),
-        _('Iyl'), _('Avg'), _('Sen'), _('Okt'), _('Noy'), _('Dek'),
+        _('Yan'),
+        _('Fev'),
+        _('Mar'),
+        _('Apr'),
+        _('May'),
+        _('Iyun'),
+        _('Iyl'),
+        _('Avg'),
+        _('Sen'),
+        _('Okt'),
+        _('Noy'),
+        _('Dek'),
     ]
     for entry in monthly_qs:
         if entry['month']:
@@ -1632,9 +2028,7 @@ def profile(request):
             'total_teachers': CustomUser.objects.filter(school=school, role='teacher').count(),
             'active_issues': issue_qs.count(),
             'overdue_issues': issue_qs.filter(issued_at__lt=timezone.now() - timezone.timedelta(days=30)).count(),
-            'issued_today': BookIssue.objects.filter(
-                book__school=school, issued_at__date=today
-            ).count(),
+            'issued_today': BookIssue.objects.filter(book__school=school, issued_at__date=today).count(),
             'returned_today': BookIssue.objects.filter(
                 book__school=school, returned_at__date=today, is_returned=True
             ).count(),
@@ -1936,6 +2330,15 @@ def textbook_distribute(request):
                     textbooks_for_grade = textbooks_for_grade.filter(grade=grade_num)
                 for book in textbooks_for_grade:
                     create_loan(student, book)
+        elif request.POST.get('distribute_all_book_id'):
+            # Distribute a single specific book to all students in the selected grade
+            book_id = request.POST.get('distribute_all_book_id')
+            book = get_object_or_404(Book, pk=book_id, school=school, is_textbook=True)
+            students = CustomUser.objects.filter(school=school, role='student')
+            if grade_filter:
+                students = students.filter(grade=grade_filter)
+            for student in students:
+                create_loan(student, book)
         else:
             selected = {}
             for key, value in request.POST.items():
@@ -2161,22 +2564,62 @@ def import_students_csv(request):
     csv_file = request.FILES.get('csv_file')
     if not csv_file:
         return JsonResponse({'success': False, 'errors': [_('Fayl yuklanmadi')]}, status=400)
-    if not csv_file.name.endswith('.csv'):
-        return JsonResponse({'success': False, 'errors': [_('Faqat CSV fayl yuklang')]}, status=400)
+    if not (csv_file.name.endswith('.csv') or csv_file.name.endswith('.xlsx')):
+        return JsonResponse({'success': False, 'errors': [_('Faqat CSV yoki XLSX fayl yuklang')]}, status=400)
+
     school = request.user.school
     import csv
     import secrets
     import string
 
-    decoded = csv_file.read().decode('utf-8-sig')
-    reader = csv.DictReader(decoded.splitlines())
+    data_rows = []
+
+    if csv_file.name.endswith('.xlsx'):
+        import openpyxl
+
+        wb = openpyxl.load_workbook(csv_file, data_only=True)
+        sheet = wb.active
+        headers = [cell.value.strip() if isinstance(cell.value, str) else cell.value for cell in sheet[1]]
+
+        # Determine column indexes
+        first_name_idx, last_name_idx, grade_idx = None, None, None
+        for i, header in enumerate(headers):
+            if header == 'first_name':
+                first_name_idx = i
+            elif header == 'last_name':
+                last_name_idx = i
+            elif header == 'grade':
+                grade_idx = i
+
+        for row_num, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), 2):
+            if first_name_idx is not None and last_name_idx is not None and grade_idx is not None:
+                first_name = str(row[first_name_idx] or '').strip()
+                last_name = str(row[last_name_idx] or '').strip()
+                grade = str(row[grade_idx] or '').strip()
+                data_rows.append({'row_num': row_num, 'first_name': first_name, 'last_name': last_name, 'grade': grade})
+    else:
+        decoded = csv_file.read().decode('utf-8-sig')
+        reader = csv.DictReader(decoded.splitlines())
+        for row_num, row in enumerate(reader, 2):
+            data_rows.append(
+                {
+                    'row_num': row_num,
+                    'first_name': row.get('first_name', '').strip(),
+                    'last_name': row.get('last_name', '').strip(),
+                    'grade': row.get('grade', '').strip(),
+                }
+            )
+
     created = 0
     errors = []
     credentials = []
-    for row_num, row in enumerate(reader, 2):
-        first_name = row.get('first_name', '').strip()
-        last_name = row.get('last_name', '').strip()
-        grade = row.get('grade', '').strip()
+
+    for item in data_rows:
+        row_num = item['row_num']
+        first_name = item['first_name']
+        last_name = item['last_name']
+        grade = item['grade']
+
         if not first_name or not last_name or not grade:
             errors.append(_('Qator {}: ism, familiya va sinf majburiy').format(row_num))
             continue

@@ -1,67 +1,78 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{{ title }} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}{{ title }}{% endblock %}
+{% block title %}{% trans "Ko'p o'quvchilarni qo'shish" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Ko'p o'quvchilarni qo'shish" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/school/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="mw-500 mx-auto">
+<div class="mw-1000 mx-auto" style="max-width: 1000px;">
     <div class="glass-panel animate-fade p-3xl">
-        <form method="post">
+        <form method="post" id="bulk-student-form">
             {% csrf_token %}
-
-            <div class="d-flex flex-column gap-xl">
-                <div>
-                    <label class="d-block mb-xs text-medium text-sm text-muted">
-                        <i class="fas fa-user text-primary mr-xs"></i> {{ form.first_name.label }}
-                    </label>
-                    {{ form.first_name }}
-                    {% if form.first_name.errors %}
-                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ form.first_name.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <div>
-                    <label class="d-block mb-xs text-medium text-sm text-muted">
-                        <i class="fas fa-user text-primary mr-xs"></i> {{ form.last_name.label }}
-                    </label>
-                    {{ form.last_name }}
-                    {% if form.last_name.errors %}
-                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ form.last_name.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <div>
-                    <label class="d-block mb-xs text-medium text-sm text-muted">
-                        <i class="fas fa-graduation-cap text-success mr-xs"></i> {% trans "Sinf va harf" %}
-                    </label>
-                    <div class="d-flex gap-sm">
-                        <div class="flex-1">{{ form.grade_number }}</div>
-                        <div class="flex-1">{{ form.grade_letter }}</div>
+            
+            <div class="d-flex align-center flex-wrap gap-xl mb-xl p-lg rounded-xl" style="background-color: rgba(var(--primary-rgb, 100, 100, 255), 0.1); border: 1px solid var(--primary); padding: 15px; display: flex; justify-content: space-between;">
+                <div style="display: flex; gap: 20px;">
+                    <div>
+                        <label class="d-block mb-xs text-medium text-sm text-primary">
+                            <i class="fas fa-graduation-cap mr-xs"></i> {% trans "Umumiy Sinf" %}
+                        </label>
+                        <select name="grade_number" class="form-control" style="min-width: 120px;" required>
+                            {% for val, label in form.fields.grade_number.choices %}
+                                <option value="{{ val }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="d-block mb-xs text-medium text-sm text-primary">
+                            <i class="fas fa-font mr-xs"></i> {% trans "Umumiy Harf" %}
+                        </label>
+                        <select name="grade_letter" class="form-control" style="min-width: 120px;" required>
+                            {% for val, label in form.fields.grade_letter.choices %}
+                                <option value="{{ val }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
-
-                <div>
-                    <label class="d-block mb-xs text-medium text-sm text-muted">
-                        <i class="fas fa-calendar-alt mr-xs" style="color: #f59e0b;"></i> {{ form.birth_date.label }}
-                    </label>
-                    {{ form.birth_date }}
-                    {% if form.birth_date.errors %}
-                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ form.birth_date.errors.0 }}</p>
-                    {% endif %}
+                <div class="text-right" style="padding-right: 15px;">
+                    <label class="d-block mb-xs text-medium text-sm" style="color: #666;">{% trans "O'quvchilar soni" %}</label>
+                    <div style="font-size: 2rem; font-weight: bold; color: var(--primary);" id="student-counter">0</div>
                 </div>
             </div>
 
-            <div class="mt-2xl d-flex gap-md">
-                <button type="submit" class="btn-primary text-md rounded-md" style="flex: 2; padding: 10px 0;">
-                    <i class="fas fa-save"></i> {% trans "Saqlash" %}
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table w-100" id="students-table" style="min-width: 800px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;">#</th>
+                            <th>{% trans "Familiya" %}</th>
+                            <th>{% trans "Ism" %}</th>
+                            <th>{% trans "Otasining ismi" %}</th>
+                            <th>{% trans "Tug'ilgan sana" %}</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-tbody">
+                        <!-- Rows added by JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-md">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="addRow()">
+                    <i class="fas fa-plus"></i> {% trans "Yana qo'shish" %}
                 </button>
-                <a href="{% url 'frontend:students_list' %}" class="glass-card flex-1 rounded-md text-center text-decoration-none d-flex align-center justify-center border text-md" style="padding: 10px 0; gap: 6px;">
-                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
+            </div>
+            
+            <div class="mt-2xl d-flex gap-md">
+                <button type="submit" class="btn-primary text-md rounded-md px-2xl">
+                    <i class="fas fa-save"></i> {% trans "Barchasini Saqlash" %}
+                </button>
+                <a href="{% url 'frontend:students_list' %}" class="btn btn-outline-secondary px-2xl d-flex align-center">
+                    {% trans "Bekor qilish" %}
                 </a>
             </div>
         </form>
@@ -69,8 +80,75 @@
 </div>
 
 <style>
-    .form-control { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--input-text); outline: none; font-size: 0.85rem; transition: 0.3s; box-sizing: border-box; }
-    .form-control:focus { border-color: var(--primary); }
-    select.form-control { appearance: auto; }
+    .table input, .table select {
+        width: 100%;
+        padding: 8px;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--input-text);
+        outline: none;
+    }
+    .table th {
+        text-align: left;
+        padding-bottom: 10px;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .table td {
+        padding: 5px;
+        vertical-align: middle;
+    }
 </style>
+
+<script>
+    function updateCounter() {
+        const tbody = document.getElementById('students-tbody');
+        const rows = tbody.querySelectorAll('tr');
+        document.getElementById('student-counter').innerText = rows.length;
+        
+        // Update row numbers
+        rows.forEach((row, index) => {
+            const numberCell = row.querySelector('.row-number');
+            if (numberCell) {
+                numberCell.innerText = index + 1;
+            }
+        });
+    }
+
+    function addRow() {
+        const tbody = document.getElementById('students-tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="text-center font-weight-bold text-muted"><span class="row-number"></span></td>
+            <td><input type="text" name="last_name" required placeholder="Familiya"></td>
+            <td><input type="text" name="first_name" required placeholder="Ism"></td>
+            <td><input type="text" name="patronymic" placeholder="Otasining ismi"></td>
+            <td><input type="date" name="birth_date"></td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger px-sm py-xs" onclick="removeRow(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        updateCounter();
+    }
+
+    function removeRow(btn) {
+        const tbody = document.getElementById('students-tbody');
+        if (tbody.querySelectorAll('tr').length > 1) {
+            btn.closest('tr').remove();
+            updateCounter();
+        } else {
+            const tr = btn.closest('tr');
+            tr.querySelectorAll('input').forEach(input => input.value = '');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        addRow(); 
+    });
+</script>
 {% endblock %}

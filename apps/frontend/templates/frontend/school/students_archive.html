@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Bitiruvchilarni arxivlash" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Sinfni arxivlash (Mass Archive)" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="glass-panel p-3xl mw-500 mx-auto">
+        <h3 class="mb-lg"><i class="fas fa-archive text-warning"></i> {% trans "Bitiruvchilarni arxivlash" %}</h3>
+        <p class="text-muted text-sm mb-xl">{% trans "Ushbu amal tanlangan sinfdagi barcha o'quvchilarni arxivga o'tkazadi. Ular tizimga kira olmaydi, lekin ularning qarz kitoblari va tarixi saqlanib qoladi." %}</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-xl">
+                <label class="d-block mb-sm text-md text-semibold">{% trans "Arxivlanadigan sinf" %}</label>
+                <select name="grade" class="form-control w-full" required>
+                    <option value="">--- {% trans "Tanlang" %} ---</option>
+                    {% for g in grades_list %}
+                    <option value="{{ g }}">{{ g }} {% trans "sinf" %}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="d-flex gap-md">
+                <button type="submit" class="btn-primary py-sm px-xl rounded-md flex-1" style="background-color: var(--warning);">
+                    <i class="fas fa-archive"></i> {% trans "Arxivlash" %}
+                </button>
+                <a href="{% url 'frontend:students_list' %}" class="glass-card py-sm px-xl rounded-md text-decoration-none text-center flex-1">
+                    {% trans "Bekor qilish" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -186,10 +186,14 @@ class SuperUserStatsView(viewsets.ViewSet):
                 month_end = month_start.replace(year=month_start.year + 1, month=1)
             else:
                 month_end = month_start.replace(month=month_start.month + 1)
-            count = BookIssue.objects.filter(issued_at__gte=month_start, issued_at__lt=month_end, is_deleted=False).count()
+            count = BookIssue.objects.filter(
+                issued_at__gte=month_start, issued_at__lt=month_end, is_deleted=False
+            ).count()
             monthly_issues.append(count)
 
-        top_books = list(Book.objects.filter(is_deleted=False).order_by('-borrow_count')[:10].values('title', 'borrow_count'))
+        top_books = list(
+            Book.objects.filter(is_deleted=False).order_by('-borrow_count')[:10].values('title', 'borrow_count')
+        )
         roles = CustomUser.objects.filter(is_deleted=False).values('role').annotate(count=Count('id'))
 
         return Response(

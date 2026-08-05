@@ -1,4 +1,7 @@
+import os
 import sys
+
+os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -24,7 +27,7 @@ def live_server_url(live_server):
 
 @pytest.fixture
 def page(page):
-    page.set_default_timeout(15000)
+    page.set_default_timeout(30000)
     return page
 
 

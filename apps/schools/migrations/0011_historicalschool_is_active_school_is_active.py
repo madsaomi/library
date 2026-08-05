@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('schools', '0010_historicalschool'),
     ]
@@ -13,11 +12,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='historicalschool',
             name='is_active',
-            field=models.BooleanField(default=True, help_text="Agar o'chirilsa, maktab admini kira olmaydi", verbose_name='Faol'),
+            field=models.BooleanField(
+                default=True, help_text="Agar o'chirilsa, maktab admini kira olmaydi", verbose_name='Faol'
+            ),
         ),
         migrations.AddField(
             model_name='school',
             name='is_active',
-            field=models.BooleanField(default=True, help_text="Agar o'chirilsa, maktab admini kira olmaydi", verbose_name='Faol'),
+            field=models.BooleanField(
+                default=True, help_text="Agar o'chirilsa, maktab admini kira olmaydi", verbose_name='Faol'
+            ),
         ),
     ]

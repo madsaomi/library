@@ -1,6 +1,7 @@
 # 02-CURRENT-STATE — What is true right now
 
-Last fully verified: 2026-08-05 (admin polish + QR automation + 169 tests).
+Last fully verified: 2026-08-05 (auth/error pages dynamic backgrounds + 169 tests).
+
 
 ## Green (verified)
 - `python manage.py check` → 0 issues
