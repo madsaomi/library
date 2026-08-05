@@ -3,146 +3,49 @@
 {% load frontend_tags %}
 
 {% block title %}{% trans "Yutuqlar" %} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}{% trans "Mening yutuqlarim" %}{% endblock %}
+{% block page_title %}{% trans "Yutuqlar" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/user/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade">
-    <!-- Level & XP Summary -->
-    <div class="glass-panel p-xl mb-2xl" style="border-radius: 20px;">
-        <div class="d-flex align-center gap-xl flex-wrap">
-            <div class="d-flex flex-center rounded-full flex-shrink-0" style="width: 72px; height: 72px; background: var(--hover-bg); border: 1px solid var(--border);">
-                <i class="fas {{ user.selected_icon|default:'fa-trophy' }}" style="font-size: 1.6rem; color: var(--primary);"></i>
-            </div>
-            <div class="flex-1" style="min-width: 200px;">
-                <h3 class="mb-xs" style="color: var(--text-color);">{{ user.first_name }} {{ user.last_name }}</h3>
-                <p class="text-muted mb-md">
-                    <span class="pill-subtle">
-                        <i class="fas fa-star"></i> {% trans "Daraja" %} {{ user.level }}
-                    </span>
-                </p>
-                <div class="d-flex align-center gap-lg">
-                    <div class="flex-1 overflow-hidden" style="height: 8px; background: var(--hover-bg); border-radius: 4px;">
-                        <div style="width: {{ xp_percent }}%; height: 100%; background: var(--primary); border-radius: 4px; transition: width 1s ease;"></div>
-                    </div>
-                    <span class="text-muted text-sm text-nowrap">{{ user.xp_points }} / {{ next_xp }} XP</span>
-                </div>
-            </div>
+<div class="animate-fade mw-600 mx-auto">
+    <div class="glass-panel p-xl mb-xl text-center" style="border-radius: 20px;">
+        <div class="flex-center rounded-full mx-auto mb-md" style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary), #a855f7);">
+            <i class="fas fa-trophy text-2xl text-white"></i>
+        </div>
+        <div class="text-2xl text-semibold text-main mb-xs">{{ earned|length }}</div>
+        <div class="text-muted text-sm">{% trans "ta yutuq" %}</div>
+        <div class="mt-lg" style="height: 6px; background: var(--hover-bg); border-radius: 3px; overflow: hidden;">
+            <div style="width: {% widthratio earned|length all_achievements|length 100 %}%; height: 100%; background: linear-gradient(90deg, var(--primary), #a855f7); border-radius: 3px;"></div>
         </div>
     </div>
 
-    <!-- Stats row -->
-    <div class="responsive-grid-3 mb-2xl" style="gap: 14px;">
-        <div class="user-stat">
-            <div class="value text-primary">{{ earned|length }}</div>
-            <div class="label">{% trans "Yutuqlar" %}</div>
-        </div>
-        <div class="user-stat">
-            <div class="value">{{ user.xp_points|default:"0" }}</div>
-            <div class="label">XP</div>
-        </div>
-        <div class="user-stat">
-            <div class="value">{{ unlocked_icons|length }}</div>
-            <div class="label">{% trans "Ikonkalar" %}</div>
-        </div>
-    </div>
-
-    <h2 class="user-section-title mb-lg">
-        <i class="fas fa-trophy"></i> {% trans "Yutuqlar" %}
-        <span class="pill-subtle ml-sm">{{ earned|length }}/{{ all_achievements|length }}</span>
-    </h2>
-    <div class="responsive-grid-3 gap-lg animate-group">
+    <h4 class="mb-lg text-semibold">{% trans "Yutuqlar" %}</h4>
+    <div class="d-grid gap-md mb-xl" style="grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));">
         {% for ach in all_achievements %}
-        <div class="glass-card achievement-card pos-relative overflow-hidden text-center p-xl rounded-xl transition animate-item {% if ach.id in earned_ids %}achievement-earned{% else %}achievement-locked{% endif %}" style="border: 1px solid {% if ach.id in earned_ids %}rgba(251,191,36,0.3){% else %}var(--border){% endif %};">
-            {% if ach.id in earned_ids %}
-            <div class="pos-absolute text-lg" style="top: 10px; right: 10px; color: #f59e0b;">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            {% else %}
-            <div class="pos-absolute text-lg text-muted" style="top: 10px; right: 10px; opacity: 0.25;">
-                <i class="fas fa-lock"></i>
-            </div>
-            {% endif %}
-            <div class="text-3xl mb-md transition" style="{% if ach.id not in earned_ids %}opacity: 0.25; filter: grayscale(1);{% endif %}">
-                <i class="fas {{ ach.icon }}"></i>
-            </div>
-            <h4 class="mb-xs text-md" style="color: var(--text-color);">{{ ach|ach_name }}</h4>
-            <p class="text-sm text-muted mb-sm lh-tight">{{ ach|ach_desc }}</p>
-            <div class="text-sm text-semibold text-primary">
-                <i class="fas fa-plus-circle"></i> +{{ ach.xp_reward }} XP
-            </div>
-            {% if ach.id in earned_ids %}
-            {% for e in earned %}{% if e.achievement_id == ach.id %}
-            <div class="mt-sm text-xs text-muted">
-                <i class="fas fa-calendar"></i> {{ e.earned_at|date:"d.m.Y" }}
-            </div>
-            {% endif %}{% endfor %}
+        <div class="glass-panel p-md text-center" style="border-radius: 14px; {% if ach.id not in earned_achievement_ids %}opacity: 0.35;{% endif %}">
+            <i class="fas {{ ach.icon }} text-xl mb-sm" style="color: {% if ach.id in earned_achievement_ids %}#fbbf24{% else %}var(--text-muted){% endif %};"></i>
+            <div class="text-xs text-semibold text-truncate">{{ ach|ach_name }}</div>
+            {% if ach.xp_reward %}
+            <div class="text-xs text-muted mt-xs">+{{ ach.xp_reward }} XP</div>
             {% endif %}
         </div>
-        {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
         {% endfor %}
     </div>
 
-    <!-- Icons -->
-    <h2 class="user-section-title mt-2xl mb-lg">
-        <i class="fas fa-paint-brush"></i> {% trans "Ikonkalar" %}
-    </h2>
-    <div class="glass-panel border p-xl">
-        <div class="d-flex gap-md flex-wrap">
-            {% for icon in unlocked_icons %}
-            <div class="glass-card icon-item cursor-pointer transition-fast d-flex align-center justify-center rounded-md" onclick="selectIcon('{{ icon }}')" style="width: 56px; height: 56px; border: 2px solid {% if user.selected_icon == icon %}var(--primary){% else %}transparent{% endif %};{% if user.selected_icon == icon %}background: var(--glass){% endif %}">
-                <i class="fas {{ icon }}" style="font-size: 1.3rem; color: {% if user.selected_icon == icon %}var(--primary){% else %}var(--text-muted){% endif %};"></i>
+    {% if unlocked_icons %}
+    <h4 class="mb-lg text-semibold">{% trans "Ikonkalar" %}</h4>
+    <div class="d-flex gap-md flex-wrap">
+        {% for icon in unlocked_icons %}
+        <a href="{% url 'frontend:profile_edit' %}?icon={{ icon }}" class="text-decoration-none">
+            <div class="glass-panel p-md flex-center" style="width: 50px; height: 50px; border-radius: 12px; {% if user.selected_icon == icon %}border: 2px solid var(--primary);{% endif %}">
+                <i class="fas {{ icon }} text-lg text-primary"></i>
             </div>
-            {% endfor %}
-        </div>
-        <form id="icon-form" method="post" action="{% url 'frontend:profile_edit' %}" class="d-none">
-            {% csrf_token %}
-            <input type="hidden" name="selected_icon" id="selected-icon-input" value="">
-        </form>
+        </a>
+        {% endfor %}
     </div>
+    {% endif %}
 </div>
-
-<script>
-function selectIcon(icon) {
-    document.getElementById('selected-icon-input').value = icon;
-    document.getElementById('icon-form').submit();
-}
-</script>
-
-<style>
-.achievement-card {
-    position: relative;
-}
-.achievement-card:hover {
-    transform: translateY(-5px);
-}
-.achievement-earned {
-    border-color: rgba(251, 191, 36, 0.3);
-}
-.achievement-locked {
-    opacity: 0.7;
-}
-.achievement-locked:hover {
-    opacity: 1;
-}
-.icon-item:hover {
-    border-color: var(--primary) !important;
-    transform: scale(1.1);
-}
-.icon-item.selected {
-    background: var(--primary);
-    color: white;
-}
-</style>
 {% endblock %}

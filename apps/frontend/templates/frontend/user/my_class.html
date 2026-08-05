@@ -2,73 +2,51 @@
 {% load i18n %}
 
 {% block title %}{% trans "Mening sinfim" %} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}<i class="fas fa-users" style="margin-right: 8px;"></i> {{ user.grade }} {% trans "sinf" %}{% endblock %}
+{% block page_title %}{{ user.grade }} {% trans "sinf" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/user/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade mw-800 mx-auto">
-
-    <!-- Class Stats Header -->
-    <div class="glass-panel text-center p-xl mb-xl" style="border-radius: 20px;">
-        <div class="text-sm text-muted mb-xs">{% trans "Sinfdoshlar" %}</div>
-        <div class="text-2xl text-extrabold text-main">{{ class_data|length }}</div>
-        <div class="text-xs text-muted">{{ user.grade }} {% trans "sinf" %} &middot; {{ user.school.name }}</div>
+<div class="animate-fade mw-600 mx-auto">
+    <div class="glass-panel p-lg mb-xl text-center" style="border-radius: 16px;">
+        <div class="text-2xl text-semibold text-main">{{ class_data|length }}</div>
+        <div class="text-sm text-muted">{% trans "o'quvchi" %}</div>
     </div>
 
-    <!-- My Stats -->
-    <div class="responsive-grid-3 mb-xl" style="gap: 12px;">
-        <div class="user-stat">
-            <div class="value">{{ my_read }}</div>
-            <div class="label">{% trans "O'qilgan" %}</div>
+    <div class="d-grid gap-sm mb-xl" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="glass-panel p-md text-center" style="border-radius: 12px;">
+            <div class="text-lg text-semibold text-main">{{ my_read }}</div>
+            <div class="text-xs text-muted">{% trans "O'qilgan" %}</div>
         </div>
-        <div class="user-stat">
-            <div class="value">{{ my_active }}</div>
-            <div class="label">{% trans "Faol" %}</div>
+        <div class="glass-panel p-md text-center" style="border-radius: 12px;">
+            <div class="text-lg text-semibold text-main">{{ my_active }}</div>
+            <div class="text-xs text-muted">{% trans "Faol" %}</div>
         </div>
-        <div class="user-stat">
-            <div class="value">{{ my_ach }}</div>
-            <div class="label">{% trans "Yutuqlar" %}</div>
+        <div class="glass-panel p-md text-center" style="border-radius: 12px;">
+            <div class="text-lg text-semibold text-main">{{ my_ach }}</div>
+            <div class="text-xs text-muted">{% trans "Yutuq" %}</div>
         </div>
     </div>
 
-    <!-- Classmates List -->
-    <div class="glass-panel p-xs">
-        {% for item in class_data %}
-        <div class="d-flex align-center gap-md border-bottom py-md px-lg transition" onmouseenter="this.style.background='var(--hover-bg)'" onmouseleave="this.style.background=''">
-            <div class="text-sm text-bold text-center text-muted flex-shrink-0" style="width: 24px;">
-                {% if forloop.counter == 1 %}
-                <i class="fas fa-crown" style="color: #fbbf24;"></i>
-                {% else %}
-                {{ forloop.counter }}
-                {% endif %}
-            </div>
-            <div class="avatar-circle flex-shrink-0" style="width: 36px; height: 36px; background: var(--hover-bg); border: 1px solid var(--border);">
-                <span class="avatar-initials text-xs text-muted">{{ item.student.first_name|first|upper }}{{ item.student.last_name|first|upper }}</span>
-            </div>
+    <div class="glass-panel p-md" style="border-radius: 16px;">
+        {% for item in class_data|slice:":10" %}
+        <div class="d-flex align-center gap-md py-sm {% if not forloop.last %}border-bottom{% endif %} {% if item.student.pk == request.user.pk %}" style="background: var(--glass); border-radius: 8px;{% endif %}">
+            <div class="text-muted text-sm" style="width: 20px;">{{ forloop.counter }}</div>
             <div class="flex-1" style="min-width: 0;">
-                <div class="text-bold text-lg">{{ item.student.first_name }} {{ item.student.last_name }}</div>
-                <div class="text-md text-muted d-flex gap-lg mt-xs">
-                    <span><i class="fas fa-book"></i> {{ item.total_read }}</span>
-                    <span><i class="fas fa-hand-holding-heart"></i> {{ item.active_loans }}</span>
-                    <span><i class="fas fa-trophy"></i> {{ item.achievements }}</span>
-                </div>
+                <div class="text-sm text-semibold text-main text-truncate">{{ item.student.first_name }}</div>
             </div>
-            <div class="text-md text-muted text-semibold">
-                {{ item.student.xp_points }} XP
+            <div class="d-flex gap-md text-xs text-muted">
+                <span><i class="fas fa-book"></i> {{ item.total_read }}</span>
+                <span><i class="fas fa-trophy"></i> {{ item.achievements }}</span>
             </div>
         </div>
         {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
+        <div class="text-center py-xl text-muted">
+            <i class="fas fa-users text-2xl mb-md" style="opacity: 0.3;"></i>
+            <p>{% trans "Ma'lumot yo'q" %}</p>
         </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
         {% endfor %}
     </div>
 </div>

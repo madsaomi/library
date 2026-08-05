@@ -9,124 +9,110 @@
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade">
-    <!-- Currently Reading -->
-    <div class="glass-panel p-xl mb-2xl" style="border-radius: 20px;">
-        <h3 class="user-section-title">
-            <i class="fas fa-book-open"></i>
-            {% trans "Hozir o'qilayotgan kitoblar" %}
-            <span class="pill-subtle ml-sm">{{ issues|length }}</span>
-        </h3>
-
-        <div class="book-shelf-grid animate-group" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px;">
-            {% for issue in issues %}
-            <div class="shelf-item pos-relative overflow-hidden border transition rounded-2xl animate-item" style="background: var(--hover-bg);" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='var(--primary)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border)'">
-                {% if issue.book.cover %}
-                <img src="{{ issue.book.cover.url }}" alt="{{ issue.book.title }}" class="w-full d-block object-cover" style="aspect-ratio: 3/4;">
-                {% else %}
-                <div class="d-flex align-center justify-center p-xl text-center" style="width: 100%; aspect-ratio: 3/4; background: var(--hover-bg);">
-                    <div>
-                        <i class="fas fa-book text-2xl text-muted" style="opacity: 0.3; margin-bottom: 8px;"></i>
-                        <div class="text-sm text-semibold text-muted">{{ issue.book.title|truncatechars:30 }}</div>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="p-md">
-                    <div class="text-sm text-semibold text-truncate mb-xs" style="color: var(--text-color);">{{ issue.book.title|truncatechars:25 }}</div>
-                    <div class="text-xs text-muted mb-sm">
-                        <i class="fas fa-calendar"></i> {{ issue.issued_at|date:"d.m.Y" }}
-                    </div>
-                    <a href="{% url 'frontend:issue_qr' issue.pk %}" class="btn-primary d-block text-center text-sm text-decoration-none text-semibold" style="padding: 8px; border-radius: 10px; border: none;">
-                        <i class="fas fa-undo"></i> {% trans "Topshirish" %}
-                    </a>
-                </div>
-            </div>
-            {% empty %}
-            <div class="empty-state text-center p-3xl animate-fade" style="grid-column: 1 / -1;">
-                <div class="empty-icon-wrapper mb-lg">
-                    <i class="fas fa-book text-3xl text-primary"></i>
-                </div>
-                <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
-                <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
-            </div>
-            {% endfor %}
-        </div>
+<div class="animate-fade mw-800 mx-auto">
+    <div class="d-flex gap-sm mb-xl">
+        <button type="button" class="tab-btn active" data-tab="reading" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); background: var(--glass); color: var(--text-main); font-weight: 600; cursor: pointer;">
+            {% trans "O'qiyotgan" %} <span class="text-xs text-muted ml-xs">{{ issues|length }}</span>
+        </button>
+        <button type="button" class="tab-btn" data-tab="reserved" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer;">
+            {% trans "Bron" %} <span class="text-xs text-muted ml-xs">{{ requests|length }}</span>
+        </button>
+        <button type="button" class="tab-btn" data-tab="history" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer;">
+            {% trans "Tarix" %} <span class="text-xs text-muted ml-xs">{{ history|length }}</span>
+        </button>
     </div>
 
-    <!-- Pending Requests -->
-    {% if requests %}
-    <div class="glass-panel p-xl mb-2xl" style="border-radius: 20px;">
-        <h3 class="user-section-title">
-            <i class="fas fa-clock"></i>
-            {% trans "Bron qilingan" %}
-            <span class="pill-subtle ml-sm">{{ requests|length }}</span>
-        </h3>
-        <div class="d-flex flex-column gap-md">
-            {% for req in requests %}
-            <div class="d-flex gap-lg p-lg align-center rounded-xl" style="border: 1px solid var(--border); background: var(--hover-bg);">
-                <div class="rounded-md overflow-hidden flex-shrink-0" style="width: 50px; height: 70px; background: var(--bg-card);">
-                    {% if req.book.cover %}
-                    <img src="{{ req.book.cover.url }}" alt="{{ req.book.title }}" class="w-full h-full object-cover">
+    <div id="tab-reading" class="tab-content">
+        {% for issue in issues %}
+        <a href="{% url 'frontend:issue_qr' issue.pk %}" class="text-decoration-none d-block mb-md">
+            <div class="glass-panel p-md d-flex align-center gap-md" style="border-radius: 14px;">
+                <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
+                    {% if issue.book.cover %}
+                    <img src="{{ issue.book.cover.url }}" alt="" class="w-full h-full object-cover">
                     {% else %}
-                    <div class="w-full h-full flex-center" style="background: var(--hover-bg);"><i class="fas fa-book text-muted" style="opacity: 0.3;"></i></div>
+                    <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
                     {% endif %}
                 </div>
                 <div class="flex-1" style="min-width: 0;">
-                    <h4 class="text-md mb-xs" style="color: var(--text-color);">{{ req.book.title }}</h4>
-                    <p class="text-sm text-muted mb-xs">
-                        {% trans "So'ralgan" %}: {{ req.requested_at|date:"d.m.Y H:i" }}
-                    </p>
-                    <span class="pill-subtle">{{ req.get_status_display }}</span>
+                    <div class="text-sm text-semibold text-main text-truncate">{{ issue.book.title }}</div>
+                    <div class="text-xs text-muted">{{ issue.issued_at|date:"d.m.Y" }}</div>
                 </div>
-                <a href="{% url 'frontend:request_qr' req.pk %}" class="btn-primary text-decoration-none text-nowrap text-semibold rounded-md" style="padding: 8px 16px; font-size: 0.8rem; border: none;">
-                    <i class="fas fa-qrcode"></i> QR
-                </a>
+                <i class="fas fa-qrcode text-muted"></i>
             </div>
-            {% endfor %}
+        </a>
+        {% empty %}
+        <div class="text-center py-2xl text-muted">
+            <i class="fas fa-book-open text-3xl mb-md" style="opacity: 0.3;"></i>
+            <p>{% trans "Hozir kitob o'qimayapti" %}</p>
         </div>
+        {% endfor %}
     </div>
-    {% endif %}
 
-    <!-- Reading History -->
-    {% if history %}
-    <div class="glass-panel p-xl" style="border-radius: 20px;">
-        <h3 class="user-section-title">
-            <i class="fas fa-history"></i>
-            {% trans "O'qilgan kitoblar" %}
-            <span class="pill-subtle ml-sm">{{ history|length }}</span>
-        </h3>
+    <div id="tab-reserved" class="tab-content d-none">
+        {% for req in requests %}
+        <a href="{% url 'frontend:request_qr' req.pk %}" class="text-decoration-none d-block mb-md">
+            <div class="glass-panel p-md d-flex align-center gap-md" style="border-radius: 14px;">
+                <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
+                    {% if req.book.cover %}
+                    <img src="{{ req.book.cover.url }}" alt="" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
+                    {% endif %}
+                </div>
+                <div class="flex-1" style="min-width: 0;">
+                    <div class="text-sm text-semibold text-main text-truncate">{{ req.book.title }}</div>
+                    <div class="text-xs text-muted">{{ req.requested_at|date:"d.m.Y" }}</div>
+                </div>
+                <span class="text-xs px-sm py-xs" style="background: var(--hover-bg); border-radius: 6px;">{{ req.get_status_display }}</span>
+            </div>
+        </a>
+        {% empty %}
+        <div class="text-center py-2xl text-muted">
+            <i class="fas fa-clock text-3xl mb-md" style="opacity: 0.3;"></i>
+            <p>{% trans "Bron qilingan kitoblar yo'q" %}</p>
+        </div>
+        {% endfor %}
+    </div>
 
-        <div class="book-shelf-grid animate-group" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px;">
-            {% for item in history %}
-            <div class="shelf-item pos-relative overflow-hidden border transition animate-item" style="border-radius: 14px; background: var(--hover-bg);" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='var(--primary)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border)'">
+    <div id="tab-history" class="tab-content d-none">
+        {% for item in history %}
+        <div class="glass-panel p-md d-flex align-center gap-md mb-md" style="border-radius: 14px;">
+            <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
                 {% if item.book.cover %}
-                <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}" class="w-full d-block object-cover" style="aspect-ratio: 3/4;">
+                <img src="{{ item.book.cover.url }}" alt="" class="w-full h-full object-cover">
                 {% else %}
-                <div class="d-flex align-center justify-center p-lg text-center" style="width: 100%; aspect-ratio: 3/4; background: var(--hover-bg);">
-                    <div>
-                        <i class="fas fa-book text-2xl text-muted" style="opacity: 0.3; margin-bottom: 6px;"></i>
-                        <div class="text-xs text-semibold text-muted">{{ item.book.title|truncatechars:25 }}</div>
-                    </div>
-                </div>
+                <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
                 {% endif %}
-                <div class="p-sm">
-                    <div class="text-sm text-semibold text-truncate mb-xs" style="color: var(--text-color);">{{ item.book.title|truncatechars:22 }}</div>
-                    <div class="text-xs" style="color: var(--text-muted);">
-                        <i class="fas fa-check"></i> {{ item.returned_at|date:"d.m.Y" }}
-                    </div>
-                </div>
             </div>
-            {% empty %}
-            <div class="empty-state text-center p-3xl animate-fade" style="grid-column: 1 / -1;">
-                <div class="empty-icon-wrapper mb-lg">
-                    <i class="fas fa-book text-3xl text-primary"></i>
-                </div>
-                <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
-                <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
+            <div class="flex-1" style="min-width: 0;">
+                <div class="text-sm text-semibold text-main text-truncate">{{ item.book.title }}</div>
+                <div class="text-xs text-muted">{{ item.returned_at|date:"d.m.Y" }}</div>
             </div>
-            {% endfor %}
+            <i class="fas fa-check text-success"></i>
         </div>
+        {% empty %}
+        <div class="text-center py-2xl text-muted">
+            <i class="fas fa-history text-3xl mb-md" style="opacity: 0.3;"></i>
+            <p>{% trans "Hali kitob o'qilmagan" %}</p>
+        </div>
+        {% endfor %}
     </div>
-    {% endif %}
 </div>
+
+<style>
+.tab-btn.active { background: var(--glass) !important; color: var(--text-main) !important; border-color: var(--primary) !important; }
+.tab-btn { transition: all 0.2s; }
+.tab-btn:hover { background: var(--hover-bg); }
+</style>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('d-none'));
+        this.classList.add('active');
+        document.getElementById('tab-' + this.dataset.tab).classList.remove('d-none');
+    });
+});
+</script>
 {% endblock %}
