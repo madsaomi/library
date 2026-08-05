@@ -6,8 +6,9 @@ Last fully verified: 2026-08-05 (admin polish + QR automation + 169 tests).
 - `python manage.py check` → 0 issues
 - `python manage.py collectstatic --noinput --clear` → works, 281 files, hashed names via
   `staticfiles/staticfiles.json` (manifest storage active)
-- `python -m pytest -q --tb=short` → **169 passed** (1 harmless DeprecationWarning from
-  `pythonjsonlogger` in site-packages)
+- `python -m pytest -q -n auto --tb=short` → **169 passed in ~29s** (xdist parallel + test-only MD5
+  hasher; ~12x faster than the 360s baseline). Use `-n auto` for the fast local run;
+  `requirements-dev.txt` includes pytest-xdist.
 - `python -m pytest e2e -q --tb=short` → **17 tests total** (14 old + 3 new QR-flow; all pass
   locally on Python 3.12; CI runs on Python 3.13 with Playwright + Postgres)
 - `python -m ruff check .` → all passed; `ruff format .` → clean

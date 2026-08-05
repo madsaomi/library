@@ -23,6 +23,8 @@ import sys
 
 sys.path.insert(0, str(BASE_DIR / 'apps'))
 
+_is_test = 'test' in sys.argv or bool(sys.modules.get('pytest'))
+
 # Ensure logs directory exists
 LOGS_DIR = BASE_DIR / 'logs'
 LOGS_DIR.mkdir(exist_ok=True)
@@ -60,7 +62,6 @@ if not DEBUG and any(cmd in _sys.argv for cmd in _dev_cmds):
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
-    _is_test = 'test' in _sys.argv or bool(_sys.modules.get('pytest'))
     if DEBUG or _is_test:
         SECRET_KEY = 'django-insecure-dev-key-change-in-production-only-32bytes-secret-token'
     else:
@@ -258,6 +259,10 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Fast password hasher for tests only (PBKDF2 720k iterations is very slow in test fixtures)
+if _is_test:
+    PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
