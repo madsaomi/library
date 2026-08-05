@@ -1831,3 +1831,266 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
     border-bottom: 1px solid var(--border, rgba(255,255,255,0.06));
     margin-bottom: 8px;
 }
+
+/* ============================================
+   STUDENT MODE: minimal, calm, distraction-free
+   ============================================ */
+body.user-panel .glass-panel,
+body.user-panel .glass-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+body.user-panel .glass-panel {
+    border-radius: 20px;
+}
+
+body.user-panel h1,
+body.user-panel h2,
+body.user-panel h3,
+body.user-panel h4 {
+    letter-spacing: -0.01em;
+}
+
+body.user-panel .page-heading {
+    font-size: clamp(1.5rem, 3vw, 1.9rem);
+}
+
+/* Calm book cards: no heavy shadows, soft borders */
+body.user-panel .book-card {
+    border-radius: 16px !important;
+    border: 1px solid var(--border) !important;
+    background: var(--bg-card) !important;
+    box-shadow: none !important;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+body.user-panel .book-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary) !important;
+    box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.user-panel .book-card .book-cover-img {
+    border-radius: 12px;
+}
+
+/* Muted category/status pills instead of loud badges */
+body.user-panel .pill-subtle {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    color: var(--text-muted);
+    background: var(--hover-bg);
+    border: 1px solid var(--border);
+}
+
+body.user-panel .pill-available {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.25);
+}
+
+body.user-panel .pill-unavailable {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Section headers */
+body.user-panel .user-section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px 0;
+}
+
+body.user-panel .user-section-title i {
+    color: var(--primary);
+    font-size: 0.9em;
+}
+
+/* Stat tiles: quiet, no rainbow colors */
+body.user-panel .user-stat {
+    padding: 18px 16px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    text-align: center;
+}
+
+body.user-panel .user-stat .value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-main);
+}
+
+body.user-panel .user-stat .label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    letter-spacing: 0.02em;
+}
+
+/* Search + filter row */
+body.user-panel .catalog-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+body.user-panel .catalog-toolbar input[type="text"] {
+    flex: 1;
+    min-width: 220px;
+    padding: 13px 18px 13px 46px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    color: var(--input-text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.25s ease;
+}
+
+body.user-panel .catalog-toolbar input[type="text"]:focus {
+    border-color: var(--primary);
+}
+
+body.user-panel .filter-chip {
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    background: transparent;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+body.user-panel .filter-chip:hover {
+    background: var(--hover-bg);
+}
+
+body.user-panel .filter-chip.active {
+    color: var(--text-main);
+    background: var(--glass);
+    border-color: var(--primary);
+}
+
+/* Leaderboard rows */
+body.user-panel .leader-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    transition: background 0.2s ease;
+}
+
+body.user-panel .leader-row:hover {
+    background: var(--hover-bg);
+}
+
+body.user-panel .leader-rank {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    width: 34px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+body.user-panel .leader-row.top-1 .leader-rank { color: #f59e0b; }
+body.user-panel .leader-row.top-2 .leader-rank { color: #94a3b8; }
+body.user-panel .leader-row.top-3 .leader-rank { color: #b45309; }
+
+body.user-panel .leader-row.is-me {
+    background: var(--glass);
+}
+
+/* Quiet empty states */
+body.user-panel .empty-state .empty-icon-wrapper {
+    opacity: 0.35;
+}
+
+body.user-panel .empty-state h4 {
+    font-size: 1.05rem;
+}
+
+/* Sidebar: calm, fewer distractions */
+body.user-panel .sidebar {
+    background: var(--bg-card);
+}
+
+body.user-panel .nav-link {
+    padding: 11px 16px;
+    margin-bottom: 6px;
+    border-radius: 12px;
+    border-left: none;
+}
+
+body.user-panel .nav-link.active {
+    background: var(--glass);
+    color: var(--hover-text);
+    border-left: 3px solid var(--primary);
+}
+
+body.user-panel .nav-link i {
+    width: 22px;
+    font-size: 1.05rem;
+}
+
+body.user-panel .sidebar-section-label {
+    opacity: 0.55;
+    letter-spacing: 1px;
+}
+
+body.user-panel .sidebar-cart-link {
+    background: var(--hover-bg) !important;
+    color: var(--text-main) !important;
+    border: 1px solid var(--border) !important;
+}
+
+body.user-panel .sidebar-cart-link .badge {
+    background: var(--primary) !important;
+    color: #fff !important;
+}
+
+/* Achievement cards */
+body.user-panel .achievement-card {
+    border-radius: 16px;
+}
+
+body.user-panel .achievement-card.achievement-earned {
+    border-color: rgba(251, 191, 36, 0.35);
+}
+
+body.user-panel .achievement-card.achievement-locked {
+    opacity: 0.55;
+}
+
+/* News body typography */
+body.user-panel .news-body {
+    line-height: 1.7;
+}
+
+/* Profile hero */
+body.user-panel .profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 32px;
+}
+
+/* Hide scroll-to-top + page overlay noise for the calmer user experience */
+body.user-panel .scroll-top {
+    opacity: 0.6;
+}

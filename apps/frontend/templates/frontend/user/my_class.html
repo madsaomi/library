@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}{% trans "Mening sinfim" %} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}<i class="fas fa-users" style="margin-right: 8px; color: #818cf8;"></i> {{ user.grade }} {% trans "sinf" %}{% endblock %}
+{% block page_title %}<i class="fas fa-users" style="margin-right: 8px;"></i> {{ user.grade }} {% trans "sinf" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/user/sidebar_items.html' %}
@@ -12,25 +12,25 @@
 <div class="animate-fade mw-800 mx-auto">
 
     <!-- Class Stats Header -->
-    <div class="glass-panel text-center p-xl mb-xl">
+    <div class="glass-panel text-center p-xl mb-xl" style="border-radius: 20px;">
         <div class="text-sm text-muted mb-xs">{% trans "Sinfdoshlar" %}</div>
-        <div class="text-2xl text-extrabold" style="color: #818cf8;">{{ class_data|length }}</div>
+        <div class="text-2xl text-extrabold text-main">{{ class_data|length }}</div>
         <div class="text-xs text-muted">{{ user.grade }} {% trans "sinf" %} &middot; {{ user.school.name }}</div>
     </div>
 
     <!-- My Stats -->
-    <div class="grid-3 mb-xl" style="gap: 12px;">
-        <div class="glass-card text-center p-lg" style="border: 1px solid rgba(99,102,241,0.15);">
-            <div class="text-lg text-extrabold" style="color: #818cf8;">{{ my_read }}</div>
-            <div class="text-xs text-muted">{% trans "O'qilgan" %}</div>
+    <div class="responsive-grid-3 mb-xl" style="gap: 12px;">
+        <div class="user-stat">
+            <div class="value">{{ my_read }}</div>
+            <div class="label">{% trans "O'qilgan" %}</div>
         </div>
-        <div class="glass-card text-center p-lg" style="border: 1px solid rgba(16,185,129,0.15);">
-            <div class="text-lg text-extrabold" style="color: #34d399;">{{ my_active }}</div>
-            <div class="text-xs text-muted">{% trans "Faol" %}</div>
+        <div class="user-stat">
+            <div class="value">{{ my_active }}</div>
+            <div class="label">{% trans "Faol" %}</div>
         </div>
-        <div class="glass-card text-center p-lg" style="border: 1px solid rgba(251,191,36,0.15);">
-            <div class="text-lg text-extrabold" style="color: #fbbf24;">{{ my_ach }}</div>
-            <div class="text-xs text-muted">{% trans "Yutuqlar" %}</div>
+        <div class="user-stat">
+            <div class="value">{{ my_ach }}</div>
+            <div class="label">{% trans "Yutuqlar" %}</div>
         </div>
     </div>
 
@@ -45,20 +45,19 @@
                 {{ forloop.counter }}
                 {% endif %}
             </div>
-            <div class="avatar-circle flex-shrink-0" style="width: 36px; height: 36px; background: linear-gradient(135deg, #6366f1, #a855f7);">
-                <span class="avatar-initials text-xs">{{ item.student.first_name|first|upper }}{{ item.student.last_name|first|upper }}</span>
+            <div class="avatar-circle flex-shrink-0" style="width: 36px; height: 36px; background: var(--hover-bg); border: 1px solid var(--border);">
+                <span class="avatar-initials text-xs text-muted">{{ item.student.first_name|first|upper }}{{ item.student.last_name|first|upper }}</span>
             </div>
             <div class="flex-1" style="min-width: 0;">
                 <div class="text-bold text-lg">{{ item.student.first_name }} {{ item.student.last_name }}</div>
                 <div class="text-md text-muted d-flex gap-lg mt-xs">
-                    <span><i class="fas fa-star" style="color: #818cf8;"></i> {{ item.student.xp_points }} XP</span>
-                    <span><i class="fas fa-book" style="color: #34d399;"></i> {{ item.total_read }}</span>
-                    <span><i class="fas fa-hand-holding-heart" style="color: #f59e0b;"></i> {{ item.active_loans }}</span>
-                    <span><i class="fas fa-trophy" style="color: #fbbf24;"></i> {{ item.achievements }}</span>
+                    <span><i class="fas fa-book"></i> {{ item.total_read }}</span>
+                    <span><i class="fas fa-hand-holding-heart"></i> {{ item.active_loans }}</span>
+                    <span><i class="fas fa-trophy"></i> {{ item.achievements }}</span>
                 </div>
             </div>
             <div class="text-md text-muted text-semibold">
-                <i class="fas fa-level-up-alt" style="color: #a855f7;"></i> {{ item.student.level }}
+                {{ item.student.xp_points }} XP
             </div>
         </div>
         {% empty %}

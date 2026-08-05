@@ -221,7 +221,7 @@
         }
     </style>
 </head>
-<body hx-boost="true" hx-target="#main-area" hx-select="#main-area" hx-swap="innerHTML" hx-push-url="true">
+<body hx-boost="true" hx-target="#main-area" hx-select="#main-area" hx-swap="innerHTML" hx-push-url="true" class="{% if user.is_authenticated and user.role == 'student' or user.is_authenticated and user.role == 'teacher' %}user-panel{% endif %}">
     <a href="#main-content" style="position: absolute; left: -9999px; top: 8px; padding: 8px 16px; background: var(--primary); color: #fff; border-radius: 8px; z-index: 10000; text-decoration: none; font-size: 0.9rem;" onfocus="this.style.left='8px'" onblur="this.style.left='-9999px'">{% trans "Asosiy mazmunga o'tish" %}</a>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()" role="presentation" aria-hidden="true"></div>
 

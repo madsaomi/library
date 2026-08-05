@@ -9,76 +9,51 @@
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade">
+<div class="animate-fade mw-800 mx-auto">
     <!-- Period Tabs -->
-    <div class="glass-panel d-flex flex-wrap gap-sm p-lg mb-2xl">
-        <a href="?period=week" class="btn-small text-decoration-none rounded-md {% if current_period == 'week' %}btn-primary{% else %}glass-card{% endif %}" style="padding: 8px 20px;">
+    <div class="d-flex gap-sm mb-2xl flex-wrap">
+        <a href="?period=week" class="filter-chip {% if current_period == 'week' %}active{% endif %}" style="padding: 9px 18px;">
             <i class="fas fa-calendar-week"></i> {% trans "Hafta" %}
         </a>
-        <a href="?period=month" class="btn-small text-decoration-none rounded-md {% if current_period == 'month' %}btn-primary{% else %}glass-card{% endif %}" style="padding: 8px 20px;">
+        <a href="?period=month" class="filter-chip {% if current_period == 'month' %}active{% endif %}" style="padding: 9px 18px;">
             <i class="fas fa-calendar-alt"></i> {% trans "Oy" %}
         </a>
-        <a href="?period=all" class="btn-small text-decoration-none rounded-md {% if current_period == 'all' %}btn-primary{% else %}glass-card{% endif %}" style="padding: 8px 20px;">
+        <a href="?period=all" class="filter-chip {% if current_period == 'all' %}active{% endif %}" style="padding: 9px 18px;">
             <i class="fas fa-infinity"></i> {% trans "Barcha vaqt" %}
         </a>
     </div>
 
-    <!-- Leaderboard Table -->
-    <div class="glass-panel overflow-hidden p-xl">
+    <!-- Leaderboard -->
+    <div class="glass-panel p-sm" style="border-radius: 20px;">
         {% if students %}
-        <table class="leaderboard-table w-full">
-            <thead>
-                <tr class="border-bottom">
-                    <th class="text-left p-lg" style="width: 60px;">#</th>
-                    <th class="text-left p-lg">{% trans "O'quvchi" %}</th>
-                    <th class="text-center p-lg">{% trans "Daraja" %}</th>
-                    <th class="text-center p-lg">XP</th>
-                    <th class="text-center p-lg">{% trans "Kitoblar" %}</th>
-                </tr>
-            </thead>
-            <tbody class="animate-group">
-                {% for student in students %}
-                <tr class="border-bottom transition animate-item" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background='transparent'">
-                    <td class="p-lg">
-                        {% if forloop.counter == 1 %}
-                        <span class="text-xl">🥇</span>
-                        {% elif forloop.counter == 2 %}
-                        <span class="text-xl">🥈</span>
-                        {% elif forloop.counter == 3 %}
-                        <span class="text-xl">🥉</span>
-                        {% else %}
-                        <span class="text-muted text-bold">{{ forloop.counter }}</span>
-                        {% endif %}
-                    </td>
-                    <td class="p-lg">
-                        <div class="d-flex align-center gap-md">
-                            <div class="flex-center rounded-full flex-shrink-0" style="width: 40px; height: 40px; background: var(--primary);">
-                                <i class="fas {{ student.selected_icon|default:'fa-user' }} text-white text-lg"></i>
-                            </div>
-                            <div>
-                                <strong>{{ student.first_name }} {{ student.last_name }}</strong>
-                                <div class="text-sm text-muted">{{ student.grade|default:"-" }} {% trans "sinf" %}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="text-center p-lg">
-                        <span class="level-badge text-white" style="background: var(--primary); padding: 3px 10px; border-radius: 15px; font-size: 0.8rem;">
-                            {{ student.level }}
-                        </span>
-                    </td>
-                    <td class="text-center p-lg text-bold text-primary">
-                        {{ student.xp_points }}
-                    </td>
-                    <td class="text-center p-lg">
-                        <div class="d-flex align-center justify-center gap-xs">
-                            <i class="fas fa-book text-muted text-md"></i>
-                            <strong>{{ student.period_books }}</strong>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="animate-group d-flex flex-column" style="gap: 2px;">
+            {% for student in students %}
+            <div class="leader-row {% if forloop.counter <= 3 %}top-{{ forloop.counter }}{% endif %} animate-item {% if student.pk == request.user.pk %}is-me{% endif %}">
+                <div class="leader-rank">
+                    {% if forloop.counter == 1 %}
+                    <i class="fas fa-crown"></i>
+                    {% elif forloop.counter == 2 %}
+                    <i class="fas fa-medal"></i>
+                    {% elif forloop.counter == 3 %}
+                    <i class="fas fa-medal"></i>
+                    {% else %}
+                    {{ forloop.counter }}
+                    {% endif %}
+                </div>
+                <div class="flex-center rounded-full flex-shrink-0" style="width: 40px; height: 40px; background: var(--hover-bg); border: 1px solid var(--border);">
+                    <i class="fas {{ student.selected_icon|default:'fa-user' }} text-sm text-muted"></i>
+                </div>
+                <div class="flex-1" style="min-width: 0;">
+                    <strong class="text-main text-md">{{ student.first_name }} {{ student.last_name }}</strong>
+                    <div class="text-xs text-muted">{{ student.grade|default:"-" }} {% trans "sinf" %}</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-semibold text-main text-md">{{ student.period_books }} <i class="fas fa-book text-xs text-muted"></i></div>
+                    <div class="text-xs text-muted">{{ student.xp_points }} XP</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
         {% else %}
         <div class="text-center p-3xl text-muted">
             <i class="fas fa-users text-3xl mb-lg" style="opacity: 0.5;"></i>
@@ -87,16 +62,4 @@
         {% endif %}
     </div>
 </div>
-
-<style>
-.leaderboard-table tr:last-child {
-    border-bottom: none !important;
-}
-.btn-small {
-    transition: 0.3s;
-}
-.btn-small:hover {
-    transform: translateY(-2px);
-}
-</style>
 {% endblock %}

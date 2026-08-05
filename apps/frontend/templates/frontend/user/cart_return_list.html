@@ -10,24 +10,24 @@
 
 {% block content %}
 <div class="animate-fade">
-    <div class="glass-panel p-xl mb-xl">
+    <div class="glass-panel p-xl mb-xl" style="border-radius: 20px;">
         <div class="d-flex align-center justify-between mb-lg">
-            <h3>
-                <i class="fas fa-reply text-primary"></i>
+            <h3 class="user-section-title m-0">
+                <i class="fas fa-reply"></i>
                 {% trans "Qaytarish uchun savat" %}
             </h3>
-            <span class="badge bg-primary text-white text-lg px-lg py-sm rounded-full">
+            <span class="pill-subtle">
                 {{ items|length }} kitob
             </span>
         </div>
 
         {% if items %}
         <div class="d-flex align-center gap-md mb-xl">
-            <button type="button" onclick="generateReturnQR()" class="btn btn-primary">
+            <a href="{% url 'frontend:cart_return_qr' %}" target="_blank" rel="noopener" class="btn-primary" style="border: none; border-radius: 12px; padding: 11px 22px; font-size: 0.9rem;">
                 <i class="fas fa-qrcode"></i>
                 {% trans "QR kod yaratish" %}
-            </button>
-            <button type="button" onclick="clearReturnCart()" class="btn btn-danger">
+            </a>
+            <button type="button" onclick="clearReturnCart()" class="cursor-pointer" style="border-radius: 12px; padding: 11px 22px; font-size: 0.9rem; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: inherit;">
                 <i class="fas fa-trash"></i>
                 {% trans "Tozalash" %}
             </button>
@@ -53,7 +53,7 @@
                     {% if item.book.author %}
                     <p class="text-xs text-muted mb-sm">{{ item.book.author }}</p>
                     {% endif %}
-                    <button type="button" onclick="removeReturnItem({{ item.id }})" class="btn btn-sm btn-danger w-100" style="border-radius: 8px;">
+                    <button type="button" onclick="removeReturnItem({{ item.id }})" class="cursor-pointer w-100" style="border-radius: 8px; padding: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: inherit;">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -71,10 +71,10 @@
         {% endif %}
     </div>
 
-    <div class="glass-panel p-xl">
+    <div class="glass-panel p-xl" style="border-radius: 20px;">
         <div class="d-flex align-center justify-between mb-lg">
-            <h3>
-                <i class="fas fa-book-open text-primary"></i>
+            <h3 class="user-section-title m-0">
+                <i class="fas fa-book-open"></i>
                 {% trans "Olingan kitoblar" %}
             </h3>
         </div>
@@ -94,7 +94,7 @@
                     <tr>
                         <td>
                             <div class="d-flex align-center gap-md">
-                                <i class="fas fa-book text-primary"></i>
+                                <i class="fas fa-book text-muted"></i>
                                 <div>
                                     <strong>{{ issue.book.title }}</strong>
                                     {% if issue.book.author %}
@@ -106,9 +106,9 @@
                         <td class="text-muted">{{ issue.issued_at|date:"d.m.Y" }}</td>
                         <td class="text-end">
                             {% if issue.book_id in in_cart_ids %}
-                            <span class="badge bg-success">{% trans "Savatda" %}</span>
+                            <span class="pill-subtle">{% trans "Savatda" %}</span>
                             {% else %}
-                            <a href="{% url 'frontend:cart_return_add' issue.pk %}" class="btn btn-sm btn-primary">
+                            <a href="{% url 'frontend:cart_return_add' issue.pk %}" class="pill-subtle text-decoration-none" style="color: var(--text-main); background: var(--hover-bg);">
                                 <i class="fas fa-plus"></i> {% trans "Qo'shish" %}
                             </a>
                             {% endif %}
@@ -145,10 +145,6 @@ function clearReturnCart() {
         if (data.success) location.reload();
         else alert(data.error || '{% trans "Xato bo\'ldi" %}');
     }).catch(() => alert('{% trans "Xatolik yuz berdi" %}'));
-}
-
-function generateReturnQR() {
-    window.open('/library/cart/return/qr/', '_blank', 'width=440,height=620');
 }
 </script>
 

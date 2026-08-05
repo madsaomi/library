@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="glass-panel animate-fade p-3xl">
+<div class="glass-panel animate-fade p-3xl" style="border-radius: 20px;">
     <div class="d-flex gap-2xl align-start flex-wrap">
         <div class="w-full flex-shrink-0 mx-auto" style="max-width: 280px;">
             <div class="overflow-hidden border rounded-2xl" style="aspect-ratio: 2/3; background: var(--hover-bg);">
@@ -22,29 +22,29 @@
                 {% endif %}
             </div>
 
-            <div class="grid-3 mt-md" style="gap: 8px;">
-                <div class="glass-card p-sm text-center">
-                    <div class="text-xs text-muted text-uppercase">{% trans "Jami" %}</div>
-                    <div class="text-lg text-bold text-main">{{ book.total_count }}</div>
+            <div class="responsive-grid-3 mt-md" style="gap: 8px;">
+                <div class="user-stat p-sm">
+                    <div class="value" style="font-size: 1.2rem;">{{ book.total_count }}</div>
+                    <div class="label">{% trans "Jami" %}</div>
                 </div>
-                <div class="glass-card p-sm text-center">
-                    <div class="text-xs text-success text-uppercase">{% trans "Mavjud" %}</div>
-                    <div class="text-lg text-bold" style="color: #10b981;">{{ book.available_count }}</div>
+                <div class="user-stat p-sm">
+                    <div class="value" style="font-size: 1.2rem;">{{ book.available_count }}</div>
+                    <div class="label">{% trans "Mavjud" %}</div>
                 </div>
-                <div class="glass-card p-sm text-center">
-                    <div class="text-xs text-primary text-uppercase">{% trans "O'qilgan" %}</div>
-                    <div class="text-lg text-bold text-primary">{{ book.borrow_count }}</div>
+                <div class="user-stat p-sm">
+                    <div class="value" style="font-size: 1.2rem;">{{ book.borrow_count }}</div>
+                    <div class="label">{% trans "O'qilgan" %}</div>
                 </div>
             </div>
         </div>
 
         <div class="flex-1" style="min-width: 280px;">
-            <div class="mb-md">
-                <span class="badge" style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 3px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">
+            <div class="mb-md d-flex align-center gap-sm">
+                <span class="pill-subtle">
                     {% if book.category %}{{ book.category.name }}{% else %}{% trans "Kategoriyasiz" %}{% endif %}
                 </span>
                 {% if book.borrow_count > 50 %}
-                <span class="badge" style="background: rgba(245,158,11,0.1); color: #f59e0b; padding: 3px 10px; border-radius: 6px; font-size: 0.7rem; margin-left: 6px;">
+                <span class="pill-subtle">
                     <i class="fas fa-star"></i> {% trans "Mashhur" %}
                 </span>
                 {% endif %}
@@ -61,12 +61,6 @@
             <div class="d-flex flex-wrap text-md text-muted gap-lg mb-2xl">
                 <span><i class="fas fa-eye"></i> {{ book.borrow_count }} {% trans "marta o'qilgan" %}</span>
                 <span><i class="fas fa-users"></i> {{ book.currently_reading_count }} {% trans "hozir o'qiyapti" %}</span>
-                <span>
-                    <i class="fas fa-star" style="color: #f59e0b;"></i>
-                    {% if book.borrow_count > 50 %}<span style="color: #f59e0b;">{{ book.borrow_count }}</span>
-                    {% elif book.borrow_count > 20 %}<span style="color: #94a3b8;">{{ book.borrow_count }}</span>
-                    {% else %}{{ book.borrow_count }}{% endif %}
-                </span>
             </div>
 
             <h4 class="m-0 mb-sm text-md text-main">{% trans "Tavsif" %}</h4>
@@ -81,16 +75,16 @@
                     <span>{% trans "Bu darslik. O'quvchilar darsliklarni o'quv yili boshida olishadi." %}</span>
                 </div>
                 {% elif book.available_count > 0 %}
-                <a href="{% url 'frontend:reserve_book' book.pk %}" class="btn-primary text-decoration-none d-flex align-center justify-center gap-sm rounded-lg flex-1" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px;">
+                <a href="{% url 'frontend:reserve_book' book.pk %}" class="btn-primary text-decoration-none d-flex align-center justify-center gap-sm rounded-lg flex-1" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px; border: none;">
                     <i class="fas fa-plus-circle"></i> {% trans "Kitobni bron qilish" %}
                 </a>
-                <a href="{% url 'frontend:cart_add' book.pk %}" class="btn-primary text-decoration-none d-flex align-center justify-center gap-sm rounded-lg flex-1" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px; background: linear-gradient(135deg, var(--secondary), #7c3aed);">
+                <a href="{% url 'frontend:cart_add' book.pk %}" class="btn-primary text-decoration-none d-flex align-center justify-center gap-sm rounded-lg flex-1" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px; background: var(--hover-bg); color: var(--text-main); border: 1px solid var(--border);">
                     <i class="fas fa-cart-plus"></i> {% trans "Savatga qo'shish" %}
                 </a>
                 {% else %}
-                <button class="btn-primary d-flex align-center justify-center gap-sm rounded-lg flex-1 border-none" style="padding: 14px 28px; font-size: 0.95rem; background: #374151; cursor: not-allowed; min-width: 200px; color: #94a3b8;" disabled>
+                <a href="{% url 'frontend:join_waitlist' book.pk %}" class="btn-primary d-flex align-center justify-center gap-sm rounded-lg flex-1 text-decoration-none" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px; background: var(--hover-bg); color: var(--text-main); border: 1px solid var(--border);">
                     <i class="fas fa-clock"></i> {% trans "Navbatga turish" %}
-                </button>
+                </a>
                 {% endif %}
             </div>
         </div>

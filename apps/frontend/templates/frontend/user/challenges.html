@@ -2,7 +2,7 @@
 {% load i18n %}{% load frontend_tags %}
 
 {% block title %}{% trans "Chellenjlar" %} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}{% trans "Chellenjlar" %} ⚡{% endblock %}
+{% block page_title %}{% trans "Chellenjlar" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/user/sidebar_items.html' %}
@@ -14,14 +14,14 @@
     <div class="responsive-grid-2">
         {% for challenge in challenges %}
         {% with uc=user_challenges|get_item:challenge.id %}
-        <div class="glass-panel challenge-card pos-relative overflow-hidden p-xl">
-            <div class="pos-absolute top-0 left-0 right-0" style="height: 4px; background: linear-gradient(90deg, var(--primary), #a855f7);"></div>
+        <div class="glass-panel challenge-card pos-relative overflow-hidden p-xl" style="border-radius: 20px;">
+            <div class="pos-absolute top-0 left-0 right-0" style="height: 3px; background: var(--primary);"></div>
             <div class="flex-between align-start mb-lg flex-wrap gap-sm">
                 <div>
                     <h3 class="mb-xs">{{ challenge.title }}</h3>
                     <p class="text-muted text-md">{{ challenge.description }}</p>
                 </div>
-                <div class="xp-reward-badge text-white text-md text-nowrap" style="background: var(--primary); padding: 5px 15px; border-radius: 20px;">
+                <div class="xp-reward-badge pill-subtle text-nowrap">
                     <i class="fas fa-plus-circle"></i> +{{ challenge.xp_reward }} XP
                 </div>
             </div>
@@ -40,9 +40,9 @@
                     </div>
                     <div class="overflow-hidden" style="height: 8px; background: var(--hover-bg); border-radius: 4px;">
                         {% if uc %}
-                        <div style="width: {% widthratio uc.progress challenge.target_count 100 %}%; height: 100%; background: linear-gradient(90deg, var(--primary), #a855f7); border-radius: 4px; transition: width 0.5s;"></div>
+                        <div style="width: {% widthratio uc.progress challenge.target_count 100 %}%; height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.5s;"></div>
                         {% else %}
-                        <div style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), #a855f7); border-radius: 4px;"></div>
+                        <div style="width: 0%; height: 100%; background: var(--primary); border-radius: 4px;"></div>
                         {% endif %}
                     </div>
                 </div>

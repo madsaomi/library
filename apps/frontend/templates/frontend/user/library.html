@@ -2,228 +2,110 @@
 {% load i18n %}
 
 {% block title %}{% trans "Kutubxona" %} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}{% trans "Kitoblar katalogi" %}{% endblock %}
+{% block page_title %}{% trans "Kitoblar" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/user/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
-{% if reader_of_month %}
-<div class="glass-panel mb-xl p-xl" style="background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border: 1px solid rgba(99,102,241,0.2);">
-    <div class="d-flex align-center gap-xl flex-wrap">
-        <div class="text-2xl">👑</div>
-        <div>
-            <div class="text-sm text-muted text-uppercase mb-xs" style="letter-spacing: 1px;">{% trans "OY O'QUVCHISI" %}</div>
-            <div class="d-flex align-center gap-sm flex-wrap">
-                <strong class="text-xl text-main">{{ reader_of_month.user.first_name }} {{ reader_of_month.user.last_name }}</strong>
-                <span class="level-badge" style="background: var(--primary); color: white; padding: 3px 12px; border-radius: 15px; font-size: 0.8rem;">
-                    <i class="fas fa-book"></i> {{ reader_of_month.books_count }} {% trans "kitob" %}
-                </span>
+<div class="animate-fade">
+    {% if latest_news %}
+    <a href="{% url 'frontend:user_news_list' %}" class="text-decoration-none d-block mb-2xl">
+        <div class="glass-panel d-flex align-center gap-lg px-xl py-md" style="border-radius: 16px;">
+            <div class="flex-shrink-0">
+                <i class="fas fa-bullhorn" style="color: var(--primary);"></i>
             </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if active_reads or school_activity %}
-<div class="responsive-grid-2 mb-2xl gap-xl">
-    <div class="glass-panel p-xl">
-        <h4 class="mb-lg text-md">
-            <i class="fas fa-book-open text-primary"></i> {% trans "Hozir o'qilayotgan kitoblar" %}
-        </h4>
-        <div class="d-flex flex-column gap-sm">
-            {% for issue in active_reads|slice:":5" %}
-            <div class="d-flex align-center gap-md p-sm rounded-lg" style="background: var(--hover-bg);">
-                <div class="flex-center rounded-full flex-shrink-0" style="width: 35px; height: 35px; background: var(--primary);">
-                    <i class="fas {{ issue.user.selected_icon|default:'fa-user' }} text-white text-sm"></i>
-                </div>
-                <div class="flex-1" style="min-width: 0;">
-                    <div class="text-md text-semibold text-main text-truncate">{{ issue.user.first_name }} {{ issue.user.last_name }}</div>
-                    <div class="text-sm text-muted text-truncate">
-                        <i class="fas fa-book text-xs"></i> {{ issue.book.title }}
-                    </div>
-                </div>
+            <div class="flex-1" style="min-width: 0;">
+                <div class="text-sm text-muted mb-xs">{{ latest_news.0.created_at|date:"d.m.Y" }}</div>
+                <div class="text-md text-semibold text-main text-truncate">{{ latest_news.0.title }}</div>
             </div>
-            {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-book text-4xl text-primary"></i>
+            <span class="text-sm text-muted flex-shrink-0" style="white-space: nowrap;">{% trans "Barchasi" %} →</span>
         </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
-    </div>
-        {% endfor %}
-        </div>
-    </div>
+    </a>
+    {% endif %}
 
-    <div class="glass-panel p-xl">
-        <h4 class="mb-lg text-md">
-            <i class="fas fa-bolt" style="color: #f97316;"></i> {% trans "So'nggi faoliyat" %}
-        </h4>
-        <div class="d-flex flex-column gap-xs">
-            {% for log in school_activity %}
-            <div class="p-sm rounded-md text-sm text-muted" style="background: var(--hover-bg);">
-                <span class="text-main">{{ log.message|truncatechars:60 }}</span>
-                <span class="text-xs" style="float: right; opacity: 0.6;">{{ log.created_at|timesince }} {% trans "oldin" %}</span>
+    <div class="glass-panel p-xl mb-2xl" style="border-radius: 20px;">
+        <form method="get" id="search-form" class="catalog-toolbar">
+            <div class="pos-relative flex-1" style="min-width: 220px;">
+                <i class="fas fa-search pos-absolute text-muted" style="left: 18px; top: 50%; transform: translateY(-50%); font-size: 0.95rem;"></i>
+                <input type="text" name="q" id="search-input" value="{{ current_query }}" aria-label="{% trans 'Kitob nomi, muallifi yoki kategoriyasi...' %}" placeholder="{% trans 'Kitob nomi, muallifi yoki kategoriyasi...' %}" autocomplete="off">
             </div>
-            {% empty %}
+            <button type="submit" class="btn-primary cursor-pointer" style="padding: 12px 28px; border-radius: 14px; border: none; font-weight: 600;">
+                <i class="fas fa-search"></i> {% trans "Qidirish" %}
+            </button>
+        </form>
 
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-book text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
-    </div>
-        {% endfor %}
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if latest_news %}
-<div class="news-ticker animate-fade mb-2xl">
-    <div class="d-flex align-center gap-lg text-primary p-xl rounded-3xl" style="background: rgba(217, 119, 6, 0.08); border: 1px solid var(--border);">
-        <i class="fas fa-bullhorn text-xl" style="animation: pulse 2s infinite;"></i>
-        <div class="flex-1 overflow-hidden">
-            <div class="d-flex" style="gap: 40px; animation: ticker 30s linear infinite; white-space: nowrap;">
-                {% for item in latest_news %}
-                <a href="{% url 'frontend:user_news_list' %}" class="text-decoration-none text-semibold" style="color: inherit;">
-                    <span style="opacity: 0.7; margin-right: 10px;">{{ item.created_at|date:"d.m" }}</span>
-                    {{ item.title }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-        <a href="{% url 'frontend:user_news_list' %}" class="text-sm text-bold text-uppercase text-primary text-decoration-none" style="letter-spacing: 1px; border-bottom: 2px solid var(--primary);">
-            {% trans "Barchasi" %}
-        </a>
-    </div>
-    <style>
-        @keyframes pulse { 0%{transform:scale(1);opacity:1} 50%{transform:scale(1.1);opacity:0.7} 100%{transform:scale(1);opacity:1} }
-        @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-    </style>
-</div>
-{% endif %}
-
-<div class="glass-panel p-xl mb-2xl rounded-3xl">
-    <form method="get" id="search-form" class="d-flex gap-md mb-xl">
-        <div class="flex-1 pos-relative">
-            <i class="fas fa-search pos-absolute text-muted" style="left: 18px; top: 50%; transform: translateY(-50%); font-size: 1.1rem;"></i>
-            <input type="text" name="q" id="search-input" value="{{ current_query }}" aria-label="{% trans 'Kitob nomi, muallifi yoki kategoriyasi...' %}" placeholder="{% trans 'Kitob nomi, muallifi yoki kategoriyasi...' %}" style="padding: 18px 18px 18px 55px; width: 100%; box-sizing: border-box; border-radius: 16px; border: 1px solid var(--border); background: var(--input-bg); color: var(--input-text); font-size: 1rem; outline: none;">
-        </div>
-        <button type="submit" class="btn-primary rounded-2xl text-bold cursor-pointer" style="padding: 0 40px; box-shadow: 0 10px 20px var(--primary-glow);">{% trans "Qidirish" %}</button>
-    </form>
-
-    <style>
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .filter-chip { padding: 10px 22px; border-radius: 12px; text-decoration: none; font-size: 0.85rem; font-weight: 600; white-space: nowrap; transition: 0.3s; border: 1px solid var(--border); background: transparent; color: var(--text-muted); }
-        .filter-chip:hover { background: var(--hover-bg); }
-        .filter-chip.active { color: var(--text-main); border-color: var(--primary); background: rgba(217, 119, 6, 0.1); }
-    </style>
-    <div class="d-flex align-center gap-lg overflow-x-auto pb-xs" style="scrollbar-width: none; -ms-overflow-style: none;">
-        <div class="no-scrollbar d-flex gap-sm">
+        <div class="d-flex align-center gap-sm flex-wrap">
             <a href="{% url 'frontend:library' %}" class="filter-chip {% if not current_query %}active{% endif %}">{% trans "Barchasi" %}</a>
             {% for cat in categories %}
             <a href="{% url 'frontend:library' %}?q={{ cat.name }}" class="filter-chip {% if current_query == cat.name %}active{% endif %}">{{ cat.name }}</a>
             {% endfor %}
         </div>
     </div>
-</div>
 
-<div id="books-grid" class="animate-group" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">
-    {% for book in books %}
-    <div class="book-card glass-card animate-fade d-flex flex-column overflow-hidden border animate-item" data-title="{{ book.title|lower }}" data-author="{{ book.author|default:''|lower }}" data-category="{{ book.category.name|default:''|lower }}" style="padding: 10px; border-radius: 24px; background: var(--bg-card);">
-        <a href="{% url 'frontend:book_detail' book.pk %}" class="text-decoration-none" style="color: inherit;">
-            <div class="pos-relative overflow-hidden rounded-2xl img-zoom" style="height: 360px; background: var(--hover-bg);">
-                {% if book.cover %}
-                <img src="{{ book.cover.url }}" alt="{{ book.title }}" loading="lazy" class="w-full h-full object-cover transition" style="">
-                {% else %}
-                <div class="w-full h-full d-flex flex-column align-center justify-center gap-sm">
-                    <i class="fas fa-book text-3xl" style="opacity: 0.15; color: var(--text-muted);"></i>
-                    <div class="text-sm text-bold text-muted text-center px-xl" style="opacity: 0.5;">{{ book.title }}</div>
-                </div>
-                {% endif %}
-
-                <div class="pos-absolute rounded-md text-sm text-semibold border" style="top: 10px; right: 10px; background: var(--bg-card); padding: 4px 10px; font-size: 0.55rem; color: var(--text-main);">
-                    {% if book.category %}{{ book.category.name }}{% else %}{% trans "Umumiy" %}{% endif %}
-                </div>
-
-                <div class="pos-absolute d-flex align-center gap-xs rounded-md" style="bottom: 10px; left: 10px; background: var(--bg-card); padding: 4px 10px; font-size: 0.6rem; color: #f59e0b; font-weight: 700; border: 1px solid var(--border);">
-                    {% if book.borrow_count > 50 %}<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    {% elif book.borrow_count > 20 %}<i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    {% elif book.borrow_count > 0 %}<i class="fas fa-star"></i>
-                    {% else %}<span class="text-muted text-semibold text-xs">{% trans "Yangi" %}</span>{% endif %}
-                    <span class="text-main ml-xs">{{ book.borrow_count }}</span>
-                </div>
-
-                {% if book.available_count == 0 %}
-                <div class="pos-absolute rounded-md text-white text-bold" style="top: 10px; left: 10px; background: rgba(239,68,68,0.9); padding: 4px 10px; font-size: 0.55rem;">
-                    {% trans "Tugagan" %}
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="d-flex flex-column gap-md" style="padding: 14px 8px 6px 8px;">
-                <h4 class="m-0 text-md text-bold lh-tight text-main" style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">{{ book.title }}</h4>
-                {% if book.author %}
-                <div class="text-sm text-muted"><i class="fas fa-user-pen"></i> {{ book.author }}</div>
-                {% endif %}
-
-                <div class="d-flex gap-xs justify-between rounded-2xl border p-sm" style="background: var(--hover-bg);">
-                    <div class="flex-1 text-center">
-                        <div class="text-xs text-muted text-uppercase">{% trans "Jami" %}</div>
-                        <div class="text-bold text-md text-main">{{ book.total_count }}</div>
+    <div id="books-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+        {% for book in books %}
+        <div class="book-card animate-item" data-title="{{ book.title|lower }}" data-author="{{ book.author|default:''|lower }}" data-category="{{ book.category.name|default:''|lower }}">
+            <a href="{% url 'frontend:book_detail' book.pk %}" class="text-decoration-none d-flex flex-column" style="color: inherit; height: 100%;">
+                <div class="pos-relative overflow-hidden book-cover-img" style="aspect-ratio: 3/4; background: var(--hover-bg);">
+                    {% if book.cover %}
+                    <img src="{{ book.cover.url }}" alt="{{ book.title }}" loading="lazy" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full d-flex align-center justify-center">
+                        <i class="fas fa-book text-3xl" style="opacity: 0.2; color: var(--text-muted);"></i>
                     </div>
-                    <div style="width: 1px; background: var(--border); margin: 4px 0;"></div>
-                    <div class="flex-1 text-center">
-                        <div class="text-xs text-success text-uppercase">{% trans "Mavjud" %}</div>
-                        <div class="text-bold text-md" style="color: #10b981;">{{ book.available_count }}</div>
-                    </div>
-                    <div style="width: 1px; background: var(--border); margin: 4px 0;"></div>
-                    <div class="flex-1 text-center">
-                        <div class="text-xs text-primary text-uppercase">{% trans "O'qilgan" %}</div>
-                        <div class="text-bold text-md text-primary">{{ book.borrow_count }}</div>
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-column gap-xs" style="padding: 14px 6px 8px 6px;">
+                    <h4 class="m-0 text-sm text-semibold lh-tight text-main" style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">{{ book.title }}</h4>
+                    {% if book.author %}
+                    <div class="text-xs text-muted text-truncate">{{ book.author }}</div>
+                    {% endif %}
+                    <div class="d-flex align-center justify-between mt-xs">
+                        <span class="pill-subtle">{{ book.category.name|default:_("Umumiy") }}</span>
+                        {% if book.available_count > 0 %}
+                        <span class="pill-subtle pill-available"><i class="fas fa-circle" style="font-size: 0.4rem;"></i> {{ book.available_count }} {% trans "mavjud" %}</span>
+                        {% else %}
+                        <span class="pill-subtle pill-unavailable">{% trans "Tugagan" %}</span>
+                        {% endif %}
                     </div>
                 </div>
-            </div>
-        </a>
-    </div>
-    {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-book text-4xl text-primary"></i>
+            </a>
         </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
-    </div>
+        {% empty %}
+        <div class="empty-state text-center p-3xl animate-fade" style="grid-column: 1 / -1;">
+            <div class="empty-icon-wrapper mb-lg">
+                <i class="fas fa-book text-3xl text-primary"></i>
+            </div>
+            <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
+            <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
+        </div>
         {% endfor %}
-    <div id="no-results" class="d-none full-width text-center p-3xl">
-        <i class="fas fa-search text-3xl mb-lg" style="opacity: 0.1; color: var(--text-muted);"></i>
-        <p class="text-xl text-muted">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</p>
+        <div id="no-results" class="d-none text-center p-3xl" style="grid-column: 1 / -1;">
+            <i class="fas fa-search text-3xl mb-lg" style="opacity: 0.1; color: var(--text-muted);"></i>
+            <p class="text-md text-muted">{% trans "Qidiruv bo'yicha hech narsa topilmadi" %}</p>
+        </div>
     </div>
-</div>
 
-{% if books.paginator.num_pages > 1 %}
-<div class="d-flex justify-center align-center gap-xs mt-2xl flex-wrap">
-    {% if books.has_previous %}
-    <a href="?page={{ books.previous_page_number }}{% if current_query %}&q={{ current_query }}{% endif %}" class="glass-card text-decoration-none text-sm text-main" style="padding: 8px 14px; border-radius: 10px;"><i class="fas fa-chevron-left"></i></a>
-    {% endif %}
-    {% for i in books.paginator.page_range %}
-        {% if i == books.number %}
-        <span class="text-sm text-bold text-white rounded-md" style="padding: 8px 14px; background: var(--primary);">{{ i }}</span>
-        {% elif i >= books.number|add:-2 and i <= books.number|add:2 %}
-        <a href="?page={{ i }}{% if current_query %}&q={{ current_query }}{% endif %}" class="glass-card text-decoration-none text-sm text-muted" style="padding: 8px 14px; border-radius: 10px;">{{ i }}</a>
+    {% if books.paginator.num_pages > 1 %}
+    <div class="d-flex justify-center align-center gap-xs mt-2xl flex-wrap">
+        {% if books.has_previous %}
+        <a href="?page={{ books.previous_page_number }}{% if current_query %}&q={{ current_query }}{% endif %}" class="glass-card text-decoration-none text-sm text-main" style="padding: 8px 14px; border-radius: 10px;"><i class="fas fa-chevron-left"></i></a>
         {% endif %}
-    {% endfor %}
-    {% if books.has_next %}
-    <a href="?page={{ books.next_page_number }}{% if current_query %}&q={{ current_query }}{% endif %}" class="glass-card text-decoration-none text-sm text-main" style="padding: 8px 14px; border-radius: 10px;"><i class="fas fa-chevron-right"></i></a>
+        {% for i in books.paginator.page_range %}
+            {% if i == books.number %}
+            <span class="text-sm text-bold text-white rounded-md" style="padding: 8px 14px; background: var(--primary);">{{ i }}</span>
+            {% elif i >= books.number|add:-2 and i <= books.number|add:2 %}
+            <a href="?page={{ i }}{% if current_query %}&q={{ current_query }}{% endif %}" class="glass-card text-decoration-none text-sm text-muted" style="padding: 8px 14px; border-radius: 10px;">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+        {% if books.has_next %}
+        <a href="?page={{ books.next_page_number }}{% if current_query %}&q={{ current_query }}{% endif %}" class="glass-card text-decoration-none text-sm text-main" style="padding: 8px 14px; border-radius: 10px;"><i class="fas fa-chevron-right"></i></a>
+        {% endif %}
+    </div>
     {% endif %}
 </div>
-{% endif %}
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -240,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const author = card.getAttribute('data-author');
             const category = card.getAttribute('data-category');
             if (title.includes(query) || author.includes(query) || category.includes(query)) {
-                card.style.display = 'flex'; found++;
+                card.style.display = 'block'; found++;
             } else {
                 card.style.display = 'none';
             }

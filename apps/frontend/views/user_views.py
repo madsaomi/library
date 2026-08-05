@@ -583,7 +583,7 @@ def cart_list(request):
 
     cart = _get_pending_cart(request.user, 'borrow')
 
-    items = BookCartItem.objects.filter(cart=cart, is_deleted=False).select_related('book')
+    items = BookCartItem.objects.filter(cart=cart, is_deleted=False).select_related('book').order_by('id')
     paginator = Paginator(items, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)

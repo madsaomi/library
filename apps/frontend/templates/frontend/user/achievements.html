@@ -12,21 +12,21 @@
 {% block content %}
 <div class="animate-fade">
     <!-- Level & XP Summary -->
-    <div class="glass-panel border p-xl mb-2xl">
+    <div class="glass-panel p-xl mb-2xl" style="border-radius: 20px;">
         <div class="d-flex align-center gap-xl flex-wrap">
-            <div class="d-flex flex-center rounded-full flex-shrink-0" style="width: 76px; height: 76px; background: linear-gradient(135deg, var(--primary), #a855f7); box-shadow: 0 0 20px var(--primary-glow);">
-                <i class="fas {{ user.selected_icon|default:'fa-trophy' }}" style="font-size: 1.8rem; color: white;"></i>
+            <div class="d-flex flex-center rounded-full flex-shrink-0" style="width: 72px; height: 72px; background: var(--hover-bg); border: 1px solid var(--border);">
+                <i class="fas {{ user.selected_icon|default:'fa-trophy' }}" style="font-size: 1.6rem; color: var(--primary);"></i>
             </div>
             <div class="flex-1" style="min-width: 200px;">
                 <h3 class="mb-xs" style="color: var(--text-color);">{{ user.first_name }} {{ user.last_name }}</h3>
                 <p class="text-muted mb-md">
-                    <span class="level-badge text-white" style="background: var(--primary); padding: 4px 14px; border-radius: 20px; font-size: 0.82rem;">
+                    <span class="pill-subtle">
                         <i class="fas fa-star"></i> {% trans "Daraja" %} {{ user.level }}
                     </span>
                 </p>
                 <div class="d-flex align-center gap-lg">
                     <div class="flex-1 overflow-hidden" style="height: 8px; background: var(--hover-bg); border-radius: 4px;">
-                        <div style="width: {{ xp_percent }}%; height: 100%; background: linear-gradient(90deg, var(--primary), #a855f7); border-radius: 4px; transition: width 1s ease;"></div>
+                        <div style="width: {{ xp_percent }}%; height: 100%; background: var(--primary); border-radius: 4px; transition: width 1s ease;"></div>
                     </div>
                     <span class="text-muted text-sm text-nowrap">{{ user.xp_points }} / {{ next_xp }} XP</span>
                 </div>
@@ -36,23 +36,23 @@
 
     <!-- Stats row -->
     <div class="responsive-grid-3 mb-2xl" style="gap: 14px;">
-        <div class="glass-panel text-center border p-lg">
-            <div class="text-xl text-primary mb-xs">{{ earned|length }}</div>
-            <div class="text-sm text-muted">{% trans "Yutuqlar" %}</div>
+        <div class="user-stat">
+            <div class="value text-primary">{{ earned|length }}</div>
+            <div class="label">{% trans "Yutuqlar" %}</div>
         </div>
-        <div class="glass-panel text-center border p-lg">
-            <div class="text-xl mb-xs" style="color: #10b981;">{{ user.xp_points|default:"0" }}</div>
-            <div class="text-sm text-muted">XP</div>
+        <div class="user-stat">
+            <div class="value">{{ user.xp_points|default:"0" }}</div>
+            <div class="label">XP</div>
         </div>
-        <div class="glass-panel text-center border p-lg">
-            <div class="text-xl mb-xs" style="color: #f59e0b;">{{ unlocked_icons|length }}</div>
-            <div class="text-sm text-muted">{% trans "Ikonkalar" %}</div>
+        <div class="user-stat">
+            <div class="value">{{ unlocked_icons|length }}</div>
+            <div class="label">{% trans "Ikonkalar" %}</div>
         </div>
     </div>
 
-    <h2 class="mb-xl text-lg" style="color: var(--text-color);">
-        <i class="fas fa-trophy" style="color: #f59e0b;"></i> {% trans "Yutuqlar" %}
-        <span class="level-badge text-white rounded-md text-xs ml-sm" style="background: #f59e0b; padding: 2px 10px;">{{ earned|length }}/{{ all_achievements|length }}</span>
+    <h2 class="user-section-title mb-lg">
+        <i class="fas fa-trophy"></i> {% trans "Yutuqlar" %}
+        <span class="pill-subtle ml-sm">{{ earned|length }}/{{ all_achievements|length }}</span>
     </h2>
     <div class="responsive-grid-3 gap-lg animate-group">
         {% for ach in all_achievements %}
@@ -95,8 +95,8 @@
     </div>
 
     <!-- Icons -->
-    <h2 class="mt-2xl mb-lg text-lg" style="color: var(--text-color);">
-        <i class="fas fa-paint-brush text-primary"></i> {% trans "Ikonkalar" %}
+    <h2 class="user-section-title mt-2xl mb-lg">
+        <i class="fas fa-paint-brush"></i> {% trans "Ikonkalar" %}
     </h2>
     <div class="glass-panel border p-xl">
         <div class="d-flex gap-md flex-wrap">

@@ -11,12 +11,11 @@
 {% block content %}
 <div class="news-container mw-800 mx-auto">
     {% for news in news_list %}
-    <div class="glass-panel animate-fade pos-relative overflow-hidden mb-2xl p-3xl rounded-3xl">
-        <div class="pos-absolute top-0 left-0" style="width: 4px; height: 100%; background: var(--primary);"></div>
+    <div class="glass-panel animate-fade pos-relative overflow-hidden mb-2xl p-3xl" style="border-radius: 20px;">
 
         <div class="flex-between align-start mb-lg">
             <div class="d-flex align-center gap-md">
-                <div class="flex-center" style="width: 40px; height: 40px; background: rgba(217, 119, 6, 0.1); border-radius: 12px;">
+                <div class="flex-center" style="width: 40px; height: 40px; background: var(--hover-bg); border: 1px solid var(--border); border-radius: 12px;">
                     <i class="fas fa-bullhorn text-primary"></i>
                 </div>
                 <h3 class="m-0 text-xl text-bold">{{ news.title }}</h3>

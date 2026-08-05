@@ -2,23 +2,24 @@
 {% load i18n %}
 
 {% block sidebar_content %}
-<!-- Cart section - prominent for all roles -->
-<div class="sidebar-section-label" style="margin-top: 12px;">{% trans "Savat" %}</div>
-<a href="{% url 'frontend:cart_list' %}" class="nav-link {% if 'cart' in request.resolver_match.url_name %}active{% endif %}" data-name="savat cart books" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; font-weight: 600; border-radius: 12px;">
-    <i class="fas fa-shopping-cart"></i>
-    <span>{% trans "Kitoblar savati" %}</span>
-    <span id="cartBadge" class="badge bg-white text-dark ms-auto" style="border-radius: 20px; padding: 2px 8px; font-size: 0.75rem;">0</span>
-</a>
-
-<div class="sidebar-section-label">{% trans "Asosiy" %}</div>
+<div class="sidebar-section-label" style="margin-top: 8px;">{% trans "Asosiy" %}</div>
 <a href="{% url 'frontend:library' %}" class="nav-link {% if request.resolver_match.url_name == 'library' %}active{% endif %}" data-name="kutubxona library" {% if request.resolver_match.url_name == 'library' %}aria-current="page"{% endif %}>
     <i class="fas fa-home"></i> <span>{% trans "Kutubxona" %}</span>
 </a>
 <a href="{% url 'frontend:my_books' %}" class="nav-link {% if request.resolver_match.url_name == 'my_books' or 'qr' in request.resolver_match.url_name %}active{% endif %}" data-name="mening kitoblarim my books" {% if request.resolver_match.url_name == 'my_books' or 'qr' in request.resolver_match.url_name %}aria-current="page"{% endif %}>
     <i class="fas fa-bookmark"></i> <span>{% trans "Mening kitoblarim" %}</span>
 </a>
+<a href="{% url 'frontend:cart_list' %}" class="nav-link sidebar-cart-link {% if 'cart' in request.resolver_match.url_name %}active{% endif %}" data-name="savat cart books" {% if 'cart' in request.resolver_match.url_name %}aria-current="page"{% endif %}>
+    <i class="fas fa-shopping-cart"></i> <span>{% trans "Savat" %}</span>
+    <span id="cartBadge" class="badge ms-auto" style="border-radius: 20px; padding: 2px 8px; font-size: 0.72rem;">0</span>
+</a>
+
+<div class="sidebar-section-label">{% trans "Faoliyat" %}</div>
 <a href="{% url 'frontend:achievements' %}" class="nav-link {% if request.resolver_match.url_name == 'achievements' %}active{% endif %}" data-name="yutuqlar achievements" {% if request.resolver_match.url_name == 'achievements' %}aria-current="page"{% endif %}>
     <i class="fas fa-trophy"></i> <span>{% trans "Yutuqlar" %}</span>
+</a>
+<a href="{% url 'frontend:challenges' %}" class="nav-link {% if request.resolver_match.url_name == 'challenges' %}active{% endif %}" data-name="chellenjlar challenges" {% if request.resolver_match.url_name == 'challenges' %}aria-current="page"{% endif %}>
+    <i class="fas fa-bolt"></i> <span>{% trans "Chellenjlar" %}</span>
 </a>
 <a href="{% url 'frontend:leaderboard' %}" class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}" data-name="top oquvchilar leaderboard" {% if request.resolver_match.url_name == 'leaderboard' %}aria-current="page"{% endif %}>
     <i class="fas fa-crown"></i> <span>{% trans "Top o'quvchilar" %}</span>
@@ -26,9 +27,8 @@
 <a href="{% url 'frontend:my_class' %}" class="nav-link {% if request.resolver_match.url_name == 'my_class' %}active{% endif %}" data-name="mening sinfim my class" {% if request.resolver_match.url_name == 'my_class' %}aria-current="page"{% endif %}>
     <i class="fas fa-users"></i> <span>{% trans "Mening sinfim" %}</span>
 </a>
-<a href="{% url 'frontend:challenges' %}" class="nav-link {% if request.resolver_match.url_name == 'challenges' %}active{% endif %}" data-name="chellenjlar challenges" {% if request.resolver_match.url_name == 'challenges' %}aria-current="page"{% endif %}>
-    <i class="fas fa-bolt"></i> <span>{% trans "Chellenjlar" %}</span>
-</a>
+
+<div class="sidebar-section-label">{% trans "Ma'lumot" %}</div>
 <a href="{% url 'frontend:user_news_list' %}" class="nav-link {% if request.resolver_match.url_name == 'user_news_list' %}active{% endif %}" data-name="yangiliklar news" {% if request.resolver_match.url_name == 'user_news_list' %}aria-current="page"{% endif %}>
     <i class="fas fa-newspaper"></i> <span>{% trans "Yangiliklar" %}</span>
 </a>

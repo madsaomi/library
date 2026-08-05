@@ -10,24 +10,24 @@
 
 {% block content %}
 <div class="animate-fade">
-    <div class="glass-panel p-xl mb-xl">
+    <div class="glass-panel p-xl mb-xl" style="border-radius: 20px;">
         <div class="d-flex align-center justify-between mb-lg">
-            <h3>
-                <i class="fas fa-shopping-cart text-primary"></i>
+            <h3 class="user-section-title m-0">
+                <i class="fas fa-shopping-cart"></i>
                 {% trans "Savatingiz" %}
             </h3>
-            <span class="badge bg-primary text-white text-lg px-lg py-sm rounded-full">
+            <span class="pill-subtle">
                 {{ items|length }} kitob
             </span>
         </div>
 
         {% if items %}
         <div class="d-flex align-center gap-md mb-xl">
-            <button type="button" onclick="generateCartQR()" class="btn btn-primary">
+            <a href="{% url 'frontend:cart_generate_qr' %}" target="_blank" rel="noopener" class="btn-primary" style="border: none; border-radius: 12px; padding: 11px 22px; font-size: 0.9rem;">
                 <i class="fas fa-qrcode"></i>
                 {% trans "QR kod yaratish" %}
-            </button>
-            <button type="button" onclick="clearCart()" class="btn btn-danger">
+            </a>
+            <button type="button" onclick="clearCart()" class="cursor-pointer" style="border-radius: 12px; padding: 11px 22px; font-size: 0.9rem; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: inherit;">
                 <i class="fas fa-trash"></i>
                 {% trans "Tozalash" %}
             </button>
@@ -53,7 +53,7 @@
                     {% if item.book.author %}
                     <p class="text-xs text-muted mb-sm">{{ item.book.author }}</p>
                     {% endif %}
-                    <button type="button" onclick="removeCartItem({{ item.id }})" class="btn btn-sm btn-danger w-100" style="border-radius: 8px;">
+                    <button type="button" onclick="removeCartItem({{ item.id }})" class="cursor-pointer w-100" style="border-radius: 8px; padding: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: inherit;">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -97,10 +97,6 @@ function clearCart() {
         if (data.success) location.reload();
         else alert(data.error || '{% trans "Xato bo\'ldi" %}');
     }).catch(() => alert('{% trans "Xatolik yuz berdi" %}'));
-}
-
-function generateCartQR() {
-    window.open('/library/cart/qr/', '_blank', 'width=440,height=620');
 }
 </script>
 

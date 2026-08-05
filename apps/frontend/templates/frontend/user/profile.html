@@ -12,35 +12,30 @@
 {% block content %}
 <div class="animate-fade mw-800 mx-auto">
     <!-- Avatar & Level Card -->
-    <div class="glass-panel p-3xl mb-2xl">
-        <div class="d-flex align-center gap-2xl flex-wrap">
-            <div class="pos-relative flex-shrink-0">
-                <div class="flex-center rounded-full" style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary), #a855f7); box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);">
-                    <i class="fas {{ user.selected_icon|default:'fa-book' }} text-2xl text-white"></i>
-                </div>
-                <div class="pos-absolute flex-center text-bold text-md text-primary rounded-full" style="bottom: -5px; right: -5px; background: var(--bg-main); border: 3px solid var(--primary); width: 35px; height: 35px;">
-                    {{ user.level }}
-                </div>
+    <div class="glass-panel profile-hero mb-2xl">
+        <div class="pos-relative flex-shrink-0">
+            <div class="flex-center rounded-full" style="width: 84px; height: 84px; background: var(--hover-bg); border: 1px solid var(--border);">
+                <i class="fas {{ user.selected_icon|default:'fa-book' }} text-2xl text-primary"></i>
             </div>
-            <div class="flex-1" style="min-width: 200px;">
-                <h2 class="mb-xs">{{ user.first_name }} {{ user.last_name }}</h2>
-                <p class="text-muted mb-xs">
-                    <span class="level-title text-primary text-bold">{{ level_info.title }}</span>
-                    {% if user.role == 'student' %} · {{ user.grade }} {% trans "sinf" %}{% endif %}
-                </p>
-                <p class="text-muted text-md">
-                    <i class="fas fa-book"></i> {{ user.total_books_read }} {% trans "kitob" %}
-                    · <i class="fas fa-fire"></i> {{ user.current_streak }} {% trans "haftalik streak" %}
-                </p>
-                <!-- XP Bar -->
-                <div class="mt-md">
-                    <div class="flex-between mb-xs text-sm">
-                        <span class="text-muted">{% trans "XP" %}</span>
-                        <span class="text-primary text-bold">{{ user.xp_points }} / {{ next_xp }}</span>
-                    </div>
-                    <div class="overflow-hidden" style="height: 10px; background: var(--hover-bg); border-radius: 5px;">
-                        <div id="xpBar" style="width: {{ xp_percent }}%; height: 100%; background: linear-gradient(90deg, var(--primary), #a855f7); border-radius: 5px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
-                    </div>
+        </div>
+        <div class="flex-1" style="min-width: 220px;">
+            <h2 class="mb-xs">{{ user.first_name }} {{ user.last_name }}</h2>
+            <p class="text-muted mb-xs">
+                <span class="text-primary text-bold">{{ level_info.title }}</span>
+                {% if user.role == 'student' %} · {{ user.grade }} {% trans "sinf" %}{% endif %}
+            </p>
+            <p class="text-muted text-md">
+                <i class="fas fa-book"></i> {{ user.total_books_read }} {% trans "kitob" %}
+                · <i class="fas fa-fire"></i> {{ user.current_streak }} {% trans "haftalik streak" %}
+            </p>
+            <!-- XP Bar -->
+            <div class="mt-md">
+                <div class="flex-between mb-xs text-sm">
+                    <span class="text-muted">{% trans "XP" %}</span>
+                    <span class="text-primary text-bold">{{ user.xp_points }} / {{ next_xp }}</span>
+                </div>
+                <div class="overflow-hidden" style="height: 8px; background: var(--hover-bg); border-radius: 4px;">
+                    <div id="xpBar" style="width: 0%; height: 100%; background: var(--primary); border-radius: 4px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
                 </div>
             </div>
         </div>
