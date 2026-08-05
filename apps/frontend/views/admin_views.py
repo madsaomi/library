@@ -124,23 +124,53 @@ def schools_list(request):
     if district_id:
         schools = schools.filter(district_id=district_id)
 
-    schools = schools.order_by('-id')
-    school_count = schools.count()
+    sort = request.GET.get('sort', '-id')
+    sort_map = {
+        'name': 'name',
+        '-name': '-name',
+        'district': 'district__name',
+        '-district': '-district__name',
+        'students': '-student_count',
+        '-students': 'student_count',
+        'books': '-book_count',
+        '-books': 'book_count',
+        'id': 'id',
+        '-id': '-id',
+    }
+    schools = schools.order_by(sort_map.get(sort, '-id'))
+
+    from django.core.paginator import Paginator
+
+    paginator = Paginator(schools, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    school_count = paginator.count
     districts = District.objects.annotate(
         school_count=Count('schools', filter=Q(schools__customuser__role='school_admin'))
     ).order_by('name')
 
     total_students = CustomUser.objects.filter(role='student').count()
     total_books = Book.objects.count()
+
+    def toggle(s):
+        return s[1:] if s.startswith('-') else f'-{s}'
+
     return render(
         request,
         'frontend/admin/schools.html',
         {
-            'schools': schools,
+            'schools': page_obj,
+            'page_obj': page_obj,
             'school_count': school_count,
             'districts': districts,
             'current_district': district_id,
             'current_query': q or '',
+            'sort': sort,
+            'current_sort_toggle': toggle('name'),
+            'district_sort_toggle': toggle('district'),
+            'students_sort_toggle': toggle('students'),
+            'books_sort_toggle': toggle('books'),
             'total_students': total_students,
             'total_books': total_books,
         },

@@ -295,3 +295,25 @@ ews_list: added early guard for
 - **Verified**: 169 unit tests PASS, ruff clean, `manage.py check` 0, full E2E scan flow
   (book→student issue, book→student return, student search/pick, clear, state) all green.
 
+## Session: reader cards, book labels, schools pagination, QR e2e (2026-08-05)
+- **Reader card** (`student_card` view + `student_card.html`): printable library card for a
+  student — credit-card size, gradient, name/grade/school/ID + static STU_ QR image, print button
+  (window.print with print CSS). URL `/school/students/<pk>/card/`; "Karta" button in student
+  detail hero.
+- **Book QR label** (`book_qr_label` view + `book_qr_label.html`): printable white sticker —
+  title/author/category/ID + BOOK_ QR, textbook badge; print button. URL
+  `/school/qr/book-label/<pk>/`; tag button added next to QR on book cards.
+- **Schools list pagination + sorting** (`schools_list`): `sort` param
+  (name/district/students/books, ±), `Paginator(…, 20)`, `page_obj` + `page_obj` in context;
+  table headers are now clickable sort links using `{% querystring sort=… %}`; added pagination
+  include. Sort toggle helper computed in view.
+- **e2e tests** (`e2e/test_qr_flow.py`, 3 tests): `test_qr_auto_issue_and_return` (scan book→
+  student = issue, scan again = return via `/school/qr/process-unified/`), `test_qr_student_search`
+  (JSON search), `test_qr_image_endpoints` (book/student QR PNGs 200 + image/png). Added
+  `status:'success'` to `qr_search_students` response.
+- **CI/Postgres**: new views use standard ORM only (no Postgres-specific SQL); removed a dead
+  `django.contrib.postgres.search` import from `qr_search_students`. Docker not available locally,
+  so Postgres path is verified by CI (`DATABASE_URL` Postgres in tests.yml).
+- **Verified**: 169 unit tests PASS; 3 new e2e tests PASS locally (total 17 e2e); ruff clean;
+  `manage.py check` 0; schools sorts + card + label all render 200.
+

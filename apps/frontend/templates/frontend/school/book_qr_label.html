@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Kitob QR yorlig'i" %} | {{ book.title }}{% endblock %}
+{% block page_title %}{% trans "Kitob QR yorlig'i" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/school/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="mw-500 mx-auto">
+    <div class="glass-panel p-2xl text-center mb-xl">
+        <p class="text-muted text-sm mb-lg">
+            {% trans "Yorliqni chop eting va kitob muqovasiga yopishtiring. Skaner orqali avtomatik berish/qabul qilish mumkin." %}
+        </p>
+
+        <!-- Printable label -->
+        <div id="book-label" class="d-inline-block text-left" style="width: 320px; border-radius: 14px; overflow: hidden; position: relative; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.25); border: 1px solid rgba(0,0,0,0.08);">
+            <div style="padding: 16px;">
+                <div class="d-flex align-center gap-sm mb-sm">
+                    <div class="flex-center" style="width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, var(--primary), #7c3aed);">
+                        <i class="fas fa-book text-white" style="font-size: 0.7rem;"></i>
+                    </div>
+                    <span class="text-bold" style="font-size: 0.65rem; letter-spacing: 0.5px; color: var(--primary);">ONLINE KUTIBXONA</span>
+                    {% if book.is_textbook %}
+                    <span class="ml-auto text-bold text-uppercase" style="font-size: 0.5rem; background: rgba(217,119,6,0.12); color: #d97706; padding: 2px 6px; border-radius: 4px;">
+                        <i class="fas fa-book-open"></i> {% trans "Darslik" %}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex align-center gap-lg">
+                    <img src="{% url 'frontend:book_qr_image' book.pk %}" alt="QR" style="width: 92px; height: 92px; border-radius: 8px; border: 1px solid #eee;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="text-bold text-truncate" style="font-size: 0.8rem; color: #111;" title="{{ book.title }}">{{ book.title }}</div>
+                        {% if book.author %}
+                        <div class="text-truncate mt-xs" style="font-size: 0.65rem; color: #555;">
+                            <i class="fas fa-user"></i> {{ book.author }}
+                        </div>
+                        {% endif %}
+                        <div class="text-truncate mt-xs" style="font-size: 0.6rem; color: #777;">
+                            <i class="fas fa-tag"></i> {{ book.category.name|default:_("Umumiy") }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-center justify-between mt-md">
+                    <div style="font-size: 0.55rem; color: #999;">
+                        ID #{{ book.id|stringformat:"05d" }}
+                        {% if book.grade %} · {{ book.grade }} {% trans "sinf" %}{% endif %}
+                    </div>
+                    <div style="font-size: 0.55rem; color: #999;">
+                        <i class="fas fa-qrcode"></i> {% trans "Avtomatik berish" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-md justify-center mt-xl">
+            <button class="btn-primary d-flex align-center gap-sm rounded-md text-md" style="padding: 11px 28px;" onclick="window.print()">
+                <i class="fas fa-print"></i> {% trans "Chop etish" %}
+            </button>
+            <a href="{% url 'frontend:school_books_list' %}" class="glass-card border d-flex align-center justify-center gap-sm rounded-md text-decoration-none text-md" style="padding: 11px 28px;">
+                <i class="fas fa-arrow-left text-primary"></i> {% trans "Orqaga" %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    body { background: #fff !important; }
+    .sidebar, .topbar, .no-print { display: none !important; }
+    .glass-panel { background: transparent !important; border: none !important; padding: 0 !important; box-shadow: none !important; }
+    #book-label { box-shadow: none !important; margin: 0 auto; }
+    button, .glass-card { display: none !important; }
+}
+</style>
+{% endblock %}

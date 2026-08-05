@@ -707,8 +707,6 @@ def qr_student_scanned(request, token):
 @school_admin_required
 def qr_search_students(request):
     """JSON search endpoint for the scanner's student-picker fallback."""
-    from django.contrib.postgres.search import SearchQuery, SearchVector  # noqa: F401
-
     q = request.GET.get('q', '').strip()
     school = request.user.school
     students = (
@@ -723,6 +721,7 @@ def qr_search_students(request):
     students = students[:20]
     return JsonResponse(
         {
+            'status': 'success',
             'students': [
                 {
                     'id': s.id,
@@ -871,6 +870,22 @@ def book_qr_image(request, pk):
 
 @login_required(login_url='login')
 @school_admin_required
+def book_qr_label(request, pk):
+    """Printable label (sticker) for a book: title, author, category + static QR."""
+    book = (
+        Book.objects.select_related('school', 'category')
+        .filter(id=pk, school=request.user.school, is_deleted=False)
+        .first()
+    )
+    if not book:
+        from django.http import Http404
+
+        raise Http404
+    return render(request, 'frontend/school/book_qr_label.html', {'book': book})
+
+
+@login_required(login_url='login')
+@school_admin_required
 def student_qr_image(request, pk):
     """Render the printable static QR for a student."""
     from accounts.utils import generate_static_token
@@ -884,6 +899,23 @@ def student_qr_image(request, pk):
         return JsonResponse({'status': 'error', 'message': _("O'quvchi topilmadi")}, status=404)
     token = generate_static_token('STU', student.id)
     return _qr_image_response(token)
+
+
+@login_required(login_url='login')
+@school_admin_required
+def student_card(request, pk):
+    """Printable library card for a student: name, grade, school + static QR."""
+    student = (
+        CustomUser.objects.filter(id=pk, school=request.user.school, role='student')
+        .exclude(is_archived=True)
+        .select_related('school', 'school__district')
+        .first()
+    )
+    if not student:
+        from django.http import Http404
+
+        raise Http404
+    return render(request, 'frontend/school/student_card.html', {'student': student})
 
 
 @login_required(login_url='login')

@@ -8,8 +8,8 @@ Last fully verified: 2026-08-05 (admin polish + QR automation + 169 tests).
   `staticfiles/staticfiles.json` (manifest storage active)
 - `python -m pytest -q --tb=short` → **169 passed** (1 harmless DeprecationWarning from
   `pythonjsonlogger` in site-packages)
-- `python -m pytest e2e -q --tb=short` → **13/14 passed** (1 Windows-only CDN timeout flake,
-  stable in CI on Python 3.13)
+- `python -m pytest e2e -q --tb=short` → **17 tests total** (14 old + 3 new QR-flow; all pass
+  locally on Python 3.12; CI runs on Python 3.13 with Playwright + Postgres)
 - `python -m ruff check .` → all passed; `ruff format .` → clean
 - Smoke render (test client, `HTTP_HOST='localhost'`): `/admin/schools/`, `/admin/schools/<id>/`,
   `/school/books/`, `/school/qr/`, `/profile/` (school_admin) all 200
@@ -123,4 +123,16 @@ Last fully verified: 2026-08-05 (admin polish + QR automation + 169 tests).
 - `apps/frontend/templates/frontend/school/qr_unified.html` (pending panel, student search modal)
 - `apps/frontend/templates/frontend/school/books.html` + `student_detail.html` (QR buttons)
 - `core/management/commands/seed_demo_data.py` (new — demo categories/books/textbooks/issues/news)
+- `docs/agent-context/01-HISTORY.md`, `02-CURRENT-STATE.md`
+
+### 2026-08-05 reader cards, book labels, schools pagination, QR e2e
+- `apps/frontend/views/school_views.py` (student_card, book_qr_label, qr_search_students status key)
+- `apps/frontend/templates/frontend/school/student_card.html` (new — printable library card)
+- `apps/frontend/templates/frontend/school/book_qr_label.html` (new — printable book sticker)
+- `apps/frontend/templates/frontend/school/student_detail.html` (Karta button)
+- `apps/frontend/templates/frontend/school/books.html` (Yorliq button)
+- `apps/frontend/urls.py` (student_card, book_qr_label URLs)
+- `apps/frontend/views/admin_views.py` (schools_list: sort + pagination)
+- `apps/frontend/templates/frontend/admin/schools.html` (sortable headers, pagination include)
+- `e2e/test_qr_flow.py` (new — 3 automated-QR e2e tests)
 - `docs/agent-context/01-HISTORY.md`, `02-CURRENT-STATE.md`

@@ -19,14 +19,16 @@ Ordered by priority. Nothing here blocks the current green state; all items are 
 - ~~seed_demo_data management command~~
 - Verification: manage.py check 0; ruff clean; **169 unit tests PASS**; automated QR flow E2E verified.
 
-## Remaining (from this session's discussion — not started)
-- **Reader card / library card**: printable student card with their STU_ QR (currently only a QR
-  PNG button; a print-ready card layout is the natural next step).
-- **Print modal for book QR**: currently QR opens as raw PNG in a new tab; a styled print page
-  (label size, book title + author under code) would be nicer.
-- **Schools list pagination** (renders all schools at once today) + column sorting.
-- **e2e tests for the new automated QR flow** (BOOK_/STU_ pairing, student search).
-- **CI verification** for the new views (they run on Postgres in CI; only SQLite-verified locally).
+## Remaining (from this session's discussion — mostly done)
+- ~~**Reader card / library card**: printable student card with their STU_ QR~~ — done
+  (`student_card` view + template, "Karta" button in student detail).
+- ~~**Print modal for book QR**: styled print page~~ — done (`book_qr_label` view + template,
+  "Yorliq" button on book cards).
+- ~~**Schools list pagination** + column sorting~~ — done (sort param + clickable headers +
+  Paginator 20/page).
+- ~~**e2e tests for the new automated QR flow**~~ — done (`e2e/test_qr_flow.py`, 3 tests).
+- **CI verification** for the new views (run on Postgres in CI; only SQLite-verified locally —
+  Docker not available in this environment). Watch the next `push`/PR on GitHub Actions.
 
 ## Remaining (small, safe)
 1. **`docs/REQS.md`** is a historical spec and partly stale — consider rewriting or archiving.

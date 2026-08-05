@@ -127,7 +127,8 @@
                         <div style="width: {% widthratio book.currently_reading_count book.total_count 100 %}%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px;"></div>
                     </div>
                     <div class="d-flex mt-sm gap-xs" onclick="event.stopPropagation()">
-                        <a href="{% url 'frontend:book_qr_image' book.pk %}" target="_blank" aria-label="QR" class="glass-card d-flex align-center justify-center rounded p-xs text-xs gap-xs text-decoration-none" style="color: #10b981; border-color: rgba(16,185,129,0.3);" title="{% trans 'QR kod (print uchun)' %}"><i class="fas fa-qrcode"></i></a>
+                        <a href="{% url 'frontend:book_qr_label' book.pk %}" target="_blank" aria-label="Yorliq" class="glass-card d-flex align-center justify-center rounded p-xs text-xs text-decoration-none" style="color: #10b981; border-color: rgba(16,185,129,0.3);" title="{% trans 'QR yorliq (print)' %}"><i class="fas fa-tag"></i></a>
+                        <a href="{% url 'frontend:book_qr_image' book.pk %}" target="_blank" aria-label="QR" class="glass-card d-flex align-center justify-center rounded p-xs text-xs gap-xs text-decoration-none" style="color: #10b981; border-color: rgba(16,185,129,0.3);" title="{% trans 'QR kod' %}"><i class="fas fa-qrcode"></i></a>
                         <a href="{% url 'frontend:book_edit' book.pk %}" aria-label="Tahrirlash" class="glass-card flex-1 rounded text-center text-decoration-none p-xs text-xs" style="color: var(--accent);"><i class="fas fa-edit"></i> {% trans "Tahrirlash" %}</a>
                         <a href="{% url 'frontend:book_delete' book.pk %}" aria-label="O'chirish" class="glass-card flex-1 rounded text-center text-decoration-none p-xs text-xs" style="color: #ef4444;"><i class="fas fa-trash"></i></a>
                     </div>
