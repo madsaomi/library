@@ -38,6 +38,10 @@ switch ($Command) {
         $env:SECRET_KEY = "test"; $env:DEBUG = "True"
         & $PYTHON -m pytest -q --tb=short
     }
+    "test-fast" {
+        $env:SECRET_KEY = "test"; $env:DEBUG = "True"
+        & $PYTHON -m pytest -q -n auto --tb=short
+    }
     "migrate" {
         & $DJANGO migrate
     }

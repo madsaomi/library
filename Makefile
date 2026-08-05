@@ -31,6 +31,9 @@ check: lint format-check ## Lint + format check (CI)
 test: ## Run pytest (unit tests only)
 	SECRET_KEY=test DEBUG=True $(PYTHON) -m pytest -q --tb=short
 
+test-fast: ## Run pytest in parallel across all CPU cores (needs pytest-xdist)
+	SECRET_KEY=test DEBUG=True $(PYTHON) -m pytest -q -n auto --tb=short
+
 test-cov: ## Run pytest with coverage
 	SECRET_KEY=test DEBUG=True $(PYTHON) -m pytest --cov --cov-report=term
 

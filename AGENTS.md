@@ -42,6 +42,8 @@ python manage.py runserver
 
 # Run tests (pytest, not Django test runner)
 python -m pytest -q --tb=short
+# Faster: run in parallel across CPU cores (needs pytest-xdist, ~2x faster)
+python -m pytest -q -n auto --tb=short
 
 # Seed test users (5 roles with credentials printed)
 python manage.py seed_test_users
