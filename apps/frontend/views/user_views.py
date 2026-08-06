@@ -746,12 +746,16 @@ def cart_return_qr(request):
 @login_required(login_url='login')
 def student_qr(request):
     """Unified QR code for student — single code for all operations."""
-    from accounts.utils import generate_static_token
+    from accounts.utils import generate_qr_code
 
     if not request.user.school:
         from django.contrib import messages
         messages.error(request, _("Sizda maktab topilmadi."))
         return redirect('login')
 
+    from accounts.utils import generate_static_token
     token = generate_static_token('STU', request.user.id)
-    return render(request, 'frontend/user/student_qr.html', {'token': token})
+    qr_rel = generate_qr_code(token, f'stu_{request.user.id}.png')
+    from django.conf import settings
+    qr_url = f'{settings.MEDIA_URL}{qr_rel}'
+    return render(request, 'frontend/user/student_qr.html', {'token': token, 'qr_url': qr_url})

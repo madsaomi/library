@@ -20,7 +20,11 @@
 
         <div class="d-flex justify-center mb-xl">
             <div class="glass-card rounded-xl p-xl" style="background: white;">
-                <canvas id="qr-canvas"></canvas>
+                {% if qr_url %}
+                <img src="{{ qr_url }}" alt="QR kod" style="max-width: 200px; width: 100%;">
+                {% else %}
+                <div class="text-muted text-sm p-xl">{% trans "QR kod yaratilmadi" %}</div>
+                {% endif %}
             </div>
         </div>
 
@@ -36,21 +40,4 @@
         </div>
     </div>
 </div>
-
-{% block extra_scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var canvas = document.getElementById('qr-canvas');
-    new QRCode(canvas, {
-        text: "{{ token }}",
-        width: 180,
-        height: 180,
-        colorDark: "#0f172a",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-    });
-});
-</script>
-{% endblock %}
 {% endblock %}
