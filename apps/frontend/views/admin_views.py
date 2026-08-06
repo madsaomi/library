@@ -616,7 +616,7 @@ def school_detail(request, pk):
         grades[g].append(s)
 
     def grade_sort_key(item):
-        g = item[0]
+        g = str(item[0])
         m = re.match(r'(\d+)', g)
         return (0, int(m.group(1))) if m else (1, g)
 
