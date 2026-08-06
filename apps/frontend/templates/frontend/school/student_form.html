@@ -9,45 +9,60 @@
 {% endblock %}
 
 {% block content %}
-<div class="mw-1000 mx-auto" style="max-width: 1000px;">
+<div class="mw-1000 mx-auto">
     <div class="glass-panel animate-fade p-3xl">
+        <div class="card-header mb-2xl">
+            <h3 class="card-title">
+                <i class="fas fa-users text-primary"></i> {% trans "O'quvchilarni ko'plab qo'shish" %}
+            </h3>
+            <span class="text-muted text-xs">{% trans "Sinfga bir vaqtning o'zida qo'shing" %}</span>
+        </div>
+
         <form method="post" id="bulk-student-form">
             {% csrf_token %}
-            
-            <div class="d-flex align-center flex-wrap gap-xl mb-xl p-lg rounded-xl" style="background-color: rgba(var(--primary-rgb, 100, 100, 255), 0.1); border: 1px solid var(--primary); padding: 15px; display: flex; justify-content: space-between;">
-                <div style="display: flex; gap: 20px;">
-                    <div>
-                        <label class="d-block mb-xs text-medium text-sm text-primary">
-                            <i class="fas fa-graduation-cap mr-xs"></i> {% trans "Umumiy Sinf" %}
+
+            <!-- Grade selector -->
+            <div class="glass-card p-xl rounded-lg mb-2xl" style="border: 1px solid var(--border);">
+                <div class="card-header mb-lg">
+                    <h4 class="card-title text-sm">
+                        <i class="fas fa-graduation-cap text-info"></i> {% trans "Sinf ma'lumotlari" %}
+                    </h4>
+                    <div class="d-flex align-center gap-sm">
+                        <span class="text-muted text-sm">{% trans "O'quvchilar:" %}</span>
+                        <span class="text-lg text-bold text-primary" id="student-counter">0</span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-md flex-wrap">
+                    <div class="flex-1">
+                        <label class="text-sm text-muted text-medium mb-xs d-block">
+                            <i class="fas fa-hashtag text-primary mr-xs"></i> {% trans "Umumiy Sinf" %}
                         </label>
-                        <select name="grade_number" class="form-control" style="min-width: 120px;" required>
+                        <select name="grade_number" class="form-control" required>
                             {% for val, label in form.fields.grade_number.choices %}
                                 <option value="{{ val }}">{{ label }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div>
-                        <label class="d-block mb-xs text-medium text-sm text-primary">
-                            <i class="fas fa-font mr-xs"></i> {% trans "Umumiy Harf" %}
+                    <div class="flex-1">
+                        <label class="text-sm text-muted text-medium mb-xs d-block">
+                            <i class="fas fa-font text-primary mr-xs"></i> {% trans "Umumiy Harf" %}
                         </label>
-                        <select name="grade_letter" class="form-control" style="min-width: 120px;" required>
+                        <select name="grade_letter" class="form-control" required>
                             {% for val, label in form.fields.grade_letter.choices %}
                                 <option value="{{ val }}">{{ label }}</option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
-                <div class="text-right" style="padding-right: 15px;">
-                    <label class="d-block mb-xs text-medium text-sm text-muted">{% trans "O'quvchilar soni" %}</label>
-                    <div style="font-size: 2rem; font-weight: bold; color: var(--primary);" id="student-counter">0</div>
-                </div>
             </div>
 
-            <div class="table-responsive" style="overflow-x: auto;">
-                <table class="table w-100" id="students-table" style="min-width: 800px;">
+            <!-- Students table -->
+            <div class="table-responsive-wrap mb-xl">
+                <table class="data-table w-100" id="students-table">
                     <thead>
                         <tr>
-                            <th style="width: 40px; text-align: center;">#</th>
+                            <th style="width: 40px;">#</th>
                             <th>{% trans "Familiya" %}</th>
                             <th>{% trans "Ism" %}</th>
                             <th>{% trans "Otasining ismi" %}</th>
@@ -56,99 +71,70 @@
                         </tr>
                     </thead>
                     <tbody id="students-tbody">
-                        <!-- Rows added by JS -->
                     </tbody>
                 </table>
             </div>
-            
-            <div class="mt-md">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="addRow()">
-                    <i class="fas fa-plus"></i> {% trans "Yana qo'shish" %}
+
+            <div class="d-flex gap-md flex-wrap">
+                <button type="button" class="btn-outline text-md" onclick="addRow()">
+                    <i class="fas fa-plus mr-xs"></i> {% trans "Yana qo'shish" %}
                 </button>
-            </div>
-            
-            <div class="mt-2xl d-flex gap-md">
-                <button type="submit" class="btn-primary text-md rounded-md px-2xl">
+                <button type="submit" class="btn-primary flex-1 text-md py-md">
                     <i class="fas fa-save"></i> {% trans "Barchasini Saqlash" %}
                 </button>
-                <a href="{% url 'frontend:students_list' %}" class="btn btn-outline-secondary px-2xl d-flex align-center">
-                    {% trans "Bekor qilish" %}
+                <a href="{% url 'frontend:students_list' %}" class="btn-outline flex-1 text-md py-md text-decoration-none d-flex align-center justify-center gap-sm">
+                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>
         </form>
     </div>
 </div>
 
-<style>
-    .table input, .table select {
-        width: 100%;
-        padding: 8px;
-        background: var(--input-bg);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        color: var(--input-text);
-        outline: none;
-    }
-    .table th {
-        text-align: left;
-        padding-bottom: 10px;
-        color: var(--text-muted);
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-    .table td {
-        padding: 5px;
-        vertical-align: middle;
-    }
-</style>
-
 <script>
-    function updateCounter() {
-        const tbody = document.getElementById('students-tbody');
-        const rows = tbody.querySelectorAll('tr');
-        document.getElementById('student-counter').innerText = rows.length;
-        
-        // Update row numbers
-        rows.forEach((row, index) => {
-            const numberCell = row.querySelector('.row-number');
-            if (numberCell) {
-                numberCell.innerText = index + 1;
-            }
-        });
-    }
+function updateCounter() {
+    const tbody = document.getElementById('students-tbody');
+    const rows = tbody.querySelectorAll('tr');
+    const counter = document.getElementById('student-counter');
+    if (counter) counter.innerText = rows.length;
 
-    function addRow() {
-        const tbody = document.getElementById('students-tbody');
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="text-center font-weight-bold text-muted"><span class="row-number"></span></td>
-            <td><input type="text" name="last_name" required placeholder="Familiya"></td>
-            <td><input type="text" name="first_name" required placeholder="Ism"></td>
-            <td><input type="text" name="patronymic" placeholder="Otasining ismi"></td>
-            <td><input type="date" name="birth_date"></td>
-            <td>
-                <button type="button" class="btn btn-sm btn-danger px-sm py-xs" onclick="removeRow(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-        updateCounter();
-    }
-
-    function removeRow(btn) {
-        const tbody = document.getElementById('students-tbody');
-        if (tbody.querySelectorAll('tr').length > 1) {
-            btn.closest('tr').remove();
-            updateCounter();
-        } else {
-            const tr = btn.closest('tr');
-            tr.querySelectorAll('input').forEach(input => input.value = '');
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        addRow(); 
+    rows.forEach((row, index) => {
+        const numberCell = row.querySelector('.row-number');
+        if (numberCell) numberCell.innerText = index + 1;
     });
+}
+
+function addRow() {
+    const tbody = document.getElementById('students-tbody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td class="text-center font-weight-bold text-muted"><span class="row-number"></span></td>
+        <td><input type="text" name="last_name" required placeholder="Familiya" class="form-control"></td>
+        <td><input type="text" name="first_name" required placeholder="Ism" class="form-control"></td>
+        <td><input type="text" name="patronymic" placeholder="Otasining ismi" class="form-control"></td>
+        <td><input type="date" name="birth_date" class="form-control"></td>
+        <td>
+            <button type="button" class="icon-btn icon-btn-danger" onclick="removeRow(this)" aria-label="{% trans "O'chirish" %}">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+    updateCounter();
+}
+
+function removeRow(btn) {
+    const tbody = document.getElementById('students-tbody');
+    if (tbody.querySelectorAll('tr').length > 1) {
+        btn.closest('tr').remove();
+        updateCounter();
+    } else {
+        const tr = btn.closest('tr');
+        tr.querySelectorAll('input').forEach(input => input.value = '');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    addRow();
+});
 </script>
 {% endblock %}

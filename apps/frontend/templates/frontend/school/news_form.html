@@ -9,54 +9,67 @@
 {% endblock %}
 
 {% block content %}
-<div class="mw-500 mx-auto">
+<div class="mw-600 mx-auto">
     <div class="glass-panel animate-fade p-3xl">
-        <form method="post" enctype="multipart/form-data">
+        <div class="card-header mb-2xl">
+            <h3 class="card-title">
+                <i class="fas fa-newspaper text-primary"></i> {% if is_add %}{% trans "Yangi yangilik" %}{% else %}{% trans "Yangilikni tahrirlash" %}{% endif %}
+            </h3>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" id="news-form">
             {% csrf_token %}
 
-            <div class="d-flex flex-column gap-xl">
+            <div class="d-flex flex-column gap-lg">
                 {% for field in form %}
-                <div>
-                    <label class="d-block mb-xs text-medium text-sm text-muted">
+                <div class="d-flex flex-column gap-xs">
+                    <label class="text-sm text-muted text-medium" for="{{ field.id_for_label }}">
+                        {% if field.name == 'title' %}<i class="fas fa-heading text-primary mr-xs"></i>{% endif %}
+                        {% if field.name == 'content' %}<i class="fas fa-align-left text-primary mr-xs"></i>{% endif %}
+                        {% if field.name == 'image' %}<i class="fas fa-image text-primary mr-xs"></i>{% endif %}
                         {{ field.label }}
                     </label>
 
                     {% if field.name == 'is_published' %}
                     <div class="d-flex align-center gap-md py-md px-lg rounded-md border" style="background: var(--input-bg);">
-                        {{ field }}
-                        <span class="text-md">{% trans "Saytda ko'rsatish" %}</span>
+                        <label class="switch pos-relative d-inline-block" style="width: 44px; height: 24px;">
+                            {{ field }}
+                            <span class="slider"></span>
+                        </label>
+                        <span class="text-md text-muted">{% trans "Saytda ko'rsatish" %}</span>
                     </div>
 
                     {% elif field.name == 'image' %}
                     <div class="pos-relative overflow-hidden d-inline-block">
-                        <div id="fake-upload-btn" class="d-flex align-center gap-sm cursor-pointer border rounded-md text-sm" style="padding: 10px 18px; background: var(--input-bg);">
-                            <i class="fas fa-upload text-success"></i>
+                        <div id="fake-upload-btn" class="d-flex align-center gap-sm cursor-pointer border rounded-md text-sm py-md px-lg" style="background: var(--input-bg); transition: 0.2s;">
+                            <i class="fas fa-upload text-success" id="upload-icon"></i>
                             <span id="file-name-label">{% trans "Rasm tanlash" %}</span>
                         </div>
                         <input type="file" name="image" accept="image/*" id="id_image"
-                               class="pos-absolute top-0 left-0 w-full h-full cursor-pointer"
-                               style="opacity: 0;"
+                               class="pos-absolute top-0 left-0 w-full h-full cursor-pointer opacity-0"
                                onchange="handleFileChange(this)">
                     </div>
 
                     {% else %}
-                    <div>
-                        {{ field }}
-                    </div>
+                    {{ field }}
+
                     {% endif %}
 
                     {% if field.errors %}
-                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}</p>
+                    <p class="text-danger text-sm mt-xs"><i class="fas fa-exclamation-circle mr-xs"></i> {{ field.errors.0 }}</p>
+                    {% endif %}
+                    {% if field.help_text and field.name != 'is_published' %}
+                    <span class="text-muted text-xs">{{ field.help_text }}</span>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
 
             <div class="mt-2xl d-flex gap-md">
-                <button type="submit" class="btn-primary flex-1 text-md rounded-md">
+                <button type="submit" class="btn-primary flex-1 text-md py-md">
                     <i class="fas fa-save"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend:school_news_list' %}" class="btn-outline flex-1 rounded-md">
+                <a href="{% url 'frontend:school_news_list' %}" class="btn-outline flex-1 text-md py-md text-decoration-none d-flex align-center justify-center gap-sm">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>
@@ -64,27 +77,14 @@
     </div>
 </div>
 
-<style>
-    .form-control { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--input-text); outline: none; font-size: 0.85rem; transition: 0.3s; box-sizing: border-box; }
-    .form-control:focus { border-color: var(--primary); }
-    .form-control[type="file"] { padding: 8px; }
-    #fake-upload-btn:hover { background: var(--hover-bg); }
-    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background: var(--hover-bg); border-radius: 24px; transition: 0.3s; }
-    .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: var(--text-muted); border-radius: 50%; transition: 0.3s; }
-    .switch input:checked + .slider { background: #10b981; }
-    .switch input:checked + .slider:before { transform: translateX(20px); background: white; }
-</style>
-
 <script>
 function handleFileChange(input) {
     if (input.files && input.files[0]) {
         document.getElementById('file-name-label').innerText = input.files[0].name;
         const btn = document.getElementById('fake-upload-btn');
-        btn.style.borderColor = '#10b981';
-        btn.style.background = 'rgba(16, 185, 129, 0.1)';
-        btn.querySelector('i').className = 'fas fa-check';
+        btn.style.borderColor = 'var(--success)';
+        btn.style.background = 'rgba(16, 185, 129, 0.08)';
+        document.getElementById('upload-icon').className = 'fas fa-check text-success';
     }
 }
 </script>

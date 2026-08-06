@@ -11,31 +11,41 @@
 {% block content %}
 <div class="mw-600 mx-auto">
     <div class="glass-panel animate-fade p-3xl">
+        <div class="card-header mb-2xl">
+            <h3 class="card-title">
+                <i class="fas fa-user-edit text-primary"></i> {% trans "Profil ma'lumotlari" %}
+            </h3>
+        </div>
+
         <form method="post">
             {% csrf_token %}
-            <div class="d-flex flex-column gap-lg mb-xl">
-                <div class="form-group">
-                    <label class="d-block mb-sm text-semibold text-muted text-md">
-                        <i class="fas fa-user text-primary mr-sm"></i> {% trans "Ism" %}
+            <div class="d-flex flex-column gap-lg">
+                <div class="d-flex flex-column gap-xs">
+                    <label class="text-sm text-muted text-medium" for="id_first_name">
+                        <i class="fas fa-user text-primary mr-xs"></i> {% trans "Ism" %}
                     </label>
-                    <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control" data-limit-chars="50" required>
+                    <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control" data-limit-chars="50" required id="id_first_name">
                 </div>
-                <div class="form-group">
-                    <label class="d-block mb-sm text-semibold text-muted text-md">
-                        <i class="fas fa-id-card" style="color: var(--secondary); margin-right: 8px;"></i> {% trans "Familiya" %}
+                <div class="d-flex flex-column gap-xs">
+                    <label class="text-sm text-muted text-medium" for="id_last_name">
+                        <i class="fas fa-user text-primary mr-xs"></i> {% trans "Familiya" %}
                     </label>
-                    <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control" data-limit-chars="50" required>
+                    <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control" data-limit-chars="50" required id="id_last_name">
                 </div>
                 {% if user.role == 'student' %}
-                <div class="form-group">
-                    <label class="d-block mb-sm text-semibold text-muted text-md">
-                        <i class="fas fa-icons text-primary mr-sm"></i> {% trans "Ikonka" %}
+                <div class="d-flex flex-column gap-xs">
+                    <label class="text-sm text-muted text-medium">
+                        <i class="fas fa-palette text-primary mr-xs"></i> {% trans "Ikonka" %}
                     </label>
                     <div class="d-flex gap-sm flex-wrap">
                         {% for icon in unlocked_icons %}
-                        <label class="icon-item d-flex align-center justify-center rounded-md cursor-pointer" style="width: 50px; height: 50px; border: 2px solid {% if user.selected_icon == icon %}var(--primary){% else %}var(--border){% endif %}; background: {% if user.selected_icon == icon %}var(--glass){% else %}transparent{% endif %};">
-                            <input type="radio" name="selected_icon" value="{{ icon }}" {% if user.selected_icon == icon %}checked{% endif %} class="d-none" onchange="this.closest('.icon-item').querySelector('i').style.color='var(--primary)'">
-                            <i class="fas {{ icon }}" style="font-size: 1.3rem; color: {% if user.selected_icon == icon %}var(--primary){% else %}var(--text-muted){% endif %};"></i>
+                        <label class="icon-item d-flex align-center justify-center rounded-md cursor-pointer transition"
+                               style="width: 50px; height: 50px; border: 2px solid {% if user.selected_icon == icon %}var(--primary){% else %}var(--border){% endif %}; background: {% if user.selected_icon == icon %}var(--glass){% else %}transparent{% endif %};"
+                               onmouseover="this.style.borderColor='var(--primary)'"
+                               onmouseout="if (!this.classList.contains('selected')) this.style.borderColor='var(--border)'">
+                            <input type="radio" name="selected_icon" value="{{ icon }}" {% if user.selected_icon == icon %}checked{% endif %} class="d-none"
+                                   onchange="selectIcon(this, '{{ icon }}')">
+                            <i class="fas {{ icon }} text-lg {% if user.selected_icon == icon %}text-primary{% else %}text-muted{% endif %}"></i>
                         </label>
                         {% endfor %}
                     </div>
@@ -43,15 +53,32 @@
                 {% endif %}
             </div>
 
-            <div class="d-flex gap-md">
-                <button type="submit" class="btn-primary flex-2 p-lg rounded-2xl text-bold">
-                    <i class="fas fa-save mr-sm"></i> {% trans "Saqlash" %}
+            <div class="mt-2xl d-flex gap-md">
+                <button type="submit" class="btn-primary flex-2 py-md text-semibold">
+                    <i class="fas fa-save mr-xs"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend:profile' %}" class="glass-card flex-1 p-lg rounded-2xl text-center text-decoration-none text-white d-flex align-center justify-center border transition" style="background: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.2);" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)';">
-                    <i class="fas fa-times mr-sm"></i> {% trans "Bekor qilish" %}
+                <a href="{% url 'frontend:profile' %}" class="btn-outline flex-1 py-md text-decoration-none d-flex align-center justify-center gap-sm">
+                    <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+function selectIcon(input, icon) {
+    document.querySelectorAll('.icon-item').forEach(item => {
+        item.classList.remove('selected');
+        item.style.borderColor = 'var(--border)';
+        item.style.background = 'transparent';
+        const i = item.querySelector('i');
+        i.className = 'fas ' + i.className.replace('text-primary', 'text-muted');
+    });
+    const parent = input.closest('.icon-item');
+    parent.classList.add('selected');
+    parent.style.borderColor = 'var(--primary)';
+    parent.style.background = 'var(--glass)';
+    input.nextElementSibling?.classList.add('text-primary');
+}
+</script>
 {% endblock %}
