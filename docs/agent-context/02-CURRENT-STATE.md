@@ -1,6 +1,6 @@
 # 02-CURRENT-STATE — What is true right now
 
-Last fully verified: 2026-08-07 (unified QR system + scanner redesign + design system across all ~90 templates + 169 tests).
+Last fully verified: 2026-08-07 (unified QR system + scanner redesign + cart QR redesign + 169 tests).
 
 ## 2026-08-06 — design-system rollout complete
 - **All templates** in `apps/frontend/templates/frontend/{admin,school,user,shared}` (~90) redesigned to the

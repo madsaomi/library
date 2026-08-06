@@ -486,6 +486,19 @@ ews_list: added early guard for
 - Verified: 169 tests pass, ruff clean, all 3 QR URLs render 200
 - Commits: `5dfacd6` (redesign), `2279b33` (filter links fix)
 
+## Session: cart QR redesign + scanner UX (2026-08-07)
+- **Redesigned `cart_qr.html`**: matches `student_qr.html` design — circular icon header, `glass-card` QR container, `card-header` + `list-row` items, usage guide
+- **Redesigned `cart_return_qr.html`**: same treatment with green color scheme
+- **`cart_list.html`**: replaced `book-shelf-grid` with `list-row` items, `badge-soft-warning` for count
+- **Scanner page `qr_unified.html`**: added "Savat QR kodi" info card with description of cart flow
+- **3 QR flows now complete**:
+  1. **Physical scan**: scan BOOK_ (book sticker) → scan STU_ (student phone) → auto issue/return
+  2. **Student phone first**: scan STU_ → then scan BOOK_ → auto issue/return
+  3. **Cart checkout**: student opens `/library/cart/qr/` → shows CART_ QR → librarian scans → all books issued at once
+  4. **Cart return**: student opens `/library/cart/return/qr/` → shows RETCART_ QR → librarian scans → all books returned
+- Verified: 169 tests pass, ruff clean, all cart pages render 200
+- Commit: `f808439` "feat: redesign cart QR pages and add cart info to scanner"
+
 ## Session: redesign student QR page (2026-08-07)
 - **Redesigned `student_qr.html`** following unified design system:
   - Circular icon header (64px, bg-primary) with fa-qrcode
