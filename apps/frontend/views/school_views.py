@@ -1400,9 +1400,15 @@ def book_add(request):
         subjects = request.POST.getlist('subject')
 
         created = 0
+        skipped = []
         for i in range(len(titles)):
             title = titles[i].strip()
             if not title:
+                continue
+
+            # Check for duplicate title within the same school
+            if Book.objects.filter(school=request.user.school, title__iexact=title, is_deleted=False).exists():
+                skipped.append(f'"{title}" — kitob allaqachon mavjud')
                 continue
 
             # Get cover by dynamic name cover_{idx} — idx is 1-based bookCount
@@ -1454,6 +1460,9 @@ def book_add(request):
             messages.success(request, _(f"{created} ta kitob muvaffaqiyatli qo'shildi!"))
         else:
             messages.error(request, _("Hech qanday kitob qo'shilmadi."))
+        if skipped:
+            for msg in skipped:
+                messages.warning(request, msg)
         return redirect('frontend:school_books_list')
     else:
         form = BookForm()
