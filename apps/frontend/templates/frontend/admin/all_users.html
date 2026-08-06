@@ -24,7 +24,7 @@
             <div class="stat-tile-label">{% trans "O'qituvchilar" %}</div>
         </div>
         <div class="stat-tile">
-            <div class="stat-tile-value">{{ school_admin_count }}</div>
+            <div class="stat-tile-value text-info">{{ school_admin_count }}</div>
             <div class="stat-tile-label">{% trans "Adminlar" %}</div>
         </div>
         <div class="stat-tile">
@@ -40,13 +40,12 @@
             <a href="{% url 'frontend:all_users_list' %}?role=teacher" class="filter-chip {% if role_filter == 'teacher' %}active{% endif %}">{% trans "O'qituvchilar" %}</a>
             <a href="{% url 'frontend:all_users_list' %}?role=school_admin" class="filter-chip {% if role_filter == 'school_admin' %}active{% endif %}">{% trans "Adminlar" %}</a>
             <span class="flex-1"></span>
-            <div class="pos-relative">
-                <input type="text" id="search-input" aria-label="{% trans 'Qidirish...' %}" placeholder="{% trans 'Qidirish...' %}"
-                       class="form-control" style="padding: 8px 14px 8px 36px; width: 200px; font-size: 0.8rem; border-radius: 8px;">
+            <div class="password-wrapper pos-relative mr-sm">
+                <input type="text" id="search-input" aria-label="{% trans 'Qidirish...' %}" placeholder="{% trans 'Qidirish...' %}" class="form-control" style="padding-left: 36px;">
                 <i class="fas fa-search pos-absolute text-muted text-md" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
             </div>
-            <a href="{% url 'frontend:admin_add' %}" class="btn-primary text-nowrap text-sm" style="padding: 8px 16px;">
-                <i class="fas fa-plus"></i> {% trans "Yangi Admin" %}
+            <a href="{% url 'frontend:admin_add' %}" class="btn-primary text-nowrap">
+                <i class="fas fa-plus mr-xs"></i> {% trans "Yangi Admin" %}
             </a>
         </div>
 
@@ -74,7 +73,7 @@
                             <div class="d-flex align-center gap-md">
                                 <div class="list-row-avatar">{{ user.first_name|first|default:user.username|first|upper }}{{ user.last_name|first|upper }}</div>
                                 <div>
-                                    <div class="text-semibold text-main" style="font-size: 0.82rem;">{{ user.username }}</div>
+                                    <div class="text-semibold text-main text-sm">{{ user.username }}</div>
                                     <div class="text-muted text-xs">{{ user.get_full_name|default:"" }}</div>
                                 </div>
                             </div>
@@ -84,7 +83,7 @@
                         </td>
                         <td>
                             <span class="d-flex align-center gap-xs text-sm {% if user.is_active %}text-success{% else %}text-danger{% endif %}">
-                                <span class="d-inline-block rounded-full" style="width: 7px; height: 7px; background: currentColor;"></span>
+                                <span class="d-inline-block rounded-full flex-shrink-0" style="width: 7px; height: 7px; background: currentColor;"></span>
                                 {{ user.is_active|yesno:_("Faol,Faolsiz") }}
                             </span>
                         </td>

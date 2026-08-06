@@ -38,9 +38,9 @@
     </div>
 
     <div class="action-bar mb-xl">
-        <span class="text-muted text-md"><i class="fas fa-calendar-alt"></i></span>
+        <span class="text-muted text-md"><i class="fas fa-calendar-alt mr-xs"></i>{% trans "Davomiylik:" %}</span>
         <form method="get" class="d-inline">
-            <select name="period" class="form-control text-md" style="width: auto; min-width: 100px; padding: 6px 10px; border-radius: 8px;" onchange="this.form.submit()">
+            <select name="period" class="form-control" style="width: auto; min-width: 100px;" onchange="this.form.submit()">
                 <option value="7" {% if period_days == 7 %}selected{% endif %}>{% trans "7 kun" %}</option>
                 <option value="14" {% if period_days == 14 %}selected{% endif %}>{% trans "14 kun" %}</option>
                 <option value="30" {% if period_days == 30 %}selected{% endif %}>{% trans "30 kun" %}</option>
@@ -48,7 +48,7 @@
             </select>
         </form>
         <span class="flex-1"></span>
-        <a href="{% url 'frontend:create_stats_news' %}?period={{ period_days }}" class="btn-primary text-sm text-white text-decoration-none d-flex align-center gap-xs text-nowrap">
+        <a href="{% url 'frontend:create_stats_news' %}?period={{ period_days }}" class="btn-primary text-sm d-flex align-center gap-xs text-nowrap">
             <i class="fas fa-newspaper"></i> {% trans "Yangilik qilish" %}
         </a>
     </div>
