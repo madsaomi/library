@@ -1,44 +1,99 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 
-{% block title %}{% trans "QR kod" %} | {% trans "Kitoblar qaytarish" %}{% endblock %}
+{% block title %}{% trans "QR kod" %} | {% trans "Qaytarish" %}{% endblock %}
+{% block page_title %}{% trans "QR kod" %} | {% trans "Qaytarish" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/user/sidebar_items.html' %}
+{% endblock %}
 
 {% block content %}
-<div class="animate-fade text-center py-xl">
-    <div class="glass-panel p-xl max-w-md mx-auto">
-        <h3 class="mb-xl">
-            <i class="fas fa-qrcode text-primary"></i>
-            {% trans "Qaytarish QR kodi" %}
-        </h3>
+<div class="animate-fade mw-600 mx-auto">
+    <div class="glass-panel p-2xl text-center mb-xl">
+        <div class="flex-center rounded-full mx-auto mb-lg bg-success" style="width: 64px; height: 64px;">
+            <i class="fas fa-undo text-2xl text-white"></i>
+        </div>
+        <h2 class="m-0 mb-xs">{% trans "Qaytarish QR kodi" %}</h2>
+        <p class="text-muted m-0 mb-xl text-sm">{% trans "Kutubxonachiga ko'rsating — barcha kitoblar avtomatik qaytadi" %}</p>
 
-        <div class="d-flex justify-center mb-xl" id="qrContent">
-            {% if qr_url %}
-            <img src="{{ qr_url }}" alt="QR kod" class="rounded-2xl" style="max-width: 260px; width: 100%;">
-            {% else %}
-            <p class="text-muted">{% trans "QR kod yaratilmadi" %}</p>
-            {% endif %}
+        <div class="d-flex justify-center mb-xl">
+            <div class="glass-card rounded-xl p-xl" style="background: white;">
+                {% if qr_url %}
+                <img src="{{ qr_url }}" alt="QR kod" style="max-width: 200px; width: 100%;">
+                {% else %}
+                <div class="text-muted text-sm p-xl">{% trans "QR kod yaratilmadi" %}</div>
+                {% endif %}
+            </div>
         </div>
 
-        <p class="text-sm text-muted mb-xl">
-            <i class="fas fa-info-circle"></i>
-            {% trans "Bиблиотекарь buni skanerlashi kerak" %}
-        </p>
-
         {% if items %}
-        <div class="text-left glass-panel p-lg mb-xl">
-            <h4 class="mb-md">{% trans "Qaytariladigan kitoblar" %}</h4>
-            <ul class="list-unstyled">
+        <div class="text-left mb-xl">
+            <div class="card-header mb-md">
+                <h4 class="card-title"><i class="fas fa-list text-success"></i> {% trans "Qaytariladigan kitoblar" %}</h4>
+                <span class="badge-soft badge-soft-success">{{ items|length }} {% trans "ta" %}</span>
+            </div>
+            <div class="d-flex flex-column gap-xs">
                 {% for item in items %}
-                <li class="d-flex align-center justify-between py-xs">
-                    <span><i class="fas fa-book text-primary"></i> {{ item.book.title }}</span>
-                </li>
+                <div class="list-row">
+                    <div class="list-row-avatar"><i class="fas fa-book text-success"></i></div>
+                    <div class="list-row-main">
+                        <div class="list-row-title text-truncate">{{ item.book.title }}</div>
+                        {% if item.book.author %}
+                        <div class="list-row-sub">{{ item.book.author }}</div>
+                        {% endif %}
+                    </div>
+                    <i class="fas fa-undo text-info"></i>
+                </div>
                 {% endfor %}
-            </ul>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state mb-xl">
+            <div class="empty-icon"><i class="fas fa-undo"></i></div>
+            <h4>{% trans "Qaytarish uchun kitob yo'q" %}</h4>
+            <p>{% trans "Avval 'Mening kitoblarim'dan qaytarish uchun tanlang" %}</p>
+            <a href="{% url 'frontend:cart_return_list' %}" class="btn-primary mt-lg">{% trans "Qaytarish sahifasiga o'tish" %}</a>
         </div>
         {% endif %}
 
-        <div class="d-flex gap-md justify-center">
-            <button type="button" onclick="window.close()" class="btn btn-secondary">{% trans "Yopish" %}</button>
+        <div class="d-flex gap-md justify-center flex-wrap">
+            <a href="{% url 'frontend:cart_return_list' %}" class="btn-primary py-sm px-lg text-decoration-none">
+                <i class="fas fa-undo mr-xs"></i> {% trans "Qaytarish sahifasiga" %}
+            </a>
+            <a href="{% url 'frontend:my_books' %}" class="btn-outline py-sm px-lg text-decoration-none">
+                <i class="fas fa-book mr-xs"></i> {% trans "Mening kitoblarim" %}
+            </a>
+        </div>
+    </div>
+
+    <div class="glass-panel p-xl">
+        <div class="card-header mb-lg">
+            <h3 class="card-title"><i class="fas fa-info-circle text-info"></i> {% trans "Qanday ishlatiladi?" %}</h3>
+        </div>
+        <div class="d-flex flex-column gap-sm">
+            <div class="list-row">
+                <div class="list-row-avatar"><i class="fas fa-book text-primary"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{% trans "1. Kitoblarni tanlang" %}</div>
+                    <div class="list-row-sub">{% trans "'Mening kitoblarim'dan qaytariladigan kitoblarni tanlang" %}</div>
+                </div>
+            </div>
+            <div class="list-row">
+                <div class="list-row-avatar"><i class="fas fa-qrcode text-success"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{% trans "2. QR kodni ko'rsating" %}</div>
+                    <div class="list-row-sub">{% trans "Ushbu QR kodni kutubxonachiga ko'rsating" %}</div>
+                </div>
+            </div>
+            <div class="list-row">
+                <div class="list-row-avatar"><i class="fas fa-check text-success"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{% trans "3. Barchasi qaytdi" %}</div>
+                    <div class="list-row-sub">{% trans "Kutubxonachi skanerlaydi, barcha kitoblar avtomatik qaytadi" %}</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

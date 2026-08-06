@@ -92,6 +92,22 @@
             </button>
         </div>
 
+        <!-- Cart QR info -->
+        <div class="mt-xl glass-card p-lg rounded-lg" style="border: 1px solid var(--border);">
+            <div class="d-flex align-center gap-md">
+                <div class="flex-center rounded-full" style="width: 40px; height: 40px; background: rgba(245,158,11,0.12); min-width: 40px;">
+                    <i class="fas fa-shopping-cart text-warning"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="text-sm text-semibold">{% trans "Savat QR kodi" %}</div>
+                    <div class="text-xs text-muted">{% trans "O'quvchi savatdagi barcha kitoblarni bir QR da ko'rsatadi" %}</div>
+                </div>
+                <a href="{% url 'frontend:qr_labels_batch' kind='books' %}" class="btn-outline py-sm px-md text-sm text-decoration-none">
+                    {% trans "Yorliqlar" %}
+                </a>
+            </div>
+        </div>
+
         <div class="mt-xl">
             <a href="{% url 'frontend:school_dashboard' %}" class="text-muted text-decoration-none text-sm" style="opacity: 0.7;">
                 <i class="fas fa-arrow-left"></i> {% trans "Orqaga" %}
