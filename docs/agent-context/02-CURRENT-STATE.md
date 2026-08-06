@@ -12,7 +12,10 @@ Last fully verified: 2026-08-06 (unified design system across all ~90 templates 
 - All three panels + shared templates render 200 via test client; `pytest -q -n auto` = **169 passed ~30s**;
   `ruff check .` clean; `collectstatic` OK (691 post-processed, manifest storage).
 - Commits: `9675c74` (design-system redesign), `f4009de` (SaaS cleanup: flat gradients/glow removal),
-  `c8938de` (school_detail clean).
+  `c8938de` (school_detail clean), `2160174` (remove inline hex on 403 error icons).
+- Root templates (`templates/*.html` — login, password reset, 4xx/5xx error pages): verified clean of
+  prohibited patterns (no inline `style="color: #hex"`, no gradients/glow). All render OK via
+  `render_to_string` (403/403_csrf/404/500/400/login/password_reset).
 
 
 ## Green (verified)
