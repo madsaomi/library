@@ -402,7 +402,7 @@ def create_stats_news(request):
 def system_logs(request):
     from datetime import timedelta
 
-    from django.db.models import Q
+from django.db.models import Q, Prefetch
     from django.utils import timezone
     from stats.models import ActionLog
 
@@ -628,6 +628,97 @@ def school_detail(request, pk):
 
     grade_counts = sorted([(g, len(ss)) for g, ss in grades.items()], key=grade_sort_key)
 
+    # Handle POST for editing school or toggling active status
+    if request.method == 'POST':
+        action = request.POST.get('action', '')
+
+        if action == 'toggle_active':
+            school.is_active = not school.is_active
+            school.save(update_fields=['is_active'])
+            from django.contrib import messages
+            if school.is_active:
+                messages.success(request, _('Maktab faollashtirildi: {}').format(school.name))
+            else:
+                messages.warning(request, _('Maktab bloklandi: {}').format(school.name))
+            return redirect('frontend:school_detail', pk=school.pk)
+
+        elif action == 'save':
+            from frontend.forms import UnifiedSchoolForm
+            form = UnifiedSchoolForm(request.POST, instance=school, current_admin_id=school_admins.first().pk if school_admins.exists() else None)
+            if form.is_valid():
+                school = form.save()
+                # Handle admin update
+                admin_username = form.cleaned_data.get('admin_username')
+                admin_password = form.cleaned_data.get('admin_password')
+                if school_admins.exists():
+                    admin = school_admins.first()
+                    updated = False
+                    if admin_username and admin.username != admin_username:
+                        admin.username = admin_username
+                        updated = True
+                    if admin_password:
+                        admin.set_password(admin_password)
+                        updated = True
+                    if updated:
+                        admin.save()
+                        messages.success(request, _("Maktab va admin ma'lumotlari yangilandi!"))
+                    else:
+                        messages.success(request, _("Maktab ma'lumotlari yangilandi!"))
+                else:
+                    messages.error(request, _("Maktabda kamida 1 ta admin bo'lishi shart."))
+                    return render(request, 'frontend/admin/school_detail.html', {
+                        'school': school,
+                        'student_count': len(all_students),
+                        'book_count': Book.objects.filter(school=school).count(),
+                        'issued_count': BookIssue.objects.filter(book__school=school, is_returned=False).count(),
+                        'school_admins': school_admins,
+                        'admin_count': school_admins.count(),
+                        'admin_max': ADMIN_MAX,
+                        'grades': grades,
+                        'grade_counts': grade_counts,
+                        'books': Book.objects.select_related('school', 'category').filter(school=school).order_by('-id')[:20],
+                        'form': form,
+                        'edit_mode': True,
+                    })
+                return redirect('frontend:school_detail', pk=school.pk)
+            else:
+                # Re-render with errors
+                districts = District.objects.prefetch_related(
+                    Prefetch('schools', queryset=School.active_objects.order_by('name'))
+                ).order_by('name')
+                schools_with_admins = CustomUser.objects.filter(role='school_admin').values_list('school_id', flat=True)
+                return render(request, 'frontend/admin/school_detail.html', {
+                    'school': school,
+                    'student_count': len(all_students),
+                    'book_count': Book.objects.filter(school=school).count(),
+                    'issued_count': BookIssue.objects.filter(book__school=school, is_returned=False).count(),
+                    'school_admins': school_admins,
+                    'admin_count': school_admins.count(),
+                    'admin_max': ADMIN_MAX,
+                    'grades': grades,
+                    'grade_counts': grade_counts,
+                    'books': Book.objects.select_related('school', 'category').filter(school=school).order_by('-id')[:20],
+                    'form': form,
+                    'edit_mode': True,
+                    'districts': districts,
+                    'schools_with_admins': list(schools_with_admins),
+                })
+
+    # GET request - show detail
+    from frontend.forms import UnifiedSchoolForm
+    initial = {}
+    if school_admins.exists():
+        initial['admin_username'] = school_admins.first().username
+
+    form = UnifiedSchoolForm(instance=school, initial=initial, current_admin_id=school_admins.first().pk if school_admins.exists() else None)
+
+    # Fetch Districts and Schools for the form
+    from django.db.models import Prefetch
+    districts = District.objects.prefetch_related(
+        Prefetch('schools', queryset=School.active_objects.order_by('name'))
+    ).order_by('name')
+    schools_with_admins = CustomUser.objects.filter(role='school_admin').values_list('school_id', flat=True)
+
     context = {
         'school': school,
         'student_count': len(all_students),
@@ -641,6 +732,10 @@ def school_detail(request, pk):
         'grades': grades,
         'grade_counts': grade_counts,
         'books': Book.objects.select_related('school', 'category').filter(school=school).order_by('-id')[:20],
+        'form': form,
+        'edit_mode': False,
+        'districts': districts,
+        'schools_with_admins': list(schools_with_admins),
     }
     return render(request, 'frontend/admin/school_detail.html', context)
 

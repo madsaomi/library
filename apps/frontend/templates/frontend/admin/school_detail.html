@@ -9,9 +9,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade">
+<div class="animate-fade mw-900 mx-auto">
 
-    <div class="glass-panel p-xl">
+    <!-- Header with school info -->
+    <div class="glass-panel p-xl mb-2xl">
         <div class="d-flex align-center gap-lg flex-wrap">
             <div class="flex-center rounded-lg flex-shrink-0" style="width: 56px; height: 56px; background: var(--primary);">
                 <i class="fas fa-school text-lg text-white"></i>
@@ -31,84 +32,63 @@
         </div>
     </div>
 
-    <div class="grid-3 stat-grid mb-2xl">
-        <div class="stat-tile">
-            <div class="stat-tile-value text-info">{{ student_count }}</div>
-            <div class="stat-tile-label">{% trans "O'quvchilar" %}</div>
-        </div>
-        <div class="stat-tile">
-            <div class="stat-tile-value text-success">{{ book_count }}</div>
-            <div class="stat-tile-label">{% trans "Kitoblar" %}</div>
-        </div>
-        <div class="stat-tile">
-            <div class="stat-tile-value text-warning">{{ issued_count }}</div>
-            <div class="stat-tile-label">{% trans "Tarqatilgan" %}</div>
-        </div>
+    <!-- Tabs -->
+    <div class="d-flex gap-sm mb-xl border-bottom pb-md">
+        <button type="button" class="tab-btn {% if not edit_mode %}active{% endif %}" onclick="switchTab('info')" id="tab-btn-info">
+            <i class="fas fa-info-circle mr-xs"></i> {% trans "Ma'lumotlar" %}
+        </button>
+        <button type="button" class="tab-btn {% if edit_mode %}active{% endif %}" onclick="switchTab('edit')" id="tab-btn-edit">
+            <i class="fas fa-edit mr-xs"></i> {% trans "Tahrirlash" %}
+        </button>
     </div>
 
-    <div class="glass-panel p-xl mb-2xl">
-        <div class="grid-3">
-            <div>
-                <div class="text-xs text-muted mb-xs">{% trans "Kontakt" %}</div>
-                <div class="text-md text-semibold">{{ school.contact|default:"—" }}</div>
+    <!-- Info Tab -->
+    <div id="tab-info" class="{% if edit_mode %}d-none{% endif %}">
+        <div class="grid-3 stat-grid mb-2xl">
+            <div class="stat-tile">
+                <div class="stat-tile-value text-info">{{ student_count }}</div>
+                <div class="stat-tile-label">{% trans "O'quvchilar" %}</div>
             </div>
-            <div>
-                <div class="text-xs text-muted mb-xs">{% trans "Manzil" %}</div>
-                <div class="text-md text-semibold">{{ school.address|default:"—" }}</div>
+            <div class="stat-tile">
+                <div class="stat-tile-value text-success">{{ book_count }}</div>
+                <div class="stat-tile-label">{% trans "Kitoblar" %}</div>
             </div>
-            <div>
-                <div class="text-xs text-muted mb-md d-flex align-center gap-sm">
-                    <span>{% trans "Maktab Adminlari" %}</span>
-                    <span class="badge-soft badge-soft-primary text-xs">{{ admin_count }}/{{ admin_max }}</span>
+            <div class="stat-tile">
+                <div class="stat-tile-value text-warning">{{ issued_count }}</div>
+                <div class="stat-tile-label">{% trans "Tarqatilgan" %}</div>
+            </div>
+        </div>
+
+        <div class="glass-panel p-xl mb-2xl">
+            <div class="card-header mb-lg">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle text-primary"></i> {% trans "Asosiy ma'lumotlar" %}
+                </h3>
+            </div>
+            <div class="info-grid gap-sm">
+                <div class="info-row border-bottom py-sm">
+                    <span class="info-label text-xs">{% trans "Kontakt" %}</span>
+                    <span class="info-value text-md">{{ school.contact|default:"—" }}</span>
                 </div>
-                {% if school_admins %}
-                <div class="d-flex flex-column gap-sm">
-                    {% for admin in school_admins %}
-                    <div class="list-row">
-                        <div class="list-row-avatar">{{ admin.first_name|first|upper }}{{ admin.last_name|first|upper }}</div>
-                        <div class="list-row-main">
-                            <div class="list-row-title">{{ admin.get_full_name|default:admin.username }}</div>
-                            <div class="list-row-sub">@{{ admin.username }}</div>
-                        </div>
-                        <a href="{% url 'frontend:admin_edit' admin.pk %}" class="icon-btn" title="{% trans "Tahrirlash" %}" aria-label="{% trans "Tahrirlash" %}">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                    </div>
-                    {% endfor %}
+                <div class="info-row border-bottom py-sm">
+                    <span class="info-label text-xs">{% trans "Manzil" %}</span>
+                    <span class="info-value text-md">{{ school.address|default:"—" }}</span>
                 </div>
-                {% else %}
-                <div class="text-md text-muted">{% trans "Admin yo'q" %}</div>
-                {% endif %}
+                <div class="info-row py-sm">
+                    <span class="info-label text-xs">{% trans "Maktab Adminlari" %}</span>
+                    <span class="info-value text-md">
+                        {% if school_admins %}
+                        <span class="badge-soft badge-soft-primary">{{ admin_count }}/{{ admin_max }}</span>
+                        {% else %}
+                        <span class="text-muted">{% trans "Admin yo'q" %}</span>
+                        {% endif %}
+                    </span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="glass-panel p-xl mb-2xl">
-        <div class="d-flex gap-sm flex-wrap">
-            <a href="{% url 'frontend:school_edit' school.pk %}" class="btn-primary text-decoration-none">
-                <i class="fas fa-edit"></i> {% trans "Tahrirlash" %}
-            </a>
-            <form method="post" action="{% url 'frontend:school_toggle_active' school.pk %}" class="m-0">
-                {% csrf_token %}
-                <button type="submit" class="btn-outline cursor-pointer">
-                    {% if school.is_active %}<i class="fas fa-ban text-danger"></i> {% trans "Bloklash" %}{% else %}<i class="fas fa-check-circle text-success"></i> {% trans "Faollashtirish" %}{% endif %}
-                </button>
-            </form>
-            <a href="{% url 'frontend:school_duplicate' school.pk %}" class="btn-outline text-decoration-none">
-                <i class="fas fa-copy"></i> {% trans "Nusxa" %}
-            </a>
-            <a href="{% url 'frontend:school_reset_admin_password' school.pk %}" class="btn-outline text-decoration-none">
-                <i class="fas fa-key"></i> {% trans "Parol" %}
-            </a>
-            <a href="{% url 'frontend:school_delete' school.pk %}" class="btn-danger text-decoration-none">
-                <i class="fas fa-trash"></i> {% trans "O'chirish" %}
-            </a>
-        </div>
-    </div>
-
-    <div class="grid-2">
-        <div class="glass-panel p-xl">
-            <div class="card-header">
+        <div class="glass-panel p-xl mb-2xl">
+            <div class="card-header mb-lg">
                 <h3 class="card-title">
                     <i class="fas fa-users text-info"></i> {% trans "O'quvchilar" %}
                     <span class="text-muted text-sm text-normal ml-sm">({{ student_count }})</span>
@@ -145,8 +125,8 @@
             {% endif %}
         </div>
 
-        <div class="glass-panel p-xl">
-            <div class="card-header">
+        <div class="glass-panel p-xl mb-2xl">
+            <div class="card-header mb-lg">
                 <h3 class="card-title">
                     <i class="fas fa-book text-info"></i> {% trans "Kitoblar" %}
                     <span class="text-muted text-sm text-normal ml-sm">({{ book_count }})</span>
@@ -172,10 +152,223 @@
             </div>
             {% endif %}
         </div>
+
+        <!-- Action buttons -->
+        <div class="d-flex gap-sm flex-wrap">
+            <button type="button" class="btn-primary text-decoration-none" onclick="switchTab('edit')">
+                <i class="fas fa-edit"></i> {% trans "Tahrirlash" %}
+            </button>
+            <form method="post" class="m-0">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle_active">
+                <button type="submit" class="btn-outline cursor-pointer">
+                    {% if school.is_active %}<i class="fas fa-ban text-danger"></i> {% trans "Bloklash" %}{% else %}<i class="fas fa-check-circle text-success"></i> {% trans "Faollashtirish" %}{% endif %}
+                </button>
+            </form>
+            <a href="{% url 'frontend:school_duplicate' school.pk %}" class="btn-outline text-decoration-none">
+                <i class="fas fa-copy"></i> {% trans "Nusxa" %}
+            </a>
+            <a href="{% url 'frontend:school_reset_admin_password' school.pk %}" class="btn-outline text-decoration-none">
+                <i class="fas fa-key"></i> {% trans "Parol" %}
+            </a>
+            <a href="{% url 'frontend:school_delete' school.pk %}" class="btn-danger text-decoration-none">
+                <i class="fas fa-trash"></i> {% trans "O'chirish" %}
+            </a>
+        </div>
     </div>
+
+    <!-- Edit Tab -->
+    <div id="tab-edit" class="{% if not edit_mode %}d-none{% endif %}">
+        <div class="glass-panel p-3xl rounded-2xl">
+            <form method="post" id="unified-school-form" autocomplete="off">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save">
+
+                <div class="d-flex flex-column gap-2xl">
+
+                    <!-- Section 1: School Info -->
+                    <div>
+                        <div class="d-flex align-center gap-md mb-2xl">
+                            <i class="fas fa-location-dot text-info text-xl"></i>
+                            <h4 class="m-0 text-info text-xl text-semibold">{% trans "Maktab ma'lumotlari" %}</h4>
+                        </div>
+
+                        <div style="display: grid; gap: 20px;">
+                            <!-- District Selection -->
+                            <div class="form-group">
+                                <label class="d-block mb-md text-semibold text-main">
+                                    <i class="fas fa-city text-info mr-xs"></i> {% trans "Tumanni tanlang" %}
+                                </label>
+                                <div class="pos-relative">
+                                    {{ form.district }}
+                                </div>
+                                {% if form.district.errors %}
+                                <p class="text-danger text-md mt-xs">{{ form.district.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Existing School Selection (Dynamic) -->
+                            <div id="existing-school-group" class="form-group d-none mt-md">
+                                <label class="d-block mb-md text-semibold text-main">
+                                    <i class="fas fa-list-ol text-info mr-xs"></i> {% trans "Mavjud maktablar" %}
+                                </label>
+                                <div class="pos-relative">
+                                    <select id="school-select-dropdown" class="form-control w-full">
+                                        <option value="">-- {% trans "Tanlang" %} --</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Name field -->
+                            <div class="form-group">
+                                <label class="d-block mb-md text-semibold text-main">
+                                    <i class="fas fa-school text-info mr-xs"></i> {% trans "Maktab nomi" %}
+                                </label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                <p class="text-danger text-md mt-xs">{{ form.name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Address field -->
+                            <div class="form-group">
+                                <label class="d-block mb-md text-semibold text-main">
+                                    <i class="fas fa-map-location-dot text-info mr-xs"></i> {% trans "Manzil" %}
+                                </label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                <p class="text-danger text-md mt-xs">{{ form.address.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Contact field -->
+                            <div class="form-group">
+                                <label class="d-block mb-md text-semibold text-main">
+                                    <i class="fas fa-phone text-success mr-xs"></i> {% trans "Kontakt" %}
+                                </label>
+                                {{ form.contact }}
+                                {% if form.contact.errors %}
+                                <p class="text-danger text-md mt-xs">{{ form.contact.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Section -->
+                    <div class="bg-glass p-2xl rounded-xl border border-primary mt-md">
+                        <div class="d-flex align-center gap-md mb-xl">
+                            <i class="fas fa-user-shield text-xl text-warning"></i>
+                            <h4 class="m-0 text-xl text-semibold text-warning">{% trans "Maktab admini hisobi" %}</h4>
+                        </div>
+                        <p class="text-muted text-md mb-xl">
+                            {% trans "Admin login va parolni tahrirlashingiz mumkin." %}
+                        </p>
+
+                        <div class="d-flex flex-column gap-lg">
+                            <div class="form-group">
+                                <label class="d-block mb-md text-semibold text-main">
+                                    <i class="fas fa-at text-info mr-xs"></i> {% trans "Login" %}
+                                </label>
+                                {{ form.admin_username }}
+                                {% if form.admin_username.errors %}
+                                <p class="text-danger text-md mt-xs">{{ form.admin_username.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="d-block mb-md text-semibold text-main">
+                                    <i class="fas fa-lock text-info mr-xs"></i> {% trans "Yangi parol" %}
+                                </label>
+                                <div class="password-wrapper d-flex align-center gap-sm">
+                                    {{ form.admin_password }}
+                                    <button type="button" class="icon-btn" onclick="togglePassword(this, '{{ form.admin_password.id_for_label }}')" aria-label="Parolni ko'rsatish">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                {% if form.admin_password.errors %}
+                                <p class="text-danger text-md mt-xs">{{ form.admin_password.errors.0 }}</p>
+                                {% endif %}
+                                <p class="text-muted text-xs mt-xs">{% trans "Bo'sh qoldirilsa, parol o'zgarmaydi" %}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form.existing_school_id }}
+
+                    <div class="mt-xl d-flex gap-lg flex-wrap">
+                        <button type="submit" class="btn-primary flex-1 d-flex align-center justify-center gap-md text-bold text-lg p-lg">
+                            <i class="fas fa-save"></i> {% trans "Saqlash" %}
+                        </button>
+                        <button type="button" class="btn-outline flex-1 d-flex align-center justify-center gap-md text-semibold text-main text-decoration-none p-lg" onclick="switchTab('info')">
+                            <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 
+<style>
+    .form-control {
+        background: var(--input-bg) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        padding: 14px 15px !important;
+        color: var(--input-text) !important;
+        width: 100% !important;
+        outline: none !important;
+        transition: 0.3s !important;
+    }
+    .form-control:focus {
+        border-color: var(--primary) !important;
+        background: var(--input-bg) !important;
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1) !important;
+    }
+    .tab-btn {
+        padding: 10px 20px;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+        background: transparent;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+    }
+    .tab-btn:hover { background: var(--hover-bg); }
+    .tab-btn.active { color: var(--text-main); background: var(--glass); border-color: var(--primary); }
+    .grade-header { transition: background 0.2s; }
+    .grade-header:hover { background: var(--hover-bg); }
+    .grade-body { transition: max-height 0.3s ease; }
+</style>
+
 <script>
+function switchTab(tab) {
+    document.getElementById('tab-info').classList.toggle('d-none', tab !== 'info');
+    document.getElementById('tab-edit').classList.toggle('d-none', tab !== 'edit');
+    document.getElementById('tab-btn-info').classList.toggle('active', tab === 'info');
+    document.getElementById('tab-btn-edit').classList.toggle('active', tab === 'edit');
+    if (tab === 'edit') {
+        document.getElementById('tab-edit').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function togglePassword(btn, inputId) {
+    var input = document.getElementById(inputId);
+    var icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+// Grade accordion
 document.querySelectorAll('.grade-header').forEach(function(header) {
     header.addEventListener('click', function() {
         const body = this.nextElementSibling;
@@ -192,4 +385,69 @@ document.querySelectorAll('.grade-header').forEach(function(header) {
     });
 });
 </script>
+
+{% if districts %}
+<script id="districts-data" type="application/json">
+{
+    {% for d in districts %}
+    "{{ d.id }}": {
+        "name": "{{ d.name|escapejs }}",
+        "schools": [
+            {% for s in d.schools.all %}
+            {
+                "id": "{{ s.id }}",
+                "name": "{{ s.name|escapejs }}",
+                "address": "{{ s.address|escapejs }}",
+                "contact": "{{ s.contact|escapejs }}",
+                "has_admin": {% if s.id in schools_with_admins %}true{% else %}false{% endif %}
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+}
+</script>
+{% endif %}
+
+<script>
+let districtsData = {};
+try {
+    const el = document.getElementById('districts-data');
+    if (el) districtsData = JSON.parse(el.textContent);
+} catch(e) { console.error("Error parsing districts data", e); }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const districtSelect = document.getElementById('id_district');
+    const schoolSelectGroup = document.getElementById('existing-school-group');
+    const schoolDropdown = document.getElementById('school-select-dropdown');
+
+    if (!districtSelect) return;
+
+    districtSelect.addEventListener('change', function() {
+        const dId = this.value;
+        if (schoolDropdown) schoolDropdown.value = "";
+
+        if (dId && districtsData[dId]) {
+            populateSchools(dId);
+            if (schoolSelectGroup) schoolSelectGroup.style.display = 'block';
+        } else {
+            if (schoolSelectGroup) schoolSelectGroup.style.display = 'none';
+        }
+    });
+
+    function populateSchools(dId) {
+        if (!schoolDropdown) return;
+        const schools = districtsData[dId].schools;
+        schoolDropdown.innerHTML = '<option value="">-- {% trans "Tanlang" %} --</option>';
+
+        schools.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s.id;
+            option.textContent = s.name;
+            schoolDropdown.appendChild(option);
+        });
+    }
+});
+</script>
 {% endblock %}
+
