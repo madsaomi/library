@@ -10,13 +10,13 @@
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade mw-600 mx-auto">
-    <div class="glass-panel p-2xl text-center mb-xl">
-        <div class="flex-center rounded-full mx-auto mb-lg bg-primary" style="width: 64px; height: 64px;">
-            <i class="fas fa-qrcode text-2xl text-white"></i>
+<div class="animate-fade mw-480 mx-auto">
+    <div class="glass-panel p-2xl text-center">
+        <div class="flex-center rounded-full mx-auto mb-lg bg-primary" style="width: 56px; height: 56px;">
+            <i class="fas fa-qrcode text-xl text-white"></i>
         </div>
-        <h2 class="m-0 mb-xs">{% trans "Mening QR kodim" %}</h2>
-        <p class="text-muted m-0 mb-xl text-sm">{% trans "Kutubxonachiga ko'rsating — kitob olish yoki qaytarish uchun" %}</p>
+        <h2 class="m-0 mb-xs">{% trans "QR kartochkangiz" %}</h2>
+        <p class="text-muted m-0 mb-xl text-sm">{% trans "Kutubxonachiga ko'rsating — kitob olish va qaytarish uchun" %}</p>
 
         <div class="d-flex justify-center mb-xl">
             <div class="glass-card rounded-xl p-xl" style="background: white;">
@@ -24,65 +24,15 @@
             </div>
         </div>
 
-        <div class="glass-card rounded-lg p-md mb-xl" style="border: 1px solid var(--border);">
-            <div class="text-muted text-xs mb-xs">{% trans "Kod" %}</div>
-            <code class="text-primary text-sm" style="word-break: break-all;">{{ token }}</code>
-        </div>
+        <p class="text-xs text-muted mb-xl">{% trans "Bu kod doimiy — bir marta chop etib oling yoki telefonda saqlang" %}</p>
 
-        <div class="grid-3 text-center mb-xl">
-            <div class="stat-tile text-center">
-                <div class="stat-tile-value text-success"><i class="fas fa-book"></i></div>
-                <div class="stat-tile-label">{% trans "Olish" %}</div>
-            </div>
-            <div class="stat-tile text-center">
-                <div class="stat-tile-value text-info"><i class="fas fa-undo"></i></div>
-                <div class="stat-tile-label">{% trans "Qaytarish" %}</div>
-            </div>
-            <div class="stat-tile text-center">
-                <div class="stat-tile-value text-warning"><i class="fas fa-shopping-cart"></i></div>
-                <div class="stat-tile-label">{% trans "Savat" %}</div>
-            </div>
-        </div>
-
-        <div class="d-flex gap-md justify-center flex-wrap">
+        <div class="d-flex gap-sm justify-center flex-wrap">
             <a href="{% url 'frontend:my_books' %}" class="btn-primary py-sm px-lg text-decoration-none">
-                <i class="fas fa-book mr-xs"></i> {% trans "Mening kitoblarim" %}
+                <i class="fas fa-book mr-xs"></i> {% trans "Kitoblarim" %}
             </a>
             <a href="{% url 'frontend:profile' %}" class="btn-outline py-sm px-lg text-decoration-none">
                 <i class="fas fa-user mr-xs"></i> {% trans "Profil" %}
             </a>
-        </div>
-    </div>
-
-    <div class="glass-panel p-xl">
-        <div class="card-header mb-lg">
-            <h3 class="card-title"><i class="fas fa-info-circle text-info"></i> {% trans "Qanday ishlatiladi?" %}</h3>
-        </div>
-        <div class="d-flex flex-column gap-sm">
-            <div class="list-row">
-                <div class="list-row-avatar"><i class="fas fa-qrcode text-primary"></i></div>
-                <div class="list-row-main">
-                    <div class="list-row-title">{% trans "Kitob olish" %}</div>
-                    <div class="list-row-sub">{% trans "Kutubxonachi skanerlaydi va kitob tanlaydi" %}</div>
-                </div>
-                <i class="fas fa-chevron-right text-muted text-xs"></i>
-            </div>
-            <div class="list-row">
-                <div class="list-row-avatar"><i class="fas fa-undo text-success"></i></div>
-                <div class="list-row-main">
-                    <div class="list-row-title">{% trans "Kitob qaytarish" %}</div>
-                    <div class="list-row-sub">{% trans "Kitobni ko'rsating, skaner avtomatik qaytaradi" %}</div>
-                </div>
-                <i class="fas fa-chevron-right text-muted text-xs"></i>
-            </div>
-            <div class="list-row">
-                <div class="list-row-avatar"><i class="fas fa-shopping-cart text-warning"></i></div>
-                <div class="list-row-main">
-                    <div class="list-row-title">{% trans "Savatdagi hammasi" %}</div>
-                    <div class="list-row-sub">{% trans "Barcha kitoblarni bir vaqtda olish" %}</div>
-                </div>
-                <i class="fas fa-chevron-right text-muted text-xs"></i>
-            </div>
         </div>
     </div>
 </div>
