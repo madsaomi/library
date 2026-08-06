@@ -9,154 +9,155 @@
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade responsive-grid-1-2" style="align-items: start;">
-    <div class="glass-panel p-2xl">
-        <div class="d-flex flex-column align-center mb-2xl">
-            <div class="flex-center rounded-lg mb-lg" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary), var(--secondary));">
-                <i class="fas fa-school text-xl text-white"></i>
+<div class="animate-fade" style="display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start;">
+
+    <div class="glass-panel p-xl" style="border-radius: 16px;">
+        <div class="d-flex align-center gap-lg flex-wrap">
+            <div class="flex-center rounded-lg flex-shrink-0" style="width: 56px; height: 56px; background: var(--primary);">
+                <i class="fas fa-school text-lg text-white"></i>
             </div>
-            <div class="text-bold text-center" style="font-size: 1.05rem;">{{ school.name }}</div>
-            <div class="mt-xs d-flex gap-sm align-center flex-wrap justify-center">
-                <span class="badge p-sm rounded-sm text-xs text-nowrap d-inline-flex align-center gap-xs" style="background: {% if school.is_active %}rgba(16,185,129,0.12); color: #10b981;{% else %}rgba(239,68,68,0.12); color: #ef4444;{% endif %}">
-                    {% if school.is_active %}<i class="fas fa-circle" style="font-size: 0.4rem;"></i> {% trans "Faol" %}{% else %}<i class="fas fa-ban" style="font-size: 0.6rem;"></i> {% trans "Bloklangan" %}{% endif %}
-                </span>
-                <span class="text-muted" style="font-size: 0.78rem;">
-                    <i class="fas fa-map-marker-alt" style="font-size: 0.6rem;"></i>
+            <div class="flex-1" style="min-width: 220px;">
+                <div class="d-flex align-center gap-sm flex-wrap">
+                    <h2 class="m-0 text-lg text-semibold">{{ school.name }}</h2>
+                    <span class="pill-subtle {% if school.is_active %}pill-available{% else %}pill-unavailable{% endif %}" style="font-size: 0.7rem;">
+                        {% if school.is_active %}<i class="fas fa-circle" style="font-size: 0.35rem;"></i> {% trans "Faol" %}{% else %}<i class="fas fa-ban" style="font-size: 0.5rem;"></i> {% trans "Bloklangan" %}{% endif %}
+                    </span>
+                </div>
+                <div class="text-sm text-muted mt-xs">
+                    <i class="fas fa-map-marker-alt"></i>
                     {% if school.district %}{{ school.district.name }}{% else %}—{% endif %}
-                </span>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div class="d-flex flex-column gap-md mb-2xl">
-            <div class="glass-card p-lg">
-                <div class="text-muted text-sm mb-xs">{% trans "Kontakt" %}</div>
-                <div class="text-semibold text-md">{{ school.contact|default:"+998..." }}</div>
+    <div class="d-grid gap-md" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+        <div class="glass-panel p-lg text-center" style="border-radius: 14px;">
+            <div class="text-xl text-semibold text-main">{{ student_count }}</div>
+            <div class="text-xs text-muted mt-xs">{% trans "O'quvchilar" %}</div>
+        </div>
+        <div class="glass-panel p-lg text-center" style="border-radius: 14px;">
+            <div class="text-xl text-semibold text-main">{{ book_count }}</div>
+            <div class="text-xs text-muted mt-xs">{% trans "Kitoblar" %}</div>
+        </div>
+        <div class="glass-panel p-lg text-center" style="border-radius: 14px;">
+            <div class="text-xl text-semibold text-main">{{ issued_count }}</div>
+            <div class="text-xs text-muted mt-xs">{% trans "Tarqatilgan" %}</div>
+        </div>
+    </div>
+
+    <div class="glass-panel p-xl" style="border-radius: 16px;">
+        <div class="d-grid gap-md" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <div>
+                <div class="text-xs text-muted mb-xs">{% trans "Kontakt" %}</div>
+                <div class="text-md text-semibold">{{ school.contact|default:"—" }}</div>
             </div>
-            <div class="glass-card p-lg">
-                <div class="text-muted text-sm mb-xs">{% trans "Manzil" %}</div>
-                <div class="text-semibold text-md">{{ school.address|default:"—" }}</div>
+            <div>
+                <div class="text-xs text-muted mb-xs">{% trans "Manzil" %}</div>
+                <div class="text-md text-semibold">{{ school.address|default:"—" }}</div>
             </div>
-            <div class="glass-card p-lg">
-                <div class="text-muted text-sm mb-xs">{% trans "Maktab Admini" %}</div>
+            <div>
+                <div class="text-xs text-muted mb-xs">{% trans "Maktab Admini" %}</div>
                 {% if school_admin %}
-                <div class="text-semibold text-md mb-sm">{{ school_admin.get_full_name|default:school_admin.username }}</div>
-                <div class="text-muted text-sm d-flex gap-md flex-wrap align-center">
-                    <span><i class="fas fa-user-shield text-primary"></i> {{ school_admin.username }}</span>
-                    {% if school_admin.email %}
-                    <span><i class="fas fa-envelope text-primary"></i> {{ school_admin.email }}</span>
-                    {% endif %}
-                </div>
+                <div class="text-md text-semibold">{{ school_admin.get_full_name|default:school_admin.username }}</div>
+                <div class="text-sm text-muted mt-xs">@{{ school_admin.username }}</div>
                 {% else %}
-                <div class="text-muted text-md">—</div>
+                <div class="text-md text-muted">—</div>
                 {% endif %}
             </div>
         </div>
+    </div>
 
-        <div class="d-flex flex-column gap-sm">
-            <a href="{% url 'frontend:school_edit' school.pk %}" class="btn-primary py-md text-decoration-none text-md d-flex align-center justify-center gap-xs"><i class="fas fa-edit"></i> {% trans "Tahrirlash" %}</a>
-            <div class="d-flex gap-sm">
-                <form method="post" action="{% url 'frontend:school_toggle_active' school.pk %}" class="flex-1 m-0">
-                    {% csrf_token %}
-                    <button type="submit" class="w-full py-md text-md d-flex align-center justify-center gap-xs rounded-md text-decoration-none text-main border" style="{% if school.is_active %}background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.3);{% else %}background: rgba(16,185,129,0.12); color: #10b981; border-color: rgba(16,185,129,0.3);{% endif %}">
-                        {% if school.is_active %}<i class="fas fa-ban"></i> {% trans "Bloklash" %}{% else %}<i class="fas fa-check-circle"></i> {% trans "Faollashtirish" %}{% endif %}
-                    </button>
-                </form>
-                <a href="{% url 'frontend:school_duplicate' school.pk %}" class="glass-card flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs border" style="color: var(--accent);"><i class="fas fa-copy"></i> {% trans "Nusxa" %}</a>
-            </div>
-            <div class="d-flex gap-sm">
-                <a href="{% url 'frontend:school_reset_admin_password' school.pk %}" class="glass-card flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs border" style="color: var(--secondary);"><i class="fas fa-key"></i> {% trans "Parolni almashtirish" %}</a>
-                <a href="{% url 'frontend:school_delete' school.pk %}" class="flex-1 py-md text-decoration-none text-md d-flex align-center justify-center gap-xs rounded-md" style="background: #ef4444; box-shadow: 0 4px 12px rgba(239,68,68,0.25);"><i class="fas fa-trash"></i> {% trans "O'chirish" %}</a>
-            </div>
+    <div class="glass-panel p-xl" style="border-radius: 16px;">
+        <div class="d-flex gap-sm flex-wrap">
+            <a href="{% url 'frontend:school_edit' school.pk %}" class="btn-primary text-decoration-none" style="padding: 10px 20px; border-radius: 10px; border: none;">
+                <i class="fas fa-edit"></i> {% trans "Tahrirlash" %}
+            </a>
+            <form method="post" action="{% url 'frontend:school_toggle_active' school.pk %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="cursor-pointer" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text-main); font-family: inherit;">
+                    {% if school.is_active %}<i class="fas fa-ban" style="color: #ef4444;"></i> {% trans "Bloklash" %}{% else %}<i class="fas fa-check-circle" style="color: #10b981;"></i> {% trans "Faollashtirish" %}{% endif %}
+                </button>
+            </form>
+            <a href="{% url 'frontend:school_duplicate' school.pk %}" class="text-decoration-none" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); color: var(--text-muted);">
+                <i class="fas fa-copy"></i> {% trans "Nusxa" %}
+            </a>
+            <a href="{% url 'frontend:school_reset_admin_password' school.pk %}" class="text-decoration-none" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); color: var(--text-muted);">
+                <i class="fas fa-key"></i> {% trans "Parol" %}
+            </a>
+            <a href="{% url 'frontend:school_delete' school.pk %}" class="text-decoration-none" style="padding: 10px 20px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.4); color: #ef4444;">
+                <i class="fas fa-trash"></i> {% trans "O'chirish" %}
+            </a>
         </div>
     </div>
 
-    <div class="glass-panel p-2xl">
-        <div class="grid-3 stat-grid mb-2xl">
-            <div class="glass-card stat-card p-lg cursor-default">
-                <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ student_count }}</div>
-                <div class="stat-label text-sm">{% trans "O'quvchilar" %}</div>
-            </div>
-            <div class="glass-card stat-card p-lg cursor-default">
-                <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ book_count }}</div>
-                <div class="stat-label text-sm">{% trans "Kitoblar" %}</div>
-            </div>
-            <div class="glass-card stat-card p-lg cursor-default">
-                <div class="stat-value" style="font-size: 1.25rem; color: #f59e0b;">{{ issued_count }}</div>
-                <div class="stat-label text-sm">{% trans "Tarqatilgan kitoblar" %}</div>
-            </div>
-        </div>
-
-        <h3 class="section-title text-md mb-md">
-            <i class="fas fa-users text-success" style="font-size: 0.8rem;"></i> {% trans "O'quvchilar sinflar bo'yicha" %}
-            <span class="text-muted text-sm text-normal ml-sm">({{ student_count }})</span>
-        </h3>
-
-        <div class="info-grid gap-sm">
-            {% for grade_label, grade_students in grades.items %}
-            <div class="glass-card border p-0" style="overflow: hidden;">
-                <div class="grade-header d-flex align-center flex-between cursor-pointer bg-glass p-lg" data-grade="{{ forloop.counter }}" style="user-select: none;">
-                    <div class="d-flex align-center gap-md">
-                        <i class="fas fa-chevron-right grade-chevron text-muted transition" style="font-size: 0.65rem;"></i>
-                        <span class="text-semibold text-md">{{ grade_label }} {% trans "sinf" %}</span>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: start;">
+        <div class="glass-panel p-xl" style="border-radius: 16px;">
+            <h3 class="m-0 mb-lg text-md text-semibold">
+                <i class="fas fa-users" style="color: var(--primary);"></i> {% trans "O'quvchilar" %}
+                <span class="text-muted text-sm text-normal ml-sm">({{ student_count }})</span>
+            </h3>
+            {% if grade_counts %}
+            <div class="d-flex flex-column gap-sm">
+                {% for grade_label, grade_students in grades.items %}
+                <div style="border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
+                    <div class="grade-header d-flex align-center flex-between cursor-pointer p-md" style="user-select: none;">
+                        <div class="d-flex align-center gap-sm">
+                            <i class="fas fa-chevron-right grade-chevron text-muted transition" style="font-size: 0.6rem;"></i>
+                            <span class="text-sm text-semibold">{{ grade_label }} {% trans "sinf" %}</span>
+                        </div>
+                        <span class="text-xs text-muted">{{ grade_students|length }}</span>
                     </div>
-                    <span class="text-sm text-muted bg-glass px-md py-xs rounded-md">{{ grade_students|length }}</span>
-                </div>
-                <div class="grade-body d-none p-lg" style="padding: 4px 14px 10px; gap: 4px; flex-direction: column;">
-                    {% for s in grade_students %}
-                    <div class="d-flex align-center flex-between p-xs rounded-sm text-sm" style="padding: 5px 8px;">
-                        <span>{{ s.get_full_name|default:s.username }}</span>
-                        <span class="text-muted text-xs">@{{ s.username }}</span>
+                    <div class="grade-body d-none px-md pb-md" style="display: none;">
+                        {% for s in grade_students %}
+                        <div class="d-flex align-center flex-between text-sm" style="padding: 5px 0;">
+                            <span>{{ s.get_full_name|default:s.username }}</span>
+                            <span class="text-xs text-muted">@{{ s.username }}</span>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             </div>
-            {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-building text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Muassasalar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+            {% else %}
+            <p class="text-muted text-sm text-center py-xl">{% trans "Hali o'quvchilar yo'q" %}</p>
+            {% endif %}
         </div>
 
-        <h3 class="section-title text-md mt-xl mb-md">
-            <i class="fas fa-book text-primary" style="font-size: 0.8rem;"></i> {% trans "Kitoblar" %}
-        </h3>
-        <div class="overflow-y-auto" style="max-height: 280px; padding-right: 6px;">
-            <div class="info-grid gap-sm">
+        <div class="glass-panel p-xl" style="border-radius: 16px;">
+            <h3 class="m-0 mb-lg text-md text-semibold">
+                <i class="fas fa-book" style="color: var(--primary);"></i> {% trans "Kitoblar" %}
+                <span class="text-muted text-sm text-normal ml-sm">({{ book_count }})</span>
+            </h3>
+            {% if books %}
+            <div class="d-flex flex-column gap-sm" style="max-height: 360px; overflow-y: auto;">
                 {% for book in books %}
-                <div class="glass-card info-row p-md d-flex flex-column align-start" style="gap: 2px;">
-                    <span class="text-sm text-medium w-full text-truncate">{{ book.title }}</span>
-                    <span class="text-xs text-muted">{{ book.category.name|default:"---" }}</span>
+                <div class="d-flex align-center gap-sm p-sm" style="border: 1px solid var(--border); border-radius: 8px;">
+                    <div class="flex-1" style="min-width: 0;">
+                        <div class="text-sm text-medium text-truncate">{{ book.title }}</div>
+                        <div class="text-xs text-muted">{{ book.category.name|default:"---" }}</div>
+                    </div>
                 </div>
-                {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-building text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Muassasalar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+                {% endfor %}
             </div>
+            {% else %}
+            <p class="text-muted text-sm text-center py-xl">{% trans "Hali kitoblar yo'q" %}</p>
+            {% endif %}
         </div>
     </div>
 </div>
 
 <script>
-// Grade accordion
 document.querySelectorAll('.grade-header').forEach(function(header) {
     header.addEventListener('click', function() {
         const body = this.nextElementSibling;
         const chevron = this.querySelector('.grade-chevron');
-        if (body.style.display === 'none' || body.style.display === '') {
-            body.style.display = 'flex';
+        if (body.classList.contains('d-none')) {
+            body.classList.remove('d-none');
+            body.style.display = 'block';
             chevron.style.transform = 'rotate(90deg)';
         } else {
+            body.classList.add('d-none');
             body.style.display = 'none';
             chevron.style.transform = '';
         }
