@@ -712,7 +712,6 @@ def school_detail(request, pk):
     form = UnifiedSchoolForm(instance=school, initial=initial, current_admin_id=school_admins.first().pk if school_admins.exists() else None)
 
     # Fetch Districts and Schools for the form
-    from django.db.models import Prefetch
     districts = District.objects.prefetch_related(
         Prefetch('schools', queryset=School.active_objects.order_by('name'))
     ).order_by('name')
@@ -938,8 +937,6 @@ def school_add(request):
     else:
         form = UnifiedSchoolForm()
     # Fetch Districts and Schools for the selection UI
-    from django.db.models import Prefetch
-
     districts = District.objects.prefetch_related(
         Prefetch('schools', queryset=School.active_objects.order_by('name'))
     ).order_by('name')
@@ -1016,8 +1013,6 @@ def school_edit(request, pk):
         form = UnifiedSchoolForm(instance=school, initial=initial, current_admin_id=admin.pk if admin else None)
 
     # Fetch Districts and Schools for consistent template behavior
-    from django.db.models import Prefetch
-
     districts = District.objects.prefetch_related(
         Prefetch('schools', queryset=School.active_objects.order_by('name'))
     ).order_by('name')
