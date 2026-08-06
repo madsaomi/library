@@ -40,7 +40,7 @@
             {% for s in top_students %}
             <div class="d-flex align-center border-bottom gap-sm py-sm px-sm">
                 <span class="text-sm text-bold text-center" style="width: 22px; color: {% if forloop.counter == 1 %}#f59e0b{% elif forloop.counter == 2 %}#94a3b8{% elif forloop.counter == 3 %}#b45309{% else %}var(--text-muted){% endif %};">{{ forloop.counter }}</span>
-                <div class="avatar-circle flex-shrink-0" style="width: 30px; height: 30px; background: {% if forloop.counter == 1 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, var(--primary), #7c3aed){% endif %};">
+                <div class="avatar-circle flex-shrink-0" style="width: 30px; height: 30px; background: {% if forloop.counter == 1 %}#f59e0b{% else %}var(--primary){% endif %};">
                     <span class="avatar-initials text-xs">{{ s.first_name|first|upper }}{{ s.last_name|first|upper }}</span>
                 </div>
                 <div class="flex-1" style="min-width: 0;">
@@ -80,7 +80,7 @@
         <div class="info-grid gap-xs">
             {% for s in active_students %}
             <div class="d-flex align-center border-bottom gap-sm py-sm px-sm">
-                <div class="avatar-circle flex-shrink-0" style="width: 30px; height: 30px; background: linear-gradient(135deg, #10b981, #059669);">
+                <div class="avatar-circle flex-shrink-0" style="width: 30px; height: 30px; background: #10b981;">
                     <span class="avatar-initials text-xs">{{ s.first_name|first|upper }}{{ s.last_name|first|upper }}</span>
                 </div>
                 <div class="flex-1" style="min-width: 0;">

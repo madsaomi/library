@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block title %}{% trans "Darsliklar" %} | {% trans "Online Kutibxona" %}{% endblock %}
@@ -48,7 +48,7 @@
             {% for loan in loans %}
             <div class="glass-card info-row d-flex flex-column align-start" style="padding: 10px 14px; gap: 4px;">
                 <div class="d-flex align-center w-full" style="gap: 10px;">
-                    <div class="avatar-circle flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #d97706, #f59e0b);">
+                    <div class="avatar-circle flex-shrink-0" style="width: 32px; height: 32px; background: #d97706;">
                         <span class="avatar-initials text-xs">{{ loan.student.first_name|first|upper }}{{ loan.student.last_name|first|upper }}</span>
                     </div>
                     <div class="flex-1" style="min-width: 0;">

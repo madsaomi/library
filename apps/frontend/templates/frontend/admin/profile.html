@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 {% load frontend_tags %}
 
@@ -13,7 +13,7 @@
 <div class="mw-600 mx-auto">
     <div class="glass-panel animate-fade p-3xl">
         <div class="text-center mb-2xl">
-            <div class="avatar-circle flex-center" style="width: 72px; height: 72px; background: linear-gradient(135deg, var(--primary), var(--secondary)); box-shadow: 0 0 20px var(--primary-glow);">
+            <div class="avatar-circle flex-center" style="width: 72px; height: 72px; background: var(--primary);">
                 <span class="avatar-initials text-xl">{{ user.username|first|upper }}</span>
             </div>
             <h2 class="text-xl mt-md mb-xs">{{ user.username }}</h2>

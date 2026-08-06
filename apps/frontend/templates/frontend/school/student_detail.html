@@ -4,7 +4,7 @@
 {% block title %}{{ student.get_full_name }} | {% trans "Online Kutibxona" %}{% endblock %}
 {% block page_title %}
 <div class="d-flex align-center gap-md">
-    <div class="avatar-circle" style="width: 38px; height: 38px; background: linear-gradient(135deg, var(--primary), #a855f7);">
+    <div class="avatar-circle" style="width: 38px; height: 38px; background: var(--primary);">
         <span class="avatar-initials text-md">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</span>
     </div>
     <div>
@@ -23,7 +23,7 @@
 
 {% block content %}
 <style>
-.s-profile-card { background: linear-gradient(135deg, var(--primary), #7c3aed); border-radius: 16px; padding: 28px; position: relative; overflow: hidden; }
+.s-profile-card { background: var(--primary); border-radius: 16px; padding: 28px; position: relative; overflow: hidden; }
 .s-profile-card::before { content: ''; position: absolute; inset: 0; background: url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\"); opacity: 0.4; }
 .s-stat-card { padding: 20px 16px; border-radius: 14px; text-align: center; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; cursor: default; }
 .s-stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
@@ -100,7 +100,7 @@
                 <div class="d-flex flex-column gap-xs">
                     {% for issue in active_loans %}
                     <div class="s-item">
-                        <div class="d-flex align-center justify-center flex-shrink-0" style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #34d399);">
+                        <div class="d-flex align-center justify-center flex-shrink-0" style="width: 32px; height: 32px; border-radius: 8px; background: #10b981;">
                             <i class="fas fa-book" style="font-size: 0.7rem; color: #fff;"></i>
                         </div>
                         <div class="flex-1" style="min-width: 0;">
@@ -162,7 +162,7 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px;">
                     {% for c in classmates %}
                     <a href="{% url 'frontend:student_detail' c.pk %}" class="s-classmate d-flex align-center" style="gap: 8px; padding: 8px 10px; border-radius: 10px; text-decoration: none; color: inherit; transition: 0.15s; border: 1px solid var(--border); background: var(--glass);" onmouseenter="this.style.borderColor='var(--primary)';this.style.background='var(--hover-bg)'" onmouseleave="this.style.borderColor='var(--border)';this.style.background='var(--glass)'">
-                        <div class="avatar-circle flex-shrink-0" style="width: 28px; height: 28px; background: linear-gradient(135deg, #6366f1, #a855f7);">
+                        <div class="avatar-circle flex-shrink-0" style="width: 28px; height: 28px; background: #6366f1;">
                             <span class="avatar-initials text-xs" style="font-size: 0.55rem;">{{ c.first_name|first|upper }}{{ c.last_name|first|upper }}</span>
                         </div>
                         <span class="text-medium text-truncate" style="font-size: 0.78rem;">{{ c.first_name }} {{ c.last_name }}</span>

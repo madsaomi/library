@@ -42,13 +42,6 @@
 </head>
 <body>
     <div class="auth-container">
-        <!-- Dynamic Background Layers -->
-        <div class="auth-bg-layer"></div>
-        <div class="bg-orb bg-orb-1"></div>
-        <div class="bg-orb bg-orb-2"></div>
-        <div class="bg-orb bg-orb-3"></div>
-        <div class="auth-overlay"></div>
-        <canvas id="authCanvas" class="dynamic-canvas"></canvas>
 
         <!-- Theme Toggle Button -->
         <button onclick="cycleTheme()" class="pos-fixed bg-hover border text-muted rounded-md cursor-pointer d-flex flex-center transition shadow-sm" style="top: 20px; left: 20px; z-index: 999; width: 45px; height: 45px; backdrop-filter: blur(14px); border-radius: 14px;">
@@ -88,7 +81,7 @@
                 <div class="d-inline-flex flex-center rounded-xl mb-md p-sm" style="width: 56px; height: 56px; background: var(--glass-strong); border: 1px solid var(--border);">
                     <i class="fas fa-book-reader text-primary" style="font-size: 1.8rem;"></i>
                 </div>
-                <h1 class="gradient-text text-3xl mb-xs">{% trans "Xush kelibsiz" %}</h1>
+                <h1 class="text-primary text-3xl mb-xs">{% trans "Xush kelibsiz" %}</h1>
                 <p class="text-muted text-sm">{% trans "Online kutibxonaga kirish" %}</p>
             </div>
 
@@ -139,8 +132,7 @@
             html.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
             updateThemeIcon();
-            if (window.initAuthCanvas) window.initAuthCanvas();
-        }
+            }
 
         function updateThemeIcon() {
             const icon = document.getElementById('themeIcon');
@@ -180,85 +172,7 @@
                 }
             }
         };
-
-        /* Dynamic Particle Node Background */
-        (function() {
-            const canvas = document.getElementById('authCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let width, height, particles = [];
-
-            function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resize);
-            resize();
-
-            function getThemeColor() {
-                const style = getComputedStyle(document.documentElement);
-                return style.getPropertyValue('--primary').trim() || '#6366f1';
-            }
-
-            class Particle {
-                constructor() {
-                    this.reset();
-                }
-                reset() {
-                    this.x = Math.random() * width;
-                    this.y = Math.random() * height;
-                    this.vx = (Math.random() - 0.5) * 0.4;
-                    this.vy = (Math.random() - 0.5) * 0.4;
-                    this.radius = Math.random() * 2 + 1;
-                    this.alpha = Math.random() * 0.4 + 0.1;
-                }
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    if (this.x < 0 || this.x > width) this.vx *= -1;
-                    if (this.y < 0 || this.y > height) this.vy *= -1;
-                }
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = getThemeColor();
-                    ctx.globalAlpha = this.alpha;
-                    ctx.fill();
-                }
-            }
-
-            const count = Math.min(Math.floor((width * height) / 18000), 50);
-            particles = Array.from({ length: count }, () => new Particle());
-
-            function animate() {
-                ctx.clearRect(0, 0, width, height);
-                const color = getThemeColor();
-
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
-
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 120) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle = color;
-                            ctx.globalAlpha = (1 - dist / 120) * 0.15;
-                            ctx.lineWidth = 0.8;
-                            ctx.stroke();
-                        }
-                    }
-                }
-                requestAnimationFrame(animate);
-            }
-            animate();
-            window.initAuthCanvas = () => {};
-        })();
-    </script>
+</script>
 </body>
 </html>
 

@@ -39,7 +39,7 @@
             {% for teacher in teachers %}
             <div class="glass-card info-row teacher-row" data-search="{{ teacher.username|lower }} {{ teacher.first_name|lower }} {{ teacher.last_name|lower }} {{ teacher.subject|default:''|lower }}" style="padding: 10px 14px;">
                 <div class="d-flex align-center flex-1" style="gap: 10px; min-width: 0;">
-                    <div class="avatar-circle flex-shrink-0" style="width: 34px; height: 34px; background: linear-gradient(135deg, var(--secondary), #7c3aed);">
+                    <div class="avatar-circle flex-shrink-0" style="width: 34px; height: 34px; background: var(--secondary);">
                         <span class="avatar-initials text-sm">{{ teacher.first_name|first|upper }}{{ teacher.last_name|first|upper }}</span>
                     </div>
                     <div class="flex-1" style="min-width: 0;">

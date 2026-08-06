@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block title %}{% trans "Darslik qaytarib olish" %} | {% trans "Online Kutibxona" %}{% endblock %}
@@ -42,7 +42,7 @@
                         <div class="d-flex align-center gap-xs">
                             <input type="checkbox" name="return_{{ loan.id }}" id="return-{{ loan.id }}" class="cursor-pointer" style="width: 16px; height: 16px; accent-color: var(--primary);">
                         </div>
-                        <div class="avatar-circle flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #d97706, #f59e0b);">
+                        <div class="avatar-circle flex-shrink-0" style="width: 32px; height: 32px; background: #d97706;">
                             <span class="avatar-initials text-xs">{{ loan.student.first_name|first|upper }}{{ loan.student.last_name|first|upper }}</span>
                         </div>
                         <div class="flex-1" style="min-width: 120px;">

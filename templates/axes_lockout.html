@@ -12,13 +12,6 @@
 </head>
 <body class="overflow-hidden">
     <div class="error-viewport">
-        <!-- Dynamic Background Layers -->
-        <div class="error-bg-layer"></div>
-        <div class="bg-orb bg-orb-1" style="background: linear-gradient(135deg, #ef4444, #991b1b);"></div>
-        <div class="bg-orb bg-orb-2"></div>
-        <div class="error-overlay"></div>
-        <div class="error-watermark" style="color: #ef4444;">LOCKED</div>
-        <canvas id="errorCanvas" class="dynamic-canvas"></canvas>
 
         <!-- Theme Toggle Button -->
         <button class="pos-fixed bg-hover border text-muted rounded-md cursor-pointer d-flex flex-center transition shadow-sm" onclick="cycleTheme()" style="top: 20px; right: 20px; z-index: 999; width: 45px; height: 45px; backdrop-filter: blur(14px); border-radius: 14px;">
@@ -27,12 +20,12 @@
 
         <!-- Lockout Card -->
         <div class="error-card-premium text-center" style="border-color: rgba(239, 68, 68, 0.3);">
-            <div class="error-icon-badge" style="border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 8px 35px rgba(239, 68, 68, 0.3);">
+            <div class="error-icon-badge" style="border-color: rgba(239, 68, 68, 0.4);">
                 <i class="fas fa-user-lock text-danger"></i>
             </div>
-            <h1 class="gradient-text text-2xl mb-md" style="background: linear-gradient(135deg, #ef4444, #f87171); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{% trans "Hisobingiz vaqtincha bloklandi" %}</h1>
+            <h1 class="text-primary text-2xl mb-md">{% trans "Hisobingiz vaqtincha bloklandi" %}</h1>
             <p class="text-muted text-sm mb-2xl lh-normal">{% trans "Ko'p marta noto'g'ri urinishlar tufayli hisobingiz 1 soatga bloklangan. Iltimos, birozdan so'ng qayta urinib ko'ring." %}</p>
-            <a href="{% url 'login' %}" class="btn-primary text-decoration-none d-inline-flex align-center gap-2 py-md px-2xl font-weight-bold shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #ef4444, #dc2626);">
+            <a href="{% url 'login' %}" class="btn-primary text-decoration-none d-inline-flex align-center gap-2 py-md px-2xl font-weight-bold shadow-sm">
                 <i class="fas fa-arrow-left"></i> {% trans "Orqaga qaytish" %}
             </a>
         </div>

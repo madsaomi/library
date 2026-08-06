@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
 
@@ -47,7 +47,7 @@
                 <option value="365" {% if period_days == 365 %}selected{% endif %}>{% trans "12 oy" %}</option>
             </select>
         </form>
-        <a href="{% url 'frontend:create_stats_news' %}?period={{ period_days }}" class="text-sm text-white text-decoration-none d-flex align-center gap-xs text-nowrap ml-auto" style="padding: 6px 14px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669);">
+        <a href="{% url 'frontend:create_stats_news' %}?period={{ period_days }}" class="text-sm text-white text-decoration-none d-flex align-center gap-xs text-nowrap ml-auto" style="padding: 6px 14px; border-radius: 8px; background: #10b981;">
             <i class="fas fa-newspaper"></i> {% trans "Yangilik qilish" %}
         </a>
     </div>

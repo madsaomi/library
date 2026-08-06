@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block title %}{% trans "Bitiruvchilar" %} | {% trans "Online Kutibxona" %}{% endblock %}
@@ -44,7 +44,7 @@
             {% for g in graduates %}
             <div class="glass-card info-row graduate-row" data-search="{{ g.username|lower }} {{ g.first_name|lower }} {{ g.last_name|lower }} {{ g.grade|lower }}" style="padding: 10px 14px;">
                 <div class="d-flex align-center flex-1" style="gap: 10px; min-width: 0;">
-                    <div class="avatar-circle flex-shrink-0" style="width: 34px; height: 34px; background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <div class="avatar-circle flex-shrink-0" style="width: 34px; height: 34px; background: #f59e0b;">
                         <span class="avatar-initials text-sm">{{ g.first_name|first|upper }}{{ g.last_name|first|upper }}</span>
                     </div>
                     <div class="flex-1" style="min-width: 0;">

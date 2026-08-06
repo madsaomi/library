@@ -51,7 +51,6 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 0 12px var(--primary-glow);
         }
         .sidebar-profile-avatar .avatar-initials {
             font-weight: 700;
@@ -196,7 +195,6 @@
 
         .language-selector:hover i {
             transform: translate(-50%, -50%) scale(1.1) !important;
-            filter: drop-shadow(0 0 8px var(--primary-glow)) !important;
         }
 
         /* Global Search Input Fix */
@@ -310,7 +308,7 @@
                         <button class="mobile-header-toggle" onclick="toggleSidebar()" aria-label="{% trans 'Yon panelni ochish/yopish' %}" type="button">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <h1 class="gradient-text m-xs">{% block page_title %}{% endblock %}</h1>
+                        <h1 class="text-primary m-xs">{% block page_title %}{% endblock %}</h1>
                     </div>
                     <div class="d-flex align-center pos-relative" style="gap: 12px;">
                         {% if user.is_superuser %}

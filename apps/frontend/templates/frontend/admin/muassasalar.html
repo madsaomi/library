@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block title %}{% trans "Muassasalar" %} | {% trans "Online Kutibxona" %}{% endblock %}
@@ -28,7 +28,7 @@
                        class="w-full text-md" style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none;">
                 <i class="fas fa-search pos-absolute text-muted text-md" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
             </div>
-            <a href="{% url 'frontend:muassasa_add' %}" class="btn-primary text-nowrap text-sm" style="padding: 8px 16px; text-decoration: none; background: linear-gradient(135deg, var(--secondary), #7c3aed);">
+            <a href="{% url 'frontend:muassasa_add' %}" class="btn-primary text-nowrap text-sm" style="padding: 8px 16px; text-decoration: none;">
                 <i class="fas fa-plus"></i> {% trans "Yangi muassasa" %}
             </a>
         </div>

@@ -45,7 +45,7 @@
         {% else %}
         <div class="mb-md d-flex flex-column gap-sm">
             <div class="d-flex gap-sm flex-wrap align-center">
-                <button type="button" onclick="document.getElementById('auto-form').submit()" class="btn-primary d-flex align-center rounded text-sm" style="padding: 8px 18px; gap: 6px; background: #10b981; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+                <button type="button" onclick="document.getElementById('auto-form').submit()" class="btn-primary d-flex align-center rounded text-sm" style="padding: 8px 18px; gap: 6px;">
                     <i class="fas fa-magic"></i> {% trans "Barcha darsliklarni tarqatish" %}
                 </button>
                 <span class="text-sm text-muted">
@@ -84,7 +84,7 @@
                 {% for student in students %}
                 <div class="glass-card" style="padding: 12px 14px; {% if student.id in existing_loans %}border-color: #10b981;{% endif %}">
                     <div class="d-flex align-center flex-wrap" style="gap: 10px;">
-                        <div class="avatar-circle flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), #a855f7);">
+                        <div class="avatar-circle flex-shrink-0" style="width: 32px; height: 32px; background: var(--primary);">
                             <span class="avatar-initials text-xs">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</span>
                         </div>
                         <div class="flex-1" style="min-width: 120px;">

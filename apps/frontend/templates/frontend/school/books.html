@@ -88,7 +88,7 @@
             <div class="glass-card book-card rounded-xl overflow-hidden transition p-0 animate-item cursor-pointer"
                  data-search="{{ book.title|lower }} {{ book.author|lower }} {{ book.category.name|default:''|lower }}"
                  onclick="window.location='{% url 'frontend:book_edit' book.pk %}'">
-                <div class="pos-relative overflow-hidden img-zoom" style="height: 180px; background: linear-gradient(135deg, #451a03, #92400e);">
+                <div class="pos-relative overflow-hidden img-zoom" style="height: 180px; background: #451a03;">
                     {% if book.cover %}
                     <img src="{{ book.cover.url }}" alt="{{ book.title }}" loading="lazy" class="w-full h-full object-cover">
                     {% else %}
@@ -124,7 +124,7 @@
                         <span class="text-primary">· {% trans "Berilgan" %}: <strong>{{ book.currently_reading_count }}</strong></span>
                     </div>
                     <div class="overflow-hidden" style="height: 5px; background: var(--hover-bg); border-radius: 3px;">
-                        <div style="width: {% widthratio book.currently_reading_count book.total_count 100 %}%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px;"></div>
+                        <div style="width: {% widthratio book.currently_reading_count book.total_count 100 %}%; height: 100%; background: var(--primary); border-radius: 3px;"></div>
                     </div>
                     <div class="d-flex mt-sm gap-xs" onclick="event.stopPropagation()">
                         <a href="{% url 'frontend:book_qr_label' book.pk %}" target="_blank" aria-label="Yorliq" class="glass-card d-flex align-center justify-center rounded p-xs text-xs text-decoration-none" style="color: #10b981; border-color: rgba(16,185,129,0.3);" title="{% trans 'QR yorliq (print)' %}"><i class="fas fa-tag"></i></a>

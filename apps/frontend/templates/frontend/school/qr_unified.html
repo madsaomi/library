@@ -345,7 +345,7 @@ function doStudentSearch() {
             row.type = 'button';
             row.className = 'glass-card d-flex align-center gap-md text-left cursor-pointer p-md rounded-lg border transition';
             row.onclick = function() { pickStudent(s.id); };
-            row.innerHTML = '<div class="flex-center rounded-full" style="width:32px;height:32px;background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff;font-weight:700;font-size:0.75rem;">' + (s.name.charAt(0) || '?').toUpperCase() + '</div>' +
+            row.innerHTML = '<div class="flex-center rounded-full" style="width:32px;height:32px;background:var(--primary);color:#fff;font-weight:700;font-size:0.75rem;">' + (s.name.charAt(0) || '?').toUpperCase() + '</div>' +
                 '<div class="flex-1" style="min-width:0;"><div class="text-sm text-bold text-truncate">' + s.name + '</div><div class="text-xs text-muted">' + (s.grade || '') + ' · @' + s.username + '</div></div>' +
                 '<i class="fas fa-chevron-right text-muted" style="font-size:0.7rem;"></i>';
             box.appendChild(row);

@@ -69,7 +69,7 @@
             {% for student in grade_group.list %}
             <div class="glass-card info-row student-row p-md" data-search="{{ student.username|lower }} {{ student.first_name|lower }} {{ student.last_name|lower }} {{ student.grade|lower }}">
                 <a href="{% url 'frontend:student_detail' student.pk %}" class="d-flex align-center text-decoration-none" style="gap: 10px; flex: 1; min-width: 0; color: inherit;">
-                    <div class="d-flex flex-center flex-shrink-0 rounded-full" style="width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), #a855f7);">
+                    <div class="d-flex flex-center flex-shrink-0 rounded-full" style="width: 34px; height: 34px; background: var(--primary);">
                         <span class="text-bold text-white text-xs">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</span>
                     </div>
                     <div class="flex-1" style="min-width: 0;">
