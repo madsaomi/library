@@ -14,10 +14,10 @@
         <div class="d-flex flex-between flex-wrap gap-md align-center mb-lg">
             <h3 class="card-title"><i class="fas fa-qrcode text-primary"></i> {% trans "QR Skaner" %}</h3>
             <div class="d-flex gap-sm align-center">
-                <a href="{% url 'frontend:qr_labels_batch' kind='books' %}" class="filter-chip {% if kind == 'books' or kind == None %}active{% endif %}">
+                <a href="{% url 'frontend:qr_labels_batch' %}?kind=books" class="filter-chip {% if kind == 'books' or kind == None %}active{% endif %}">
                     <i class="fas fa-book"></i> {% trans "Kitoblar" %}
                 </a>
-                <a href="{% url 'frontend:qr_labels_batch' kind='students' %}" class="filter-chip {% if kind == 'students' %}active{% endif %}">
+                <a href="{% url 'frontend:qr_labels_batch' %}?kind=students" class="filter-chip {% if kind == 'students' %}active{% endif %}">
                     <i class="fas fa-user-graduate"></i> {% trans "O'quvchilar" %}
                 </a>
             </div>
