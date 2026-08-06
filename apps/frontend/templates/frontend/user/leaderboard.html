@@ -10,56 +10,61 @@
 
 {% block content %}
 <div class="animate-fade mw-600 mx-auto">
-    <div class="d-flex gap-sm mb-xl flex-wrap">
+    <div class="action-bar mb-xl">
         <a href="?period=week" class="filter-chip {% if current_period == 'week' %}active{% endif %}">{% trans "Hafta" %}</a>
         <a href="?period=month" class="filter-chip {% if current_period == 'month' %}active{% endif %}">{% trans "Oy" %}</a>
         <a href="?period=all" class="filter-chip {% if current_period == 'all' %}active{% endif %}">{% trans "Barcha" %}</a>
     </div>
 
     {% if students|length >= 1 %}
-    <div class="d-flex gap-md mb-xl justify-center">
+    <div class="d-flex gap-md mb-xl justify-center align-end">
         {% if students|length >= 2 %}
-        <div class="glass-panel p-lg text-center" style="width: 100px; border: 2px solid var(--border);">
-            <div class="text-2xl mb-xs text-muted"><i class="fas fa-medal"></i></div>
+        <div class="glass-panel p-lg text-center flex-1" style="max-width: 120px;">
+            <div class="text-2xl mb-xs text-info"><i class="fas fa-medal"></i></div>
             <div class="text-sm text-semibold text-main text-truncate">{{ students.1.first_name }}</div>
-            <div class="text-xs text-muted">{{ students.1.period_books }}</div>
+            <div class="text-xs text-muted">{{ students.1.period_books }} {% trans "kitob" %}</div>
         </div>
         {% endif %}
         {% if students|length >= 1 %}
-        <div class="glass-panel p-lg text-center" style="width: 110px; border: 2px solid var(--warning);">
+        <div class="glass-panel p-lg text-center flex-1" style="max-width: 130px; border: 2px solid var(--warning);">
             <div class="text-3xl mb-xs text-warning"><i class="fas fa-crown"></i></div>
             <div class="text-semibold text-main text-truncate">{{ students.0.first_name }}</div>
             <div class="text-muted text-sm">{{ students.0.period_books }} {% trans "kitob" %}</div>
         </div>
         {% endif %}
         {% if students|length >= 3 %}
-        <div class="glass-panel p-lg text-center" style="width: 100px; border: 2px solid var(--warning);">
-            <div class="text-2xl mb-xs text-warning"><i class="fas fa-medal"></i></div>
+        <div class="glass-panel p-lg text-center flex-1" style="max-width: 120px;">
+            <div class="text-2xl mb-xs" style="color: #b45309;"><i class="fas fa-medal"></i></div>
             <div class="text-sm text-semibold text-main text-truncate">{{ students.2.first_name }}</div>
-            <div class="text-xs text-muted">{{ students.2.period_books }}</div>
+            <div class="text-xs text-muted">{{ students.2.period_books }} {% trans "kitob" %}</div>
         </div>
         {% endif %}
     </div>
     {% endif %}
 
     <div class="glass-panel p-md">
+        <div class="card-header mb-md">
+            <h3 class="card-title"><i class="fas fa-trophy text-warning"></i> {% trans "Reyting" %}</h3>
+            <span class="text-muted text-xs">{{ students|length }} {% trans "ta ishtirokchi" %}</span>
+        </div>
         {% for student in students %}
         {% if forloop.counter > 3 %}
-        <div class="d-flex align-center gap-md py-sm {% if not forloop.last %}border-bottom{% endif %} {% if student.pk == request.user.pk %}leader-row is-me{% endif %}">
-            <div class="text-muted text-sm" style="width: 24px;">{{ forloop.counter }}</div>
+        <div class="list-row {% if not forloop.last %}border-bottom{% endif %} {% if student.pk == request.user.pk %}is-me{% endif %}">
+            <div class="text-muted text-sm" style="width: 32px; text-align: center;">{{ forloop.counter }}</div>
             <div class="flex-center rounded-full flex-shrink-0" style="width: 36px; height: 36px; background: var(--hover-bg); border: 1px solid var(--border);">
                 <i class="fas {{ student.selected_icon|default:'fa-user' }} text-sm text-muted"></i>
             </div>
-            <div class="flex-1" style="min-width: 0;">
-                <div class="text-sm text-semibold text-main text-truncate">{{ student.first_name }} {{ student.last_name }}</div>
+            <div class="list-row-main">
+                <div class="list-row-title text-truncate">{{ student.first_name }} {{ student.last_name }}</div>
             </div>
-            <div class="text-sm text-muted">{{ student.period_books }}</div>
+            <div class="text-sm text-muted">{{ student.period_books }} {% trans "kitob" %}</div>
         </div>
         {% endif %}
         {% empty %}
         <div class="empty-state">
             <div class="empty-icon"><i class="fas fa-users"></i></div>
             <h4>{% trans "Hali ma'lumot yo'q" %}</h4>
+            <p>{% trans "Reyting hozircha bo'sh" %}</p>
         </div>
         {% endfor %}
     </div>

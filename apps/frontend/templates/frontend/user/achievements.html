@@ -17,12 +17,17 @@
         </div>
         <div class="text-2xl text-semibold text-main mb-xs">{{ earned|length }}</div>
         <div class="text-muted text-sm">{% trans "ta yutuq" %}</div>
-        <div class="mt-lg" style="height: 6px; background: var(--hover-bg); border-radius: 3px; overflow: hidden;">
-            <div style="width: {% widthratio earned|length all_achievements|length 100 %}%; height: 100%; background: var(--primary); border-radius: 3px;"></div>
+        <div class="mt-lg">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {% widthratio earned|length all_achievements|length 100 %}%;"></div>
+            </div>
         </div>
     </div>
 
-    <h4 class="mb-lg text-semibold">{% trans "Yutuqlar" %}</h4>
+    <div class="card-header mb-lg">
+        <h3 class="card-title"><i class="fas fa-medal text-warning"></i> {% trans "Yutuqlar" %}</h3>
+        <span class="text-muted text-xs">{{ earned|length }}/{{ all_achievements|length }}</span>
+    </div>
     <div class="d-grid gap-md mb-xl" style="grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));">
         {% for ach in all_achievements %}
         <div class="glass-panel p-md text-center" style="{% if ach.id not in earned_achievement_ids %}opacity: 0.35;{% endif %}">
@@ -36,11 +41,13 @@
     </div>
 
     {% if unlocked_icons %}
-    <h4 class="mb-lg text-semibold">{% trans "Ikonkalar" %}</h4>
+    <div class="card-header mb-lg">
+        <h3 class="card-title"><i class="fas fa-palette text-info"></i> {% trans "Ikonkalar" %}</h3>
+    </div>
     <div class="d-flex gap-md flex-wrap">
         {% for icon in unlocked_icons %}
         <a href="{% url 'frontend:profile_edit' %}?icon={{ icon }}" class="text-decoration-none">
-            <div class="glass-panel p-md flex-center" style="width: 50px; height: 50px; {% if user.selected_icon == icon %}border: 2px solid var(--primary);{% endif %}">
+            <div class="glass-panel p-md flex-center" style="width: 50px; height: 50px; border-radius: 12px; {% if user.selected_icon == icon %}border: 2px solid var(--primary);{% endif %}">
                 <i class="fas {{ icon }} text-lg text-primary"></i>
             </div>
         </a>

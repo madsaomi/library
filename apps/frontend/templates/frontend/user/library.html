@@ -13,23 +13,21 @@
     {% if latest_news %}
     <a href="{% url 'frontend:user_news_list' %}" class="text-decoration-none d-block mb-lg">
         <div class="list-row">
-            <div class="list-row-avatar"><i class="fas fa-bullhorn"></i></div>
+            <div class="list-row-avatar"><i class="fas fa-bullhorn text-warning"></i></div>
             <div class="list-row-main">
                 <div class="list-row-title text-truncate">{{ latest_news.0.title }}</div>
             </div>
-            <i class="fas fa-chevron-right text-muted text-sm"></i>
+            <i class="fas fa-chevron-right text-muted text-xs"></i>
         </div>
     </a>
     {% endif %}
 
     <div class="glass-panel p-md mb-lg">
-        <div class="catalog-toolbar">
-            <div class="pos-relative flex-1">
-                <i class="fas fa-search pos-absolute text-muted" style="left: 18px; top: 50%; transform: translateY(-50%); font-size: 0.85rem;"></i>
-                <input type="text" name="q" id="search-input" value="{{ current_query }}" placeholder="{% trans 'Qidirish...' %}" autocomplete="off" class="w-100">
-            </div>
+        <div class="password-wrapper pos-relative mb-md">
+            <input type="text" name="q" id="search-input" value="{{ current_query }}" placeholder="{% trans 'Qidirish...' %}" autocomplete="off" class="form-control" style="padding-left: 40px;">
+            <i class="fas fa-search pos-absolute text-muted text-md" style="left: 14px; top: 50%; transform: translateY(-50%);"></i>
         </div>
-        <div class="d-flex gap-xs mt-sm flex-wrap">
+        <div class="d-flex gap-xs flex-wrap">
             <a href="{% url 'frontend:library' %}" class="filter-chip {% if not current_query %}active{% endif %}">{% trans "Barchasi" %}</a>
             {% for cat in categories|slice:":6" %}
             <a href="{% url 'frontend:library' %}?q={{ cat.name }}" class="filter-chip {% if current_query == cat.name %}active{% endif %}">{{ cat.name }}</a>
@@ -41,7 +39,7 @@
         {% for book in books %}
         <a href="{% url 'frontend:book_detail' book.pk %}" class="text-decoration-none">
             <div class="glass-panel overflow-hidden">
-                <div style="aspect-ratio: 3/4; background: var(--hover-bg);">
+                <div style="aspect-ratio: 3/4; background: var(--hover-bg); position: relative;">
                     {% if book.cover %}
                     <img src="{{ book.cover.url }}" alt="{{ book.title }}" loading="lazy" class="w-full h-full object-cover">
                     {% else %}
@@ -58,7 +56,7 @@
                     {% if book.author %}
                     <div class="text-xs text-muted text-truncate mt-xs">{{ book.author }}</div>
                     {% endif %}
-                    <div class="text-xs text-muted mt-xs">
+                    <div class="text-xs mt-xs">
                         {% if book.available_count > 0 %}
                         <span class="text-success">{{ book.available_count }}</span> {% trans "mavjud" %}
                         {% else %}

@@ -12,38 +12,41 @@
 {% block content %}
 <div class="animate-fade mw-600 mx-auto">
     {% if challenges %}
-    {% for challenge in challenges %}
-    {% with uc=user_challenges|get_item:challenge.id %}
-    <div class="glass-panel p-lg mb-lg" style="{% if uc and uc.progress >= challenge.target_count %}border: 2px solid var(--primary);{% endif %}">
-        <div class="d-flex justify-between align-start mb-md">
-            <div class="flex-1">
-                <div class="text-semibold text-main mb-xs">{{ challenge.title }}</div>
-                <div class="text-xs text-muted">{{ challenge.description }}</div>
+    <div class="d-flex flex-column gap-md">
+        {% for challenge in challenges %}
+        {% with uc=user_challenges|get_item:challenge.id %}
+        <div class="glass-panel p-lg" style="{% if uc and uc.progress >= challenge.target_count %}border: 2px solid var(--primary);{% endif %}">
+            <div class="d-flex justify-between align-center mb-md">
+                <div class="flex-1">
+                    <div class="text-semibold text-main mb-xs">{{ challenge.title }}</div>
+                    <div class="text-xs text-muted">{{ challenge.description }}</div>
+                </div>
+                <div class="text-sm text-primary text-semibold ml-md">+{{ challenge.xp_reward }} XP</div>
             </div>
-            <div class="text-sm text-primary text-semibold ml-md">+{{ challenge.xp_reward }} XP</div>
-        </div>
-        <div class="mb-sm">
-            <div class="d-flex justify-between text-xs mb-xs">
-                <span class="text-muted">{% trans "Progress" %}</span>
-                <span>{% if uc %}{{ uc.progress }}{% else %}0{% endif %} / {{ challenge.target_count }}</span>
+            <div class="mb-sm">
+                <div class="d-flex justify-between text-xs mb-xs">
+                    <span class="text-muted">{% trans "Progress" %}</span>
+                    <span>{% if uc %}{{ uc.progress }}{% else %}0{% endif %} / {{ challenge.target_count }}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {% if uc %}{% widthratio uc.progress challenge.target_count 100 %}{% else %}0{% endif %}%; background: {% if uc and uc.progress >= challenge.target_count %}var(--success){% else %}var(--primary){% endif %};"></div>
+                </div>
             </div>
-            <div style="height: 8px; background: var(--hover-bg); border-radius: 4px; overflow: hidden;">
-                <div style="width: {% if uc %}{% widthratio uc.progress challenge.target_count 100 %}{% else %}0{% endif %}%; height: 100%; background: {% if uc and uc.progress >= challenge.target_count %}var(--success){% else %}var(--primary){% endif %}; border-radius: 4px; transition: width 0.5s;"></div>
+            {% if uc and uc.progress >= challenge.target_count %}
+            <div class="d-flex align-center gap-xs text-success text-sm">
+                <i class="fas fa-check-circle"></i>
+                <span>{% trans "Tugatildi" %}</span>
             </div>
+            {% endif %}
         </div>
-        {% if uc and uc.progress >= challenge.target_count %}
-        <div class="d-flex align-center gap-xs text-success text-sm">
-            <i class="fas fa-check-circle"></i>
-            <span>{% trans "Tugatildi" %}</span>
-        </div>
-        {% endif %}
+        {% endwith %}
+        {% endfor %}
     </div>
-    {% endwith %}
-    {% endfor %}
     {% else %}
     <div class="empty-state">
         <div class="empty-icon"><i class="fas fa-bolt"></i></div>
         <h4>{% trans "Hozircha chellenjlar yo'q" %}</h4>
+        <p>{% trans "Yangi chellenjlar tez orada qo'shiladi" %}</p>
     </div>
     {% endif %}
 </div>
