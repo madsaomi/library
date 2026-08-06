@@ -471,7 +471,20 @@ ews_list: added early guard for
 - **Updated `my_books.html`**: added "QR kod" tab button linking to `/library/my-qr/`, removed issue-specific QR links (no more `issue_qr`/`request_qr` per-book pages for students)
 - **Ruff F823 fix**: removed redundant local `from django.db.models import Prefetch` in `admin_views.py` (lines 715, 941, 1019) — ruff incorrectly flagged them as "referenced before assignment" inside nested `grade_sort_key` function; imports already at module level
 - Verified: 169 tests pass, ruff clean, pages render 200
-- Commits: `1739787` (unified QR), `0c9482a` (ruff Prefetch fix)
+- Commits: `ce037bc` (student QR redesign), `2279b33` (scanner filter links fix)
+
+## Session: redesign QR scanner page (2026-08-07)
+- **Redesigned `qr_unified.html`** to match `qr_labels_batch.html` simplicity:
+  - Removed grid-3 stat tiles from top, moved to bottom card with card-header
+  - Removed inline styles (`style="border-left: 4px solid..."`, `style="height: 220px; border: 2px dashed..."`)
+  - Pending panel uses `list-row` components instead of custom divs
+  - Result message uses `list-row` with colored avatar (green/blue/red per outcome)
+  - Manual entry modal uses `card-header` + `btn-primary`/`btn-outline`
+  - Student search results use `list-row` with chevron
+  - Filter chips for books/students links to `labels-batch` page (query param `?kind=`)
+  - Consistent spacing, no inline CSS, all design-system classes
+- Verified: 169 tests pass, ruff clean, all 3 QR URLs render 200
+- Commits: `5dfacd6` (redesign), `2279b33` (filter links fix)
 
 ## Session: redesign student QR page (2026-08-07)
 - **Redesigned `student_qr.html`** following unified design system:
