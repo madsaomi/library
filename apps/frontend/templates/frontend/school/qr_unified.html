@@ -9,272 +9,148 @@
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade mw-600 mx-auto">
-    <div class="glass-panel p-xl mb-xl">
-        <div class="d-flex flex-between flex-wrap gap-md align-center mb-lg">
-            <h3 class="card-title"><i class="fas fa-qrcode text-primary"></i> {% trans "QR Skaner" %}</h3>
-            <div class="d-flex gap-sm align-center">
-                <a href="{% url 'frontend:qr_labels_batch' %}?kind=books" class="filter-chip {% if kind == 'books' or kind == None %}active{% endif %}">
-                    <i class="fas fa-book"></i> {% trans "Kitoblar" %}
-                </a>
-                <a href="{% url 'frontend:qr_labels_batch' %}?kind=students" class="filter-chip {% if kind == 'students' %}active{% endif %}">
-                    <i class="fas fa-user-graduate"></i> {% trans "O'quvchilar" %}
-                </a>
-            </div>
+<div class="animate-fade mw-500 mx-auto">
+    <div class="glass-panel p-2xl text-center mb-xl">
+        <div class="flex-center rounded-full mx-auto mb-lg bg-primary" style="width: 56px; height: 56px;">
+            <i class="fas fa-qrcode text-xl text-white"></i>
         </div>
+        <h2 class="m-0 mb-xs">{% trans "QR Skaner" %}</h2>
+        <p class="text-muted m-0 mb-2xl text-sm">{% trans "Kitob yoki o'quvchi QR kodini skanerlang" %}</p>
 
-        <p class="text-muted text-sm m-0 mb-xl">{% trans "Kitob yoki o'quvchi QR-kodini skanerlang — avtomatik berish/qabul qilish" %}</p>
-
-        <!-- Pending panel -->
-        <div id="pending-panel" class="d-none mb-xl text-left glass-card p-lg rounded-lg" style="border-left: 3px solid var(--primary);">
-            <div class="d-flex align-center justify-between mb-md">
-                <span class="text-sm text-bold text-primary d-flex align-center gap-xs">
-                    <i class="fas fa-link"></i> {% trans "Jarayon" %}
-                </span>
-                <button id="clear-pending-btn" type="button" onclick="clearPending()" class="icon-btn">
-                    <i class="fas fa-times-circle text-danger"></i>
-                </button>
-            </div>
-            <div id="pending-book-box" class="d-none list-row mb-sm">
-                <div class="list-row-avatar"><i class="fas fa-book text-primary"></i></div>
-                <div class="list-row-main">
-                    <div class="list-row-title text-truncate" id="pending-book-title">—</div>
-                    <div class="list-row-sub"><span id="pending-book-avail"></span></div>
+        <!-- Pending indicator -->
+        {% if pending_book or pending_student %}
+        <div class="glass-card p-md rounded-lg mb-xl text-left" style="border-left: 3px solid var(--primary);">
+            <div class="d-flex align-center gap-sm mb-sm">
+                {% if pending_book %}
+                <div class="list-row-avatar" style="background: var(--primary);"><i class="fas fa-book text-white text-xs"></i></div>
+                <div class="flex-1">
+                    <div class="text-sm text-semibold text-truncate">{{ pending_book.title }}</div>
+                    <div class="text-xs text-muted">{{ pending_book.available }}/{{ pending_book.total }}</div>
                 </div>
-                <span class="badge-soft badge-soft-primary">{% trans "Kutmoqda" %}</span>
-            </div>
-            <div id="pending-student-box" class="d-none list-row">
-                <div class="list-row-avatar"><i class="fas fa-user-graduate text-success"></i></div>
-                <div class="list-row-main">
-                    <div class="list-row-title text-truncate" id="pending-student-name">—</div>
-                    <div class="list-row-sub" id="pending-student-grade"></div>
+                {% endif %}
+                {% if pending_student %}
+                <div class="list-row-avatar" style="background: var(--success);"><i class="fas fa-user-graduate text-white text-xs"></i></div>
+                <div class="flex-1">
+                    <div class="text-sm text-semibold text-truncate">{{ pending_student.name }}</div>
+                    <div class="text-xs text-muted">{{ pending_student.grade|default:"" }}</div>
                 </div>
-                <span class="badge-soft badge-soft-success">{% trans "Tanlandi" %}</span>
+                {% endif %}
             </div>
+            <p class="text-xs text-muted m-0" id="pending-hint"></p>
         </div>
+        {% endif %}
 
         <!-- Scanner area -->
-        <div class="mb-xl text-center">
-            <div id="scanner-placeholder" class="glass-card d-flex align-center justify-center mb-md cursor-pointer transition"
-                 style="height: 200px; border: 2px dashed var(--border); border-radius: 12px;"
+        <div id="scanner-area" class="mb-xl">
+            <div id="scanner-placeholder" class="glass-card d-flex align-center justify-center cursor-pointer"
+                 style="height: 180px; border: 2px dashed var(--border); border-radius: 12px;"
                  onclick="startScanner()">
                 <div>
-                    <i class="fas fa-qrcode text-primary d-block mb-md" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    <i class="fas fa-camera text-primary d-block mb-sm" style="font-size: 1.8rem; opacity: 0.6;"></i>
                     <p class="text-muted text-sm m-0">{% trans "Skanerlashni boshlash" %}</p>
                 </div>
             </div>
             <div id="reader-container" class="d-none mb-md rounded-lg overflow-hidden" style="border: 1px solid var(--border);"></div>
 
-            <!-- Result message -->
-            <div id="result-message" class="d-none list-row mb-md text-left" style="border-left: 3px solid var(--success); background: var(--glass);">
-                <div class="list-row-avatar" id="res-avatar" style="background: var(--success);">
-                    <i class="fas fa-check text-white"></i>
-                </div>
-                <div class="list-row-main">
-                    <div class="list-row-title" id="res-status" style="color: var(--success);">{% trans "Muvaffaqiyatli!" %}</div>
-                    <div class="list-row-sub" id="res-text"></div>
+            <!-- Result -->
+            <div id="result-message" class="d-none glass-card p-md rounded-lg text-left" style="border-left: 3px solid var(--success);">
+                <div class="d-flex align-center gap-md">
+                    <div class="flex-center rounded-full" style="width: 32px; height: 32px; background: var(--success); min-width: 32px;">
+                        <i id="res-icon" class="fas fa-check text-white text-xs"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div id="res-status" class="text-sm text-semibold" style="color: var(--success);">{% trans "Muvaffaqiyatli!" %}</div>
+                        <div id="res-text" class="text-xs text-muted" style="line-height: 1.4;"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Action buttons -->
-        <div class="d-flex gap-sm flex-wrap">
-            <button id="start-btn" class="btn-primary flex-1 py-md text-decoration-none" onclick="startScanner()">
+        <!-- Actions -->
+        <div class="d-flex gap-sm flex-wrap justify-center">
+            <button id="start-btn" class="btn-primary py-sm px-lg text-decoration-none" onclick="startScanner()">
                 <i class="fas fa-camera mr-xs"></i> {% trans "Skaner" %}
             </button>
-            <button id="manual-entry-btn" class="btn-outline flex-1 py-md text-decoration-none" onclick="showManualModal()">
-                <i class="fas fa-keyboard mr-xs"></i> {% trans "Kod kiritish" %}
+            <button id="manual-btn" class="btn-outline py-sm px-lg text-decoration-none" onclick="showManual()">
+                <i class="fas fa-keyboard mr-xs"></i> {% trans "Kod" %}
             </button>
-            <button id="student-search-btn" class="btn-outline flex-1 py-md text-decoration-none" onclick="showStudentSearch()">
-                <i class="fas fa-user-graduate mr-xs"></i> {% trans "O'quvchi tanlash" %}
+            <button id="student-btn" class="btn-outline py-sm px-lg text-decoration-none" onclick="showStudentSearch()">
+                <i class="fas fa-user-graduate mr-xs"></i> {% trans "O'quvchi" %}
             </button>
         </div>
 
-        <!-- Cart QR info -->
-        <div class="mt-xl glass-card p-lg rounded-lg" style="border: 1px solid var(--border);">
-            <div class="d-flex align-center gap-md">
-                <div class="flex-center rounded-full" style="width: 40px; height: 40px; background: rgba(245,158,11,0.12); min-width: 40px;">
-                    <i class="fas fa-shopping-cart text-warning"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="text-sm text-semibold">{% trans "Savat QR kodi" %}</div>
-                    <div class="text-xs text-muted">{% trans "O'quvchi savatdagi barcha kitoblarni bir QR da ko'rsatadi" %}</div>
-                </div>
-                <a href="{% url 'frontend:qr_labels_batch' %}?kind=books" class="btn-outline py-sm px-md text-sm text-decoration-none">
-                    {% trans "Yorliqlar" %}
-                </a>
-            </div>
-        </div>
-
-        <div class="mt-xl">
-            <a href="{% url 'frontend:school_dashboard' %}" class="text-muted text-decoration-none text-sm" style="opacity: 0.7;">
-                <i class="fas fa-arrow-left"></i> {% trans "Orqaga" %}
+        <!-- Quick links -->
+        <div class="d-flex gap-sm justify-center mt-xl flex-wrap">
+            <a href="{% url 'frontend:qr_labels_batch' %}?kind=books" class="filter-chip">
+                <i class="fas fa-book"></i> {% trans "Yorliqlar" %}
             </a>
-        </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="glass-panel p-xl">
-        <div class="card-header mb-lg">
-            <h3 class="card-title"><i class="fas fa-chart-bar text-info"></i> {% trans "Bugungi statistika" %}</h3>
-        </div>
-        <div class="grid-3 text-center">
-            <div class="stat-tile text-center">
-                <div class="stat-tile-value text-primary">{{ today_scans|default:"0" }}</div>
-                <div class="stat-tile-label">{% trans "Skaner" %}</div>
-            </div>
-            <div class="stat-tile text-center">
-                <div class="stat-tile-value text-success">{{ today_issues|default:"0" }}</div>
-                <div class="stat-tile-label">{% trans "Berilgan" %}</div>
-            </div>
-            <div class="stat-tile text-center">
-                <div class="stat-tile-value text-info">{{ today_returns|default:"0" }}</div>
-                <div class="stat-tile-label">{% trans "Qaytarilgan" %}</div>
-            </div>
+            <a href="{% url 'frontend:qr_labels_batch' %}?kind=students" class="filter-chip">
+                <i class="fas fa-user-graduate"></i> {% trans "Kartalarni bosish" %}
+            </a>
         </div>
     </div>
 </div>
 
-<!-- Manual Entry Modal -->
+<!-- Modals -->
 <div id="manual-modal" class="qr-modal-overlay">
     <div class="qr-modal-content">
         <div class="card-header mb-lg">
             <h3 class="card-title"><i class="fas fa-keyboard text-primary"></i> {% trans "Kod kiritish" %}</h3>
         </div>
         <div class="d-flex gap-sm mb-lg">
-            <button id="type-req" class="btn-primary flex-1 py-sm rounded text-sm" onclick="setManualType('REQ_')">{% trans "Berish" %}</button>
-            <button id="type-ret" class="btn-outline flex-1 py-sm rounded text-sm" onclick="setManualType('RET_')">{% trans "Qabul" %}</button>
+            <button class="btn-primary flex-1 py-sm rounded text-sm" onclick="setMode('REQ_')">{% trans "Berish" %}</button>
+            <button class="btn-outline flex-1 py-sm rounded text-sm" onclick="setMode('RET_')">{% trans "Qabul" %}</button>
         </div>
         <div class="d-flex align-center" style="background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 0 12px;">
-            <span id="prefix-display" class="text-primary text-bold" style="font-size: 0.95rem; border-right: 1px solid var(--border); padding-right: 12px; margin-right: 12px;">REQ_</span>
+            <span id="prefix-display" class="text-primary text-bold" style="border-right: 1px solid var(--border); padding-right: 12px; margin-right: 12px;">REQ_</span>
             <input type="text" id="manual-token" class="flex-1" style="background: transparent; border: none; color: var(--input-text); padding: 12px 0; font-size: 0.95rem; outline: none; text-transform: uppercase;" placeholder="1_A2B3C4D5">
         </div>
         <div class="d-flex gap-sm mt-xl">
-            <button id="modal-cancel-btn" class="btn-outline flex-1 py-sm" onclick="closeManualModal()">{% trans "Bekor qilish" %}</button>
-            <button id="modal-confirm-btn" class="btn-primary flex-1 py-sm" onclick="submitManualToken()">{% trans "Tasdiqlash" %}</button>
+            <button class="btn-outline flex-1 py-sm" onclick="closeManual()">{% trans "Bekor" %}</button>
+            <button class="btn-primary flex-1 py-sm" onclick="submitManual()">{% trans "Tasdiqlash" %}</button>
         </div>
     </div>
 </div>
 
-<!-- Student search modal -->
-<div id="student-search-modal" class="qr-modal-overlay">
-    <div class="qr-modal-content" style="max-width: 420px;">
+<div id="student-modal" class="qr-modal-overlay">
+    <div class="qr-modal-content" style="max-width: 400px;">
         <div class="card-header mb-lg">
             <h3 class="card-title"><i class="fas fa-user-graduate text-success"></i> {% trans "O'quvchi tanlash" %}</h3>
         </div>
         <div class="pos-relative mb-lg">
-            <input type="text" id="student-search-input" class="w-full" style="background: var(--input-bg); border: 1px solid var(--border); color: var(--input-text); padding: 12px 12px 12px 38px; border-radius: 10px; font-size: 0.95rem; outline: none;" placeholder="{% trans 'Qidirish...' %}">
+            <input type="text" id="student-search" class="w-full" style="background: var(--input-bg); border: 1px solid var(--border); color: var(--input-text); padding: 12px 12px 12px 38px; border-radius: 10px; font-size: 0.95rem; outline: none;" placeholder="{% trans 'Qidirish...' %}">
             <i class="fas fa-search pos-absolute text-muted" style="left: 14px; top: 50%; transform: translateY(-50%); font-size: 0.8rem;"></i>
         </div>
-        <div id="student-search-results" class="d-flex flex-column gap-xs" style="max-height: 300px; overflow-y: auto;"></div>
+        <div id="student-results" class="d-flex flex-column gap-xs" style="max-height: 280px; overflow-y: auto;"></div>
         <div class="mt-lg">
-            <button class="btn-outline w-full py-sm" onclick="document.getElementById('student-search-modal').classList.remove('active')">{% trans "Bekor qilish" %}</button>
+            <button class="btn-outline w-full py-sm" onclick="closeStudent()">{% trans "Bekor" %}</button>
         </div>
     </div>
 </div>
 
 <script>
-var modalEl = document.getElementById('manual-modal');
-var QR_currentPrefix = 'REQ_';
+var QR_MODE = 'REQ_';
 var CSRF = '{{ csrf_token }}';
+var searchTimer = null;
 
-function showManualModal() {
-    if (!modalEl || !document.body.contains(modalEl)) return;
-    modalEl.classList.add('active');
-    document.getElementById('manual-token').value = '';
-    setManualType('REQ_');
-    setTimeout(function() { document.getElementById('manual-token').focus(); }, 300);
-}
-function closeManualModal() { document.getElementById('manual-modal').classList.remove('active'); }
-
-function setManualType(prefix) {
-    QR_currentPrefix = prefix;
-    document.getElementById('prefix-display').innerText = prefix;
-    var req = document.getElementById('type-req');
-    var ret = document.getElementById('type-ret');
-    if (prefix === 'REQ_') {
-        req.className = 'btn-primary flex-1 py-sm rounded text-sm';
-        ret.className = 'btn-outline flex-1 py-sm rounded text-sm';
-    } else {
-        ret.className = 'btn-primary flex-1 py-sm rounded text-sm';
-        req.className = 'btn-outline flex-1 py-sm rounded text-sm';
-    }
-}
-
-function submitManualToken() {
-    var input = document.getElementById('manual-token');
-    var val = input.value.trim();
-    if (val.length > 0) { closeManualModal(); processToken(QR_currentPrefix + val); }
-}
-
-function showPendingPanel() {
-    var panel = document.getElementById('pending-panel');
-    if (panel) panel.classList.remove('d-none');
-}
-
-function updatePendingState(state) {
-    var bookBox = document.getElementById('pending-book-box');
-    var studentBox = document.getElementById('pending-student-box');
-
-    if (state.book) {
-        bookBox.classList.remove('d-none');
-        document.getElementById('pending-book-title').textContent = state.book.title;
-        document.getElementById('pending-book-avail').textContent = state.book.available + ' / ' + state.book.total;
-    } else {
-        bookBox.classList.add('d-none');
-    }
-
-    if (state.student) {
-        studentBox.classList.remove('d-none');
-        document.getElementById('pending-student-name').textContent = state.student.name;
-        document.getElementById('pending-student-grade').textContent = state.student.grade || '';
-    } else {
-        studentBox.classList.add('d-none');
-    }
-
-    if (state.book && !state.student) {
-        showPendingPanel();
-    } else if (state.student && !state.book) {
-        showPendingPanel();
-    }
-}
-
-function refreshState() {
-    fetch("{% url 'frontend:qr_state' %}", { method: 'GET', headers: { 'X-CSRFToken': CSRF } })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            if (data.status === 'success') updatePendingState(data);
-        })
-        .catch(function() {});
-}
-
-function clearPending() {
-    fetch("{% url 'frontend:qr_clear_pending' %}", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
-        body: JSON.stringify({})
-    })
-    .then(function(r) { return r.json(); })
-    .then(function() {
-        var panel = document.getElementById('pending-panel');
-        if (panel) panel.classList.add('d-none');
-        document.getElementById('pending-book-box').classList.add('d-none');
-        document.getElementById('pending-student-box').classList.add('d-none');
-        hideResult();
-    })
-    .catch(function() {});
-}
-
-function hideResult() {
-    var rm = document.getElementById('result-message');
-    if (rm) rm.style.display = 'none';
+function showResult(type, message, extra) {
+    var el = document.getElementById('result-message');
+    el.style.display = 'block';
+    var colors = { success: 'var(--success)', info: 'var(--primary)', error: 'var(--danger)' };
+    var icons = { success: 'fa-check', info: 'fa-arrow-right', error: 'fa-times' };
+    el.style.borderLeftColor = colors[type] || colors.success;
+    el.querySelector('[style*="background"]').style.background = colors[type] || colors.success;
+    document.getElementById('res-icon').className = 'fas ' + icons[type] + ' text-white text-xs';
+    document.getElementById('res-status').style.color = colors[type];
+    document.getElementById('res-status').textContent = type === 'success' ? '{% trans "Muvaffaqiyatli!" %}' : type === 'info' ? '{% trans "Kutmoqda" %}' : '{% trans "Xatolik!" %}';
+    document.getElementById('res-text').innerHTML = (message || '') + (extra || '');
 }
 
 function processToken(token) {
-    var resultMsg = document.getElementById('result-message');
-    var resStatus = document.getElementById('res-status');
-    var resText = document.getElementById('res-text');
-    var resAvatar = document.getElementById('res-avatar');
+    var el = document.getElementById('result-message');
+    el.style.display = 'none';
+    document.getElementById('start-btn').disabled = false;
+    document.getElementById('start-btn').style.opacity = '1';
 
     fetch("{% url 'frontend:process_qr_unified' %}", {
         method: 'POST',
@@ -283,75 +159,101 @@ function processToken(token) {
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
-        resultMsg.style.display = 'flex';
-        document.getElementById('start-btn').disabled = false;
-        document.getElementById('start-btn').style.opacity = '1';
-
-        if (data.status === 'info') {
-            resStatus.innerText = "{% trans 'Qo\'shimcha amal' %}";
-            resStatus.style.color = 'var(--primary)';
-            resultMsg.style.borderLeftColor = 'var(--primary)';
-            resAvatar.style.background = 'var(--primary)';
-            resAvatar.innerHTML = '<i class="fas fa-arrow-right text-white"></i>';
-            resText.innerText = data.message || '';
-            updatePendingState(data);
+        if (data.status === 'success') {
+            var extra = '';
+            if (data.student) extra += '<br><span class="text-xs" style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>';
+            if (data.xp_earned) extra += '<br><span class="text-xs" style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
+            showResult('success', data.message, extra);
             refreshState();
-        } else if (data.status === 'success') {
-            var isReturn = data.action === 'return';
-            var themeColor = isReturn ? 'var(--success)' : 'var(--primary)';
-            resStatus.innerText = "{% trans 'Muvaffaqiyatli!' %}";
-            resStatus.style.color = themeColor;
-            resultMsg.style.borderLeftColor = themeColor;
-            resAvatar.style.background = themeColor;
-            resAvatar.innerHTML = isReturn ? '<i class="fas fa-undo text-white"></i>' : '<i class="fas fa-book-reader text-white"></i>';
-            var extra = data.student ? ('<br><span style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>') : '';
-            if (data.xp_earned) extra += '<br><span style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
-            resText.innerHTML = (data.message || '') + extra;
+        } else if (data.status === 'info') {
+            showResult('info', data.message, '');
             refreshState();
         } else {
-            resStatus.innerText = "{% trans 'Xatolik!' %}";
-            resStatus.style.color = 'var(--danger)';
-            resultMsg.style.borderLeftColor = 'var(--danger)';
-            resAvatar.style.background = 'var(--danger)';
-            resAvatar.innerHTML = '<i class="fas fa-times text-white"></i>';
-            resText.innerText = data.message;
+            showResult('error', data.message, '');
         }
     })
-    .catch(function(err) {
-        console.error(err);
-        document.getElementById('start-btn').disabled = false;
-        document.getElementById('start-btn').style.opacity = '1';
-        alert("{% trans 'Tizimda xatolik' %}");
+    .catch(function() {
+        showResult('error', '{% trans "Tizimda xatolik" %}', '');
     });
 }
 
-// Student search
-var searchTimer = null;
-function showStudentSearch() {
-    document.getElementById('student-search-modal').classList.add('active');
-    var input = document.getElementById('student-search-input');
-    input.value = '';
-    document.getElementById('student-search-results').innerHTML = '';
-    setTimeout(function() { input.focus(); }, 300);
-    doStudentSearch();
+function refreshState() {
+    fetch("{% url 'frontend:qr_state' %}", { method: 'GET', headers: { 'X-CSRFToken': CSRF } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.status === 'success') {
+                var hint = document.getElementById('pending-hint');
+                var panel = document.querySelector('[style*="border-left: 3px solid"]');
+                if (panel) panel.style.display = (data.book || data.student) ? 'block' : 'none';
+                if (data.book && !data.student) hint.textContent = "{% trans 'Endi o'quvchi QR kodini skanerlang' %}";
+                else if (data.student && !data.book) hint.textContent = "{% trans 'Endi kitob QR kodini skanerlang' %}";
+                else hint.textContent = '';
+            }
+        })
+        .catch(function() {});
 }
 
-function doStudentSearch() {
-    var q = document.getElementById('student-search-input').value.trim();
+function startScanner() {
+    if (typeof Html5Qrcode === 'undefined') { alert("{% trans 'QR kutubxonasi yuklanmadi' %}"); return; }
+    document.getElementById('scanner-placeholder').style.display = 'none';
+    document.getElementById('reader-container').style.display = 'block';
+    document.getElementById('result-message').style.display = 'none';
+    document.getElementById('start-btn').disabled = true;
+    document.getElementById('start-btn').style.opacity = '0.5';
+
+    var scanner = new Html5Qrcode("reader");
+    scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 240 }, function(text) {
+        scanner.stop().then(function() {
+            document.getElementById('reader-container').style.display = 'none';
+            document.getElementById('scanner-placeholder').style.display = 'flex';
+            processToken(text);
+        }).catch(function() {});
+    }).catch(function() {
+        document.getElementById('reader-container').style.display = 'none';
+        document.getElementById('scanner-placeholder').style.display = 'flex';
+        document.getElementById('start-btn').disabled = false;
+        document.getElementById('start-btn').style.opacity = '1';
+    });
+}
+
+function showManual() {
+    document.getElementById('manual-modal').classList.add('active');
+    document.getElementById('manual-token').value = '';
+    setMode('REQ_');
+    setTimeout(function() { document.getElementById('manual-token').focus(); }, 300);
+}
+function closeManual() { document.getElementById('manual-modal').classList.remove('active'); }
+function setMode(prefix) {
+    QR_MODE = prefix;
+    document.getElementById('prefix-display').textContent = prefix;
+}
+function submitManual() {
+    var val = document.getElementById('manual-token').value.trim();
+    if (val) { closeManual(); processToken(QR_MODE + val); }
+}
+
+function showStudentSearch() {
+    document.getElementById('student-modal').classList.add('active');
+    document.getElementById('student-search').value = '';
+    document.getElementById('student-results').innerHTML = '';
+    setTimeout(function() { document.getElementById('student-search').focus(); }, 300);
+}
+function closeStudent() { document.getElementById('student-modal').classList.remove('active'); }
+function doSearch() {
+    var q = document.getElementById('student-search').value.trim();
     fetch("{% url 'frontend:qr_search_students' %}?q=" + encodeURIComponent(q))
         .then(function(r) { return r.json(); })
         .then(function(data) {
-            var box = document.getElementById('student-search-results');
+            var box = document.getElementById('student-results');
             box.innerHTML = '';
-            if (!data.students || data.students.length === 0) {
-                box.innerHTML = '<div class="text-center text-muted text-sm p-3xl">{% trans "Topilmadi" %}</div>';
+            if (!data.students || !data.students.length) {
+                box.innerHTML = '<div class="text-center text-muted text-sm p-xl">{% trans "Topilmadi" %}</div>';
                 return;
             }
             data.students.forEach(function(s) {
                 var row = document.createElement('button');
                 row.type = 'button';
                 row.className = 'list-row cursor-pointer';
-                row.style.cursor = 'pointer';
                 row.onclick = function() { pickStudent(s.id); };
                 row.innerHTML = '<div class="list-row-avatar">' + (s.name.charAt(0) || '?').toUpperCase() + '</div>' +
                     '<div class="list-row-main"><div class="list-row-title text-truncate">' + s.name + '</div><div class="list-row-sub">' + (s.grade || '') + ' · @' + s.username + '</div></div>' +
@@ -361,132 +263,37 @@ function doStudentSearch() {
         })
         .catch(function() {});
 }
-
-function pickStudent(studentId) {
-    document.getElementById('student-search-modal').classList.remove('active');
+function pickStudent(id) {
+    closeStudent();
     fetch("{% url 'frontend:qr_pick_student' %}", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
-        body: JSON.stringify({ student_id: studentId })
+        body: JSON.stringify({ student_id: id })
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
         if (data.status === 'success') {
-            var resultMsg = document.getElementById('result-message');
-            var resStatus = document.getElementById('res-status');
-            var resText = document.getElementById('res-text');
-            var resAvatar = document.getElementById('res-avatar');
-            resultMsg.style.display = 'flex';
-            var isReturn = data.action === 'return';
-            var themeColor = isReturn ? 'var(--success)' : 'var(--primary)';
-            resStatus.innerText = "{% trans 'Muvaffaqiyatli!' %}";
-            resStatus.style.color = themeColor;
-            resultMsg.style.borderLeftColor = themeColor;
-            resAvatar.style.background = themeColor;
-            resAvatar.innerHTML = isReturn ? '<i class="fas fa-undo text-white"></i>' : '<i class="fas fa-book-reader text-white"></i>';
-            var extra = data.student ? ('<br><span style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>') : '';
-            if (data.xp_earned) extra += '<br><span style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
-            resText.innerHTML = (data.message || '') + extra;
-            refreshState();
-        } else if (data.status === 'info') {
-            var resultMsg = document.getElementById('result-message');
-            resultMsg.style.display = 'flex';
-            document.getElementById('res-status').innerText = "{% trans 'Qo\'shimcha amal' %}";
-            document.getElementById('res-status').style.color = 'var(--primary)';
-            resultMsg.style.borderLeftColor = 'var(--primary)';
-            document.getElementById('res-avatar').style.background = 'var(--primary)';
-            document.getElementById('res-avatar').innerHTML = '<i class="fas fa-arrow-right text-white"></i>';
-            document.getElementById('res-text').innerText = data.message || '';
-            updatePendingState(data);
+            showResult('success', data.message, '<br><span class="text-xs" style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>');
             refreshState();
         } else {
-            var resultMsg = document.getElementById('result-message');
-            resultMsg.style.display = 'flex';
-            document.getElementById('res-status').innerText = "{% trans 'Xatolik!' %}";
-            document.getElementById('res-status').style.color = 'var(--danger)';
-            resultMsg.style.borderLeftColor = 'var(--danger)';
-            document.getElementById('res-avatar').style.background = 'var(--danger)';
-            document.getElementById('res-avatar').innerHTML = '<i class="fas fa-times text-white"></i>';
-            document.getElementById('res-text').innerText = data.message;
+            showResult(data.status === 'info' ? 'info' : 'error', data.message, '');
         }
     })
-    .catch(function() {});
+    .catch(function() { showResult('error', '{% trans "Xatolik" %}', ''); });
 }
 
-document.getElementById('manual-token').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') submitManualToken();
-});
-document.getElementById('student-search-input').addEventListener('input', function() {
+document.getElementById('manual-token').addEventListener('keypress', function(e) { if (e.key === 'Enter') submitManual(); });
+document.getElementById('student-search').addEventListener('input', function() {
     clearTimeout(searchTimer);
     var self = this;
-    searchTimer = setTimeout(function() { doStudentSearch(); }, 300);
+    searchTimer = setTimeout(function() { doSearch(); }, 300);
 });
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-        var m = document.getElementById('manual-modal');
-        if (m.classList.contains('active')) m.classList.remove('active');
-        var sm = document.getElementById('student-search-modal');
-        if (sm.classList.contains('active')) sm.classList.remove('active');
+        document.getElementById('manual-modal').classList.remove('active');
+        document.getElementById('student-modal').classList.remove('active');
     }
 });
 document.addEventListener('DOMContentLoaded', refreshState);
-</script>
-
-<script>
-var html5QrCode = null;
-
-function startScanner() {
-    var ph = document.getElementById('scanner-placeholder');
-    var rc = document.getElementById('reader-container');
-    var rm = document.getElementById('result-message');
-    var sb = document.getElementById('start-btn');
-
-    if (typeof Html5Qrcode === 'undefined') {
-        alert("{% trans 'QR kutubxonasi yuklanmadi' %}");
-        return;
-    }
-
-    ph.style.display = 'none';
-    rc.style.display = 'block';
-    rm.style.display = 'none';
-    sb.disabled = true;
-    sb.style.opacity = '0.5';
-
-    if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader");
-    }
-
-    Html5Qrcode.getCameras().then(function(cameras) {
-        if (!cameras || cameras.length === 0) {
-            throw new Error("No camera found");
-        }
-        var qrConfig = { fps: 20, qrbox: { width: 240, height: 240 } };
-        html5QrCode.start({ facingMode: "environment" }, qrConfig, onScanSuccess)
-            .catch(function(err) {
-                if (err.toString().indexOf("NotFoundError") !== -1) {
-                    return html5QrCode.start({ facingMode: "user" }, qrConfig, onScanSuccess);
-                }
-                throw err;
-            }).catch(function(err) {
-                throw err;
-            });
-    }).catch(function() {
-        ph.style.display = 'flex';
-        rc.style.display = 'none';
-        sb.disabled = false;
-        sb.style.opacity = '1';
-        showManualModal();
-    });
-}
-
-function onScanSuccess(decodedText, decodedResult) {
-    if (html5QrCode) {
-        html5QrCode.stop().then(function() {
-            document.getElementById('reader-container').style.display = 'none';
-            document.getElementById('scanner-placeholder').style.display = 'flex';
-            if (typeof processToken === 'function') processToken(decodedText);
-        }).catch(function() {});
-    }
-}
 </script>
 {% endblock %}
