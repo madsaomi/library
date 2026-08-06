@@ -59,7 +59,7 @@
             <div>
                 <div class="text-xs text-muted mb-md d-flex align-center gap-sm">
                     <span>{% trans "Maktab Adminlari" %}</span>
-                    <span class="badge-soft badge-soft-primary text-xs">{{ school_admins|length }}</span>
+                    <span class="badge-soft badge-soft-primary text-xs">{{ admin_count }}/{{ admin_max }}</span>
                 </div>
                 {% if school_admins %}
                 <div class="d-flex flex-column gap-sm">

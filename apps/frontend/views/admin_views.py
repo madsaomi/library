@@ -15,6 +15,10 @@ from schools.models import District, Institution, News, School
 
 from frontend.forms import NewsForm
 
+# School admin constraints
+ADMIN_MIN = 1  # минимум админов на школу
+ADMIN_MAX = 10  # максимум админов на школу
+
 
 def clean_name(name):
     return ''.join(c for c in name.lower() if c.isalnum() or c == '_').strip('_')
@@ -632,6 +636,8 @@ def school_detail(request, pk):
         .filter(book__school=school, is_returned=False)
         .count(),
         'school_admins': school_admins,
+        'admin_count': school_admins.count(),
+        'admin_max': ADMIN_MAX,
         'grades': grades,
         'grade_counts': grade_counts,
         'books': Book.objects.select_related('school', 'category').filter(school=school).order_by('-id')[:20],
@@ -1106,6 +1112,15 @@ def admin_add(request):
     if request.method == 'POST':
         form = SchoolAdminForm(request.POST)
         if form.is_valid():
+            # Check admin count limit
+            school = form.cleaned_data.get('school')
+            if school:
+                current_count = CustomUser.objects.filter(school=school, role='school_admin').count()
+                if current_count >= ADMIN_MAX:
+                    from django.contrib import messages as msgs
+                    msgs.error(request, _(f'Maktabda allaqachon {ADMIN_MAX} ta admin mavjud. Maksimum: {ADMIN_MAX}.'))
+                    return render(request, 'frontend/admin/admin_edit.html', {'form': form, 'title': _("Yangi maktab admini qo'shish"), 'is_add': True})
+
             admin = form.save(commit=False)
             admin.role = 'school_admin'
 
