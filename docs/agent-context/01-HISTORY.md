@@ -443,3 +443,14 @@ ews_list: added early guard for
 - No admin delete endpoint exists (admins can only be edited, not deleted)
 - Verified: 169 tests pass, ruff clean, school_detail renders 200
 - Commit: f139465 "feat: enforce 1-10 admins per school with validation"
+
+## Session: combined school detail+edit with tabs (2026-08-06)
+- **school_detail view** merged with school_edit functionality
+- **New template**: school_detail.html with two tabs:
+  - "Ma'lumotlar" tab: shows stats, students, books, action buttons
+  - "Tahrirlash" tab: shows edit form with district, school info, admin credentials
+- **POST handling**: action parameter distinguishes toggle_active vs save
+- **Password toggle**: eye icon to show/hide password in edit form
+- **Backward compat**: /admin/schools/1/edit/ still works (redirects to same view)
+- Verified: both URLs return 200, 169 tests pass, ruff clean
+- Commit: a50e32f "fix: ruff auto-fix import issues"

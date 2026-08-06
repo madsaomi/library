@@ -10,7 +10,7 @@ import string
 
 from accounts.models import CustomUser
 from books.models import Book, BookIssue
-from django.db.models import Prefetch, Q
+from django.db.models import Q
 from schools.models import District, Institution, News, School
 
 from frontend.forms import NewsForm
@@ -106,6 +106,7 @@ def schools_list(request):
     q = request.GET.get('q')
 
     from accounts.models import CustomUser
+    from django.db.models import Prefetch
 
     admins_qs = CustomUser.objects.filter(role='school_admin').only(
         'id', 'username', 'school_id', 'first_name', 'last_name', 'raw_password'
@@ -681,9 +682,8 @@ def school_detail(request, pk):
                 return redirect('frontend:school_detail', pk=school.pk)
             else:
                 # Re-render with errors
-                from django.db.models import Prefetch as _Prefetch
                 districts = District.objects.prefetch_related(
-                    _Prefetch('schools', queryset=School.active_objects.order_by('name'))
+                    Prefetch('schools', queryset=School.active_objects.order_by('name'))
                 ).order_by('name')
                 schools_with_admins = CustomUser.objects.filter(role='school_admin').values_list('school_id', flat=True)
                 return render(request, 'frontend/admin/school_detail.html', {
@@ -712,6 +712,7 @@ def school_detail(request, pk):
     form = UnifiedSchoolForm(instance=school, initial=initial, current_admin_id=school_admins.first().pk if school_admins.exists() else None)
 
     # Fetch Districts and Schools for the form
+    from django.db.models import Prefetch
     districts = District.objects.prefetch_related(
         Prefetch('schools', queryset=School.active_objects.order_by('name'))
     ).order_by('name')
@@ -937,6 +938,7 @@ def school_add(request):
     else:
         form = UnifiedSchoolForm()
     # Fetch Districts and Schools for the selection UI
+    from django.db.models import Prefetch
 
     districts = District.objects.prefetch_related(
         Prefetch('schools', queryset=School.active_objects.order_by('name'))
@@ -1014,6 +1016,7 @@ def school_edit(request, pk):
         form = UnifiedSchoolForm(instance=school, initial=initial, current_admin_id=admin.pk if admin else None)
 
     # Fetch Districts and Schools for consistent template behavior
+    from django.db.models import Prefetch
 
     districts = District.objects.prefetch_related(
         Prefetch('schools', queryset=School.active_objects.order_by('name'))
