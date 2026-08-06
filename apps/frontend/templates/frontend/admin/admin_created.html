@@ -9,64 +9,77 @@
 {% endblock %}
 
 {% block content %}
-<div class="mw-600 mx-auto">
+<div class="animate-fade mw-600 mx-auto">
 
-    <div class="glass-panel animate-fade p-3xl rounded-2xl">
-        <div class="d-flex align-center gap-md mb-xl">
-            <i class="fas fa-check-circle text-success text-3xl"></i>
+    <div class="glass-panel p-3xl rounded-2xl">
+        <!-- Success header -->
+        <div class="d-flex align-center gap-md mb-2xl">
+            <div class="icon-btn" style="width:48px;height:48px;border-radius:12px;background:var(--success);color:#fff;font-size:1.2rem;">
+                <i class="fas fa-check"></i>
+            </div>
             <div>
                 <h3 class="m-0 text-success text-xl text-semibold">{% trans "Maktab admini muvaffaqiyatli yaratildi!" %}</h3>
                 <p class="text-muted text-md m-0">{{ admin.first_name }} {{ admin.last_name }}</p>
             </div>
         </div>
 
-        <div class="glass-panel p-2xl">
-            <h4 class="text-success text-lg text-semibold mb-md">
-                <i class="fas fa-key"></i> {% trans "Kirish ma'lumotlari" %}
-            </h4>
-            <p class="text-muted text-sm mb-xl">
+        <!-- Credentials card -->
+        <div class="glass-card p-2xl rounded-lg mb-2xl" style="border: 1px solid var(--border);">
+            <div class="card-header mb-lg">
+                <h4 class="card-title">
+                    <i class="fas fa-key text-primary"></i> {% trans "Kirish ma'lumotlari" %}
+                </h4>
+                <span class="text-xs text-muted">{% trans "Faqat bir marta ko'rsatiladi" %}</span>
+            </div>
+            <p class="text-muted text-sm mb-xl m-0">
                 {% trans "Bu ma'lumotlarni maktab administratoriga bering. Parolni keyin o'zgartirish mumkin." %}
             </p>
 
-            <div style="display: grid; gap: 16px;">
-                <div class="form-group">
-                    <label class="d-block mb-sm text-medium text-muted text-md">
-                        <i class="fas fa-user mr-xs"></i> {% trans "Login" %}
+            <div class="d-flex flex-column gap-md">
+                <!-- Login -->
+                <div class="d-flex flex-column gap-xs">
+                    <label class="text-sm text-muted text-medium">
+                        <i class="fas fa-user text-primary mr-xs"></i> {% trans "Login" %}
                     </label>
-                    <div class="d-flex align-center gap-md">
-                        <code class="flex-1 p-md rounded form-control">
+                    <div class="d-flex align-center gap-sm">
+                        <code class="flex-1 p-md rounded form-control" style="background:var(--input-bg);font-family:monospace;font-size:0.9rem;">
                             {{ admin.username }}
                         </code>
-                        <button type="button" class="btn-outline text-md" onclick="copyToClipboard('{{ admin.username }}')">
+                        <button type="button" class="icon-btn" onclick="copyToClipboard('{{ admin.username }}', this)" aria-label="Nusxalash">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="d-block mb-sm text-medium text-muted text-md">
-                        <i class="fas fa-key mr-xs"></i> {% trans "Parol" %}
+                <!-- Password -->
+                <div class="d-flex flex-column gap-xs">
+                    <label class="text-sm text-muted text-medium">
+                        <i class="fas fa-lock text-primary mr-xs"></i> {% trans "Parol" %}
                     </label>
-                    <div class="d-flex align-center gap-md">
-                        <code class="flex-1 p-md rounded password-field form-control" id="password-display">••••••••••••</code>
-                        <button type="button" class="btn-outline text-md" onclick="copyToClipboard('{{ password }}')">
+                    <div class="password-wrapper d-flex align-center gap-sm">
+                        <code class="flex-1 p-md rounded form-control" style="background:var(--input-bg);font-family:monospace;font-size:0.9rem;" id="password-display">••••••••••••</code>
+                        <button type="button" class="icon-btn" onclick="togglePasswordDisplay()" aria-label="Parolni ko'rsatish">
+                            <i class="fas fa-eye" id="password-eye"></i>
+                        </button>
+                        <button type="button" class="icon-btn" onclick="copyToClipboard('{{ password }}', this)" aria-label="Nusxalash">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-xl p-md rounded glass-panel">
-                <i class="fas fa-exclamation-triangle text-warning mr-xs"></i>
-                <span class="text-warning text-sm">{% trans "Diqqat: Parol ekranda yashirilgan. Uni maktab adminiga yetkazish uchun quyidagi tugma orqali yuklab oling!" %}</span>
+            <div class="d-flex align-center gap-sm mt-xl p-md rounded-lg" style="background:rgba(var(--warning-rgb, 245, 158, 11), 0.08);border:1px solid rgba(var(--warning-rgb, 245, 158, 11), 0.2);">
+                <i class="fas fa-exclamation-triangle text-warning"></i>
+                <span class="text-warning text-sm">{% trans "Diqqat: Parol ekranda yashirilgan. Uni maktab adminiga yetkazish uchun pastdagi tugma orqali yuklab oling!" %}</span>
             </div>
         </div>
 
-        <div class="mt-2xl d-flex gap-lg flex-wrap">
-            <a href="{% url 'frontend:all_users_list' %}" class="btn-primary flex-1 d-flex align-center justify-center gap-md text-bold text-lg p-lg">
+        <!-- Actions -->
+        <div class="d-flex gap-md flex-wrap">
+            <a href="{% url 'frontend:all_users_list' %}" class="btn-primary flex-1 d-flex align-center justify-center gap-sm text-semibold text-md py-md">
                 <i class="fas fa-list"></i> {% trans "Foydalanuvchilar ro'yxati" %}
             </a>
-            <a href="{% url 'frontend:download_credentials' %}?user_id={{ admin.id }}&label={% trans 'Admin'|urlencode %}" class="btn-outline flex-1 d-flex align-center justify-center gap-md text-semibold text-main text-decoration-none p-lg">
+            <a href="{% url 'frontend:download_credentials' %}?user_id={{ admin.id }}&label={% trans 'Admin'|urlencode %}" class="btn-outline flex-1 d-flex align-center justify-center gap-sm text-semibold text-md py-md text-decoration-none">
                 <i class="fas fa-file-download"></i> {% trans "Parolni yuklab olish" %}
             </a>
         </div>
@@ -75,19 +88,31 @@
 </div>
 
 <script>
-function copyToClipboard(text) {
+var _currentPassword = '{{ password }}';
+var _passwordVisible = false;
+
+function copyToClipboard(text, btn) {
     navigator.clipboard.writeText(text).then(function() {
-        const btn = event.target.closest('button');
-        const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i>';
-        btn.classList.add('btn-primary');
-        btn.classList.remove('btn-outline');
-        setTimeout(function() {
-            btn.innerHTML = originalHTML;
-            btn.classList.remove('btn-primary');
-            btn.classList.add('btn-outline');
-        }, 2000);
+        var icon = btn.querySelector('i');
+        var orig = icon.className;
+        icon.className = 'fas fa-check text-success';
+        setTimeout(function() { icon.className = orig; }, 1500);
     });
+}
+
+function togglePasswordDisplay() {
+    var display = document.getElementById('password-display');
+    var icon = document.getElementById('password-eye');
+    _passwordVisible = !_passwordVisible;
+    if (_passwordVisible) {
+        display.textContent = _currentPassword;
+        icon.className = 'fas fa-eye-slash';
+        document.getElementById('password-eye').setAttribute('aria-label', 'Parolni yashirish');
+    } else {
+        display.textContent = '••••••••••••';
+        icon.className = 'fas fa-eye';
+        document.getElementById('password-eye').setAttribute('aria-label', 'Parolni ko\'rsatish');
+    }
 }
 </script>
 {% endblock %}

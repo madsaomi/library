@@ -11,88 +11,150 @@
 {% block content %}
 <div class="animate-fade mw-500 mx-auto">
     <div class="glass-panel p-3xl">
+
+        <div class="card-header mb-2xl">
+            <h3 class="card-title">
+                {% if is_add %}
+                <i class="fas fa-user-shield text-primary"></i> {% trans "Yangi admin qo'shish" %}
+                {% else %}
+                <i class="fas fa-user-edit text-primary"></i> {% trans "Admin tahrirlash" %}
+                {% endif %}
+            </h3>
+        </div>
+
         <form method="post" autocomplete="off">
             {% csrf_token %}
 
-            <div class="d-flex flex-column gap-xs mb-xl">
-                <label class="text-sm text-muted text-medium">{% trans "Ism" %}</label>
-                {{ form.first_name }}
-                {% if is_add %}
-                <div class="d-flex justify-end">
-                    <span id="name-counter" class="text-xs text-muted">0 / 50</span>
-                </div>
-                {% endif %}
-                {% if form.first_name.errors %}<span class="text-danger text-sm">{{ form.first_name.errors.0 }}</span>{% endif %}
-            </div>
+            <!-- Personal info section -->
+            <div class="mb-2xl">
+                <h4 class="text-sm text-muted text-medium mb-lg">
+                    <i class="fas fa-user mr-xs"></i> {% trans "Shaxsiy ma'lumotlar" %}
+                </h4>
 
-            <div class="d-flex flex-column gap-xs mb-xl">
-                <label class="text-sm text-muted text-medium">{% trans "Familiya" %}</label>
-                {{ form.last_name }}
-                {% if is_add %}
-                <div class="d-flex justify-end">
-                    <span id="surname-counter" class="text-xs text-muted">0 / 50</span>
-                </div>
-                {% endif %}
-                {% if form.last_name.errors %}<span class="text-danger text-sm">{{ form.last_name.errors.0 }}</span>{% endif %}
-            </div>
+                <div class="d-flex flex-column gap-md">
+                    <div class="d-flex flex-column gap-xs">
+                        <label class="text-sm text-muted text-medium" for="{{ form.first_name.id_for_label }}">
+                            <i class="fas fa-user text-primary mr-xs"></i> {% trans "Ism" %}
+                        </label>
+                        {{ form.first_name }}
+                        {% if is_add %}
+                        <div class="text-right">
+                            <span id="name-counter" class="text-xs text-muted">0 / 50</span>
+                        </div>
+                        {% endif %}
+                        {% if form.first_name.errors %}<span class="text-danger text-sm">{{ form.first_name.errors.0 }}</span>{% endif %}
+                    </div>
 
-            <div class="d-flex flex-column gap-xs mb-xl">
-                <label class="text-sm text-muted text-medium">{% trans "Maktab" %}</label>
-                {{ form.school }}
-                {% if form.school.errors %}<span class="text-danger text-sm">{{ form.school.errors.0 }}</span>{% endif %}
+                    <div class="d-flex flex-column gap-xs">
+                        <label class="text-sm text-muted text-medium" for="{{ form.last_name.id_for_label }}">
+                            <i class="fas fa-user text-primary mr-xs"></i> {% trans "Familiya" %}
+                        </label>
+                        {{ form.last_name }}
+                        {% if is_add %}
+                        <div class="text-right">
+                            <span id="surname-counter" class="text-xs text-muted">0 / 50</span>
+                        </div>
+                        {% endif %}
+                        {% if form.last_name.errors %}<span class="text-danger text-sm">{{ form.last_name.errors.0 }}</span>{% endif %}
+                    </div>
+
+                    <div class="d-flex flex-column gap-xs">
+                        <label class="text-sm text-muted text-medium" for="{{ form.school.id_for_label }}">
+                            <i class="fas fa-school text-primary mr-xs"></i> {% trans "Maktab" %}
+                        </label>
+                        {{ form.school }}
+                        {% if form.school.errors %}<span class="text-danger text-sm">{{ form.school.errors.0 }}</span>{% endif %}
+                    </div>
+                </div>
             </div>
 
             {% if is_add %}
-            <div class="bg-glass p-xl rounded-lg border border-primary mb-xl">
-                <div class="d-flex align-center gap-sm mb-lg">
-                    <i class="fas fa-user-shield text-lg text-warning"></i>
-                    <span class="text-md text-semibold text-warning">{% trans "Hisob ma'lumotlari" %}</span>
+            <!-- Credentials section -->
+            <div class="glass-card p-xl rounded-lg mb-2xl" style="border: 1px solid var(--warning); background: rgba(var(--warning-rgb, 245, 158, 11), 0.05);">
+                <div class="card-header mb-lg">
+                    <h4 class="card-title">
+                        <i class="fas fa-key text-warning"></i> {% trans "Hisob ma'lumotlari" %}
+                    </h4>
+                    <span class="text-xs text-muted">{% trans "Ixtiyoriy" %}</span>
                 </div>
-                <p class="text-muted text-sm mb-lg">
+                <p class="text-muted text-sm mb-lg m-0">
                     {% trans "Bo'sh qoldirilsa, avtomatik yaratiladi" %}
                 </p>
 
-                <div class="d-flex flex-column gap-xs mb-lg">
-                    <label class="text-sm text-muted text-medium">{{ form.admin_username.label }}</label>
-                    {{ form.admin_username }}
-                    {% if form.admin_username.errors %}<span class="text-danger text-sm">{{ form.admin_username.errors.0 }}</span>{% endif %}
-                </div>
+                <div class="d-flex flex-column gap-md">
+                    <div class="d-flex flex-column gap-xs">
+                        <label class="text-sm text-muted text-medium" for="{{ form.admin_username.id_for_label }}">
+                            <i class="fas fa-at text-info mr-xs"></i> {{ form.admin_username.label }}
+                        </label>
+                        {{ form.admin_username }}
+                        {% if form.admin_username.errors %}<span class="text-danger text-sm">{{ form.admin_username.errors.0 }}</span>{% endif %}
+                    </div>
 
-                <div class="d-flex flex-column gap-xs mb-md">
-                    <label class="text-sm text-muted text-medium">{{ form.admin_password.label }}</label>
-                    {{ form.admin_password }}
-                    {% if form.admin_password.errors %}<span class="text-danger text-sm">{{ form.admin_password.errors.0 }}</span>{% endif %}
-                </div>
+                    <div class="d-flex flex-column gap-xs">
+                        <label class="text-sm text-muted text-medium" for="{{ form.admin_password.id_for_label }}">
+                            <i class="fas fa-lock text-info mr-xs"></i> {{ form.admin_password.label }}
+                        </label>
+                        <div class="password-wrapper d-flex align-center gap-sm">
+                            {{ form.admin_password }}
+                            <button type="button" class="icon-btn" onclick="togglePassword(this, '{{ form.admin_password.id_for_label }}')" aria-label="Parolni ko'rsatish">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        {% if form.admin_password.errors %}<span class="text-danger text-sm">{{ form.admin_password.errors.0 }}</span>{% endif %}
+                    </div>
 
-                <div class="d-flex flex-column gap-xs">
-                    <label class="text-sm text-muted text-medium">{{ form.admin_password_confirm.label }}</label>
-                    {{ form.admin_password_confirm }}
-                    {% if form.admin_password_confirm.errors %}<span class="text-danger text-sm">{{ form.admin_password_confirm.errors.0 }}</span>{% endif %}
+                    <div class="d-flex flex-column gap-xs">
+                        <label class="text-sm text-muted text-medium" for="{{ form.admin_password_confirm.id_for_label }}">
+                            <i class="fas fa-lock text-info mr-xs"></i> {{ form.admin_password_confirm.label }}
+                        </label>
+                        <div class="password-wrapper d-flex align-center gap-sm">
+                            {{ form.admin_password_confirm }}
+                            <button type="button" class="icon-btn" onclick="togglePassword(this, '{{ form.admin_password.id_for_label }}')" aria-label="Parolni ko'rsatish">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        {% if form.admin_password_confirm.errors %}<span class="text-danger text-sm">{{ form.admin_password_confirm.errors.0 }}</span>{% endif %}
+                    </div>
                 </div>
             </div>
             {% else %}
-            <div class="d-flex flex-column gap-xs mb-xl">
-                <label class="text-sm text-muted text-medium">{% trans "Login" %}</label>
-                <div class="text-md text-muted p-md form-control" style="opacity: 0.6;">
-                    {{ form.instance.username }}
+            <!-- Edit mode -->
+            <div class="mb-2xl">
+                <h4 class="text-sm text-muted text-medium mb-lg">
+                    <i class="fas fa-id-badge mr-xs"></i> {% trans "Kirish ma'lumotlari" %}
+                </h4>
+
+                <div class="d-flex flex-column gap-md">
+                    <div class="d-flex flex-column gap-xs">
+                        <label class="text-sm text-muted text-medium">{% trans "Login" %}</label>
+                        <div class="text-md text-muted p-md form-control" style="background: var(--input-bg);">
+                            <i class="fas fa-at text-muted mr-xs"></i> {{ form.instance.username }}
+                        </div>
+                    </div>
+
+                    <hr class="border-bottom my-lg">
+
+                    <div class="d-flex flex-column gap-xs">
+                        <label class="text-sm text-muted text-medium">{% trans "Yangi parol" %}</label>
+                        <div class="password-wrapper d-flex align-center gap-sm">
+                            {{ form.password }}
+                            <button type="button" class="icon-btn" onclick="togglePassword(this, '{{ form.password.id_for_label }}')" aria-label="Parolni ko'rsatish">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        {% if form.password.help_text %}<span class="text-muted text-xs">{{ form.password.help_text }}</span>{% endif %}
+                        {% if form.password.errors %}<span class="text-danger text-sm">{{ form.password.errors.0 }}</span>{% endif %}
+                    </div>
                 </div>
-            </div>
-
-            <hr class="border-bottom mb-xl">
-
-            <div class="d-flex flex-column gap-xs mb-xl">
-                <label class="text-sm text-muted text-medium">{% trans "Yangi parol" %}</label>
-                {{ form.password }}
-                {% if form.password.help_text %}<span class="text-muted text-xs">{{ form.password.help_text }}</span>{% endif %}
-                {% if form.password.errors %}<span class="text-danger text-sm">{{ form.password.errors.0 }}</span>{% endif %}
             </div>
             {% endif %}
 
+            <!-- Actions -->
             <div class="d-flex gap-md flex-wrap">
-                <button type="submit" class="btn-primary flex-1 text-md">
+                <button type="submit" class="btn-primary flex-1 text-md py-md">
                     <i class="fas fa-check"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend:all_users_list' %}" class="btn-outline flex-1 d-flex align-center justify-center gap-xs text-decoration-none text-md">
+                <a href="{% url 'frontend:all_users_list' %}" class="btn-outline flex-1 d-flex align-center justify-center gap-xs text-decoration-none text-md py-md">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>
@@ -110,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function update() {
             var len = input.value.length;
             counter.textContent = len + ' / ' + max;
-            counter.style.color = len > max ? '#ef4444' : 'var(--text-muted)';
+            counter.className = 'text-xs ' + (len > max ? 'text-danger' : 'text-muted');
         }
         input.addEventListener('input', update);
         update();
@@ -118,6 +180,20 @@ document.addEventListener('DOMContentLoaded', function() {
     initCounter('first_name', 'name-counter', 50);
     initCounter('last_name', 'surname-counter', 50);
 });
+
+function togglePassword(btn, inputId) {
+    var input = document.getElementById(inputId);
+    var icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+        btn.setAttribute('aria-label', 'Parolni yashirish');
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+        btn.setAttribute('aria-label', 'Parolni ko\'rsatish');
+    }
+}
 </script>
 {% endif %}
 {% endblock %}
