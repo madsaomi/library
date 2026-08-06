@@ -10,7 +10,7 @@ import string
 
 from accounts.models import CustomUser
 from books.models import Book, BookIssue
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from schools.models import District, Institution, News, School
 
 from frontend.forms import NewsForm
