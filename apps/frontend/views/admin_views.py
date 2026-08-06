@@ -682,8 +682,9 @@ def school_detail(request, pk):
                 return redirect('frontend:school_detail', pk=school.pk)
             else:
                 # Re-render with errors
+                from django.db.models import Prefetch as _Prefetch
                 districts = District.objects.prefetch_related(
-                    Prefetch('schools', queryset=School.active_objects.order_by('name'))
+                    _Prefetch('schools', queryset=School.active_objects.order_by('name'))
                 ).order_by('name')
                 schools_with_admins = CustomUser.objects.filter(role='school_admin').values_list('school_id', flat=True)
                 return render(request, 'frontend/admin/school_detail.html', {
