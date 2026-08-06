@@ -38,6 +38,9 @@ class School(models.Model):
     is_deleted = models.BooleanField(_("O'chirilgan"), default=False)
     history = HistoricalRecords()
 
+    objects = models.Manager()
+    active_objects = SoftDeleteManager()
+
     def delete(self, using=None, keep_parents=False):
         self.is_deleted = True
         self.save()

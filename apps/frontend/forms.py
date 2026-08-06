@@ -415,6 +415,12 @@ class SchoolAdminForm(forms.ModelForm):
 
 class UnifiedSchoolForm(forms.ModelForm):
     existing_school_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    district = forms.ModelChoiceField(
+        queryset=District.objects.filter(is_deleted=False).order_by('name'),
+        label=_('Tuman (raion)'),
+        empty_label=_('-- Tumanni tanlang --'),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
     admin_username = forms.CharField(
         label=_('Admin login (username)'),
         required=False,

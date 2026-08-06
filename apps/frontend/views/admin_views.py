@@ -31,7 +31,7 @@ def dashboard(request):
 
     from frontend.utils import month_bounds
 
-    active_schools_query = School.objects.annotate(
+    active_schools_query = School.active_objects.annotate(
         has_admin=Exists(CustomUser.objects.filter(school=OuterRef('pk'), role='school_admin'))
     ).filter(has_admin=True)
 
@@ -108,7 +108,7 @@ def schools_list(request):
         'id', 'username', 'school_id', 'first_name', 'last_name', 'raw_password'
     )
     schools = (
-        School.objects.annotate(
+        School.active_objects.annotate(
             has_admin=Exists(CustomUser.objects.filter(school=OuterRef('pk'), role='school_admin')),
             student_count=Count('customuser', filter=Q(customuser__role='student')),
             book_count=Count('book', distinct=True),
@@ -261,7 +261,7 @@ def statistics(request):
     total_books = Book.objects.count()
     total_students = CustomUser.objects.filter(role='student').count()
     total_teachers = CustomUser.objects.filter(role='teacher').count()
-    total_schools = School.objects.count()
+    total_schools = School.active_objects.count()
     issued_today = BookIssue.objects.select_related('book', 'user').filter(issued_at__date=today).count()
     returned_today = BookIssue.objects.select_related('book', 'user').filter(returned_at__date=today).count()
     active_loans = BookIssue.objects.select_related('book', 'user').filter(is_returned=False).count()
@@ -277,7 +277,7 @@ def statistics(request):
 
     # Top schools by active readers (within period)
     top_schools = (
-        School.objects.annotate(
+        School.active_objects.annotate(
             active_count=Count(
                 'customuser__bookissue',
                 filter=Q(customuser__bookissue__issued_at__date__gte=period_start, customuser__role='student'),
@@ -329,7 +329,7 @@ def statistics_json(request):
     data = {
         'total_books': Book.objects.count(),
         'total_students': CustomUser.objects.filter(role='student').count(),
-        'total_schools': School.objects.count(),
+        'total_schools': School.active_objects.count(),
         'issued_today': BookIssue.objects.select_related('book', 'user').filter(issued_at__date=today).count(),
         'returned_today': BookIssue.objects.select_related('book', 'user').filter(returned_at__date=today).count(),
         'active_loans': BookIssue.objects.select_related('book', 'user').filter(is_returned=False).count(),
@@ -356,7 +356,7 @@ def create_stats_news(request):
     period_start = today - timedelta(days=period_days)
 
     top_schools = (
-        School.objects.annotate(
+        School.active_objects.annotate(
             active_count=Count(
                 'customuser__bookissue',
                 filter=Q(customuser__bookissue__issued_at__date__gte=period_start, customuser__role='student'),
@@ -594,7 +594,7 @@ def all_active_loans_list(request):
 @login_required(login_url='login')
 @superuser_required
 def school_detail(request, pk):
-    school = get_object_or_404(School, pk=pk)
+    school = get_object_or_404(School, pk=pk, is_deleted=False)
     import re
     from collections import OrderedDict
 
@@ -841,7 +841,7 @@ def school_add(request):
     from django.db.models import Prefetch
 
     districts = District.objects.prefetch_related(
-        Prefetch('schools', queryset=School.objects.all().order_by('name'))
+        Prefetch('schools', queryset=School.active_objects.order_by('name'))
     ).order_by('name')
 
     # Pass which schools already have admins
@@ -862,7 +862,7 @@ def school_add(request):
 @login_required(login_url='login')
 @superuser_required
 def school_edit(request, pk):
-    school = get_object_or_404(School, pk=pk)
+    school = get_object_or_404(School, pk=pk, is_deleted=False)
     admin = CustomUser.objects.filter(school=school, role='school_admin').first()
 
     if request.method == 'POST':
@@ -919,7 +919,7 @@ def school_edit(request, pk):
     from django.db.models import Prefetch
 
     districts = District.objects.prefetch_related(
-        Prefetch('schools', queryset=School.objects.all().order_by('name'))
+        Prefetch('schools', queryset=School.active_objects.order_by('name'))
     ).order_by('name')
     schools_with_admins = CustomUser.objects.filter(role='school_admin').values_list('school_id', flat=True)
 
@@ -938,7 +938,7 @@ def school_edit(request, pk):
 @login_required(login_url='login')
 @superuser_required
 def school_delete(request, pk):
-    school = get_object_or_404(School, pk=pk)
+    school = get_object_or_404(School, pk=pk, is_deleted=False)
     if request.method == 'POST':
         school.delete()
         return redirect('frontend:schools_list')
@@ -949,7 +949,7 @@ def school_delete(request, pk):
 @superuser_required
 def school_toggle_active(request, pk):
     """Block/unblock a school. Blocked school admins cannot log in."""
-    school = get_object_or_404(School, pk=pk)
+    school = get_object_or_404(School, pk=pk, is_deleted=False)
     if request.method == 'POST':
         school.is_active = not school.is_active
         school.save(update_fields=['is_active'])
@@ -980,7 +980,7 @@ def school_reset_admin_password(request, pk):
     import secrets
     import string
 
-    school = get_object_or_404(School, pk=pk)
+    school = get_object_or_404(School, pk=pk, is_deleted=False)
     admin = CustomUser.objects.filter(school=school, role='school_admin').first()
     if not admin:
         from django.contrib import messages
@@ -1010,7 +1010,7 @@ def school_duplicate(request, pk):
     import secrets
     import string
 
-    school = get_object_or_404(School, pk=pk)
+    school = get_object_or_404(School, pk=pk, is_deleted=False)
 
     if request.method == 'POST':
         new_name = request.POST.get('name', '').strip()
@@ -1073,7 +1073,7 @@ def schools_export_csv(request):
     writer = csv.writer(output)
     writer.writerow(['ID', 'Nomi', 'Tuman', 'Manzil', 'Kontakt', 'Admin', "O'quvchilar", 'Kitoblar', 'Holat'])
 
-    for school in School.objects.select_related('district').annotate(
+    for school in School.active_objects.select_related('district').annotate(
         student_count=Count('customuser', filter=Q(customuser__role='student')),
         book_count=Count('book', distinct=True),
     ):
@@ -1280,7 +1280,7 @@ def admin_global_search(request):
     results = []
 
     if len(q) >= 2:
-        for s in School.objects.filter(name__icontains=q)[:5]:
+        for s in School.active_objects.filter(name__icontains=q)[:5]:
             results.append(
                 {
                     'title': s.name,
