@@ -473,6 +473,16 @@ ews_list: added early guard for
 - Verified: 169 tests pass, ruff clean, pages render 200
 - Commits: `ce037bc` (student QR redesign), `2279b33` (scanner filter links fix)
 
+## Session: fix student QR rendering + add QR to profile (2026-08-07)
+- **Root cause**: `student_qr.html` used JS `qrcodejs` CDN to render QR on `<canvas>`, but the library wasn't loading reliably
+- **Fix**: switched to server-side QR image via `generate_qr_code()` — same approach as `cart_qr.html`/`cart_return_qr.html`
+- **View `student_qr`**: now generates PNG via `accounts.utils.generate_qr_code('STU_{id}.png')` and passes `qr_url` to template
+- **Template**: replaced `<canvas id="qr-canvas">` + JS with `<img src="{{ qr_url }}">`
+- **Profile page**: added "QR kartochkamni ko'rish" button for students (links to `/library/my-qr/`)
+- **Duplicate scripts fix**: removing the JS CDN approach also eliminated the duplicate script rendering issue
+- Verified: 169 tests pass, ruff clean, `/library/my-qr/` shows QR image, `/profile/` shows QR link
+- Commits: `4de628b` (server-side QR), `9fc245d` (profile QR link)
+
 ## Session: redesign QR scanner page (2026-08-07)
 - **Redesigned `qr_unified.html`** to match `qr_labels_batch.html` simplicity:
   - Removed grid-3 stat tiles from top, moved to bottom card with card-header
