@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Mening QR kodim" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "Mening QR kodim" %}{% endblock %}
+
+{% block sidebar_nav %}
+{% include 'frontend/user/sidebar_items.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="animate-fade mw-500 mx-auto">
+    <div class="glass-panel p-3xl text-center">
+        <div class="card-header justify-center mb-2xl">
+            <h3 class="card-title justify-center">
+                <i class="fas fa-qrcode text-primary"></i> {% trans "Mening yagona QR kodim" %}
+            </h3>
+        </div>
+
+        <p class="text-muted text-sm mb-2xl">
+            {% trans "Ushbu QR kodni kutubxonachiga ko'rsating. U orqali kitob olish va qaytarish mumkin." %}
+        </p>
+
+        <div class="d-flex justify-center mb-xl">
+            <div style="width: 220px; height: 220px; background: white; padding: 16px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+                <canvas id="qr-canvas"></canvas>
+            </div>
+        </div>
+
+        <div class="glass-card p-xl rounded-lg mb-xl" style="border: 1px solid var(--border);">
+            <div class="text-muted text-xs mb-xs">{% trans "Kod turi" %}</div>
+            <code class="text-primary text-md">{{ token }}</code>
+        </div>
+
+        <div class="d-flex flex-column gap-md">
+            <a href="{% url 'frontend:my_books' %}" class="btn-primary py-md text-decoration-none">
+                <i class="fas fa-book mr-xs"></i> {% trans "Mening kitoblarim" %}
+            </a>
+            <a href="{% url 'frontend:profile' %}" class="btn-outline py-md text-decoration-none">
+                <i class="fas fa-user mr-xs"></i> {% trans "Profil" %}
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-2xl glass-panel p-xl">
+        <h4 class="text-md text-semibold mb-lg">
+            <i class="fas fa-info-circle text-info mr-xs"></i> {% trans "Qanday ishlatiladi?" %}
+        </h4>
+        <div class="d-flex flex-column gap-md">
+            <div class="list-row">
+                <div class="list-row-avatar"><i class="fas fa-qrcode text-primary"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{% trans "Kitob olish" %}</div>
+                    <div class="list-row-sub">{% trans "Kutubxonachi QR skanerlaydi va kitob tanlaydi" %}</div>
+                </div>
+            </div>
+            <div class="list-row">
+                <div class="list-row-avatar"><i class="fas fa-undo text-success"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{% trans "Kitob qaytarish" %}</div>
+                    <div class="list-row-sub">{% trans "Kitobni ko'rsating, kutubxonachi QR skanerlaydi" %}</div>
+                </div>
+            </div>
+            <div class="list-row">
+                <div class="list-row-avatar"><i class="fas fa-shopping-cart text-warning"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{% trans "Korporativ to'lov" %}</div>
+                    <div class="list-row-sub">{% trans "Savatdagi barcha kitoblarni bir vaqtda olish" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var canvas = document.getElementById('qr-canvas');
+    new QRCode(canvas, {
+        text: "{{ token }}",
+        width: 188,
+        height: 188,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

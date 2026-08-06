@@ -20,53 +20,52 @@
         <button type="button" class="tab-btn" data-tab="history">
             {% trans "Tarix" %} <span class="text-xs text-muted ml-xs">{{ history|length }}</span>
         </button>
+        <a href="{% url 'frontend:student_qr' %}" class="tab-btn ml-auto" target="_blank">
+            <i class="fas fa-qrcode mr-xs"></i> {% trans "QR kod" %}
+        </a>
     </div>
 
     <div id="tab-reading" class="tab-content">
         {% for issue in issues %}
-        <a href="{% url 'frontend:issue_qr' issue.pk %}" class="text-decoration-none d-block mb-md">
-            <div class="list-row">
-                <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
-                    {% if issue.book.cover %}
-                    <img src="{{ issue.book.cover.url }}" alt="" class="w-full h-full object-cover">
-                    {% else %}
-                    <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
-                    {% endif %}
-                </div>
-                <div class="list-row-main">
-                    <div class="list-row-title text-truncate">{{ issue.book.title }}</div>
-                    <div class="list-row-sub">{{ issue.issued_at|date:"d.m.Y" }}</div>
-                </div>
-                <i class="fas fa-qrcode text-muted"></i>
+        <div class="list-row mb-md">
+            <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
+                {% if issue.book.cover %}
+                <img src="{{ issue.book.cover.url }}" alt="" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
+                {% endif %}
             </div>
-        </a>
+            <div class="list-row-main">
+                <div class="list-row-title text-truncate">{{ issue.book.title }}</div>
+                <div class="list-row-sub">{{ issue.issued_at|date:"d.m.Y" }}</div>
+            </div>
+            <span class="badge-soft badge-soft-primary text-nowrap">{% trans "O'qiyapti" %}</span>
+        </div>
         {% empty %}
         <div class="empty-state">
             <div class="empty-icon"><i class="fas fa-book-open"></i></div>
             <h4>{% trans "Hozir kitob o'qimayapti" %}</h4>
-            <p>{% trans "Kutubxonadan kitob olib o'qing" %}</p>
+            <p>{% trans "Kutubxonadan kitob olib o'qing yoki QR kod ko'rsating" %}</p>
         </div>
         {% endfor %}
     </div>
 
     <div id="tab-reserved" class="tab-content d-none">
         {% for req in requests %}
-        <a href="{% url 'frontend:request_qr' req.pk %}" class="text-decoration-none d-block mb-md">
-            <div class="list-row">
-                <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
-                    {% if req.book.cover %}
-                    <img src="{{ req.book.cover.url }}" alt="" class="w-full h-full object-cover">
-                    {% else %}
-                    <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
-                    {% endif %}
-                </div>
-                <div class="list-row-main">
-                    <div class="list-row-title text-truncate">{{ req.book.title }}</div>
-                    <div class="list-row-sub">{{ req.requested_at|date:"d.m.Y" }}</div>
-                </div>
-                <span class="badge-soft badge-soft-muted">{{ req.get_status_display }}</span>
+        <div class="list-row mb-md">
+            <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
+                {% if req.book.cover %}
+                <img src="{{ req.book.cover.url }}" alt="" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
+                {% endif %}
             </div>
-        </a>
+            <div class="list-row-main">
+                <div class="list-row-title text-truncate">{{ req.book.title }}</div>
+                <div class="list-row-sub">{{ req.requested_at|date:"d.m.Y" }}</div>
+            </div>
+            <span class="badge-soft badge-soft-warning text-nowrap">{{ req.get_status_display }}</span>
+        </div>
         {% empty %}
         <div class="empty-state">
             <div class="empty-icon"><i class="fas fa-clock"></i></div>

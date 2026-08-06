@@ -141,4 +141,5 @@ urlpatterns = [
     path('library/cart/return/remove/<int:item_pk>/', user_views.cart_return_remove, name='cart_return_remove'),
     path('library/cart/return/clear/', user_views.cart_return_clear, name='cart_return_clear'),
     path('library/cart/return/qr/', user_views.cart_return_qr, name='cart_return_qr'),
+    path('library/my-qr/', user_views.student_qr, name='student_qr'),
 ]
