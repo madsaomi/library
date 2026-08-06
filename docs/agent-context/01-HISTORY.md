@@ -454,3 +454,11 @@ ews_list: added early guard for
 - **Backward compat**: /admin/schools/1/edit/ still works (redirects to same view)
 - Verified: both URLs return 200, 169 tests pass, ruff clean
 - Commit: a50e32f "fix: ruff auto-fix import issues"
+
+## Session: revert combined school pages (2026-08-06)
+- User feedback: combined detail+edit was confusing
+- Reverted to separate /admin/schools/1/ (detail) and /admin/schools/1/edit/ (edit form)
+- Fixed indentation error in system_logs function
+- Added missing Prefetch import at module level
+- Verified: both URLs return 200, 169 tests pass
+- Commit: 4232fbd "fix: add missing Prefetch import"
