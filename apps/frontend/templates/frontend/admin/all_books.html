@@ -10,63 +10,60 @@
 
 {% block content %}
 <div class="glass-panel animate-fade p-3xl">
-    <div class="flex-between mb-2xl gap-xl flex-wrap">
-        <h3><i class="fas fa-book text-primary" style="margin-right: 10px;"></i> {% trans "Tizimdagi barcha kitoblar" %}</h3>
-
+    <div class="action-bar mb-2xl">
+        <h3 class="card-title"><i class="fas fa-book text-info"></i> {% trans "Tizimdagi barcha kitoblar" %}</h3>
+        <span class="flex-1"></span>
         <div class="pos-relative flex-1 mw-400">
-<input type="text" id="search-input" aria-label="{% trans 'Kitob nomi, maktab yoki kategoriya bo\'yicha qidirish...' %}" placeholder="{% trans 'Kitob nomi, maktab yoki kategoriya bo\'yicha qidirish...' %}"
-                    class="w-full" style="padding: 12px 20px 12px 45px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; color: var(--input-text); outline: none; transition: 0.3s;">
+            <input type="text" id="search-input" aria-label="{% trans 'Kitob nomi, maktab yoki kategoriya bo\'yicha qidirish...' %}" placeholder="{% trans 'Kitob nomi, maktab yoki kategoriya bo\'yicha qidirish...' %}"
+                        class="form-control w-full" style="padding: 12px 20px 12px 45px; border-radius: 12px;">
             <i class="fas fa-search pos-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
         </div>
     </div>
 
-    <div class="table-container overflow-x-auto">
-        <table class="w-full" style="border-collapse: collapse; text-align: left;">
+    <div class="table-responsive-wrap">
+        <table class="data-table">
             <thead>
-                <tr class="border-bottom">
-                    <th class="text-muted text-medium p-lg">{% trans "Muqova" %}</th>
-                    <th class="text-muted text-medium p-lg">{% trans "Kitob nomi" %}</th>
-                    <th class="text-muted text-medium p-lg">{% trans "Maktab" %}</th>
-                    <th class="text-muted text-medium p-lg">{% trans "Kategoriya" %}</th>
-                    <th class="text-muted text-medium p-lg">{% trans "Jami" %}</th>
-                    <th class="text-muted text-medium p-lg">{% trans "Mavjud" %}</th>
-                    <th class="text-muted text-medium p-lg">{% trans "O'qilgan" %}</th>
+                <tr>
+                    <th>{% trans "Muqova" %}</th>
+                    <th>{% trans "Kitob nomi" %}</th>
+                    <th>{% trans "Maktab" %}</th>
+                    <th>{% trans "Kategoriya" %}</th>
+                    <th>{% trans "Jami" %}</th>
+                    <th>{% trans "Mavjud" %}</th>
+                    <th>{% trans "O'qilgan" %}</th>
                 </tr>
             </thead>
             <tbody id="book-table-body" class="animate-group">
                 {% for book in books %}
-                <tr class="book-row animate-item hover-lift hover-border-glow" data-search="{{ book.title|lower }} {{ book.school.name|default:''|lower }} {{ book.category.name|default:''|lower }}" class="border-bottom" style="transition: 0.3s;">
-                    <td class="p-md" style="padding: 10px 15px;">
+                <tr class="book-row animate-item hover-lift hover-border-glow" data-search="{{ book.title|lower }} {{ book.school.name|default:''|lower }} {{ book.category.name|default:''|lower }}">
+                    <td>
                         {% if book.cover %}
                             <img src="{{ book.cover.url }}" alt="{{ book.title }}" class="object-cover rounded-sm" style="width: 45px; height: 60px;">
                         {% else %}
-                            <div class="d-flex align-center justify-center rounded-sm" style="width: 45px; height: 60px; background: rgba(255,255,255,0.05);">
+                            <div class="d-flex align-center justify-center rounded-sm" style="width: 45px; height: 60px; background: var(--hover-bg);">
                                 <i class="fas fa-book text-muted"></i>
                             </div>
                         {% endif %}
                     </td>
-                    <td class="text-semibold p-lg">{{ book.title }}</td>
-                    <td class="text-muted p-lg">{{ book.school.name|default:"-" }}</td>
-                    <td class="p-lg">
-                        <span class="badge text-primary p-sm rounded-sm text-md" style="background: rgba(245, 158, 11, 0.1);">
+                    <td class="text-semibold">{{ book.title }}</td>
+                    <td class="text-muted">{{ book.school.name|default:"-" }}</td>
+                    <td>
+                        <span class="badge-soft badge-soft-warning">
                             {{ book.category.name|default:"-" }}
                         </span>
                     </td>
-                    <td class="p-lg">{{ book.total_count }}</td>
-                    <td class="p-lg text-success">{{ book.available_count }}</td>
-                    <td class="p-lg" style="color: var(--secondary);">{{ book.borrow_count }}</td>
+                    <td>{{ book.total_count }}</td>
+                    <td class="text-success">{{ book.available_count }}</td>
+                    <td class="text-info">{{ book.borrow_count }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="100%" class="text-center p-xl border-none">
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-book text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
-    </div>
+                    <td colspan="100%">
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fas fa-book"></i></div>
+                            <h4>{% trans "Kitoblar topilmadi" %}</h4>
+                            <p>{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
+                        </div>
                     </td>
                 </tr>
             {% endfor %}
@@ -84,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-input');
     const rows = document.querySelectorAll('.book-row');
     const noResults = document.getElementById('no-results');
-    const emptyState = document.getElementById('empty-state');
+    const emptyState = document.querySelector('.empty-state');
 
     searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();

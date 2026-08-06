@@ -29,21 +29,21 @@
             <div class="flex-center rounded-full mb-xl" style="width: 80px; height: 80px; background: #10b981; margin: 0 auto;">
                 <i class="fas fa-check text-2xl text-white"></i>
             </div>
-            <h2 class="mb-sm" style="color: #10b981;">{% trans "Kitob topshirildi!" %}</h2>
+            <h2 class="mb-sm text-success">{% trans "Kitob topshirildi!" %}</h2>
             <p class="text-muted mb-2xl">{% trans "Kitob kutubxonaga muvaffaqiyatli qaytarildi." %}</p>
         </div>
 
         <div id="qr-container" class="d-inline-block mb-2xl" style="padding: 25px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
             <div id="qrcode"></div>
-            <div class="mt-lg pt-lg" style="border-top: 1px dashed #eee;">
-                <p class="text-xs text-uppercase m-0 mb-xs" style="color: #999; letter-spacing: 1px;">{% trans "Manual ID:" %}</p>
+            <div class="mt-lg pt-lg" style="border-top: 1px dashed var(--border);">
+                <p class="text-xs text-uppercase m-0 mb-xs text-muted" style="letter-spacing: 1px;">{% trans "Manual ID:" %}</p>
                 <div id="manual-id-display" style="font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: 700; color: #333; letter-spacing: 2px;">
                     {{ issue_obj.qr_token }}
                 </div>
-                <div class="mt-lg w-full pos-relative overflow-hidden" style="height: 4px; background: #eee; border-radius: 2px;">
+                <div class="mt-lg w-full pos-relative overflow-hidden" style="height: 4px; background: var(--border); border-radius: 2px;">
                     <div id="timer-bar" class="pos-absolute left-0 top-0 w-full" style="height: 100%; background: var(--secondary); transition: width 1s linear;"></div>
                 </div>
-                <p class="text-xs text-uppercase m-0 mt-sm" style="color: #999;">
+                <p class="text-xs text-uppercase m-0 mt-sm text-muted">
                     {% trans "Yangilanishiga:" %} <span id="timer-text">00:00</span>
                 </p>
             </div>

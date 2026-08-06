@@ -11,8 +11,8 @@
 
 {% block content %}
 <div class="animate-fade mw-600 mx-auto">
-    <div class="glass-panel p-xl mb-xl text-center" style="border-radius: 20px;">
-        <div class="flex-center rounded-full mx-auto mb-md" style="width: 70px; height: 70px; background: var(--primary);">
+    <div class="glass-panel p-xl mb-xl text-center">
+        <div class="flex-center rounded-full mx-auto mb-md bg-primary" style="width: 70px; height: 70px;">
             <i class="fas fa-trophy text-2xl text-white"></i>
         </div>
         <div class="text-2xl text-semibold text-main mb-xs">{{ earned|length }}</div>
@@ -25,8 +25,8 @@
     <h4 class="mb-lg text-semibold">{% trans "Yutuqlar" %}</h4>
     <div class="d-grid gap-md mb-xl" style="grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));">
         {% for ach in all_achievements %}
-        <div class="glass-panel p-md text-center" style="border-radius: 14px; {% if ach.id not in earned_achievement_ids %}opacity: 0.35;{% endif %}">
-            <i class="fas {{ ach.icon }} text-xl mb-sm" style="color: {% if ach.id in earned_achievement_ids %}#fbbf24{% else %}var(--text-muted){% endif %};"></i>
+        <div class="glass-panel p-md text-center" style="{% if ach.id not in earned_achievement_ids %}opacity: 0.35;{% endif %}">
+            <i class="fas {{ ach.icon }} text-xl mb-sm {% if ach.id in earned_achievement_ids %}text-warning{% else %}text-muted{% endif %}"></i>
             <div class="text-xs text-semibold text-truncate">{{ ach|ach_name }}</div>
             {% if ach.xp_reward %}
             <div class="text-xs text-muted mt-xs">+{{ ach.xp_reward }} XP</div>
@@ -40,7 +40,7 @@
     <div class="d-flex gap-md flex-wrap">
         {% for icon in unlocked_icons %}
         <a href="{% url 'frontend:profile_edit' %}?icon={{ icon }}" class="text-decoration-none">
-            <div class="glass-panel p-md flex-center" style="width: 50px; height: 50px; border-radius: 12px; {% if user.selected_icon == icon %}border: 2px solid var(--primary);{% endif %}">
+            <div class="glass-panel p-md flex-center" style="width: 50px; height: 50px; {% if user.selected_icon == icon %}border: 2px solid var(--primary);{% endif %}">
                 <i class="fas {{ icon }} text-lg text-primary"></i>
             </div>
         </a>

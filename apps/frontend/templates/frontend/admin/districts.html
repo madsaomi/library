@@ -11,55 +11,49 @@
 {% block content %}
 <div class="animate-fade">
     <div class="grid-2 stat-grid mb-xl">
-        <div class="glass-card stat-card p-lg cursor-default">
-            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ districts|length }}</div>
-            <div class="stat-label text-sm">{% trans "Jami tumanlar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ districts|length }}</div>
+            <div class="stat-tile-label">{% trans "Jami tumanlar" %}</div>
         </div>
-        <div class="glass-card stat-card p-lg cursor-default">
-            <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ total_schools|default:"0" }}</div>
-            <div class="stat-label text-sm">{% trans "Maktablar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-success">{{ total_schools|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Maktablar" %}</div>
         </div>
     </div>
 
     <div class="glass-panel p-xl">
-        <div class="flex-between mb-lg">
+        <div class="action-bar mb-lg">
             <div class="text-md text-muted">{{ districts|length }} {% trans "ta tuman" %}</div>
-            <a href="{% url 'frontend:district_add' %}" class="btn-primary text-nowrap text-sm" style="padding: 8px 16px; text-decoration: none;">
+            <span class="flex-1"></span>
+            <a href="{% url 'frontend:district_add' %}" class="btn-primary text-nowrap text-sm text-decoration-none">
                 <i class="fas fa-plus"></i> {% trans "Yangi tuman" %}
             </a>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;">
+        <div class="d-flex flex-column gap-sm">
             {% for district in districts %}
-            <div class="glass-card p-lg cursor-pointer transition" onclick="window.location='{% url 'frontend:schools_list' %}?district={{ district.id }}'"
-                 onmouseover="this.style.borderColor='var(--secondary)'" onmouseout="this.style.borderColor=''">
-                <div class="flex-between align-center">
-                    <div>
-                        <div class="text-semibold" style="font-size: 0.9rem;">{{ district.name }}</div>
-                        <div class="text-muted mt-xs" style="font-size: 0.72rem;">
-                            {{ district.school_count }} {% trans "maktab" %}
-                        </div>
-                    </div>
-                    <div class="d-flex gap-xs" onclick="event.stopPropagation()">
-<a href="{% url 'frontend:district_edit' district.pk %}" aria-label="Tahrirlash" class="text-muted p-xs" style="font-size: 0.85rem;" title="{% trans 'Tahrirlash' %}">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="{% url 'frontend:district_delete' district.pk %}" aria-label="O'chirish" class="p-xs" style="color: #ef4444; font-size: 0.85rem;" title="{% trans "O'chirish" %}">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </div>
+            <div class="list-row cursor-pointer transition" onclick="window.location='{% url 'frontend:schools_list' %}?district={{ district.id }}'">
+                <div class="list-row-avatar"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ district.name }}</div>
+                    <div class="list-row-sub">{{ district.school_count }} {% trans "maktab" %}</div>
+                </div>
+                <div class="row-actions" onclick="event.stopPropagation()">
+                    <a href="{% url 'frontend:district_edit' district.pk %}" aria-label="Tahrirlash" class="icon-btn" title="{% trans 'Tahrirlash' %}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'frontend:district_delete' district.pk %}" aria-label="O'chirish" class="icon-btn icon-btn-danger" title="{% trans "O'chirish" %}">
+                        <i class="fas fa-trash"></i>
+                    </a>
                 </div>
             </div>
             {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-building text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Muassasalar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-building"></i></div>
+                <h4>{% trans "Muassasalar topilmadi" %}</h4>
+                <p>{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>

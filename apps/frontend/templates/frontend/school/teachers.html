@@ -11,17 +11,17 @@
 {% block content %}
 <div class="animate-fade">
     <div class="grid-3 stat-grid mb-xl">
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl" style="color: var(--secondary);">{{ total_teachers|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Jami o'qituvchilar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ total_teachers|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Jami o'qituvchilar" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl text-success">{{ entered_today|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Bugun kirdi" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-success">{{ entered_today|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Bugun kirdi" %}</div>
         </div>
-        <a href="{% url 'frontend:teacher_add' %}" class="glass-card stat-card p-md d-flex align-center justify-center gap-xs text-decoration-none" style="border: 1px dashed var(--secondary);">
-            <i class="fas fa-plus" style="font-size: 0.8rem; color: var(--secondary);"></i>
-            <span class="text-sm text-medium" style="color: var(--secondary);">{% trans "Yangi o'qituvchi" %}</span>
+        <a href="{% url 'frontend:teacher_add' %}" class="stat-tile d-flex align-center justify-center gap-xs text-decoration-none">
+            <i class="fas fa-plus text-info text-sm"></i>
+            <span class="text-sm text-medium">{% trans "Yangi o'qituvchi" %}</span>
         </a>
     </div>
 
@@ -29,55 +29,43 @@
         <div class="d-flex flex-between mb-lg">
             <div class="pos-relative">
                 <input type="text" id="search-input" aria-label="{% trans 'Ism yoki login...' %}" placeholder="{% trans 'Ism yoki login...' %}"
-                       class="border rounded text-sm" style="padding: 8px 14px 8px 36px; background: var(--input-bg); color: var(--input-text); outline: none; width: 220px;">
+                       class="form-control" style="padding: 8px 14px 8px 36px; width: 220px; font-size: 0.8rem; border-radius: 8px;">
                 <i class="fas fa-search pos-absolute text-muted text-sm" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
             </div>
             <div class="text-sm text-muted">{{ page_obj.paginator.count }} {% trans "ta o'qituvchi" %}</div>
         </div>
 
-        <div class="info-grid" style="gap: 6px;">
+        <div class="d-flex flex-column gap-xs">
             {% for teacher in teachers %}
-            <div class="glass-card info-row teacher-row" data-search="{{ teacher.username|lower }} {{ teacher.first_name|lower }} {{ teacher.last_name|lower }} {{ teacher.subject|default:''|lower }}" style="padding: 10px 14px;">
-                <div class="d-flex align-center flex-1" style="gap: 10px; min-width: 0;">
-                    <div class="avatar-circle flex-shrink-0" style="width: 34px; height: 34px; background: var(--secondary);">
-                        <span class="avatar-initials text-sm">{{ teacher.first_name|first|upper }}{{ teacher.last_name|first|upper }}</span>
-                    </div>
-                    <div class="flex-1" style="min-width: 0;">
-                        <div class="text-semibold" style="font-size: 0.82rem;">{{ teacher.first_name }} {{ teacher.last_name }}</div>
-                        <div class="text-xs text-muted" style="margin-top: 1px;">
-                            <span>@{{ teacher.username }}</span>
-                            {% if teacher.subject %}
-                            <span class="badge ml-xs" style="background: rgba(168,85,247,0.1); color: #a855f7; padding: 1px 6px; border-radius: 4px; font-size: 0.6rem;">{{ teacher.subject }}</span>
-                            {% endif %}
-                            {% if teacher.birth_date %}
-                            <span class="ml-xs"><i class="far fa-calendar-alt"></i> {{ teacher.birth_date|date:"d.m.Y" }}</span>
-                            {% endif %}
-                        </div>
-                        {% if teacher.address %}
-                        <div class="text-xs text-muted" style="margin-top: 1px;"><i class="fas fa-map-marker-alt" style="font-size: 0.5rem;"></i> {{ teacher.address|truncatechars:30 }}</div>
+            <div class="list-row teacher-row" data-search="{{ teacher.username|lower }} {{ teacher.first_name|lower }} {{ teacher.last_name|lower }} {{ teacher.subject|default:''|lower }}">
+                <div class="list-row-avatar">{{ teacher.first_name|first|upper }}{{ teacher.last_name|first|upper }}</div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ teacher.first_name }} {{ teacher.last_name }}</div>
+                    <div class="list-row-sub">
+                        <span>@{{ teacher.username }}</span>
+                        {% if teacher.subject %}
+                        <span class="badge-soft badge-soft-primary ml-xs">{{ teacher.subject }}</span>
+                        {% endif %}
+                        {% if teacher.birth_date %}
+                        <span class="ml-xs"><i class="far fa-calendar-alt"></i> {{ teacher.birth_date|date:"d.m.Y" }}</span>
                         {% endif %}
                     </div>
+                    {% if teacher.address %}
+                    <div class="list-row-sub mt-xs"><i class="fas fa-map-marker-alt"></i> {{ teacher.address|truncatechars:30 }}</div>
+                    {% endif %}
                 </div>
-                <div class="d-flex align-center flex-shrink-0" style="gap: 10px;">
-                    <div class="d-flex align-center gap-xs">
-                        <span class="text-muted" style="font-family: monospace; font-size: 0.7rem;">••••••••</span>
-                    </div>
-                    <div class="d-flex gap-xs">
-                        <a href="{% url 'frontend:teacher_edit' teacher.pk %}" class="glass-card px-sm py-xs rounded-sm text-decoration-none text-xs text-nowrap" style="color: var(--secondary);"><i class="fas fa-edit"></i></a>
-                        <a href="{% url 'frontend:teacher_delete' teacher.pk %}" class="glass-card px-sm py-xs rounded-sm text-decoration-none text-xs text-nowrap text-danger"><i class="fas fa-trash"></i></a>
-                    </div>
+                <div class="row-actions">
+                    <a href="{% url 'frontend:teacher_edit' teacher.pk %}" class="icon-btn" aria-label="{% trans 'Tahrirlash' %}"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'frontend:teacher_delete' teacher.pk %}" class="icon-btn icon-btn-danger" aria-label="{% trans 'Ochirish' %}"><i class="fas fa-trash"></i></a>
                 </div>
             </div>
             {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-users text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Foydalanuvchilar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha foydalanuvchilar ro'yxati bo'sh" %}</p>
-    </div>
-        {% endfor %}
+            <div class="empty-state" id="empty-state">
+                <div class="empty-icon"><i class="fas fa-users"></i></div>
+                <h4>{% trans "Foydalanuvchilar topilmadi" %}</h4>
+                <p>{% trans "Hozircha foydalanuvchilar ro'yxati bo'sh" %}</p>
+            </div>
+            {% endfor %}
             <div id="no-results" class="d-none full-width p-3xl text-center text-muted text-md">
                 {% trans "Qidiruv bo'yicha hech narsa topilmadi" %}
             </div>

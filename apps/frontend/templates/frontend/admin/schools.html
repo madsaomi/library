@@ -10,129 +10,126 @@
 
 {% block content %}
 <div class="animate-fade">
-    <!-- Stat cards -->
+    <!-- Stat tiles -->
     <div class="grid-4 stat-grid mb-xl">
-        <div class="glass-card stat-card p-lg cursor-default">
-            <div class="stat-value" style="font-size: 1.25rem; color: var(--primary);">{{ school_count }}</div>
-            <div class="stat-label text-sm">{% trans "Maktablar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ school_count }}</div>
+            <div class="stat-tile-label">{% trans "Maktablar" %}</div>
         </div>
-        <div class="glass-card stat-card p-lg cursor-default">
-            <div class="stat-value" style="font-size: 1.25rem; color: #10b981;">{{ total_students|default:"0" }}</div>
-            <div class="stat-label text-sm">{% trans "O'quvchilar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-success">{{ total_students|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "O'quvchilar" %}</div>
         </div>
-        <div class="glass-card stat-card p-lg cursor-default">
-            <div class="stat-value" style="font-size: 1.25rem; color: #f59e0b;">{{ total_books|default:"0" }}</div>
-            <div class="stat-label text-sm">{% trans "Kitoblar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-warning">{{ total_books|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Kitoblar" %}</div>
         </div>
-        <div class="glass-card stat-card p-lg cursor-default">
-            <div class="stat-value" style="font-size: 1.25rem; color: #6366f1;">{{ districts|length }}</div>
-            <div class="stat-label text-sm">{% trans "Tumanlar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ districts|length }}</div>
+            <div class="stat-tile-label">{% trans "Tumanlar" %}</div>
         </div>
     </div>
 
     <div class="glass-panel p-xl">
         <!-- Toolbar -->
-        <div class="flex-between mb-lg gap-lg flex-wrap">
+        <div class="action-bar mb-lg">
             <form method="get" class="d-flex gap-xs align-center flex-wrap" id="filter-form">
                 <div class="pos-relative">
                     <input type="text" name="q" value="{{ current_query }}" id="search-input"
                            aria-label="{% trans 'Qidirish...' %}" placeholder="{% trans 'Maktab nomi yoki manzil...' %}"
-                           class="text-md" style="padding: 8px 14px 8px 36px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--input-text); outline: none; width: 220px;">
+                           class="form-control text-md" style="padding: 8px 14px 8px 36px; width: 220px;">
                     <i class="fas fa-search pos-absolute text-muted text-md" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
                 <span class="text-sm text-muted text-medium">{% trans "Tuman" %}:</span>
-                <select name="district" onchange="this.form.submit()" class="text-md" style="background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; outline: none; cursor: pointer;">
+                <select name="district" onchange="this.form.submit()" class="form-control text-md" style="padding: 8px 12px; width: auto; cursor: pointer;">
                     <option value="">{% trans "Barchasi" %}</option>
                     {% for d in districts %}
                     <option value="{{ d.id }}" {% if current_district == d.id|stringformat:"i" %}selected{% endif %}>{{ d.name }}</option>
                     {% endfor %}
                 </select>
                 {% if current_district or current_query %}
-                <a href="{% url 'frontend:schools_list' %}" class="d-flex align-center gap-xs text-sm text-decoration-none" style="color: #ef4444;">
+                <a href="{% url 'frontend:schools_list' %}" class="d-flex align-center gap-xs text-sm text-danger text-decoration-none">
                     <i class="fas fa-times"></i> {% trans "Tozalash" %}
                 </a>
                 {% endif %}
             </form>
-            <div class="d-flex gap-xs align-center">
-                <a href="{% url 'frontend:schools_export_csv' %}" class="glass-card text-nowrap text-sm d-flex align-center gap-xs text-decoration-none text-muted" style="padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px;">
-                    <i class="fas fa-download"></i> CSV
-                </a>
-                <a href="{% url 'frontend:school_add' %}" class="btn-primary text-nowrap text-sm d-flex align-center gap-xs" style="padding: 9px 16px; text-decoration: none;">
-                    <i class="fas fa-plus"></i> {% trans "Maktab qo'shish" %}
-                </a>
-            </div>
+            <span class="flex-1"></span>
+            <a href="{% url 'frontend:schools_export_csv' %}" class="btn-outline text-sm text-nowrap">
+                <i class="fas fa-download"></i> CSV
+            </a>
+            <a href="{% url 'frontend:school_add' %}" class="btn-primary text-sm text-nowrap">
+                <i class="fas fa-plus"></i> {% trans "Maktab qo'shish" %}
+            </a>
         </div>
 
         <!-- Table -->
-        <div class="table-container overflow-x-auto">
-            <table class="w-full text-md" style="border-collapse: collapse; text-align: left;">
+        <div class="table-responsive-wrap">
+            <table class="data-table">
                 <thead>
-                    <tr class="border-bottom">
-                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;"><a href="?{% querystring sort=current_sort_toggle %}" class="text-decoration-none text-muted d-inline-flex align-center gap-xs" style="cursor: pointer;">{% trans "Maktab" %} {% if sort == 'name' %}<i class="fas fa-sort-up"></i>{% elif sort == '-name' %}<i class="fas fa-sort-down"></i>{% endif %}</a></th>
-                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;"><a href="?{% querystring sort=district_sort_toggle %}" class="text-decoration-none text-muted d-inline-flex align-center gap-xs" style="cursor: pointer;">{% trans "Tuman" %} {% if sort == 'district' %}<i class="fas fa-sort-up"></i>{% elif sort == '-district' %}<i class="fas fa-sort-down"></i>{% endif %}</a></th>
-                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Admin" %}</th>
-                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;"><a href="?{% querystring sort=students_sort_toggle %}" class="text-decoration-none text-muted d-inline-flex align-center gap-xs" style="cursor: pointer;">{% trans "O'quvchilar" %} {% if sort == 'students' %}<i class="fas fa-sort-up"></i>{% elif sort == '-students' %}<i class="fas fa-sort-down"></i>{% endif %}</a></th>
-                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;"><a href="?{% querystring sort=books_sort_toggle %}" class="text-decoration-none text-muted d-inline-flex align-center gap-xs" style="cursor: pointer;">{% trans "Kitoblar" %} {% if sort == 'books' %}<i class="fas fa-sort-up"></i>{% elif sort == '-books' %}<i class="fas fa-sort-down"></i>{% endif %}</a></th>
-                        <th class="text-muted text-medium p-md" style="padding: 10px 12px;">{% trans "Amallar" %}</th>
+                    <tr>
+                        <th><a href="?{% querystring sort=current_sort_toggle %}" class="text-decoration-none text-muted d-inline-flex align-center gap-xs">{% trans "Maktab" %} {% if sort == 'name' %}<i class="fas fa-sort-up"></i>{% elif sort == '-name' %}<i class="fas fa-sort-down"></i>{% endif %}</a></th>
+                        <th><a href="?{% querystring sort=district_sort_toggle %}" class="text-decoration-none text-muted d-inline-flex align-center gap-xs">{% trans "Tuman" %} {% if sort == 'district' %}<i class="fas fa-sort-up"></i>{% elif sort == '-district' %}<i class="fas fa-sort-down"></i>{% endif %}</a></th>
+                        <th>{% trans "Admin" %}</th>
+                        <th><a href="?{% querystring sort=students_sort_toggle %}" class="text-decoration-none text-muted d-inline-flex align-center gap-xs">{% trans "O'quvchilar" %} {% if sort == 'students' %}<i class="fas fa-sort-up"></i>{% elif sort == '-students' %}<i class="fas fa-sort-down"></i>{% endif %}</a></th>
+                        <th><a href="?{% querystring sort=books_sort_toggle %}" class="text-decoration-none text-muted d-inline-flex align-center gap-xs">{% trans "Kitoblar" %} {% if sort == 'books' %}<i class="fas fa-sort-up"></i>{% elif sort == '-books' %}<i class="fas fa-sort-down"></i>{% endif %}</a></th>
+                        <th>{% trans "Amallar" %}</th>
                     </tr>
                 </thead>
                 <tbody class="animate-group">
                     {% for school in schools %}
-                    <tr class="school-row animate-item cursor-pointer border-bottom" data-search="{{ school.name|lower }} {{ school.district.name|default:''|lower }} {{ school.address|default:''|lower }} {{ school.admins.0.username|default:''|lower }}"
-                        onclick="window.location='{% url 'frontend:school_detail' school.pk %}'" style="transition: 0.15s;">
-                        <td class="p-md" style="padding: 10px 12px;">
+                    <tr class="school-row animate-item cursor-pointer" data-search="{{ school.name|lower }} {{ school.district.name|default:''|lower }} {{ school.address|default:''|lower }} {{ school.admins.0.username|default:''|lower }}"
+                        onclick="window.location='{% url 'frontend:school_detail' school.pk %}'">
+                        <td>
                             <div class="d-flex align-center gap-md">
                                 <div class="flex-center rounded-lg" style="width: 36px; height: 36px; min-width: 36px; background: var(--primary);">
-                                    <i class="fas fa-school text-white" style="font-size: 0.85rem;"></i>
+                                    <i class="fas fa-school text-white"></i>
                                 </div>
                                 <div>
-                                    <div class="text-semibold text-main" style="font-size: 0.82rem;">{{ school.name }}</div>
+                                    <div class="text-semibold text-main">{{ school.name }}</div>
                                     <div class="d-flex align-center gap-xs mt-xs">
                                         {% if school.address %}<div class="text-muted text-xs">{{ school.address|truncatechars:30 }}</div>{% endif %}
-                                        <span class="text-xs" style="color: {% if school.is_active %}#10b981{% else %}#ef4444{% endif %};">
-                                            <i class="fas {% if school.is_active %}fa-circle{% else %}fa-ban{% endif %}" style="font-size: 0.4rem;"></i> {% if school.is_active %}{% trans "Faol" %}{% else %}{% trans "Bloklangan" %}{% endif %}
+                                        <span class="text-xs {% if school.is_active %}text-success{% else %}text-danger{% endif %}">
+                                            <i class="fas {% if school.is_active %}fa-circle{% else %}fa-ban{% endif %} text-xs"></i> {% if school.is_active %}{% trans "Faol" %}{% else %}{% trans "Bloklangan" %}{% endif %}
                                         </span>
                                     </div>
                                 </div>
                             </div>
                         </td>
-                        <td class="text-muted text-sm p-md" style="padding: 10px 12px;">
-                            <span class="badge text-muted p-sm rounded-sm text-nowrap" style="background: rgba(99,102,241,0.1);">
-                                <i class="fas fa-map-marker-alt mr-xs" style="font-size: 0.6rem;"></i> {{ school.district.name|default:"—" }}
+                        <td>
+                            <span class="badge-soft badge-soft-muted text-nowrap">
+                                <i class="fas fa-map-marker-alt"></i> {{ school.district.name|default:"—" }}
                             </span>
                         </td>
-                        <td class="p-md" style="padding: 10px 12px;">
+                        <td>
                             {% with admin=school.admins|first %}
                             {% if admin %}
-                            <div class="d-flex align-center gap-sm">
-                                <span class="text-sm d-flex align-center gap-xs">
-                                    <i class="fas fa-user-shield text-primary" style="font-size: 0.65rem;"></i> {{ admin.username }}
-                                </span>
-                            </div>
+                            <span class="text-sm d-flex align-center gap-xs">
+                                <i class="fas fa-user-shield text-info"></i> {{ admin.username }}
+                            </span>
                             {% else %}
                             <span class="text-muted text-sm">{% trans "Admin yo'q" %}</span>
                             {% endif %}
                             {% endwith %}
                         </td>
-                        <td class="p-md" style="padding: 10px 12px;">
+                        <td>
                             <span class="d-flex align-center gap-xs text-sm text-success">
-                                <i class="fas fa-users" style="font-size: 0.65rem;"></i> {{ school.student_count|default:"0" }}
+                                <i class="fas fa-users"></i> {{ school.student_count|default:"0" }}
                             </span>
                         </td>
-                        <td class="p-md" style="padding: 10px 12px;">
-                            <span class="d-flex align-center gap-xs text-sm" style="color: var(--accent);">
-                                <i class="fas fa-book" style="font-size: 0.65rem;"></i> {{ school.book_count }}
+                        <td>
+                            <span class="d-flex align-center gap-xs text-sm text-info">
+                                <i class="fas fa-book"></i> {{ school.book_count }}
                             </span>
                         </td>
-                        <td class="p-md" style="padding: 10px 12px;">
+                        <td>
                             <div class="d-flex gap-xs" onclick="event.stopPropagation()">
-                                <a href="{% url 'frontend:school_detail' school.pk %}" aria-label="Batafsil" class="text-primary p-xs" style="font-size: 0.85rem;" title="{% trans 'Batafsil' %}">
+                                <a href="{% url 'frontend:school_detail' school.pk %}" aria-label="Batafsil" class="icon-btn" title="{% trans 'Batafsil' %}">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{% url 'frontend:school_edit' school.pk %}" aria-label="Tahrirlash" class="text-muted p-xs" style="font-size: 0.85rem;" title="{% trans 'Tahrirlash' %}">
+                                <a href="{% url 'frontend:school_edit' school.pk %}" aria-label="Tahrirlash" class="icon-btn" title="{% trans 'Tahrirlash' %}">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{% url 'frontend:school_delete' school.pk %}" aria-label="O'chirish" class="p-xs" style="color: #ef4444; font-size: 0.85rem;" title="{% trans "O'chirish" %}">
+                                <a href="{% url 'frontend:school_delete' school.pk %}" aria-label="O'chirish" class="icon-btn icon-btn-danger" title="{% trans "O'chirish" %}">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>
@@ -140,13 +137,11 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center p-xl border-none">
-                            <div class="empty-state text-center p-3xl animate-fade">
-                                <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-                                    <i class="fas fa-school text-4xl text-primary"></i>
-                                </div>
-                                <h4 class="text-lg font-semibold mb-xs">{% trans "Maktablar topilmadi" %}</h4>
-                                <p class="text-muted text-sm">{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fas fa-school"></i></div>
+                                <h4>{% trans "Maktablar topilmadi" %}</h4>
+                                <p>{% trans "Hozircha ta'lim muassasalari kiritilmagan" %}</p>
                             </div>
                         </td>
                     </tr>

@@ -10,14 +10,14 @@
 
 {% block content %}
 <div class="animate-fade mw-800 mx-auto">
-    <div class="d-flex gap-sm mb-xl">
-        <button type="button" class="tab-btn active" data-tab="reading" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); background: var(--glass); color: var(--text-main); font-weight: 600; cursor: pointer;">
+    <div class="d-flex gap-sm mb-xl flex-wrap">
+        <button type="button" class="tab-btn active" data-tab="reading">
             {% trans "O'qiyotgan" %} <span class="text-xs text-muted ml-xs">{{ issues|length }}</span>
         </button>
-        <button type="button" class="tab-btn" data-tab="reserved" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer;">
+        <button type="button" class="tab-btn" data-tab="reserved">
             {% trans "Bron" %} <span class="text-xs text-muted ml-xs">{{ requests|length }}</span>
         </button>
-        <button type="button" class="tab-btn" data-tab="history" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer;">
+        <button type="button" class="tab-btn" data-tab="history">
             {% trans "Tarix" %} <span class="text-xs text-muted ml-xs">{{ history|length }}</span>
         </button>
     </div>
@@ -25,7 +25,7 @@
     <div id="tab-reading" class="tab-content">
         {% for issue in issues %}
         <a href="{% url 'frontend:issue_qr' issue.pk %}" class="text-decoration-none d-block mb-md">
-            <div class="glass-panel p-md d-flex align-center gap-md" style="border-radius: 14px;">
+            <div class="list-row">
                 <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
                     {% if issue.book.cover %}
                     <img src="{{ issue.book.cover.url }}" alt="" class="w-full h-full object-cover">
@@ -33,17 +33,17 @@
                     <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
                     {% endif %}
                 </div>
-                <div class="flex-1" style="min-width: 0;">
-                    <div class="text-sm text-semibold text-main text-truncate">{{ issue.book.title }}</div>
-                    <div class="text-xs text-muted">{{ issue.issued_at|date:"d.m.Y" }}</div>
+                <div class="list-row-main">
+                    <div class="list-row-title text-truncate">{{ issue.book.title }}</div>
+                    <div class="list-row-sub">{{ issue.issued_at|date:"d.m.Y" }}</div>
                 </div>
                 <i class="fas fa-qrcode text-muted"></i>
             </div>
         </a>
         {% empty %}
-        <div class="text-center py-2xl text-muted">
-            <i class="fas fa-book-open text-3xl mb-md" style="opacity: 0.3;"></i>
-            <p>{% trans "Hozir kitob o'qimayapti" %}</p>
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-book-open"></i></div>
+            <h4>{% trans "Hozir kitob o'qimayapti" %}</h4>
         </div>
         {% endfor %}
     </div>
@@ -51,7 +51,7 @@
     <div id="tab-reserved" class="tab-content d-none">
         {% for req in requests %}
         <a href="{% url 'frontend:request_qr' req.pk %}" class="text-decoration-none d-block mb-md">
-            <div class="glass-panel p-md d-flex align-center gap-md" style="border-radius: 14px;">
+            <div class="list-row">
                 <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
                     {% if req.book.cover %}
                     <img src="{{ req.book.cover.url }}" alt="" class="w-full h-full object-cover">
@@ -59,24 +59,24 @@
                     <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
                     {% endif %}
                 </div>
-                <div class="flex-1" style="min-width: 0;">
-                    <div class="text-sm text-semibold text-main text-truncate">{{ req.book.title }}</div>
-                    <div class="text-xs text-muted">{{ req.requested_at|date:"d.m.Y" }}</div>
+                <div class="list-row-main">
+                    <div class="list-row-title text-truncate">{{ req.book.title }}</div>
+                    <div class="list-row-sub">{{ req.requested_at|date:"d.m.Y" }}</div>
                 </div>
-                <span class="text-xs px-sm py-xs" style="background: var(--hover-bg); border-radius: 6px;">{{ req.get_status_display }}</span>
+                <span class="badge-soft badge-soft-muted">{{ req.get_status_display }}</span>
             </div>
         </a>
         {% empty %}
-        <div class="text-center py-2xl text-muted">
-            <i class="fas fa-clock text-3xl mb-md" style="opacity: 0.3;"></i>
-            <p>{% trans "Bron qilingan kitoblar yo'q" %}</p>
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-clock"></i></div>
+            <h4>{% trans "Bron qilingan kitoblar yo'q" %}</h4>
         </div>
         {% endfor %}
     </div>
 
     <div id="tab-history" class="tab-content d-none">
         {% for item in history %}
-        <div class="glass-panel p-md d-flex align-center gap-md mb-md" style="border-radius: 14px;">
+        <div class="list-row mb-md">
             <div class="flex-shrink-0 rounded-md overflow-hidden" style="width: 45px; height: 60px; background: var(--hover-bg);">
                 {% if item.book.cover %}
                 <img src="{{ item.book.cover.url }}" alt="" class="w-full h-full object-cover">
@@ -84,25 +84,36 @@
                 <div class="w-full h-full flex-center"><i class="fas fa-book text-xs text-muted" style="opacity: 0.3;"></i></div>
                 {% endif %}
             </div>
-            <div class="flex-1" style="min-width: 0;">
-                <div class="text-sm text-semibold text-main text-truncate">{{ item.book.title }}</div>
-                <div class="text-xs text-muted">{{ item.returned_at|date:"d.m.Y" }}</div>
+            <div class="list-row-main">
+                <div class="list-row-title text-truncate">{{ item.book.title }}</div>
+                <div class="list-row-sub">{{ item.returned_at|date:"d.m.Y" }}</div>
             </div>
             <i class="fas fa-check text-success"></i>
         </div>
         {% empty %}
-        <div class="text-center py-2xl text-muted">
-            <i class="fas fa-history text-3xl mb-md" style="opacity: 0.3;"></i>
-            <p>{% trans "Hali kitob o'qilmagan" %}</p>
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-history"></i></div>
+            <h4>{% trans "Hali kitob o'qilmagan" %}</h4>
         </div>
         {% endfor %}
     </div>
 </div>
 
 <style>
-.tab-btn.active { background: var(--glass) !important; color: var(--text-main) !important; border-color: var(--primary) !important; }
-.tab-btn { transition: all 0.2s; }
+.tab-btn {
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
 .tab-btn:hover { background: var(--hover-bg); }
+.tab-btn.active { color: var(--text-main); background: var(--glass); border-color: var(--primary); }
 </style>
 
 <script>

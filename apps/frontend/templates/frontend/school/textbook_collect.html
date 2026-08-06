@@ -11,23 +11,23 @@
 {% block content %}
 <div class="animate-fade">
     <div class="d-flex gap-sm flex-wrap mb-md">
-        <a href="{% url 'frontend:textbook_collect' %}" class="glass-card py-xs px-md text-sm text-decoration-none rounded-sm" style="{% if not selected_grade %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{% trans "Barcha sinflar" %}</a>
+        <a href="{% url 'frontend:textbook_collect' %}" class="filter-chip {% if not selected_grade %}active{% endif %}">{% trans "Barcha sinflar" %}</a>
         {% for g in grades_list %}
-        <a href="{% url 'frontend:textbook_collect' %}?grade={{ g|urlencode }}" class="glass-card py-xs px-md text-sm text-decoration-none rounded-sm" style="{% if selected_grade == g %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{{ g }} {% trans "sinf" %}</a>
+        <a href="{% url 'frontend:textbook_collect' %}?grade={{ g|urlencode }}" class="filter-chip {% if selected_grade == g %}active{% endif %}">{{ g }} {% trans "sinf" %}</a>
         {% endfor %}
     </div>
 
     {% if not loans %}
-    <div class="glass-panel text-center" style="padding: 40px;">
-        <i class="fas fa-check-circle text-success d-block mb-lg" style="font-size: 2.5rem; opacity: 0.4;"></i>
-        <h3 class="text-lg mb-sm">{% trans "Barcha darsliklar qaytarilgan" %}</h3>
-        <p class="text-muted text-md">{% trans "Faol darslik ijaralari yo'q." %}</p>
+    <div class="glass-panel empty-state">
+        <div class="empty-icon"><i class="fas fa-check-circle"></i></div>
+        <h4>{% trans "Barcha darsliklar qaytarilgan" %}</h4>
+        <p>{% trans "Faol darslik ijaralari yo'q." %}</p>
     </div>
     {% else %}
     <div class="glass-panel p-xl">
-        <div class="mb-lg">
-            <h3 class="text-md" style="margin: 0;">
-                <i class="fas fa-undo-alt" style="color: #f59e0b;"></i>
+        <div class="card-header mb-lg">
+            <h3 class="card-title">
+                <i class="fas fa-undo-alt text-warning"></i>
                 {% trans "Qaytarilishi kerak bo'lgan darsliklar" %}
                 <span class="text-sm text-muted text-normal ml-sm">({{ loans|length }})</span>
             </h3>
@@ -35,44 +35,40 @@
 
         <form method="post">
             {% csrf_token %}
-            <div class="info-grid gap-sm">
+            <div class="d-flex flex-column gap-sm">
                 {% for loan in loans %}
-                <div class="glass-card" style="padding: 12px 14px;">
-                    <div class="d-flex align-center flex-wrap" style="gap: 10px;">
-                        <div class="d-flex align-center gap-xs">
-                            <input type="checkbox" name="return_{{ loan.id }}" id="return-{{ loan.id }}" class="cursor-pointer" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                <div class="list-row d-flex align-center flex-wrap" style="gap: 10px;">
+                    <div class="d-flex align-center gap-xs">
+                        <input type="checkbox" name="return_{{ loan.id }}" id="return-{{ loan.id }}" class="cursor-pointer" style="width: 16px; height: 16px;">
+                    </div>
+                    <div class="list-row-avatar">{{ loan.student.first_name|first|upper }}{{ loan.student.last_name|first|upper }}</div>
+                    <div class="list-row-main" style="min-width: 120px;">
+                        <div class="list-row-title">{{ loan.student.first_name }} {{ loan.student.last_name }}</div>
+                        <div class="list-row-sub">
+                            <span class="badge-soft badge-soft-warning">{{ loan.student.grade }}</span>
+                            <span class="ml-xs"><i class="fas fa-book-open"></i> {{ loan.book.title }}</span>
                         </div>
-                        <div class="avatar-circle flex-shrink-0" style="width: 32px; height: 32px; background: #d97706;">
-                            <span class="avatar-initials text-xs">{{ loan.student.first_name|first|upper }}{{ loan.student.last_name|first|upper }}</span>
-                        </div>
-                        <div class="flex-1" style="min-width: 120px;">
-                            <div class="text-semibold" style="font-size: 0.82rem;">{{ loan.student.first_name }} {{ loan.student.last_name }}</div>
-                            <div class="text-xs text-muted">
-                                <span class="badge" style="background: rgba(217,119,6,0.1); color: #d97706; padding: 1px 6px; border-radius: 4px; font-size: 0.6rem;">{{ loan.student.grade }}</span>
-                                <span class="ml-xs"><i class="fas fa-book-open"></i> {{ loan.book.title }}</span>
-                            </div>
-                        </div>
-                        <div class="flex-1" style="min-width: 100px;">
-                            <select name="condition_{{ loan.id }}" class="form-control w-full text-sm" style="padding: 6px 10px;">
-                                <option value="new">{% trans "Yangi" %}</option>
-                                <option value="good">{% trans "Yaxshi" %}</option>
-                                <option value="fair" selected>{% trans "Qoniqarli" %}</option>
-                                <option value="poor">{% trans "Yomon" %}</option>
-                                <option value="lost">{% trans "Yo'qolgan" %}</option>
-                            </select>
-                        </div>
-                        <div style="flex: 1.5; min-width: 120px;">
-                            <input type="text" name="notes_{{ loan.id }}" class="form-control w-full text-sm" placeholder="{% trans 'Izoh' %}" style="padding: 6px 10px;" value="{{ loan.notes|default:'' }}">
-                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 100px;">
+                        <select name="condition_{{ loan.id }}" class="form-control w-full text-sm" style="padding: 6px 10px;">
+                            <option value="new">{% trans "Yangi" %}</option>
+                            <option value="good">{% trans "Yaxshi" %}</option>
+                            <option value="fair" selected>{% trans "Qoniqarli" %}</option>
+                            <option value="poor">{% trans "Yomon" %}</option>
+                            <option value="lost">{% trans "Yo'qolgan" %}</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1.5; min-width: 120px;">
+                        <input type="text" name="notes_{{ loan.id }}" class="form-control w-full text-sm" placeholder="{% trans 'Izoh' %}" style="padding: 6px 10px;" value="{{ loan.notes|default:'' }}">
                     </div>
                 </div>
                 {% endfor %}
             </div>
             <div class="mt-xl d-flex gap-md">
-                <button type="submit" class="btn-primary py-sm px-2xl text-md rounded-md">
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-undo-alt"></i> {% trans "Qaytarib olish" %}
                 </button>
-                <a href="{% url 'frontend:textbook_loans' %}" class="glass-card py-sm px-2xl rounded-md text-decoration-none text-md d-flex align-center border" style="gap: 6px;">
+                <a href="{% url 'frontend:textbook_loans' %}" class="btn-outline">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>

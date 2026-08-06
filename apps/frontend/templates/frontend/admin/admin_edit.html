@@ -45,8 +45,8 @@
             {% if is_add %}
             <div class="bg-glass p-xl rounded-lg border border-primary mb-xl">
                 <div class="d-flex align-center gap-sm mb-lg">
-                    <i class="fas fa-user-shield text-lg" style="color: #fbbf24;"></i>
-                    <span class="text-md text-semibold" style="color: #fbbf24;">{% trans "Hisob ma'lumotlari" %}</span>
+                    <i class="fas fa-user-shield text-lg text-warning"></i>
+                    <span class="text-md text-semibold text-warning">{% trans "Hisob ma'lumotlari" %}</span>
                 </div>
                 <p class="text-muted text-sm mb-lg">
                     {% trans "Bo'sh qoldirilsa, avtomatik yaratiladi" %}
@@ -73,7 +73,7 @@
             {% else %}
             <div class="d-flex flex-column gap-xs mb-xl">
                 <label class="text-sm text-muted text-medium">{% trans "Login" %}</label>
-                <div class="text-md text-muted p-md" style="background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; opacity: 0.6;">
+                <div class="text-md text-muted p-md form-control" style="opacity: 0.6;">
                     {{ form.instance.username }}
                 </div>
             </div>
@@ -89,10 +89,10 @@
             {% endif %}
 
             <div class="d-flex gap-md flex-wrap">
-                <button type="submit" class="btn-primary flex-1" style="min-width: 140px; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;">
+                <button type="submit" class="btn-primary flex-1 text-md">
                     <i class="fas fa-check"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend:all_users_list' %}" class="glass-card flex-1 d-flex align-center justify-center gap-xs text-decoration-none text-muted border text-md" style="min-width: 100px; padding: 12px; border-radius: 10px;">
+                <a href="{% url 'frontend:all_users_list' %}" class="btn-outline flex-1 d-flex align-center justify-center gap-xs text-decoration-none text-md">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>

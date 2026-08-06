@@ -10,13 +10,13 @@
 
 {% block content %}
 <div class="mw-600 mx-auto">
-    <div class="glass-panel animate-fade p-3xl" style="padding: 32px 36px;">
+    <div class="glass-panel animate-fade p-3xl">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
             {% for field in form %}
             <div class="form-group mb-2xl">
-                <label class="d-block mb-sm text-sm text-semibold text-muted" style="letter-spacing: 0.3px;">
+                <label class="d-block mb-sm text-sm text-semibold text-muted">
                     {{ field.label }}
                 </label>
 
@@ -50,7 +50,7 @@
                 <button type="submit" class="btn-primary flex-1 p-md text-md d-flex align-center justify-center gap-sm">
                     <i class="fas fa-check"></i> {% trans "Saqlash" %}
                 </button>
-                <a href="{% url 'frontend:admin_news_list' %}" class="glass-card flex-1 p-md text-center text-decoration-none text-muted text-md d-flex align-center justify-center gap-sm border rounded-md">
+                <a href="{% url 'frontend:admin_news_list' %}" class="btn-outline flex-1 p-md text-center text-decoration-none text-muted text-md d-flex align-center justify-center gap-sm">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>

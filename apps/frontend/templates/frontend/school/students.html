@@ -7,74 +7,66 @@
 {% block content %}
 <div class="animate-fade">
     <div class="grid-4 stat-grid mb-xl">
-        <div class="glass-card stat-card p-lg" style="cursor: default;">
-            <div class="stat-value text-xl text-primary">{{ total_students|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Jami o'quvchilar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ total_students|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Jami o'quvchilar" %}</div>
         </div>
-        <div class="glass-card stat-card p-lg" style="cursor: default;">
-            <div class="stat-value text-xl text-success">{{ reading_students|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Kitob o'qiyotganlar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-success">{{ reading_students|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Kitob o'qiyotganlar" %}</div>
         </div>
-        <div class="glass-card stat-card p-lg" style="cursor: default;">
-            <div class="stat-value text-xl" style="color: #6366f1;">{{ entered_today|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Bugun kirdi" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ entered_today|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Bugun kirdi" %}</div>
         </div>
-        <a href="{% url 'frontend:student_add' %}" class="glass-card stat-card d-flex flex-center text-decoration-none p-lg" style="gap: 6px; border: 1px dashed var(--primary);">
-            <i class="fas fa-plus text-primary text-md"></i>
-            <span class="text-xs text-medium text-primary">{% trans "Yangi o'quvchi" %}</span>
-        </a>
-        <a href="{% url 'frontend:import_students_csv' %}" class="glass-card stat-card d-flex flex-center text-decoration-none p-lg" style="gap: 6px; border: 1px dashed var(--accent);">
-            <i class="fas fa-file-csv text-md" style="color: var(--accent);"></i>
-            <span class="text-xs text-medium" style="color: var(--accent);">{% trans "Import CSV" %}</span>
+        <a href="{% url 'frontend:student_add' %}" class="stat-tile d-flex flex-center text-decoration-none gap-sm">
+            <i class="fas fa-plus text-info text-md"></i>
+            <span class="text-sm text-medium">{% trans "Yangi o'quvchi" %}</span>
         </a>
     </div>
 
-    <div class="d-flex gap-sm align-center flex-wrap mb-lg">
-        <a href="{% url 'frontend:graduates_list' %}" class="glass-card d-inline-flex align-center text-decoration-none rounded-md p-sm text-md" style="gap: 6px; color: var(--text);">
-            <i class="fas fa-graduation-cap"></i> {% trans "Bitiruvchilar" %}
-        </a>
+    <div class="action-bar">
+        <a href="{% url 'frontend:graduates_list' %}" class="filter-chip"><i class="fas fa-graduation-cap"></i> {% trans "Bitiruvchilar" %}</a>
+        <span class="flex-1"></span>
+        <a href="{% url 'frontend:import_students_csv' %}" class="btn-outline"><i class="fas fa-file-csv"></i> {% trans "Import CSV" %}</a>
+        <a href="{% url 'frontend:export_students_csv' %}" class="btn-outline"><i class="fas fa-download"></i> CSV</a>
+        <a href="{% url 'frontend:student_add' %}" class="btn-primary"><i class="fas fa-plus"></i> {% trans "Yangi o'quvchi" %}</a>
     </div>
 
-    <div class="d-flex align-center justify-between flex-wrap mb-lg" style="gap: 8px;">
-        <div class="d-flex align-center gap-sm flex-wrap">
-            <a href="{% url 'frontend:students_list' %}" class="glass-card text-decoration-none rounded-xs p-xs text-xs" style="{% if not selected_grade %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{% trans "Barcha sinflar" %}</a>
-            {% for g in grades_list %}
-            <a href="{% url 'frontend:students_list' %}?grade={{ g|urlencode }}" class="glass-card text-decoration-none rounded-xs p-xs text-xs" style="{% if selected_grade == g %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{{ g }} {% trans "sinf" %}</a>
-            {% endfor %}
-        </div>
-        <div class="d-flex align-center gap-sm">
+    <div class="d-flex align-center gap-sm flex-wrap mb-lg">
+        <a href="{% url 'frontend:students_list' %}" class="filter-chip {% if not selected_grade %}active{% endif %}">{% trans "Barcha sinflar" %}</a>
+        {% for g in grades_list %}
+        <a href="{% url 'frontend:students_list' %}?grade={{ g|urlencode }}" class="filter-chip {% if selected_grade == g %}active{% endif %}">{{ g }} {% trans "sinf" %}</a>
+        {% endfor %}
+    </div>
+
+    <div class="glass-panel p-xl">
+        <div class="d-flex align-center justify-between flex-wrap mb-lg" style="gap: 8px;">
             <div class="pos-relative">
                 <input type="text" id="search-input" aria-label="{% trans 'Ism, login yoki sinf...' %}" placeholder="{% trans 'Ism, login yoki sinf...' %}"
                        class="form-control" style="padding: 8px 14px 8px 36px; width: 200px; font-size: 0.8rem; border-radius: 8px;">
                 <i class="fas fa-search pos-absolute text-muted text-md" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
             </div>
             <div class="text-xs text-muted text-nowrap">{{ page_obj.paginator.count }} {% trans "ta o'quvchi" %}</div>
-            <a href="{% url 'frontend:export_students_csv' %}" class="glass-card d-flex align-center text-decoration-none text-muted text-xs border p-sm rounded-md" style="gap: 5px;">
-                <i class="fas fa-download"></i> CSV
-            </a>
         </div>
-    </div>
 
-    <div class="glass-panel p-xl">
-        <div class="info-grid" style="gap: 6px;">
+        <div class="d-flex flex-column gap-xs">
             {% regroup students by grade as grade_groups %}
             {% for grade_group in grade_groups %}
             {% if grade_group.grouper %}
-            <div class="d-flex align-center gap-sm border-bottom p-xs mt-sm" style="grid-column: 1 / -1;">
+            <div class="d-flex align-center gap-sm p-xs mt-sm">
                 <i class="fas fa-layer-group text-xs text-primary"></i>
                 <span class="text-bold text-md">{{ grade_group.grouper }} {% trans "sinf" %}</span>
-                <span class="text-xs text-muted bg-glass px-sm" style="border-radius: 8px; padding-top: 1px; padding-bottom: 1px;">{{ grade_group.list|length }}</span>
+                <span class="badge-soft badge-soft-muted">{{ grade_group.list|length }}</span>
             </div>
             {% endif %}
             {% for student in grade_group.list %}
-            <div class="glass-card info-row student-row p-md" data-search="{{ student.username|lower }} {{ student.first_name|lower }} {{ student.last_name|lower }} {{ student.grade|lower }}">
+            <div class="list-row student-row" data-search="{{ student.username|lower }} {{ student.first_name|lower }} {{ student.last_name|lower }} {{ student.grade|lower }}">
                 <a href="{% url 'frontend:student_detail' student.pk %}" class="d-flex align-center text-decoration-none" style="gap: 10px; flex: 1; min-width: 0; color: inherit;">
-                    <div class="d-flex flex-center flex-shrink-0 rounded-full" style="width: 34px; height: 34px; background: var(--primary);">
-                        <span class="text-bold text-white text-xs">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</span>
-                    </div>
-                    <div class="flex-1" style="min-width: 0;">
-                        <div class="text-semibold text-md">{{ student.first_name }} {{ student.last_name }}</div>
-                        <div class="text-xs text-muted mt-xs">
+                    <div class="list-row-avatar">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</div>
+                    <div class="list-row-main">
+                        <div class="list-row-title">{{ student.first_name }} {{ student.last_name }}</div>
+                        <div class="list-row-sub">
                             <span>@{{ student.username }}</span>
                             {% if student.birth_date %}
                             <span class="ml-xs"><i class="far fa-calendar-alt"></i> {{ student.birth_date|date:"d.m.Y" }}</span>
@@ -82,28 +74,20 @@
                         </div>
                     </div>
                 </a>
-                <div class="d-flex align-center gap-sm flex-shrink-0">
-                    <div class="d-flex align-center gap-xs">
-                        <span class="text-muted text-xs" style="font-family: monospace;">••••••••</span>
-                    </div>
-                    <div class="d-flex gap-xs">
-                        <a href="{% url 'frontend:student_edit' student.pk %}" class="glass-card text-decoration-none text-primary text-xs p-xs rounded-xs" style="white-space: nowrap;"><i class="fas fa-edit"></i></a>
-                        <a href="{% url 'frontend:student_delete' student.pk %}" class="glass-card text-decoration-none rounded-xs p-xs text-xs" style="color: #ef4444; white-space: nowrap;"><i class="fas fa-trash"></i></a>
-                    </div>
+                <div class="row-actions">
+                    <a href="{% url 'frontend:student_edit' student.pk %}" class="icon-btn" aria-label="{% trans 'Tahrirlash' %}"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'frontend:student_delete' student.pk %}" class="icon-btn icon-btn-danger" aria-label="{% trans 'Ochirish' %}"><i class="fas fa-trash"></i></a>
                 </div>
             </div>
             {% endfor %}
             {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-users text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Foydalanuvchilar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha foydalanuvchilar ro'yxati bo'sh" %}</p>
-    </div>
-        {% endfor %}
-            <div id="no-results" class="d-none text-center text-muted text-md p-2xl" style="grid-column: 1 / -1;">
+            <div class="empty-state" id="empty-state">
+                <div class="empty-icon"><i class="fas fa-users"></i></div>
+                <h4>{% trans "Foydalanuvchilar topilmadi" %}</h4>
+                <p>{% trans "Hozircha foydalanuvchilar ro'yxati bo'sh" %}</p>
+            </div>
+            {% endfor %}
+            <div id="no-results" class="d-none text-center text-muted text-md p-2xl">
                 {% trans "Qidiruv bo'yicha hech narsa topilmadi" %}
             </div>
         </div>

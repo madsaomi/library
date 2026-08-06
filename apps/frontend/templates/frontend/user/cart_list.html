@@ -10,36 +10,37 @@
 
 {% block content %}
 <div class="animate-fade">
-    <div class="glass-panel p-xl mb-xl" style="border-radius: 20px;">
-        <div class="d-flex align-center justify-between mb-lg">
-            <h3 class="user-section-title m-0">
+    <div class="glass-panel p-xl mb-xl">
+        <div class="card-header">
+            <h3 class="card-title">
                 <i class="fas fa-shopping-cart"></i>
                 {% trans "Savatingiz" %}
             </h3>
-            <span class="pill-subtle">
-                {{ items|length }} kitob
+            <span class="badge-soft badge-soft-muted">
+                {{ items|length }} {% trans "kitob" %}
             </span>
         </div>
 
         {% if items %}
-        <div class="d-flex align-center gap-md mb-xl">
-            <a href="{% url 'frontend:cart_generate_qr' %}" target="_blank" rel="noopener" class="btn-primary" style="border: none; border-radius: 12px; padding: 11px 22px; font-size: 0.9rem;">
+        <div class="action-bar mb-xl">
+            <a href="{% url 'frontend:cart_generate_qr' %}" target="_blank" rel="noopener" class="btn-primary">
                 <i class="fas fa-qrcode"></i>
                 {% trans "QR kod yaratish" %}
             </a>
-            <button type="button" onclick="clearCart()" class="cursor-pointer" style="border-radius: 12px; padding: 11px 22px; font-size: 0.9rem; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: inherit;">
+            <span class="flex-1"></span>
+            <button type="button" onclick="clearCart()" class="btn-outline">
                 <i class="fas fa-trash"></i>
                 {% trans "Tozalash" %}
             </button>
         </div>
 
-        <div class="book-shelf-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px;">
+        <div class="book-shelf-grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));">
             {% for item in items %}
-            <div class="shelf-item pos-relative overflow-hidden cursor-pointer border transition rounded-2xl" style="background: var(--hover-bg);">
+            <div class="shelf-item pos-relative overflow-hidden cursor-pointer border transition">
                 {% if item.book.cover %}
-                <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}" class="w-full d-block object-cover" style="aspect-ratio: 3/4;">
+                <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}" class="w-full d-block object-cover">
                 {% else %}
-                <div class="d-flex align-center justify-center p-xl text-center" style="width: 100%; aspect-ratio: 3/4; background: var(--hover-bg);">
+                <div class="d-flex align-center justify-center p-xl text-center" style="width: 100%; height: 100%; background: var(--hover-bg);">
                     <div>
                         <i class="fas fa-book text-2xl text-muted" style="opacity: 0.3; margin-bottom: 8px;"></i>
                         <p class="text-sm">{% trans "Ko'rsatilmagan kitob" %}</p>
@@ -53,7 +54,7 @@
                     {% if item.book.author %}
                     <p class="text-xs text-muted mb-sm">{{ item.book.author }}</p>
                     {% endif %}
-                    <button type="button" onclick="removeCartItem({{ item.id }})" class="cursor-pointer w-100" style="border-radius: 8px; padding: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: inherit;">
+                    <button type="button" onclick="removeCartItem({{ item.id }})" class="icon-btn w-100">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -61,13 +62,11 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center py-2xl" style="color: var(--text-muted);">
-            <div class="d-flex justify-center mb-lg">
-                <i class="fas fa-shopping-cart text-5xl opacity-20"></i>
-            </div>
-            <h4 class="mb-md">{% trans "Savatingiz bo'sh" %}</h4>
-            <p class="mb-xl">{% trans "Kutubxonadan kitob tanlang va savatga qo'shing" %}</p>
-            <a href="{% url 'frontend:library' %}" class="btn btn-primary">
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-shopping-cart"></i></div>
+            <h4>{% trans "Savatingiz bo'sh" %}</h4>
+            <p>{% trans "Kutubxonadan kitob tanlang va savatga qo'shing" %}</p>
+            <a href="{% url 'frontend:library' %}" class="btn-primary mt-lg">
                 <i class="fas fa-book-open"></i>
                 {% trans "Kutubxonaga o'tish" %}
             </a>

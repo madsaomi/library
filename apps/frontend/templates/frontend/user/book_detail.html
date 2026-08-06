@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="glass-panel animate-fade p-3xl" style="border-radius: 20px;">
+<div class="glass-panel animate-fade p-3xl">
     <div class="d-flex gap-2xl align-start flex-wrap">
         <div class="w-full flex-shrink-0 mx-auto" style="max-width: 280px;">
             <div class="overflow-hidden border rounded-2xl" style="aspect-ratio: 2/3; background: var(--hover-bg);">
@@ -17,23 +17,23 @@
                 <img src="{{ book.cover.url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
                 {% else %}
                 <div class="h-full flex-center">
-                    <i class="fas fa-book text-3xl" style="opacity: 0.15; color: var(--text-muted);"></i>
+                    <i class="fas fa-book text-3xl text-muted" style="opacity: 0.15;"></i>
                 </div>
                 {% endif %}
             </div>
 
             <div class="responsive-grid-3 mt-md" style="gap: 8px;">
-                <div class="user-stat p-sm">
-                    <div class="value" style="font-size: 1.2rem;">{{ book.total_count }}</div>
-                    <div class="label">{% trans "Jami" %}</div>
+                <div class="stat-tile p-sm text-center">
+                    <div class="stat-tile-value text-main">{{ book.total_count }}</div>
+                    <div class="stat-tile-label">{% trans "Jami" %}</div>
                 </div>
-                <div class="user-stat p-sm">
-                    <div class="value" style="font-size: 1.2rem;">{{ book.available_count }}</div>
-                    <div class="label">{% trans "Mavjud" %}</div>
+                <div class="stat-tile p-sm text-center">
+                    <div class="stat-tile-value text-success">{{ book.available_count }}</div>
+                    <div class="stat-tile-label">{% trans "Mavjud" %}</div>
                 </div>
-                <div class="user-stat p-sm">
-                    <div class="value" style="font-size: 1.2rem;">{{ book.borrow_count }}</div>
-                    <div class="label">{% trans "O'qilgan" %}</div>
+                <div class="stat-tile p-sm text-center">
+                    <div class="stat-tile-value text-main">{{ book.borrow_count }}</div>
+                    <div class="stat-tile-label">{% trans "O'qilgan" %}</div>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
                 </span>
                 {% if book.borrow_count > 50 %}
                 <span class="pill-subtle">
-                    <i class="fas fa-star"></i> {% trans "Mashhur" %}
+                    <i class="fas fa-star text-warning"></i> {% trans "Mashhur" %}
                 </span>
                 {% endif %}
             </div>
@@ -70,19 +70,19 @@
 
             <div class="d-flex gap-lg flex-wrap">
                 {% if request.user.role == 'student' and book.is_textbook %}
-                <div class="glass-card p-lg d-flex align-center gap-sm flex-1" style="min-width: 200px; border: 1px solid rgba(217,119,6,0.3); font-size: 0.85rem;">
-                    <i class="fas fa-book-open" style="color: #d97706;"></i>
+                <div class="glass-card p-lg d-flex align-center gap-sm flex-1" style="min-width: 200px; border: 1px solid var(--warning); font-size: 0.85rem;">
+                    <i class="fas fa-book-open text-warning"></i>
                     <span>{% trans "Bu darslik. O'quvchilar darsliklarni o'quv yili boshida olishadi." %}</span>
                 </div>
                 {% elif book.available_count > 0 %}
-                <a href="{% url 'frontend:reserve_book' book.pk %}" class="btn-primary text-decoration-none d-flex align-center justify-center gap-sm rounded-lg flex-1" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px; border: none;">
+                <a href="{% url 'frontend:reserve_book' book.pk %}" class="btn-primary text-decoration-none d-flex align-center justify-center gap-sm flex-1" style="min-width: 200px;">
                     <i class="fas fa-plus-circle"></i> {% trans "Kitobni bron qilish" %}
                 </a>
-                <a href="{% url 'frontend:cart_add' book.pk %}" class="btn-primary text-decoration-none d-flex align-center justify-center gap-sm rounded-lg flex-1" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px; background: var(--hover-bg); color: var(--text-main); border: 1px solid var(--border);">
+                <a href="{% url 'frontend:cart_add' book.pk %}" class="btn-outline text-decoration-none d-flex align-center justify-center gap-sm flex-1" style="min-width: 200px;">
                     <i class="fas fa-cart-plus"></i> {% trans "Savatga qo'shish" %}
                 </a>
                 {% else %}
-                <a href="{% url 'frontend:join_waitlist' book.pk %}" class="btn-primary d-flex align-center justify-center gap-sm rounded-lg flex-1 text-decoration-none" style="padding: 14px 28px; font-size: 0.95rem; min-width: 200px; background: var(--hover-bg); color: var(--text-main); border: 1px solid var(--border);">
+                <a href="{% url 'frontend:join_waitlist' book.pk %}" class="btn-outline d-flex align-center justify-center gap-sm flex-1 text-decoration-none" style="min-width: 200px;">
                     <i class="fas fa-clock"></i> {% trans "Navbatga turish" %}
                 </a>
                 {% endif %}

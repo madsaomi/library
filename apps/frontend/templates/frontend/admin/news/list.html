@@ -10,53 +10,49 @@
 
 {% block content %}
 <div class="animate-fade mw-800 mx-auto">
-    <div class="d-flex gap-md mb-xl">
-<a href="{% url 'frontend:admin_news_add' %}" class="btn-primary text-md" style="padding: 8px 16px; text-decoration: none;">
+    <div class="action-bar mb-xl">
+        <div class="stat-tile text-decoration-none" style="padding: 12px 18px;">
+            <span class="text-muted text-sm">{% trans "Barcha" %}: <strong class="text-main">{{ news|length }}</strong></span>
+        </div>
+        <span class="flex-1"></span>
+        <a href="{% url 'frontend:admin_news_add' %}" class="btn-primary text-md text-decoration-none">
             <i class="fas fa-plus"></i> {% trans "Yangi" %}
         </a>
-        <div class="glass-card p-lg d-flex align-center gap-sm text-sm">
-            <span class="text-muted">{% trans "Barcha" %}: <strong class="text-main">{{ news|length }}</strong></span>
-        </div>
     </div>
 
     <div class="d-flex flex-column gap-md">
         {% for item in news %}
-        <div class="glass-card p-xl d-flex align-start gap-lg">
+        <div class="list-row">
             {% if item.image %}
-            <div class="flex-shrink-0 overflow-hidden rounded-md bg-hover" style="width: 60px; height: 60px;">
+            <div class="flex-shrink-0 overflow-hidden rounded-md" style="width: 60px; height: 60px;">
                 <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-full object-cover">
             </div>
             {% else %}
-            <div class="flex-center flex-shrink-0 rounded-md bg-hover" style="width: 60px; height: 60px;">
-                <i class="fas fa-newspaper text-muted" style="opacity: 0.3;"></i>
-            </div>
+            <div class="list-row-avatar"><i class="fas fa-newspaper"></i></div>
             {% endif %}
-            <div class="flex-1" style="min-width: 0;">
+            <div class="list-row-main">
                 <div class="d-flex align-center gap-sm mb-xs">
-                    <h4 class="text-semibold m-0" style="font-size: 0.9rem;">{{ item.title }}</h4>
+                    <div class="list-row-title">{{ item.title }}</div>
                     {% if item.is_published %}
-                    <span class="text-xs text-bold text-success bg-success px-xs py-xs rounded-sm">{% trans "Chop etilgan" %}</span>
+                    <span class="badge-soft badge-soft-success">{% trans "Chop etilgan" %}</span>
                     {% else %}
-                    <span class="text-xs text-bold text-danger bg-danger px-xs py-xs rounded-sm">{% trans "Qoralama" %}</span>
+                    <span class="badge-soft badge-soft-danger">{% trans "Qoralama" %}</span>
                     {% endif %}
                 </div>
-                <div class="text-sm text-muted lh-normal" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ item.render_body }}</div>
+                <div class="text-sm text-muted" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ item.render_body }}</div>
                 <div class="mt-sm d-flex gap-md align-center">
-                    <span class="text-xs text-muted" style="opacity: 0.6;"><i class="far fa-clock"></i> {{ item.created_at|date:"d.m.Y H:i" }}</span>
-<a href="{% url 'frontend:admin_news_edit' item.pk %}" aria-label="Tahrirlash" class="text-xs text-primary text-decoration-none"><i class="fas fa-edit"></i></a>
-                    <a href="{% url 'frontend:admin_news_delete' item.pk %}" aria-label="O'chirish" class="text-xs text-danger text-decoration-none"><i class="fas fa-trash"></i></a>
+                    <span class="text-xs text-muted text-muted"><i class="far fa-clock"></i> {{ item.created_at|date:"d.m.Y H:i" }}</span>
+                    <a href="{% url 'frontend:admin_news_edit' item.pk %}" aria-label="Tahrirlash" class="text-info text-decoration-none"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'frontend:admin_news_delete' item.pk %}" aria-label="O'chirish" class="text-danger text-decoration-none"><i class="fas fa-trash"></i></a>
                 </div>
             </div>
         </div>
         {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+            <h4>{% trans "Ma'lumot topilmadi" %}</h4>
+            <p>{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
         </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
         {% endfor %}
     </div>
 </div>

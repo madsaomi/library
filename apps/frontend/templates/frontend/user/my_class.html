@@ -10,29 +10,29 @@
 
 {% block content %}
 <div class="animate-fade mw-600 mx-auto">
-    <div class="glass-panel p-lg mb-xl text-center" style="border-radius: 16px;">
-        <div class="text-2xl text-semibold text-main">{{ class_data|length }}</div>
-        <div class="text-sm text-muted">{% trans "o'quvchi" %}</div>
+    <div class="stat-tile text-center mb-xl">
+        <div class="stat-tile-value text-main">{{ class_data|length }}</div>
+        <div class="stat-tile-label">{% trans "o'quvchi" %}</div>
     </div>
 
-    <div class="d-grid gap-sm mb-xl" style="grid-template-columns: repeat(3, 1fr);">
-        <div class="glass-panel p-md text-center" style="border-radius: 12px;">
-            <div class="text-lg text-semibold text-main">{{ my_read }}</div>
-            <div class="text-xs text-muted">{% trans "O'qilgan" %}</div>
+    <div class="grid-3 mb-xl" style="gap: 12px;">
+        <div class="stat-tile text-center">
+            <div class="stat-tile-value text-main">{{ my_read }}</div>
+            <div class="stat-tile-label">{% trans "O'qilgan" %}</div>
         </div>
-        <div class="glass-panel p-md text-center" style="border-radius: 12px;">
-            <div class="text-lg text-semibold text-main">{{ my_active }}</div>
-            <div class="text-xs text-muted">{% trans "Faol" %}</div>
+        <div class="stat-tile text-center">
+            <div class="stat-tile-value text-main">{{ my_active }}</div>
+            <div class="stat-tile-label">{% trans "Faol" %}</div>
         </div>
-        <div class="glass-panel p-md text-center" style="border-radius: 12px;">
-            <div class="text-lg text-semibold text-main">{{ my_ach }}</div>
-            <div class="text-xs text-muted">{% trans "Yutuq" %}</div>
+        <div class="stat-tile text-center">
+            <div class="stat-tile-value text-main">{{ my_ach }}</div>
+            <div class="stat-tile-label">{% trans "Yutuq" %}</div>
         </div>
     </div>
 
-    <div class="glass-panel p-md" style="border-radius: 16px;">
+    <div class="glass-panel p-md">
         {% for item in class_data|slice:":10" %}
-        <div class="d-flex align-center gap-md py-sm {% if not forloop.last %}border-bottom{% endif %} {% if item.student.pk == request.user.pk %}" style="background: var(--glass); border-radius: 8px;{% endif %}">
+        <div class="d-flex align-center gap-md py-sm {% if not forloop.last %}border-bottom{% endif %} {% if item.student.pk == request.user.pk %}leader-row is-me{% endif %}">
             <div class="text-muted text-sm" style="width: 20px;">{{ forloop.counter }}</div>
             <div class="flex-1" style="min-width: 0;">
                 <div class="text-sm text-semibold text-main text-truncate">{{ item.student.first_name }}</div>
@@ -43,9 +43,9 @@
             </div>
         </div>
         {% empty %}
-        <div class="text-center py-xl text-muted">
-            <i class="fas fa-users text-2xl mb-md" style="opacity: 0.3;"></i>
-            <p>{% trans "Ma'lumot yo'q" %}</p>
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-users"></i></div>
+            <h4>{% trans "Ma'lumot yo'q" %}</h4>
         </div>
         {% endfor %}
     </div>

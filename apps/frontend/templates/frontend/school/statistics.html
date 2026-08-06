@@ -12,53 +12,51 @@
 {% block content %}
 <div class="animate-fade mw-800 mx-auto">
     <div class="grid-4 stat-grid mb-xl">
-        <div class="glass-card stat-card p-md cursor-default text-center">
-            <div class="stat-value text-primary" style="font-size: 1.15rem;">{{ total_students }}</div>
-            <div class="stat-label text-xs">{% trans "O'quvchilar" %}</div>
+        <div class="stat-tile text-center">
+            <div class="stat-tile-value text-info">{{ total_students }}</div>
+            <div class="stat-tile-label">{% trans "O'quvchilar" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default text-center">
-            <div class="stat-value text-success" style="font-size: 1.15rem;">{{ active_count }}</div>
-            <div class="stat-label text-xs">{% trans "Aktiv o'quvchilar" %}</div>
+        <div class="stat-tile text-center">
+            <div class="stat-tile-value text-success">{{ active_count }}</div>
+            <div class="stat-tile-label">{% trans "Aktiv o'quvchilar" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default text-center">
-            <div class="stat-value" style="font-size: 1.15rem; color: #f59e0b;">{{ total_books }}</div>
-            <div class="stat-label text-xs">{% trans "Kitoblar" %}</div>
+        <div class="stat-tile text-center">
+            <div class="stat-tile-value text-warning">{{ total_books }}</div>
+            <div class="stat-tile-label">{% trans "Kitoblar" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default text-center">
-            <div class="stat-value" style="font-size: 1.15rem; color: #6366f1;">{{ active_issues }}/{{ total_issues }}</div>
-            <div class="stat-label text-xs">{% trans "Ijaralar" %}</div>
+        <div class="stat-tile text-center">
+            <div class="stat-tile-value text-info">{{ active_issues }}/{{ total_issues }}</div>
+            <div class="stat-tile-label">{% trans "Ijaralar" %}</div>
         </div>
     </div>
 
     <!-- Top o'quvchilar -->
     <div class="glass-panel p-xl mb-lg">
-        <h3 class="mb-md text-md d-flex align-center gap-sm">
-            <i class="fas fa-trophy" style="color: #f59e0b;"></i> {% trans "Top o'quvchilar" %}
-        </h3>
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-trophy text-warning"></i> {% trans "Top o'quvchilar" %}</h3>
+        </div>
         {% if top_students %}
-        <div class="info-grid gap-xs">
+        <div class="d-flex flex-column gap-xs">
             {% for s in top_students %}
-            <div class="d-flex align-center border-bottom gap-sm py-sm px-sm">
-                <span class="text-sm text-bold text-center" style="width: 22px; color: {% if forloop.counter == 1 %}#f59e0b{% elif forloop.counter == 2 %}#94a3b8{% elif forloop.counter == 3 %}#b45309{% else %}var(--text-muted){% endif %};">{{ forloop.counter }}</span>
-                <div class="avatar-circle flex-shrink-0" style="width: 30px; height: 30px; background: {% if forloop.counter == 1 %}#f59e0b{% else %}var(--primary){% endif %};">
-                    <span class="avatar-initials text-xs">{{ s.first_name|first|upper }}{{ s.last_name|first|upper }}</span>
-                </div>
-                <div class="flex-1" style="min-width: 0;">
-                    <div class="text-sm text-medium">{{ s.first_name }} {{ s.last_name }}</div>
-                    <div class="text-xs text-muted">{{ s.grade|default:"—" }}</div>
+            <div class="list-row">
+                <span class="text-sm text-bold text-center" style="width: 22px; {% if forloop.counter == 1 %}color: #f59e0b;{% elif forloop.counter == 2 %}color: #94a3b8;{% elif forloop.counter == 3 %}color: #b45309;{% endif %}">{{ forloop.counter }}</span>
+                <div class="list-row-avatar">{{ s.first_name|first|upper }}{{ s.last_name|first|upper }}</div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ s.first_name }} {{ s.last_name }}</div>
+                    <div class="list-row-sub">{{ s.grade|default:"—" }}</div>
                 </div>
                 <div class="text-right">
-                    <div class="text-sm text-semibold text-primary">{{ s.total_books_read }}</div>
-                    <div class="text-muted" style="font-size: 0.55rem;">{% trans "kitob" %}</div>
+                    <div class="text-sm text-semibold text-info">{{ s.total_books_read }}</div>
+                    <div class="text-muted text-xs">{% trans "kitob" %}</div>
                 </div>
                 <form method="post" action="{% url 'frontend:post_top_student_news' s.pk %}" onsubmit="return confirm('{% trans "Chop etishni tasdiqlaysizmi?" as confirm_msg %}{{ confirm_msg|escapejs }}')">
                     {% csrf_token %}
                     {% if s.pk in posted_today_ids %}
-                    <button type="submit" disabled class="d-flex align-center gap-xs rounded text-success text-medium text-nowrap cursor-default py-sm px-md" style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); font-size: 0.72rem;">
+                    <button type="submit" disabled class="badge-soft badge-soft-success border-none text-medium text-nowrap cursor-default">
                         <i class="fas fa-check-circle"></i> {% trans "Chop etilgan" %}
                     </button>
                     {% else %}
-                    <button type="submit" class="d-flex align-center gap-xs rounded cursor-pointer text-nowrap py-sm px-md transition-fast" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; font-size: 0.72rem; font-weight: 500;" title="{% trans 'Yangilik qilib post qilish' %}">
+                    <button type="submit" class="btn-outline text-nowrap" style="font-size: 0.78rem;" title="{% trans 'Yangilik qilib post qilish' %}">
                         <i class="fas fa-newspaper"></i> {% trans "Post qilish" %}
                     </button>
                     {% endif %}
@@ -73,31 +71,29 @@
 
     <!-- Aktiv o'quvchilar -->
     <div class="glass-panel p-xl mb-lg">
-        <h3 class="mb-md text-md d-flex align-center gap-sm">
-            <i class="fas fa-book-reader text-success"></i> {% trans "Aktiv o'quvchilar" %} <span class="badge rounded-sm text-xs" style="background: rgba(16,185,129,0.1); color: #10b981;">{{ active_count }}</span>
-        </h3>
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-book-reader text-success"></i> {% trans "Aktiv o'quvchilar" %}
+                <span class="badge-soft badge-soft-success">{{ active_count }}</span>
+            </h3>
+        </div>
         {% if active_students %}
-        <div class="info-grid gap-xs">
+        <div class="d-flex flex-column gap-xs">
             {% for s in active_students %}
-            <div class="d-flex align-center border-bottom gap-sm py-sm px-sm">
-                <div class="avatar-circle flex-shrink-0" style="width: 30px; height: 30px; background: #10b981;">
-                    <span class="avatar-initials text-xs">{{ s.first_name|first|upper }}{{ s.last_name|first|upper }}</span>
-                </div>
-                <div class="flex-1" style="min-width: 0;">
-                    <div class="text-sm text-medium">{{ s.first_name }} {{ s.last_name }}</div>
-                    <div class="text-xs text-muted">@{{ s.username }} · {{ s.grade|default:"—" }}</div>
+            <div class="list-row">
+                <div class="list-row-avatar">{{ s.first_name|first|upper }}{{ s.last_name|first|upper }}</div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ s.first_name }} {{ s.last_name }}</div>
+                    <div class="list-row-sub">@{{ s.username }} · {{ s.grade|default:"—" }}</div>
                 </div>
             </div>
             {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+                <h4>{% trans "Ma'lumot topilmadi" %}</h4>
+                <p>{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+            </div>
+            {% endfor %}
         </div>
         {% else %}
         <p class="text-sm text-muted">{% trans "Aktiv o'quvchilar yo'q" %}</p>
@@ -106,19 +102,19 @@
 
     <!-- Yutuqlar -->
     <div class="glass-panel p-xl mb-lg">
-        <h3 class="mb-md text-md d-flex align-center gap-sm">
-            <i class="fas fa-medal" style="color: #f59e0b;"></i> {% trans "Yutuqlar" %}
-        </h3>
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-medal text-warning"></i> {% trans "Yutuqlar" %}</h3>
+        </div>
         {% if recent_yutuqlar %}
-        <div class="info-grid gap-xs">
+        <div class="d-flex flex-column gap-xs">
             {% for y in recent_yutuqlar %}
-            <div class="d-flex align-center border-bottom gap-sm py-sm px-sm">
-                <i class="{{ y.achievement.icon }}" style="font-size: 1rem; color: #f59e0b; width: 24px; text-align: center;"></i>
-                <div class="flex-1" style="min-width: 0;">
-                    <div class="text-sm text-medium">{{ y.achievement|ach_name }}</div>
-                    <div class="text-xs text-muted">{{ y.user.first_name }} {{ y.user.last_name }} · {{ y.earned_at|date:"d.m.Y" }}</div>
+            <div class="list-row">
+                <i class="{{ y.achievement.icon }} text-warning text-center" style="width: 24px; flex-shrink: 0;"></i>
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ y.achievement|ach_name }}</div>
+                    <div class="list-row-sub">{{ y.user.first_name }} {{ y.user.last_name }} · {{ y.earned_at|date:"d.m.Y" }}</div>
                 </div>
-                <span class="badge rounded-sm text-xs text-nowrap" style="background: rgba(245,158,11,0.1); color: #f59e0b;">+{{ y.achievement.xp_reward }} XP</span>
+                <span class="badge-soft badge-soft-warning text-nowrap">+{{ y.achievement.xp_reward }} XP</span>
             </div>
             {% endfor %}
         </div>
@@ -129,19 +125,19 @@
 
     <!-- Chellenjlar -->
     <div class="glass-panel p-xl mb-lg">
-        <h3 class="mb-md text-md d-flex align-center gap-sm">
-            <i class="fas fa-fire text-danger"></i> {% trans "Chellenjlar" %}
-        </h3>
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-fire text-danger"></i> {% trans "Chellenjlar" %}</h3>
+        </div>
         {% if active_chellenjlar %}
-        <div class="info-grid gap-xs">
+        <div class="d-flex flex-column gap-xs">
             {% for c in active_chellenjlar %}
-            <div class="d-flex align-center border-bottom gap-sm py-sm px-sm">
-                <i class="fas fa-flag-checkered" style="font-size: 1rem; color: #ef4444; width: 24px; text-align: center;"></i>
-                <div class="flex-1" style="min-width: 0;">
-                    <div class="text-sm text-medium">{{ c.title }}</div>
-                    <div class="text-xs text-muted">{{ c.target_count }} {% trans "kitob" %} · {{ c.end_date|date:"d.m.Y" }} gacha</div>
+            <div class="list-row">
+                <i class="fas fa-flag-checkered text-danger text-center" style="width: 24px; flex-shrink: 0;"></i>
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ c.title }}</div>
+                    <div class="list-row-sub">{{ c.target_count }} {% trans "kitob" %} · {{ c.end_date|date:"d.m.Y" }} gacha</div>
                 </div>
-                <span class="badge rounded-sm text-xs text-nowrap" style="background: rgba(239,68,68,0.1); color: #ef4444;">+{{ c.xp_reward }} XP</span>
+                <span class="badge-soft badge-soft-danger text-nowrap">+{{ c.xp_reward }} XP</span>
             </div>
             {% endfor %}
         </div>

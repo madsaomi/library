@@ -11,17 +11,17 @@
 {% block content %}
 <div class="animate-fade">
     <div class="grid-3 stat-grid mb-xl">
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl" style="color: #6366f1;">{{ total_issued|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Berilgan kitoblar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ total_issued|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Berilgan kitoblar" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl text-success">{{ unique_students|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "O'quvchilar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-success">{{ unique_students|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "O'quvchilar" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl" style="color: #f59e0b;">{{ unique_books|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Kitoblar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-warning">{{ unique_books|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Kitoblar" %}</div>
         </div>
     </div>
 
@@ -29,51 +29,42 @@
         <div class="d-flex flex-between mb-lg">
             <div class="pos-relative">
                 <input type="text" id="search-input" aria-label="{% trans 'Kitob nomi yoki foydalanuvchi...' %}" placeholder="{% trans 'Kitob nomi yoki foydalanuvchi...' %}"
-                       class="border rounded text-sm" style="padding: 8px 14px 8px 36px; background: var(--input-bg); color: var(--input-text); outline: none; width: 240px;">
+                       class="form-control" style="padding: 8px 14px 8px 36px; width: 240px; font-size: 0.8rem; border-radius: 8px;">
                 <i class="fas fa-search pos-absolute text-muted text-sm" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
             </div>
-            <div class="text-sm text-muted">{{ total_issued }} {% trans "ta aktiv" %}</div>
-            <a href="{% url 'frontend:export_issues_csv' %}" class="glass-card d-flex align-center gap-xs rounded text-sm text-decoration-none text-muted border py-sm px-md">
-                <i class="fas fa-download"></i> CSV
-            </a>
+            <div class="d-flex align-center gap-md">
+                <div class="text-sm text-muted">{{ total_issued }} {% trans "ta aktiv" %}</div>
+                <a href="{% url 'frontend:export_issues_csv' %}" class="btn-outline text-sm"><i class="fas fa-download"></i> CSV</a>
+            </div>
         </div>
 
-        <div class="info-grid gap-xs animate-group">
+        <div class="d-flex flex-column gap-xs">
             {% for issue in issues %}
-            <div class="glass-card info-row issue-row animate-item" data-search="{{ issue.book.title|lower }} {{ issue.user.first_name|lower }} {{ issue.user.last_name|lower }} {{ issue.user.username|lower }}" style="padding: 10px 14px;">
-                <div class="d-flex align-center flex-1 gap-sm" style="min-width: 0;">
-                    <div class="rounded d-flex align-center justify-center flex-shrink-0 overflow-hidden" style="width: 36px; height: 36px; background: rgba(99,102,241,0.1);">
-                        {% if issue.book.cover %}
-                        <img src="{{ issue.book.cover.url }}" alt="{{ issue.book.title }}" class="w-full h-full object-cover">
+            <div class="list-row issue-row" data-search="{{ issue.book.title|lower }} {{ issue.user.first_name|lower }} {{ issue.user.last_name|lower }} {{ issue.user.username|lower }}">
+                <div class="list-row-avatar"><i class="fas fa-book"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ issue.book.title|truncatechars:40 }}</div>
+                    <div class="list-row-sub">
+                        {{ issue.user.get_full_name|default:issue.user.username }}
+                        {% if issue.user.role == 'student' %}
+                        <span class="badge-soft badge-soft-primary ml-xs">{{ issue.user.grade }}</span>
                         {% else %}
-                        <i class="fas fa-book text-sm" style="color: #6366f1;"></i>
+                        <span class="badge-soft badge-soft-warning ml-xs">{{ issue.user.get_role_display }}</span>
                         {% endif %}
-                    </div>
-                    <div class="flex-1" style="min-width: 0;">
-                        <div class="text-semibold text-sm">{{ issue.book.title|truncatechars:40 }}</div>
-                        <div class="text-xs text-muted" style="margin-top: 1px;">
-                            {{ issue.user.get_full_name|default:issue.user.username }}
-                            <span class="badge ml-xs" style="padding: 1px 6px; border-radius: 4px; font-size: 0.6rem; background: {% if issue.user.role == 'student' %}rgba(99,102,241,0.1); color: #6366f1{% else %}rgba(245,158,11,0.1); color: #f59e0b{% endif %};">
-                                {% if issue.user.role == 'student' and issue.user.grade %}{{ issue.user.grade }}{% else %}{{ issue.user.get_role_display }}{% endif %}
-                            </span>
-                        </div>
                     </div>
                 </div>
                 <div class="text-right flex-shrink-0">
                     <div class="text-xs text-muted">{{ issue.issued_at|date:"d.m.Y H:i" }}</div>
-                    <span class="badge text-success rounded-sm text-xs d-inline-block" style="padding: 2px 8px; background: rgba(16,185,129,0.1); margin-top: 2px;">{% trans "Berilgan" %}</span>
+                    <span class="badge-soft badge-soft-success d-inline-block" style="margin-top: 2px;">{% trans "Berilgan" %}</span>
                 </div>
             </div>
             {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-book text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
-    </div>
-        {% endfor %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-book"></i></div>
+                <h4>{% trans "Kitoblar topilmadi" %}</h4>
+                <p>{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
+            </div>
+            {% endfor %}
             <div id="no-results" class="d-none full-width p-3xl text-center text-muted text-md">
                 {% trans "Qidiruv bo'yicha hech narsa topilmadi" %}
             </div>

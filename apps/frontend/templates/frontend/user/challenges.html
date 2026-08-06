@@ -14,7 +14,7 @@
     {% if challenges %}
     {% for challenge in challenges %}
     {% with uc=user_challenges|get_item:challenge.id %}
-    <div class="glass-panel p-lg mb-lg" style="border-radius: 16px; {% if uc and uc.progress >= challenge.target_count %}border: 2px solid var(--primary);{% endif %}">
+    <div class="glass-panel p-lg mb-lg" style="{% if uc and uc.progress >= challenge.target_count %}border: 2px solid var(--primary);{% endif %}">
         <div class="d-flex justify-between align-start mb-md">
             <div class="flex-1">
                 <div class="text-semibold text-main mb-xs">{{ challenge.title }}</div>
@@ -28,7 +28,7 @@
                 <span>{% if uc %}{{ uc.progress }}{% else %}0{% endif %} / {{ challenge.target_count }}</span>
             </div>
             <div style="height: 8px; background: var(--hover-bg); border-radius: 4px; overflow: hidden;">
-                <div style="width: {% if uc %}{% widthratio uc.progress challenge.target_count 100 %}{% else %}0{% endif %}%; height: 100%; background: {% if uc and uc.progress >= challenge.target_count %}#10b981{% else %}var(--primary){% endif %}; border-radius: 4px; transition: width 0.5s;"></div>
+                <div style="width: {% if uc %}{% widthratio uc.progress challenge.target_count 100 %}{% else %}0{% endif %}%; height: 100%; background: {% if uc and uc.progress >= challenge.target_count %}var(--success){% else %}var(--primary){% endif %}; border-radius: 4px; transition: width 0.5s;"></div>
             </div>
         </div>
         {% if uc and uc.progress >= challenge.target_count %}
@@ -41,9 +41,9 @@
     {% endwith %}
     {% endfor %}
     {% else %}
-    <div class="text-center py-2xl text-muted">
-        <i class="fas fa-bolt text-3xl mb-md" style="opacity: 0.3;"></i>
-        <p>{% trans "Hozircha chellenjlar yo'q" %}</p>
+    <div class="empty-state">
+        <div class="empty-icon"><i class="fas fa-bolt"></i></div>
+        <h4>{% trans "Hozircha chellenjlar yo'q" %}</h4>
     </div>
     {% endif %}
 </div>

@@ -10,34 +10,34 @@
 {% endblock %}
 {% block content %}
 <div class="animate-fade">
-    <div class="grid-6 stat-grid">
-        <a href="{% url 'frontend:all_books_list' %}" class="glass-card stat-card p-lg" id="stat-total_books">
-            <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">{{ total_books }}</div>
-            <div class="stat-label text-sm">{% trans "Kitoblar" %}</div>
+    <div class="grid-6 stat-grid mb-2xl">
+        <a href="{% url 'frontend:all_books_list' %}" class="stat-tile text-decoration-none" id="stat-total_books">
+            <div class="stat-tile-value text-info">{{ total_books }}</div>
+            <div class="stat-tile-label">{% trans "Kitoblar" %}</div>
         </a>
-        <a href="{% url 'frontend:all_users_list' %}" class="glass-card stat-card p-lg" id="stat-total_students">
-            <div class="stat-value" style="font-size: 1.3rem; color: #10b981;">{{ total_students }}</div>
-            <div class="stat-label text-sm">{% trans "Kitobxonlar" %}</div>
+        <a href="{% url 'frontend:all_users_list' %}" class="stat-tile text-decoration-none" id="stat-total_students">
+            <div class="stat-tile-value text-success">{{ total_students }}</div>
+            <div class="stat-tile-label">{% trans "Kitobxonlar" %}</div>
         </a>
-        <a href="{% url 'frontend:schools_list' %}" class="glass-card stat-card p-lg" id="stat-total_schools">
-            <div class="stat-value" style="font-size: 1.3rem; color: #6366f1;">{{ total_schools }}</div>
-            <div class="stat-label text-sm">{% trans "Maktablar" %}</div>
+        <a href="{% url 'frontend:schools_list' %}" class="stat-tile text-decoration-none" id="stat-total_schools">
+            <div class="stat-tile-value text-info">{{ total_schools }}</div>
+            <div class="stat-tile-label">{% trans "Maktablar" %}</div>
         </a>
-        <a href="{% url 'frontend:system_logs' %}?action=ISSUE&period=today" class="glass-card stat-card p-lg" id="stat-issued_today">
-            <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">{{ issued_today }}</div>
-            <div class="stat-label text-sm">{% trans "Bugun berilgan" %}</div>
+        <a href="{% url 'frontend:system_logs' %}?action=ISSUE&period=today" class="stat-tile text-decoration-none" id="stat-issued_today">
+            <div class="stat-tile-value text-info">{{ issued_today }}</div>
+            <div class="stat-tile-label">{% trans "Bugun berilgan" %}</div>
         </a>
-        <a href="{% url 'frontend:system_logs' %}?action=RETURN&period=today" class="glass-card stat-card p-lg" id="stat-returned_today">
-            <div class="stat-value" style="font-size: 1.3rem; color: var(--secondary);">{{ returned_today }}</div>
-            <div class="stat-label text-sm">{% trans "Bugun qaytarilgan" %}</div>
+        <a href="{% url 'frontend:system_logs' %}?action=RETURN&period=today" class="stat-tile text-decoration-none" id="stat-returned_today">
+            <div class="stat-tile-value text-success">{{ returned_today }}</div>
+            <div class="stat-tile-label">{% trans "Bugun qaytarilgan" %}</div>
         </a>
-        <div class="glass-card stat-card p-lg cursor-default" id="stat-total_xp">
-            <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">{{ total_xp }}</div>
-            <div class="stat-label text-sm">{% trans "Umumiy XP" %}</div>
+        <div class="stat-tile" id="stat-total_xp">
+            <div class="stat-tile-value text-info">{{ total_xp }}</div>
+            <div class="stat-tile-label">{% trans "Umumiy XP" %}</div>
         </div>
     </div>
 
-    <div class="d-flex gap-md align-center mb-xl">
+    <div class="action-bar mb-xl">
         <span class="text-muted text-md"><i class="fas fa-calendar-alt"></i></span>
         <form method="get" class="d-inline">
             <select name="period" class="form-control text-md" style="width: auto; min-width: 100px; padding: 6px 10px; border-radius: 8px;" onchange="this.form.submit()">
@@ -47,79 +47,86 @@
                 <option value="365" {% if period_days == 365 %}selected{% endif %}>{% trans "12 oy" %}</option>
             </select>
         </form>
-        <a href="{% url 'frontend:create_stats_news' %}?period={{ period_days }}" class="text-sm text-white text-decoration-none d-flex align-center gap-xs text-nowrap ml-auto" style="padding: 6px 14px; border-radius: 8px; background: #10b981;">
+        <span class="flex-1"></span>
+        <a href="{% url 'frontend:create_stats_news' %}?period={{ period_days }}" class="btn-primary text-sm text-white text-decoration-none d-flex align-center gap-xs text-nowrap">
             <i class="fas fa-newspaper"></i> {% trans "Yangilik qilish" %}
         </a>
     </div>
 
     <div class="grid-2 mb-2xl">
         <div class="glass-panel p-xl">
-            <h3 class="section-title text-md mb-lg">
-                <i class="fas fa-chart-line text-primary" style="font-size: 0.85rem;"></i> {% trans "Foydalanish dinamikasi" %}
-            </h3>
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-line text-info"></i> {% trans "Foydalanish dinamikasi" %}
+                </h3>
+            </div>
             <div style="height: 240px;">
                 <canvas id="usageChart"></canvas>
             </div>
         </div>
         <div class="glass-panel p-xl">
-            <h3 class="section-title text-md mb-lg">
-                <i class="fas fa-chart-pie" style="color: var(--accent); font-size: 0.85rem;"></i> {% trans "Kategoriyalar" %}
-            </h3>
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-pie text-info"></i> {% trans "Kategoriyalar" %}
+                </h3>
+            </div>
             <div style="height: 240px;">
                 <canvas id="categoryChart"></canvas>
             </div>
         </div>
     </div>
 
-    <div class="responsive-grid-1-2" style="gap: 20px;">
+    <div class="responsive-grid-1-2">
         <div class="glass-panel p-xl">
-            <h3 class="section-title text-md mb-lg">
-                <i class="fas fa-trophy" style="color: #fbbf24; font-size: 0.85rem;"></i> {% trans "Eng faol maktablar" %}
-                <span class="text-muted text-xs text-normal ml-sm">({% blocktrans with n=period_days %}{{ n }} kun{% endblocktrans %})</span>
-            </h3>
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-trophy text-warning"></i> {% trans "Eng faol maktablar" %}
+                    <span class="text-muted text-xs text-normal ml-sm">({% blocktrans with n=period_days %}{{ n }} kun{% endblocktrans %})</span>
+                </h3>
+            </div>
             <div class="info-grid gap-sm">
                 {% for school in top_schools %}
-                <div class="glass-card info-row p-md">
-                    <span class="text-md"><span class="text-muted text-bold mr-xs">#{{ forloop.counter }}</span> {{ school.name|truncatechars:20 }}</span>
-                    <span class="text-semibold text-md" style="color: #fbbf24;">{{ school.active_count }}</span>
+                <div class="list-row">
+                    <div class="list-row-main">
+                        <div class="list-row-title"><span class="text-muted text-bold mr-xs">#{{ forloop.counter }}</span> {{ school.name|truncatechars:20 }}</div>
+                    </div>
+                    <span class="text-semibold text-md text-warning">{{ school.active_count }}</span>
                 </div>
                 {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+                    <h4>{% trans "Ma'lumot topilmadi" %}</h4>
+                    <p>{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
         <div class="glass-panel p-xl">
-            <h3 class="section-title text-md mb-lg">
-                <i class="fas fa-crown" style="color: #f59e0b; font-size: 0.85rem;"></i> {% trans "Eng faol kitobxonlar" %}
-                <span class="text-muted text-xs text-normal ml-sm">({% blocktrans with n=period_days %}{{ n }} kun{% endblocktrans %})</span>
-            </h3>
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-crown text-warning"></i> {% trans "Eng faol kitobxonlar" %}
+                    <span class="text-muted text-xs text-normal ml-sm">({% blocktrans with n=period_days %}{{ n }} kun{% endblocktrans %})</span>
+                </h3>
+            </div>
             <div class="info-grid gap-sm">
                 {% for reader in top_readers %}
-                <div class="glass-card info-row p-md">
-                    <span class="text-md">
-                        <span class="text-muted text-bold mr-xs">#{{ forloop.counter }}</span>
-                        {{ reader.username }}
-                        {% if reader.grade %}<span class="text-muted text-xs">({{ reader.grade }})</span>{% endif %}
-                    </span>
-                    <span class="text-semibold text-primary text-md">{{ reader.books_read }}</span>
+                <div class="list-row">
+                    <div class="list-row-main">
+                        <div class="list-row-title">
+                            <span class="text-muted text-bold mr-xs">#{{ forloop.counter }}</span>
+                            {{ reader.username }}
+                            {% if reader.grade %}<span class="text-muted text-xs">({{ reader.grade }})</span>{% endif %}
+                        </div>
+                    </div>
+                    <span class="text-semibold text-info text-md">{{ reader.books_read }}</span>
                 </div>
                 {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+                    <h4>{% trans "Ma'lumot topilmadi" %}</h4>
+                    <p>{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>

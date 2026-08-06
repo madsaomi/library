@@ -11,17 +11,17 @@
 {% block content %}
 <div class="animate-fade">
     <div class="grid-3 stat-grid mb-xl">
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl text-primary">{{ today_scans|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Bugungi skaner" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-primary">{{ today_scans|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Bugungi skaner" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl" style="color: #6366f1;">{{ today_issues|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Berilgan" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ today_issues|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Berilgan" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl text-success">{{ today_returns|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Qaytarilgan" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-success">{{ today_returns|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Qaytarilgan" %}</div>
         </div>
     </div>
 

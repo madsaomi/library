@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="mw-600 mx-auto" style="padding-bottom: 50px;">
+<div class="mw-600 mx-auto">
 
     <div class="glass-panel animate-fade p-3xl rounded-2xl">
         <div class="d-flex align-center gap-md mb-xl">
@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <div class="bg-success bg-opacity-10 border border-success rounded-xl p-2xl">
+        <div class="glass-panel p-2xl">
             <h4 class="text-success text-lg text-semibold mb-md">
                 <i class="fas fa-key"></i> {% trans "Kirish ma'lumotlari" %}
             </h4>
@@ -34,10 +34,10 @@
                         <i class="fas fa-user mr-xs"></i> {% trans "Login" %}
                     </label>
                     <div class="d-flex align-center gap-md">
-                        <code class="flex-1 p-md rounded" style="background: var(--input-bg); font-size: 1rem; word-break: break-all;">
+                        <code class="flex-1 p-md rounded form-control">
                             {{ admin.username }}
                         </code>
-                        <button type="button" class="btn btn-sm btn-secondary" onclick="copyToClipboard('{{ admin.username }}')">
+                        <button type="button" class="btn-outline text-md" onclick="copyToClipboard('{{ admin.username }}')">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
@@ -48,25 +48,25 @@
                         <i class="fas fa-key mr-xs"></i> {% trans "Parol" %}
                     </label>
                     <div class="d-flex align-center gap-md">
-                        <code class="flex-1 p-md rounded password-field" style="background: var(--input-bg); font-size: 1rem; word-break: break-all;" id="password-display">••••••••••••</code>
-                        <button type="button" class="btn btn-sm btn-secondary" onclick="copyToClipboard('{{ password }}')">
+                        <code class="flex-1 p-md rounded password-field form-control" id="password-display">••••••••••••</code>
+                        <button type="button" class="btn-outline text-md" onclick="copyToClipboard('{{ password }}')">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-xl p-md rounded bg-warning bg-opacity-10 border border-warning">
+            <div class="mt-xl p-md rounded glass-panel">
                 <i class="fas fa-exclamation-triangle text-warning mr-xs"></i>
                 <span class="text-warning text-sm">{% trans "Diqqat: Parol ekranda yashirilgan. Uni maktab adminiga yetkazish uchun quyidagi tugma orqali yuklab oling!" %}</span>
             </div>
         </div>
 
         <div class="mt-2xl d-flex gap-lg flex-wrap">
-            <a href="{% url 'frontend:all_users_list' %}" class="btn-primary flex-1 d-flex align-center justify-center gap-md text-bold text-lg p-lg" style="min-width: 160px;">
+            <a href="{% url 'frontend:all_users_list' %}" class="btn-primary flex-1 d-flex align-center justify-center gap-md text-bold text-lg p-lg">
                 <i class="fas fa-list"></i> {% trans "Foydalanuvchilar ro'yxati" %}
             </a>
-            <a href="{% url 'frontend:download_credentials' %}?user_id={{ admin.id }}&label={% trans 'Admin'|urlencode %}" class="flex-1 d-flex align-center justify-center gap-md text-semibold text-main text-decoration-none p-lg rounded-2xl bg-hover border transition" style="min-width: 160px;">
+            <a href="{% url 'frontend:download_credentials' %}?user_id={{ admin.id }}&label={% trans 'Admin'|urlencode %}" class="btn-outline flex-1 d-flex align-center justify-center gap-md text-semibold text-main text-decoration-none p-lg">
                 <i class="fas fa-file-download"></i> {% trans "Parolni yuklab olish" %}
             </a>
         </div>
@@ -80,19 +80,14 @@ function copyToClipboard(text) {
         const btn = event.target.closest('button');
         const originalHTML = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-check"></i>';
-        btn.classList.add('btn-success');
-        btn.classList.remove('btn-secondary');
+        btn.classList.add('btn-primary');
+        btn.classList.remove('btn-outline');
         setTimeout(function() {
             btn.innerHTML = originalHTML;
-            btn.classList.remove('btn-success');
-            btn.classList.add('btn-secondary');
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline');
         }, 2000);
     });
 }
 </script>
-
-<style>
-.bg-opacity-10 { background-opacity: 0.1; }
-.bg-opacity-20 { background-opacity: 0.2; }
-</style>
 {% endblock %}

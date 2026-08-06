@@ -11,24 +11,24 @@
 {% block content %}
 <div class="animate-fade">
     <div class="d-flex gap-sm flex-wrap mb-md">
-        <a href="{% url 'frontend:textbook_distribute' %}" class="glass-card py-xs px-md text-sm text-decoration-none rounded-sm" style="{% if not selected_grade %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{% trans "Barcha sinflar" %}</a>
+        <a href="{% url 'frontend:textbook_distribute' %}" class="filter-chip {% if not selected_grade %}active{% endif %}">{% trans "Barcha sinflar" %}</a>
         {% for g in grades_list %}
-        <a href="{% url 'frontend:textbook_distribute' %}?grade={{ g|urlencode }}" class="glass-card py-xs px-md text-sm text-decoration-none rounded-sm" style="{% if selected_grade == g %}background: var(--primary); color: #fff; font-weight: 600;{% else %}color: var(--text);{% endif %}">{{ g }} {% trans "sinf" %}</a>
+        <a href="{% url 'frontend:textbook_distribute' %}?grade={{ g|urlencode }}" class="filter-chip {% if selected_grade == g %}active{% endif %}">{{ g }} {% trans "sinf" %}</a>
         {% endfor %}
     </div>
 
     {% if not selected_grade %}
-    <div class="glass-panel text-center" style="padding: 40px;">
-        <i class="fas fa-hand-holding-heart text-primary d-block mb-lg" style="font-size: 2.5rem; opacity: 0.4;"></i>
-        <h3 class="text-lg mb-sm">{% trans "Sinfni tanlang" %}</h3>
-        <p class="text-muted text-md">{% trans "Darslik tarqatish uchun yuqoridan sinfni tanlang." %}</p>
+    <div class="glass-panel empty-state">
+        <div class="empty-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <h4>{% trans "Sinfni tanlang" %}</h4>
+        <p>{% trans "Darslik tarqatish uchun yuqoridan sinfni tanlang." %}</p>
     </div>
     {% else %}
     <div class="glass-panel p-xl">
         <div class="d-flex flex-between flex-wrap gap-sm mb-lg">
             <div>
                 <h3 class="text-md" style="margin: 0;">
-                    <i class="fas fa-calendar-alt" style="color: var(--primary);"></i>
+                    <i class="fas fa-calendar-alt text-info"></i>
                     {% trans "O'quv yili" %}: <strong>{{ academic_year }}</strong>
                 </h3>
             </div>
@@ -38,23 +38,22 @@
         </div>
 
         {% if not textbooks %}
-        <div class="p-3xl text-center text-muted">
-            <i class="fas fa-exclamation-triangle d-block mb-sm" style="font-size: 1.5rem; color: #f59e0b;"></i>
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h4>{% trans "Darsliklar topilmadi" %}</h4>
             <p>{% trans "Bu sinf uchun darsliklar topilmadi. Avval darsliklarni qo'shing." %}</p>
         </div>
         {% else %}
         <div class="mb-md d-flex flex-column gap-sm">
             <div class="d-flex gap-sm flex-wrap align-center">
-                <button type="button" onclick="document.getElementById('auto-form').submit()" class="btn-primary d-flex align-center rounded text-sm" style="padding: 8px 18px; gap: 6px;">
-                    <i class="fas fa-magic"></i> {% trans "Barcha darsliklarni tarqatish" %}
-                </button>
+                <button type="button" onclick="document.getElementById('auto-form').submit()" class="btn-primary text-sm"><i class="fas fa-magic"></i> {% trans "Barcha darsliklarni tarqatish" %}</button>
                 <span class="text-sm text-muted">
                     <i class="fas fa-info-circle"></i> {% trans "Sinfga tegishli barcha darsliklarni birdan tarqatadi" %}
                 </span>
             </div>
-            
-            <div class="d-flex gap-sm flex-wrap align-center mt-sm p-sm rounded" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
-                <form method="post" class="d-flex gap-sm align-center w-full" style="margin:0;">
+
+            <div class="glass-panel p-sm" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+                <form method="post" class="d-flex gap-sm align-center w-full flex-wrap" style="margin:0;">
                     {% csrf_token %}
                     <label class="text-sm text-semibold">{% trans "Yoki faqat bitta darslikni barchaga tarqatish:" %}</label>
                     <select name="distribute_all_book_id" class="form-control text-sm" style="max-width: 300px;" required>
@@ -63,9 +62,7 @@
                         <option value="{{ tb.id }}">{{ tb.subject|default:tb.title }} - {{ tb.title }}</option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn-primary d-flex align-center rounded text-sm" style="padding: 8px 18px; gap: 6px;">
-                        <i class="fas fa-share-all"></i> {% trans "Barchaga tarqatish" %}
-                    </button>
+                    <button type="submit" class="btn-primary text-sm"><i class="fas fa-share-all"></i> {% trans "Barchaga tarqatish" %}</button>
                 </form>
             </div>
         </div>
@@ -73,36 +70,32 @@
         <form method="post">
             {% csrf_token %}
             <div class="d-flex gap-md mb-md">
-                <button type="submit" class="btn-primary py-sm px-2xl text-md rounded-md">
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-save"></i> {% trans "Tarqatish" %}
                 </button>
-                <a href="{% url 'frontend:textbook_loans' %}" class="glass-card py-sm px-2xl rounded-md text-decoration-none text-md d-flex align-center border" style="gap: 6px;">
+                <a href="{% url 'frontend:textbook_loans' %}" class="btn-outline">
                     <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                 </a>
             </div>
-            <div class="info-grid gap-sm">
+            <div class="d-flex flex-column gap-sm">
                 {% for student in students %}
-                <div class="glass-card" style="padding: 12px 14px; {% if student.id in existing_loans %}border-color: #10b981;{% endif %}">
-                    <div class="d-flex align-center flex-wrap" style="gap: 10px;">
-                        <div class="avatar-circle flex-shrink-0" style="width: 32px; height: 32px; background: var(--primary);">
-                            <span class="avatar-initials text-xs">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</span>
-                        </div>
-                        <div class="flex-1" style="min-width: 120px;">
-                            <div class="text-semibold" style="font-size: 0.82rem;">{{ student.first_name }} {{ student.last_name }}</div>
-                            <div class="text-xs text-muted">{{ student.grade }} {% trans "sinf" %}</div>
-                        </div>
-                        <div class="flex-1" style="min-width: 150px;">
-                            <select name="book_{{ student.id }}" class="form-control w-full text-sm" style="padding: 6px 10px;">
-                                <option value="">---</option>
-                                {% for tb in textbooks %}
-                                <option value="{{ tb.id }}">{{ tb.subject|default:tb.title }} - {{ tb.title }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        {% if student.id in existing_loans %}
-                        <span class="text-xs text-nowrap" style="color: #10b981;"><i class="fas fa-check-circle"></i> {% trans "Tarqatilgan" %}</span>
-                        {% endif %}
+                <div class="list-row d-flex align-center flex-wrap" style="gap: 10px; {% if student.id in existing_loans %}border-color: #10b981;{% endif %}">
+                    <div class="list-row-avatar">{{ student.first_name|first|upper }}{{ student.last_name|first|upper }}</div>
+                    <div class="list-row-main" style="min-width: 120px;">
+                        <div class="list-row-title">{{ student.first_name }} {{ student.last_name }}</div>
+                        <div class="list-row-sub">{{ student.grade }} {% trans "sinf" %}</div>
                     </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <select name="book_{{ student.id }}" class="form-control w-full text-sm" style="padding: 6px 10px;">
+                            <option value="">---</option>
+                            {% for tb in textbooks %}
+                            <option value="{{ tb.id }}">{{ tb.subject|default:tb.title }} - {{ tb.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% if student.id in existing_loans %}
+                    <span class="badge-soft badge-soft-success text-nowrap"><i class="fas fa-check-circle"></i> {% trans "Tarqatilgan" %}</span>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>

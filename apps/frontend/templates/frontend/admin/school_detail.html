@@ -9,18 +9,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade" style="display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start;">
+<div class="animate-fade">
 
-    <div class="glass-panel p-xl" style="border-radius: 16px;">
+    <div class="glass-panel p-xl">
         <div class="d-flex align-center gap-lg flex-wrap">
             <div class="flex-center rounded-lg flex-shrink-0" style="width: 56px; height: 56px; background: var(--primary);">
                 <i class="fas fa-school text-lg text-white"></i>
             </div>
-            <div class="flex-1" style="min-width: 220px;">
+            <div class="flex-1">
                 <div class="d-flex align-center gap-sm flex-wrap">
                     <h2 class="m-0 text-lg text-semibold">{{ school.name }}</h2>
-                    <span class="pill-subtle {% if school.is_active %}pill-available{% else %}pill-unavailable{% endif %}" style="font-size: 0.7rem;">
-                        {% if school.is_active %}<i class="fas fa-circle" style="font-size: 0.35rem;"></i> {% trans "Faol" %}{% else %}<i class="fas fa-ban" style="font-size: 0.5rem;"></i> {% trans "Bloklangan" %}{% endif %}
+                    <span class="badge-soft {% if school.is_active %}badge-soft-success{% else %}badge-soft-danger{% endif %}">
+                        {% if school.is_active %}<i class="fas fa-circle"></i> {% trans "Faol" %}{% else %}<i class="fas fa-ban"></i> {% trans "Bloklangan" %}{% endif %}
                     </span>
                 </div>
                 <div class="text-sm text-muted mt-xs">
@@ -31,23 +31,23 @@
         </div>
     </div>
 
-    <div class="d-grid gap-md" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
-        <div class="glass-panel p-lg text-center" style="border-radius: 14px;">
-            <div class="text-xl text-semibold text-main">{{ student_count }}</div>
-            <div class="text-xs text-muted mt-xs">{% trans "O'quvchilar" %}</div>
+    <div class="grid-3 stat-grid mb-2xl">
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ student_count }}</div>
+            <div class="stat-tile-label">{% trans "O'quvchilar" %}</div>
         </div>
-        <div class="glass-panel p-lg text-center" style="border-radius: 14px;">
-            <div class="text-xl text-semibold text-main">{{ book_count }}</div>
-            <div class="text-xs text-muted mt-xs">{% trans "Kitoblar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-success">{{ book_count }}</div>
+            <div class="stat-tile-label">{% trans "Kitoblar" %}</div>
         </div>
-        <div class="glass-panel p-lg text-center" style="border-radius: 14px;">
-            <div class="text-xl text-semibold text-main">{{ issued_count }}</div>
-            <div class="text-xs text-muted mt-xs">{% trans "Tarqatilgan" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-warning">{{ issued_count }}</div>
+            <div class="stat-tile-label">{% trans "Tarqatilgan" %}</div>
         </div>
     </div>
 
-    <div class="glass-panel p-xl" style="border-radius: 16px;">
-        <div class="d-grid gap-md" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+    <div class="glass-panel p-xl mb-2xl">
+        <div class="grid-3">
             <div>
                 <div class="text-xs text-muted mb-xs">{% trans "Kontakt" %}</div>
                 <div class="text-md text-semibold">{{ school.contact|default:"—" }}</div>
@@ -68,47 +68,49 @@
         </div>
     </div>
 
-    <div class="glass-panel p-xl" style="border-radius: 16px;">
+    <div class="glass-panel p-xl mb-2xl">
         <div class="d-flex gap-sm flex-wrap">
-            <a href="{% url 'frontend:school_edit' school.pk %}" class="btn-primary text-decoration-none" style="padding: 10px 20px; border-radius: 10px; border: none;">
+            <a href="{% url 'frontend:school_edit' school.pk %}" class="btn-primary text-decoration-none">
                 <i class="fas fa-edit"></i> {% trans "Tahrirlash" %}
             </a>
             <form method="post" action="{% url 'frontend:school_toggle_active' school.pk %}" class="m-0">
                 {% csrf_token %}
-                <button type="submit" class="cursor-pointer" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text-main); font-family: inherit;">
-                    {% if school.is_active %}<i class="fas fa-ban" style="color: #ef4444;"></i> {% trans "Bloklash" %}{% else %}<i class="fas fa-check-circle" style="color: #10b981;"></i> {% trans "Faollashtirish" %}{% endif %}
+                <button type="submit" class="btn-outline cursor-pointer">
+                    {% if school.is_active %}<i class="fas fa-ban text-danger"></i> {% trans "Bloklash" %}{% else %}<i class="fas fa-check-circle text-success"></i> {% trans "Faollashtirish" %}{% endif %}
                 </button>
             </form>
-            <a href="{% url 'frontend:school_duplicate' school.pk %}" class="text-decoration-none" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); color: var(--text-muted);">
+            <a href="{% url 'frontend:school_duplicate' school.pk %}" class="btn-outline text-decoration-none">
                 <i class="fas fa-copy"></i> {% trans "Nusxa" %}
             </a>
-            <a href="{% url 'frontend:school_reset_admin_password' school.pk %}" class="text-decoration-none" style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); color: var(--text-muted);">
+            <a href="{% url 'frontend:school_reset_admin_password' school.pk %}" class="btn-outline text-decoration-none">
                 <i class="fas fa-key"></i> {% trans "Parol" %}
             </a>
-            <a href="{% url 'frontend:school_delete' school.pk %}" class="text-decoration-none" style="padding: 10px 20px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.4); color: #ef4444;">
+            <a href="{% url 'frontend:school_delete' school.pk %}" class="btn-danger text-decoration-none">
                 <i class="fas fa-trash"></i> {% trans "O'chirish" %}
             </a>
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: start;">
-        <div class="glass-panel p-xl" style="border-radius: 16px;">
-            <h3 class="m-0 mb-lg text-md text-semibold">
-                <i class="fas fa-users" style="color: var(--primary);"></i> {% trans "O'quvchilar" %}
-                <span class="text-muted text-sm text-normal ml-sm">({{ student_count }})</span>
-            </h3>
+    <div class="grid-2">
+        <div class="glass-panel p-xl">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-users text-info"></i> {% trans "O'quvchilar" %}
+                    <span class="text-muted text-sm text-normal ml-sm">({{ student_count }})</span>
+                </h3>
+            </div>
             {% if grade_counts %}
             <div class="d-flex flex-column gap-sm">
                 {% for grade_label, grade_students in grades.items %}
-                <div style="border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
-                    <div class="grade-header d-flex align-center flex-between cursor-pointer p-md" style="user-select: none;">
+                <div class="glass-card" style="overflow: hidden;">
+                    <div class="grade-header d-flex align-center flex-between cursor-pointer p-md">
                         <div class="d-flex align-center gap-sm">
-                            <i class="fas fa-chevron-right grade-chevron text-muted transition" style="font-size: 0.6rem;"></i>
+                            <i class="fas fa-chevron-right grade-chevron text-muted"></i>
                             <span class="text-sm text-semibold">{{ grade_label }} {% trans "sinf" %}</span>
                         </div>
                         <span class="text-xs text-muted">{{ grade_students|length }}</span>
                     </div>
-                    <div class="grade-body d-none px-md pb-md" style="display: none;">
+                    <div class="grade-body d-none px-md pb-md">
                         {% for s in grade_students %}
                         <div class="d-flex align-center flex-between text-sm" style="padding: 5px 0;">
                             <span>{{ s.get_full_name|default:s.username }}</span>
@@ -120,28 +122,39 @@
                 {% endfor %}
             </div>
             {% else %}
-            <p class="text-muted text-sm text-center py-xl">{% trans "Hali o'quvchilar yo'q" %}</p>
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-users"></i></div>
+                <h4>{% trans "O'quvchilar yo'q" %}</h4>
+                <p>{% trans "Hali o'quvchilar qo'shilmagan" %}</p>
+            </div>
             {% endif %}
         </div>
 
-        <div class="glass-panel p-xl" style="border-radius: 16px;">
-            <h3 class="m-0 mb-lg text-md text-semibold">
-                <i class="fas fa-book" style="color: var(--primary);"></i> {% trans "Kitoblar" %}
-                <span class="text-muted text-sm text-normal ml-sm">({{ book_count }})</span>
-            </h3>
+        <div class="glass-panel p-xl">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-book text-info"></i> {% trans "Kitoblar" %}
+                    <span class="text-muted text-sm text-normal ml-sm">({{ book_count }})</span>
+                </h3>
+            </div>
             {% if books %}
             <div class="d-flex flex-column gap-sm" style="max-height: 360px; overflow-y: auto;">
                 {% for book in books %}
-                <div class="d-flex align-center gap-sm p-sm" style="border: 1px solid var(--border); border-radius: 8px;">
-                    <div class="flex-1" style="min-width: 0;">
-                        <div class="text-sm text-medium text-truncate">{{ book.title }}</div>
-                        <div class="text-xs text-muted">{{ book.category.name|default:"---" }}</div>
+                <div class="list-row">
+                    <div class="list-row-avatar"><i class="fas fa-book"></i></div>
+                    <div class="list-row-main">
+                        <div class="list-row-title">{{ book.title }}</div>
+                        <div class="list-row-sub">{{ book.category.name|default:"---" }}</div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <p class="text-muted text-sm text-center py-xl">{% trans "Hali kitoblar yo'q" %}</p>
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-book"></i></div>
+                <h4>{% trans "Kitoblar yo'q" %}</h4>
+                <p>{% trans "Hali kitoblar qo'shilmagan" %}</p>
+            </div>
             {% endif %}
         </div>
     </div>

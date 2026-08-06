@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="mw-600 mx-auto" style="padding-bottom: 50px;">
+<div class="mw-600 mx-auto">
 
     <div class="glass-panel animate-fade p-3xl rounded-2xl">
         <form method="post" id="unified-school-form" autocomplete="off">
@@ -20,15 +20,15 @@
                 <!-- Section 1: School Info -->
                 <div>
                     <div class="d-flex align-center gap-md mb-2xl">
-                        <i class="fas fa-location-dot text-primary text-xl"></i>
-                        <h4 class="m-0 text-primary text-xl text-semibold">{% trans "Tuman ma'lumotlari" %}</h4>
+                        <i class="fas fa-location-dot text-info text-xl"></i>
+                        <h4 class="m-0 text-info text-xl text-semibold">{% trans "Tuman ma'lumotlari" %}</h4>
                     </div>
 
                     <div style="display: grid; gap: 20px;">
                         <!-- District Selection -->
                         <div class="form-group">
-                            <label class="d-block mb-md text-semibold text-main" style="font-size: 0.95rem;">
-                                <i class="fas fa-city text-primary mr-xs" style="font-size: 0.8rem;"></i> {% trans "Tumanni tanlang" %}
+                            <label class="d-block mb-md text-semibold text-main">
+                                <i class="fas fa-city text-info mr-xs"></i> {% trans "Tumanni tanlang" %}
                             </label>
                             <div class="pos-relative">
                                 {{ form.district }}
@@ -40,8 +40,8 @@
 
                         <!-- Existing School Selection (Dynamic) -->
                         <div id="existing-school-group" class="form-group d-none mt-md">
-                            <label class="d-block mb-md text-semibold text-main" style="font-size: 0.95rem;">
-                                <i class="fas fa-list-ol mr-xs" style="color: var(--secondary); font-size: 0.8rem;"></i> {% trans "Mavjud maktablar" %}
+                            <label class="d-block mb-md text-semibold text-main">
+                                <i class="fas fa-list-ol text-info mr-xs"></i> {% trans "Mavjud maktablar" %}
                             </label>
                             <div class="pos-relative">
                                 <select id="school-select-dropdown" class="form-control w-full">
@@ -52,8 +52,8 @@
 
                         <!-- Name field -->
                         <div class="form-group">
-                            <label class="d-block mb-md text-semibold text-main" style="font-size: 0.95rem;">
-                                <i class="fas fa-school text-primary mr-xs" style="font-size: 0.8rem;"></i> {% trans "Maktab nomi" %}
+                            <label class="d-block mb-md text-semibold text-main">
+                                <i class="fas fa-school text-info mr-xs"></i> {% trans "Maktab nomi" %}
                             </label>
                             {{ form.name }}
                             {% if form.name.errors %}
@@ -63,8 +63,8 @@
 
                         <!-- Address field -->
                         <div class="form-group">
-                            <label class="d-block mb-md text-semibold text-main" style="font-size: 0.95rem;">
-                                <i class="fas fa-map-location-dot mr-xs" style="color: var(--secondary); font-size: 0.8rem;"></i> {% trans "Manzil" %}
+                            <label class="d-block mb-md text-semibold text-main">
+                                <i class="fas fa-map-location-dot text-info mr-xs"></i> {% trans "Manzil" %}
                             </label>
                             {{ form.address }}
                             {% if form.address.errors %}
@@ -74,8 +74,8 @@
 
                         <!-- Contact field -->
                         <div class="form-group">
-                            <label class="d-block mb-md text-semibold text-main" style="font-size: 0.95rem;">
-                                <i class="fas fa-phone text-success mr-xs" style="font-size: 0.8rem;"></i> {% trans "Kontakt" %}
+                            <label class="d-block mb-md text-semibold text-main">
+                                <i class="fas fa-phone text-success mr-xs"></i> {% trans "Kontakt" %}
                             </label>
                             {{ form.contact }}
                             {% if form.contact.errors %}
@@ -87,8 +87,8 @@
 
                 <div class="bg-glass p-2xl rounded-xl border border-primary mt-md">
                     <div class="d-flex align-center gap-md mb-xl">
-                        <i class="fas fa-user-shield text-xl" style="color: #fbbf24;"></i>
-                        <h4 class="m-0 text-xl text-semibold" style="color: #fbbf24;">{% trans "Maktab admini hisobi" %}</h4>
+                        <i class="fas fa-user-shield text-xl text-warning"></i>
+                        <h4 class="m-0 text-xl text-semibold text-warning">{% trans "Maktab admini hisobi" %}</h4>
                     </div>
                     <p class="text-muted text-md mb-xl">
                         {% trans "Admin login va paroli avtomatik yaratiladi. Maktab yaratilgandan keyin ko'rsatiladi." %}
@@ -98,11 +98,11 @@
                 {{ form.existing_school_id }}
 
                 <div class="mt-xl d-flex gap-lg flex-wrap">
-                    <button type="submit" class="btn-primary flex-1 d-flex align-center justify-center gap-md text-bold text-lg p-lg" style="min-width: 160px; border-radius: 12px; border: none;">
+                    <button type="submit" class="btn-primary flex-1 d-flex align-center justify-center gap-md text-bold text-lg p-lg">
                         <i class="fas fa-save"></i> {% trans "Saqlash" %}
                     </button>
 
-                    <a href="{% url 'frontend:schools_list' %}" class="flex-1 d-flex align-center justify-center gap-md text-semibold text-main text-decoration-none p-lg rounded-2xl bg-hover border transition" style="min-width: 120px;">
+                    <a href="{% url 'frontend:schools_list' %}" class="btn-outline flex-1 d-flex align-center justify-center gap-md text-semibold text-main text-decoration-none p-lg">
                         <i class="fas fa-times"></i> {% trans "Bekor qilish" %}
                     </a>
                 </div>

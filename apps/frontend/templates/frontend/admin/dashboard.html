@@ -6,63 +6,59 @@
 {% block title %}{% trans "Super Admin" %} | {% trans "Online Kutibxona" %}{% endblock %}
 {% block page_title %}{% trans "Tizim boshqaruvi" %}{% endblock %}
 
-
 {% block sidebar_nav %}
 {% include 'frontend/admin/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
 <div class="animate-fade">
-    <!-- Quick Actions -->
-    <div class="mb-xl">
-        <div class="d-flex flex-wrap gap-sm mb-md">
-            <a href="{% url 'frontend:school_add' %}" class="glass-card py-sm px-md text-decoration-none rounded text-sm text-primary border-hover" style="gap: 6px;">
-                <i class="fas fa-school"></i> {% trans "Maktab qo'shish" %}
-            </a>
-            <a href="{% url 'frontend:all_books_list' %}?q=&action=add" class="glass-card py-sm px-md text-decoration-none rounded text-sm text-success border-hover" style="gap: 6px;">
-                <i class="fas fa-book"></i> {% trans "Kitob qo'shish" %}
-            </a>
-            <a href="{% url 'frontend:admin_news_add' %}" class="glass-card py-sm px-md text-decoration-none rounded text-sm text-warning border-hover" style="gap: 6px;">
-                <i class="fas fa-newspaper"></i> {% trans "Yangilik qo'shish" %}
-            </a>
-            <a href="{% url 'frontend:all_active_loans_list' %}" class="glass-card py-sm px-md text-decoration-none rounded text-sm text-danger border-hover" style="gap: 6px;">
-                <i class="fas fa-clock"></i> {% trans "Ijarolar" %}
-            </a>
-        </div>
+    <div class="action-bar">
+        <a href="{% url 'frontend:school_add' %}" class="btn-outline text-sm" style="padding: 8px 14px;">
+            <i class="fas fa-school"></i> {% trans "Maktab qo'shish" %}
+        </a>
+        <a href="{% url 'frontend:all_books_list' %}?q=&action=add" class="btn-outline text-sm" style="padding: 8px 14px;">
+            <i class="fas fa-book"></i> {% trans "Kitob qo'shish" %}
+        </a>
+        <a href="{% url 'frontend:admin_news_add' %}" class="btn-outline text-sm" style="padding: 8px 14px;">
+            <i class="fas fa-newspaper"></i> {% trans "Yangilik qo'shish" %}
+        </a>
+        <a href="{% url 'frontend:all_active_loans_list' %}" class="btn-outline text-sm" style="padding: 8px 14px;">
+            <i class="fas fa-clock"></i> {% trans "Ijaralar" %}
+        </a>
     </div>
 
-    <div class="grid-4 stat-grid mb-xl">
-        <div class="glass-card stat-card py-lg px-md hover-lift hover-glow">
-            <div class="stat-value text-primary counter" data-target="{{ school_count|default:0 }}">0</div>
-            <div class="stat-label text-sm">{% trans "Maktablar" %}</div>
+    <div class="grid-4 mb-xl">
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ school_count|default:0 }}</div>
+            <div class="stat-tile-label">{% trans "Maktablar" %}</div>
         </div>
-        <div class="glass-card stat-card py-lg px-md hover-lift hover-glow">
-            <div class="stat-value counter" data-target="{{ user_count|default:0 }}" style="color: #10b981;">0</div>
-            <div class="stat-label text-sm">{% trans "Foydalanuvchilar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-success">{{ user_count|default:0 }}</div>
+            <div class="stat-tile-label">{% trans "Foydalanuvchilar" %}</div>
         </div>
-        <div class="glass-card stat-card py-lg px-md hover-lift hover-glow">
-            <div class="stat-value counter" data-target="{{ total_books|default:0 }}" style="color: #f59e0b;">0</div>
-            <div class="stat-label text-sm">{% trans "Kitoblar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-warning">{{ total_books|default:0 }}</div>
+            <div class="stat-tile-label">{% trans "Kitoblar" %}</div>
         </div>
-        <div class="glass-card stat-card py-lg px-md hover-lift hover-glow">
-            <div class="stat-value counter" data-target="{{ active_loans|default:0 }}" style="color: #6366f1;">0</div>
-            <div class="stat-label text-sm">{% trans "Aktiv ijaralar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value">{{ active_loans|default:0 }}</div>
+            <div class="stat-tile-label">{% trans "Aktiv ijaralar" %}</div>
         </div>
     </div>
 
     <div class="grid-2 mb-2xl">
         <div class="glass-panel p-xl">
-            <h3 class="section-title text-md mb-lg">
-                <i class="fas fa-chart-bar text-primary"></i> {% trans "Oylik kitob berishlar" %}
-            </h3>
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-bar text-primary"></i> {% trans "Oylik kitob berishlar" %}</h3>
+            </div>
             <div style="height: 200px;">
                 <canvas id="issuesChart"></canvas>
             </div>
         </div>
         <div class="glass-panel p-xl">
-            <h3 class="section-title text-md mb-lg">
-                <i class="fas fa-chart-pie" style="color: var(--secondary);"></i> {% trans "Foydalanuvchi turlari" %}
-            </h3>
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-pie text-primary"></i> {% trans "Foydalanuvchi turlari" %}</h3>
+            </div>
             <div style="height: 200px;">
                 <canvas id="rolesChart"></canvas>
             </div>
@@ -71,9 +67,9 @@
 
     {% if top_books %}
     <div class="glass-panel p-xl mb-2xl">
-        <h3 class="section-title text-md mb-lg">
-            <i class="fas fa-trophy" style="color: #fbbf24;"></i> {% trans "Eng ko'p o'qilgan kitoblar (Top 10)" %}
-        </h3>
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-trophy text-warning"></i> {% trans "Eng ko'p o'qilgan kitoblar (Top 10)" %}</h3>
+        </div>
         <div style="height: 120px;">
             <canvas id="topBooksChart"></canvas>
         </div>
@@ -81,67 +77,55 @@
     {% endif %}
 
     <div class="glass-panel p-xl mb-2xl">
-        <div class="flex-between mb-lg">
-            <h3 class="section-title text-md m-0">
-                <i class="fas fa-school text-primary"></i> {% trans "So'nggi qo'shilgan maktablar" %}
-            </h3>
-            <a href="{% url 'frontend:schools_list' %}" class="glass-card py-sm px-lg text-decoration-none text-sm text-muted rounded">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-school text-primary"></i> {% trans "So'nggi qo'shilgan maktablar" %}</h3>
+            <a href="{% url 'frontend:schools_list' %}" class="text-muted text-sm text-decoration-none d-flex align-center gap-xs">
                 {% trans "Barchasi" %} <i class="fas fa-arrow-right" style="font-size: 0.6rem;"></i>
             </a>
         </div>
-        <div class="info-grid gap-sm animate-group">
+        <div class="d-flex flex-column" style="gap: 8px;">
             {% for school in schools %}
-            <a href="{% url 'frontend:school_detail' school.pk %}" class="glass-card info-row py-md px-lg text-decoration-none animate-item">
-                <div>
-                    <div class="text-semibold" style="font-size: 0.82rem;">{{ school.name }}</div>
-                    <div class="text-muted" style="font-size: 0.68rem; margin-top: 2px;">{{ school.district.name|default:"—" }} · {{ school.address|truncatechars:30 }}</div>
+            <a href="{% url 'frontend:school_detail' school.pk %}" class="list-row">
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ school.name }}</div>
+                    <div class="list-row-sub">{{ school.district.name|default:"—" }} · {{ school.address|truncatechars:30 }}</div>
                 </div>
-                <span class="text-primary" style="font-size: 0.7rem;"><i class="fas fa-chevron-right"></i></span>
+                <i class="fas fa-chevron-right text-muted" style="font-size: 0.7rem;"></i>
             </a>
             {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-school"></i></div>
+                <h4>{% trans "Ma'lumot topilmadi" %}</h4>
+                <p>{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 
     <div class="glass-panel p-xl">
-        <div class="flex-between mb-lg">
-            <h3 class="section-title text-md m-0">
-                <i class="fas fa-history" style="color: var(--secondary);"></i> {% trans "Oxirgi harakatlar" %}
-            </h3>
-            <a href="{% url 'frontend:system_logs' %}" class="glass-card py-sm px-lg text-decoration-none text-sm text-muted rounded">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-history text-primary"></i> {% trans "Oxirgi harakatlar" %}</h3>
+            <a href="{% url 'frontend:system_logs' %}" class="text-muted text-sm text-decoration-none d-flex align-center gap-xs">
                 {% trans "Barchasi" %} <i class="fas fa-arrow-right" style="font-size: 0.6rem;"></i>
             </a>
         </div>
-        <div class="activity-list animate-group">
+        <div class="activity-list">
             {% for log in recent_logs %}
-            <div class="activity-item py-sm border-bottom animate-item">
-                <div class="flex-between">
-                    <div class="d-flex align-center gap-sm">
-                        <span class="badge bg-danger text-primary px-sm py-xs rounded-sm" style="font-size: 0.65rem;">{{ log.action_type|action_name }}</span>
-                        <span style="font-size: 0.78rem;">{% if log.user %}{{ log.user.username }}{% else %}{% trans "Tizim" %}{% endif %}</span>
-                    </div>
-                    <span class="text-muted" style="font-size: 0.68rem;">{{ log.created_at|date:"d.m H:i" }}</span>
+            <div class="activity-item py-sm border-bottom">
+                <div class="d-flex align-center gap-sm">
+                    <span class="badge-soft badge-soft-primary text-xs">{{ log.action_type|action_name }}</span>
+                    <span style="font-size: 0.78rem;">{% if log.user %}{{ log.user.username }}{% else %}{% trans "Tizim" %}{% endif %}</span>
+                    <span class="text-muted ml-auto" style="font-size: 0.68rem;">{{ log.created_at|date:"d.m H:i" }}</span>
                 </div>
-                <div class="text-muted" style="font-size: 0.72rem; margin-top: 3px; margin-left: 72px;">{{ log.message }}</div>
+                <div class="text-muted" style="font-size: 0.72rem; margin-top: 3px;">{{ log.message }}</div>
             </div>
             {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-history"></i></div>
+                <h4>{% trans "Ma'lumot topilmadi" %}</h4>
+                <p>{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
@@ -250,7 +234,6 @@ function initDashCharts() {
         }));
     }
 }
-function initPage() { initDashCharts(); }
 document.addEventListener('DOMContentLoaded', initDashCharts);
 document.addEventListener('themechange', function() {
     while(window._chartInstances.length) window._chartInstances.pop().destroy();

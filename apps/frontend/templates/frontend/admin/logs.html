@@ -11,33 +11,33 @@
 
 {% block content %}
 <div class="animate-fade">
-    <div class="d-flex gap-md mb-xl">
-        <a href="?{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}" class="glass-card p-lg d-flex align-center gap-md text-decoration-none" style="color: inherit;">
-            <span class="stat-value" style="font-size: 1.2rem; color: var(--primary);">{{ total_logs }}</span>
-            <span class="stat-label text-sm">{% trans "Barcha amallar" %}</span>
+    <div class="grid-3 stat-grid mb-xl">
+        <a href="?{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}" class="stat-tile text-decoration-none">
+            <div class="stat-tile-value text-info">{{ total_logs }}</div>
+            <div class="stat-tile-label">{% trans "Barcha amallar" %}</div>
         </a>
-        <a href="?period=today{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}" class="glass-card p-lg d-flex align-center gap-md text-decoration-none" style="color: inherit;">
-            <span class="stat-value" style="font-size: 1.2rem; color: #10b981;">{{ today_count }}</span>
-            <span class="stat-label text-sm">{% trans "Bugun" %}</span>
+        <a href="?period=today{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}" class="stat-tile text-decoration-none">
+            <div class="stat-tile-value text-success">{{ today_count }}</div>
+            <div class="stat-tile-label">{% trans "Bugun" %}</div>
         </a>
-        <a href="?period=week{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}" class="glass-card p-lg d-flex align-center gap-md text-decoration-none" style="color: inherit;">
-            <span class="stat-value" style="font-size: 1.2rem; color: #6366f1;">{{ week_count }}</span>
-            <span class="stat-label text-sm">{% trans "7 kun" %}</span>
+        <a href="?period=week{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}" class="stat-tile text-decoration-none">
+            <div class="stat-tile-value text-info">{{ week_count }}</div>
+            <div class="stat-tile-label">{% trans "7 kun" %}</div>
         </a>
     </div>
 
-    <div class="glass-panel filter-bar">
-        <form method="get" class="d-flex gap-md flex-wrap align-center">
-            <div class="flex-1 pos-relative" style="min-width: 200px;">
+    <div class="glass-panel filter-bar mb-xl">
+        <form method="get" class="action-bar">
+            <div class="flex-1 pos-relative">
                 <i class="fas fa-search pos-absolute text-muted text-md" style="left: 14px; top: 50%; transform: translateY(-50%);"></i>
                 <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="{% trans 'Qidirish...' %}" style="padding: 10px 14px 10px 40px; border-radius: 10px;">
             </div>
             <select name="action" class="form-control rounded-md" style="width: auto; min-width: 140px; padding: 10px 14px;" onchange="this.form.submit()">
                 <option value="">{% trans "Barcha amallar" %}</option>
-                <option value="ISSUE" {% if current_action == 'ISSUE' %}selected{% endif %}>📤 {% trans "Kitob berish" %} ({{ action_counts.ISSUE }})</option>
-                <option value="RETURN" {% if current_action == 'RETURN' %}selected{% endif %}>📥 {% trans "Kitob qaytarish" %} ({{ action_counts.RETURN }})</option>
-                <option value="CREATE" {% if current_action == 'CREATE' %}selected{% endif %}>➕ {% trans "Yaratish" %} ({{ action_counts.CREATE }})</option>
-                <option value="LOGIN" {% if current_action == 'LOGIN' %}selected{% endif %}>🔑 {% trans "Kirish" %} ({{ action_counts.LOGIN }})</option>
+                <option value="ISSUE" {% if current_action == 'ISSUE' %}selected{% endif %}>{% trans "Kitob berish" %} ({{ action_counts.ISSUE }})</option>
+                <option value="RETURN" {% if current_action == 'RETURN' %}selected{% endif %}>{% trans "Kitob qaytarish" %} ({{ action_counts.RETURN }})</option>
+                <option value="CREATE" {% if current_action == 'CREATE' %}selected{% endif %}>{% trans "Yaratish" %} ({{ action_counts.CREATE }})</option>
+                <option value="LOGIN" {% if current_action == 'LOGIN' %}selected{% endif %}>{% trans "Kirish" %} ({{ action_counts.LOGIN }})</option>
             </select>
             <select name="period" class="form-control rounded-md" style="width: auto; min-width: 130px; padding: 10px 14px;" onchange="this.form.submit()">
                 <option value="">{% trans "Barcha vaqt" %}</option>
@@ -45,11 +45,11 @@
                 <option value="week" {% if current_period == 'week' %}selected{% endif %}>{% trans "7 kun" %}</option>
                 <option value="month" {% if current_period == 'month' %}selected{% endif %}>{% trans "Oy" %}</option>
             </select>
-            <button type="submit" class="btn-primary rounded-md text-md" style="padding: 10px 20px;">
+            <button type="submit" class="btn-primary rounded-md text-md">
                 <i class="fas fa-filter"></i> {% trans "Filtrlash" %}
             </button>
             {% if query or current_action or current_period %}
-            <a href="{% url 'frontend:system_logs' %}" class="btn-small glass-card rounded-md text-md" style="padding: 10px 16px; text-decoration: none;">
+            <a href="{% url 'frontend:system_logs' %}" class="btn-outline rounded-md text-md text-decoration-none">
                 <i class="fas fa-times"></i> {% trans "Tozalash" %}
             </a>
             {% endif %}
@@ -61,24 +61,30 @@
         <div class="activity-list">
             {% for log in logs %}
             {% with action_type=log.action_type %}
-            <div class="glass-card activity-item" style="border-left-color: {% if action_type == 'ISSUE' %}#6366f1{% elif action_type == 'RETURN' %}#10b981{% elif action_type == 'CREATE' %}#d97706{% elif action_type == 'LOGIN' %}#a855f7{% else %}var(--text-muted){% endif %};">
-                <div class="flex-center flex-shrink-0 rounded-md" style="width: 42px; height: 42px; background: {% if action_type == 'ISSUE' %}rgba(99, 102, 241, 0.1){% elif action_type == 'RETURN' %}rgba(16, 185, 129, 0.1){% elif action_type == 'CREATE' %}rgba(217, 119, 6, 0.1){% elif action_type == 'LOGIN' %}rgba(168, 85, 247, 0.1){% else %}rgba(255,255,255,0.05){% endif %};">
-                    {% if action_type == 'ISSUE' %}<i class="fas fa-book-open" style="color: #6366f1;"></i>
-                    {% elif action_type == 'RETURN' %}<i class="fas fa-undo-alt" style="color: #10b981;"></i>
-                    {% elif action_type == 'CREATE' %}<i class="fas fa-plus-circle" style="color: #d97706;"></i>
-                    {% elif action_type == 'LOGIN' %}<i class="fas fa-sign-in-alt" style="color: #a855f7;"></i>
-                    {% else %}<i class="fas fa-circle text-muted" style="font-size: 0.5rem;"></i>{% endif %}
-                </div>
-                <div class="flex-1" style="min-width: 0;">
-                    <div class="d-flex align-center gap-sm flex-wrap mb-xs">
-                        <span class="d-inline-block text-bold text-xs px-md py-xs rounded-sm" style="background: {% if action_type == 'ISSUE' %}rgba(99, 102, 241, 0.15){% elif action_type == 'RETURN' %}rgba(16, 185, 129, 0.15){% elif action_type == 'CREATE' %}rgba(217, 119, 6, 0.15){% elif action_type == 'LOGIN' %}rgba(168, 85, 247, 0.15){% else %}rgba(255,255,255,0.05){% endif %}; color: {% if action_type == 'ISSUE' %}#818cf8{% elif action_type == 'RETURN' %}#34d399{% elif action_type == 'CREATE' %}#d97706{% elif action_type == 'LOGIN' %}#c084fc{% else %}var(--text-muted){% endif %};">
-                            {{ action_type|action_name }}
-                        </span>
-                        <span class="text-md text-muted">{{ log.message }}</span>
-                    </div>
-                    <div class="activity-meta">
-                        <span><i class="fas fa-user"></i> {% if log.user %}{{ log.user.username }}{% if log.user.school %} · {{ log.user.school.name|truncatechars:20 }}{% endif %}{% else %}{% trans "Tizim" %}{% endif %}</span>
-                        <span class="ml-md"><i class="far fa-clock"></i> {{ log.created_at|date:"d.m.Y H:i" }} ({{ log.created_at|timesince }} {% trans "oldin" %})</span>
+            <div class="glass-card activity-item" style="padding: 14px 16px;">
+                <div class="d-flex align-center gap-md">
+                    {% if action_type == 'ISSUE' %}
+                    <div class="badge-soft badge-soft-primary"><i class="fas fa-book-open"></i></div>
+                    {% elif action_type == 'RETURN' %}
+                    <div class="badge-soft badge-soft-success"><i class="fas fa-undo-alt"></i></div>
+                    {% elif action_type == 'CREATE' %}
+                    <div class="badge-soft badge-soft-warning"><i class="fas fa-plus-circle"></i></div>
+                    {% elif action_type == 'LOGIN' %}
+                    <div class="badge-soft badge-soft-primary"><i class="fas fa-sign-in-alt"></i></div>
+                    {% else %}
+                    <div class="badge-soft badge-soft-muted"><i class="fas fa-circle"></i></div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <div class="d-flex align-center gap-sm flex-wrap mb-xs">
+                            <span class="badge-soft {% if action_type == 'ISSUE' %}badge-soft-primary{% elif action_type == 'RETURN' %}badge-soft-success{% elif action_type == 'CREATE' %}badge-soft-warning{% elif action_type == 'LOGIN' %}badge-soft-primary{% else %}badge-soft-muted{% endif %}">
+                                {{ action_type|action_name }}
+                            </span>
+                            <span class="text-md text-muted">{{ log.message }}</span>
+                        </div>
+                        <div class="activity-meta">
+                            <span><i class="fas fa-user"></i> {% if log.user %}{{ log.user.username }}{% if log.user.school %} · {{ log.user.school.name|truncatechars:20 }}{% endif %}{% else %}{% trans "Tizim" %}{% endif %}</span>
+                            <span class="ml-md"><i class="far fa-clock"></i> {{ log.created_at|date:"d.m.Y H:i" }} ({{ log.created_at|timesince }} {% trans "oldin" %})</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,25 +95,25 @@
         {% if page_obj.paginator.num_pages > 1 %}
         <div class="d-flex justify-center align-center gap-sm mt-2xl pt-xl border-top flex-wrap">
             {% if page_obj.has_previous %}
-            <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-small glass-card text-md rounded-sm" style="padding: 8px 14px; text-decoration: none;">
+            <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-outline text-md rounded-sm text-decoration-none">
                 <i class="fas fa-angle-double-left"></i>
             </a>
-            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-small glass-card text-md rounded-sm" style="padding: 8px 14px; text-decoration: none;">
+            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-outline text-md rounded-sm text-decoration-none">
                 <i class="fas fa-angle-left"></i>
             </a>
             {% endif %}
             {% for num in page_obj.paginator.page_range %}
             {% if num == page_obj.number %}
-            <span class="btn-small btn-primary text-md rounded-sm" style="padding: 8px 14px;">{{ num }}</span>
+            <span class="btn-primary text-md rounded-sm">{{ num }}</span>
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-small glass-card text-md rounded-sm" style="padding: 8px 14px; text-decoration: none;">{{ num }}</a>
+            <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-outline text-md rounded-sm text-decoration-none">{{ num }}</a>
             {% endif %}
             {% endfor %}
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-small glass-card text-md rounded-sm" style="padding: 8px 14px; text-decoration: none;">
+            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-outline text-md rounded-sm text-decoration-none">
                 <i class="fas fa-angle-right"></i>
             </a>
-            <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-small glass-card text-md rounded-sm" style="padding: 8px 14px; text-decoration: none;">
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if current_action %}&action={{ current_action }}{% endif %}{% if current_period %}&period={{ current_period }}{% endif %}" class="btn-outline text-md rounded-sm text-decoration-none">
                 <i class="fas fa-angle-double-right"></i>
             </a>
             {% endif %}
@@ -118,11 +124,12 @@
         {% endif %}
 
         {% else %}
-        <div class="text-center p-3xl" style="padding: 60px;">
-            <i class="fas fa-inbox text-3xl mb-lg text-muted" style="opacity: 0.2;"></i>
-            <p class="text-muted text-xl">{% trans "Amallar tarixi topilmadi" %}</p>
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+            <h4>{% trans "Amallar tarixi topilmadi" %}</h4>
+            <p>{% trans "Filtrlarni o'zgartirib qayta urinib ko'ring" %}</p>
             {% if query or current_action or current_period %}
-            <a href="{% url 'frontend:system_logs' %}" class="btn-primary d-inline-block mt-lg rounded-lg text-decoration-none" style="padding: 10px 25px;">
+            <a href="{% url 'frontend:system_logs' %}" class="btn-primary d-inline-block mt-lg rounded-lg text-decoration-none">
                 <i class="fas fa-times"></i> {% trans "Filtrlarni tozalash" %}
             </a>
             {% endif %}

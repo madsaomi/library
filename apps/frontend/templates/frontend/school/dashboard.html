@@ -8,25 +8,25 @@
 {% block content %}
 <div class="animate-fade">
     <div class="grid-5 stat-grid mb-xl">
-        <a href="{% url 'frontend:students_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
-            <div class="stat-value text-xl text-primary">{{ student_count|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "O'quvchilar" %}</div>
+        <a href="{% url 'frontend:students_list' %}" class="stat-tile text-decoration-none d-block">
+            <div class="stat-tile-value text-info">{{ student_count|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "O'quvchilar" %}</div>
         </a>
-        <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
-            <div class="stat-value text-xl text-success">{{ total_copies|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Jami kitoblar" %}</div>
+        <a href="{% url 'frontend:school_books_list' %}" class="stat-tile text-decoration-none d-block">
+            <div class="stat-tile-value text-success">{{ total_copies|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Jami kitoblar" %}</div>
         </a>
-        <a href="{% url 'frontend:issued_books_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
-            <div class="stat-value text-xl" style="color: #6366f1;">{{ issued_count|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Berilgan kitoblar" %}</div>
+        <a href="{% url 'frontend:issued_books_list' %}" class="stat-tile text-decoration-none d-block">
+            <div class="stat-tile-value text-info">{{ issued_count|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Berilgan kitoblar" %}</div>
         </a>
-        <a href="{% url 'frontend:school_books_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
-            <div class="stat-value text-xl" style="color: #f59e0b;">{{ available_copies|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Qolgan kitoblar" %}</div>
+        <a href="{% url 'frontend:school_books_list' %}" class="stat-tile text-decoration-none d-block">
+            <div class="stat-tile-value text-warning">{{ available_copies|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Qolgan kitoblar" %}</div>
         </a>
-        <a href="{% url 'frontend:school_news_list' %}" class="glass-card stat-card text-decoration-none p-lg hover-lift hover-glow">
-            <div class="stat-value text-xl" style="color: #a855f7;">{{ news_count|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Yangiliklar" %}</div>
+        <a href="{% url 'frontend:school_news_list' %}" class="stat-tile text-decoration-none d-block">
+            <div class="stat-tile-value text-info">{{ news_count|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Yangiliklar" %}</div>
         </a>
     </div>
 
@@ -41,26 +41,22 @@
         </div>
         <div class="glass-panel p-xl">
             <h3 class="section-title text-sm mb-lg">
-                <i class="fas fa-bolt" style="color: var(--accent);"></i> {% trans "Tezkor amallar" %}
+                <i class="fas fa-bolt text-info"></i> {% trans "Tezkor amallar" %}
             </h3>
             <div class="d-flex flex-column gap-sm">
-                <a href="{% url 'frontend:qr_scanner' %}" class="glass-card d-flex align-center text-decoration-none transition p-lg gap-xl" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
-                    <div class="d-flex flex-center flex-shrink-0 rounded-md" style="width: 44px; height: 44px; background: var(--primary);">
-                        <i class="fas fa-qrcode text-white text-xl"></i>
-                    </div>
-                    <div class="flex-1" style="min-width: 0;">
-                        <div class="text-semibold text-sm">{% trans "QR Skaner" %}</div>
-                        <div class="text-xs text-muted mt-xs">{% trans "Kitob berish va qabul qilish" %}</div>
+                <a href="{% url 'frontend:qr_scanner' %}" class="list-row text-decoration-none">
+                    <div class="list-row-avatar"><i class="fas fa-qrcode"></i></div>
+                    <div class="list-row-main">
+                        <div class="list-row-title">{% trans "QR Skaner" %}</div>
+                        <div class="list-row-sub">{% trans "Kitob berish va qabul qilish" %}</div>
                     </div>
                     <i class="fas fa-chevron-right text-muted text-xs"></i>
                 </a>
-                <a href="{% url 'frontend:issued_books_list' %}" class="glass-card d-flex align-center text-decoration-none transition p-lg gap-xl" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
-                    <div class="d-flex flex-center flex-shrink-0 rounded-md" style="width: 44px; height: 44px; background: #6366f1;">
-                        <i class="fas fa-hand-holding-heart text-white text-xl"></i>
-                    </div>
-                    <div class="flex-1" style="min-width: 0;">
-                        <div class="text-semibold text-sm">{% trans "O'qilayotganlar" %}</div>
-                        <div class="text-xs text-muted mt-xs">{{ issued_count }} {% trans "aktiv kitob" %}</div>
+                <a href="{% url 'frontend:issued_books_list' %}" class="list-row text-decoration-none">
+                    <div class="list-row-avatar"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="list-row-main">
+                        <div class="list-row-title">{% trans "O'qilayotganlar" %}</div>
+                        <div class="list-row-sub">{{ issued_count }} {% trans "aktiv kitob" %}</div>
                     </div>
                     <i class="fas fa-chevron-right text-muted text-xs"></i>
                 </a>
@@ -69,49 +65,37 @@
     </div>
 
     <div class="glass-panel p-xl mb-2xl">
-        <div class="flex-between mb-lg">
-            <h3 class="section-title text-sm m-xs">
+        <div class="card-header">
+            <h3 class="card-title">
                 <i class="fas fa-history text-primary"></i> {% trans "Oxirgi amallar" %}
             </h3>
-            <a href="{% url 'frontend:history_list' %}" class="glass-card text-decoration-none text-muted text-xs p-sm rounded">{% trans "Barchasi" %} <i class="fas fa-arrow-right text-xs"></i></a>
+            <a href="{% url 'frontend:history_list' %}" class="text-muted text-xs text-decoration-none">{% trans "Barchasi" %} <i class="fas fa-arrow-right text-xs"></i></a>
         </div>
-        <div class="info-grid animate-group" style="gap: 6px;">
+        <div class="d-flex flex-column gap-xs">
             {% for activity in recent_activities %}
-            <div class="glass-card info-row p-md animate-item">
-                <div class="d-flex align-center gap-sm flex-1" style="min-width: 0;">
-                    {% if activity.is_returned %}
-                    <div class="d-flex flex-center flex-shrink-0 rounded-full" style="width: 36px; height: 36px; background: rgba(16,185,129,0.1);">
-                        <i class="fas fa-undo" style="color: #10b981; font-size: 0.8rem;"></i>
-                    </div>
-                    {% else %}
-                    <div class="d-flex flex-center flex-shrink-0 rounded-full" style="width: 36px; height: 36px; background: rgba(99,102,241,0.1);">
-                        <i class="fas fa-book-open" style="color: #6366f1; font-size: 0.8rem;"></i>
-                    </div>
-                    {% endif %}
-                    <div class="flex-1" style="min-width: 0;">
-                        <div class="text-md text-semibold">{{ activity.book.title|truncatechars:35 }}</div>
-                        <div class="text-xs text-muted mt-xs">{{ activity.user.get_full_name|default:activity.user.username }}</div>
-                    </div>
+            <div class="list-row animate-item">
+                {% if activity.is_returned %}
+                <div class="list-row-avatar"><i class="fas fa-undo"></i></div>
+                {% else %}
+                <div class="list-row-avatar"><i class="fas fa-book-open"></i></div>
+                {% endif %}
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ activity.book.title|truncatechars:35 }}</div>
+                    <div class="list-row-sub">{{ activity.user.get_full_name|default:activity.user.username }} · {{ activity.issued_at|date:"d.m H:i" }}</div>
                 </div>
-                <div class="text-right flex-shrink-0">
-                    <div class="text-xs text-muted">{{ activity.issued_at|date:"d.m H:i" }}</div>
-                    {% if activity.is_returned %}
-                    <span class="badge text-xs" style="padding: 2px 8px; border-radius: 4px; background: rgba(16,185,129,0.1); color: #10b981;">{% trans "Qaytarildi" %}</span>
-                    {% else %}
-                    <span class="badge text-xs" style="padding: 2px 8px; border-radius: 4px; background: rgba(99,102,241,0.1); color: #6366f1;">{% trans "Berildi" %}</span>
-                    {% endif %}
-                </div>
+                {% if activity.is_returned %}
+                <span class="badge-soft badge-soft-success text-nowrap">{% trans "Qaytarildi" %}</span>
+                {% else %}
+                <span class="badge-soft badge-soft-primary text-nowrap">{% trans "Berildi" %}</span>
+                {% endif %}
             </div>
             {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-folder-open text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Ma'lumot topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
-    </div>
-        {% endfor %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+                <h4>{% trans "Ma'lumot topilmadi" %}</h4>
+                <p>{% trans "Ushbu bo'limda hozircha ma'lumot kiritilmagan" %}</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>

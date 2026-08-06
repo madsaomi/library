@@ -11,25 +11,25 @@
 {% block content %}
 <div class="animate-fade">
     <div class="grid-5 stat-grid mb-xl">
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl" style="color: #f59e0b;">{{ total_books|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Kitoblar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-warning">{{ total_books|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Kitoblar" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl text-primary">{{ total_copies|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Jami nusxa" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ total_copies|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Jami nusxa" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl text-success">{{ available_copies|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Mavjud" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-success">{{ available_copies|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Mavjud" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl" style="color: #6366f1;">{{ issued_count|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Berilgan" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-info">{{ issued_count|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Berilgan" %}</div>
         </div>
-        <div class="glass-card stat-card p-md cursor-default">
-            <div class="stat-value text-xl" style="color: var(--secondary);">{{ textbook_count|default:"0" }}</div>
-            <div class="stat-label text-xs">{% trans "Darsliklar" %}</div>
+        <div class="stat-tile">
+            <div class="stat-tile-value text-warning">{{ textbook_count|default:"0" }}</div>
+            <div class="stat-tile-label">{% trans "Darsliklar" %}</div>
         </div>
     </div>
 
@@ -38,112 +38,78 @@
             <div class="d-flex align-center flex-wrap gap-sm">
                 <div class="pos-relative">
                     <input type="text" id="search-input" aria-label="{% trans 'Kitob nomi...' %}" placeholder="{% trans 'Kitob nomi yoki muallif...' %}"
-                           class="border rounded text-sm" style="padding: 8px 14px 8px 36px; background: var(--input-bg); color: var(--input-text); outline: none; width: 220px;">
+                           class="form-control" style="padding: 8px 14px 8px 36px; width: 220px; font-size: 0.8rem; border-radius: 8px;">
                     <i class="fas fa-search pos-absolute text-muted text-sm" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
                 <select id="category-filter" onchange="applyFilters()"
-                        class="border rounded text-sm" style="padding: 8px 14px; background: var(--input-bg); color: var(--input-text); outline: none;">
+                        class="form-control" style="width: auto; padding: 8px 14px; font-size: 0.8rem; border-radius: 8px;">
                     <option value="">{% trans "Barcha kategoriyalar" %}</option>
                     {% for cat in categories %}
                     <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>{{ cat.name }}</option>
                     {% endfor %}
                 </select>
                 <select id="sort-select" onchange="applyFilters()"
-                        class="border rounded text-sm" style="padding: 8px 14px; background: var(--input-bg); color: var(--input-text); outline: none;">
+                        class="form-control" style="width: auto; padding: 8px 14px; font-size: 0.8rem; border-radius: 8px;">
                     <option value="title" {% if sort == 'title' %}selected{% endif %}>{% trans "Nomi (A-Z)" %}</option>
                     <option value="-title" {% if sort == '-title' %}selected{% endif %}>{% trans "Nomi (Z-A)" %}</option>
                     <option value="borrow" {% if sort == 'borrow' %}selected{% endif %}>{% trans "Eng ko'p o'qilgan" %}</option>
                     <option value="available" {% if sort == 'available' %}selected{% endif %}>{% trans "Mavjudligi" %}</option>
                     <option value="newest" {% if sort == 'newest' %}selected{% endif %}>{% trans "Eng yangi" %}</option>
                 </select>
-                <label class="glass-card d-flex align-center gap-xs cursor-pointer border text-sm text-nowrap py-sm px-md">
-                    <input type="checkbox" id="no-cover-filter" {% if no_cover %}checked{% endif %} onchange="applyFilters()" class="cursor-pointer" style="accent-color: var(--accent); width: 14px; height: 14px;">
+                <label class="d-flex align-center gap-xs cursor-pointer text-sm text-nowrap py-sm px-md">
+                    <input type="checkbox" id="no-cover-filter" {% if no_cover %}checked{% endif %} onchange="applyFilters()" class="cursor-pointer">
                     {% trans "Muqovasiz" %}
                 </label>
-                <label class="glass-card d-flex align-center gap-xs cursor-pointer border text-sm text-nowrap py-sm px-md">
-                    <input type="checkbox" id="textbook-filter" {% if textbook_filter %}checked{% endif %} onchange="applyFilters()" class="cursor-pointer" style="accent-color: var(--accent); width: 14px; height: 14px;">
+                <label class="d-flex align-center gap-xs cursor-pointer text-sm text-nowrap py-sm px-md">
+                    <input type="checkbox" id="textbook-filter" {% if textbook_filter %}checked{% endif %} onchange="applyFilters()" class="cursor-pointer">
                     {% trans "Darslik" %}
                 </label>
                 {% if query or selected_category or no_cover or textbook_filter %}
-                <a href="{% url 'frontend:school_books_list' %}" class="glass-card d-flex align-center gap-xs rounded text-sm text-decoration-none text-danger py-sm px-md" style="border: 1px solid rgba(239,68,68,0.3);">
-                    <i class="fas fa-times-circle"></i> {% trans "Tozalash" %}
-                </a>
+                <a href="{% url 'frontend:school_books_list' %}" class="btn-outline text-sm"><i class="fas fa-times-circle"></i> {% trans "Tozalash" %}</a>
                 {% endif %}
             </div>
             <div class="d-flex align-center flex-wrap gap-sm">
-                <a href="{% url 'frontend:import_books_csv' %}" class="glass-card d-flex align-center gap-sm rounded text-sm text-decoration-none py-sm px-lg" style="color: var(--accent); border: 1px dashed var(--accent);">
-                    <i class="fas fa-file-csv"></i> {% trans "Import CSV" %}
-                </a>
-                <a href="{% url 'frontend:export_books_csv' %}" class="glass-card d-flex align-center gap-xs rounded text-sm text-decoration-none text-muted border py-sm px-md">
-                    <i class="fas fa-download"></i> CSV
-                </a>
-                <a href="{% url 'frontend:book_add' %}" class="btn-primary d-flex align-center gap-sm rounded text-sm text-decoration-none py-sm px-lg">
-                    <i class="fas fa-plus"></i> {% trans "Yangi kitob" %}
-                </a>
+                <a href="{% url 'frontend:import_books_csv' %}" class="btn-outline text-sm"><i class="fas fa-file-csv"></i> {% trans "Import CSV" %}</a>
+                <a href="{% url 'frontend:export_books_csv' %}" class="btn-outline text-sm"><i class="fas fa-download"></i> CSV</a>
+                <a href="{% url 'frontend:book_add' %}" class="btn-primary text-sm"><i class="fas fa-plus"></i> {% trans "Yangi kitob" %}</a>
             </div>
         </div>
 
-        <div id="book-grid" class="animate-group" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px;">
+        <div id="book-grid" class="d-flex flex-column gap-xs">
             {% for book in books %}
-            <div class="glass-card book-card rounded-xl overflow-hidden transition p-0 animate-item cursor-pointer"
+            <div class="list-row book-card animate-item cursor-pointer"
                  data-search="{{ book.title|lower }} {{ book.author|lower }} {{ book.category.name|default:''|lower }}"
                  onclick="window.location='{% url 'frontend:book_edit' book.pk %}'">
-                <div class="pos-relative overflow-hidden img-zoom" style="height: 180px; background: #451a03;">
-                    {% if book.cover %}
-                    <img src="{{ book.cover.url }}" alt="{{ book.title }}" loading="lazy" class="w-full h-full object-cover">
-                    {% else %}
-                    <div class="p-xl d-flex flex-column justify-center h-full">
-                        <div class="text-md text-bold lh-tight" style="color: #fde68a;">{{ book.title|truncatechars:40 }}</div>
+                <div class="list-row-avatar"><i class="fas fa-book"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title">{{ book.title }}</div>
+                    <div class="list-row-sub">
+                        {% if book.author %}<i class="fas fa-user"></i> {{ book.author|truncatechars:25 }}{% endif %}
                     </div>
-                    {% endif %}
-                    {% if book.is_textbook %}
-                    <div class="pos-absolute rounded text-white text-bold text-uppercase" style="top: 8px; left: 8px; background: rgba(217,119,6,0.85); padding: 3px 8px; font-size: 0.5rem; letter-spacing: 0.5px;">
-                        <i class="fas fa-book-open"></i> {% trans "Darslik" %}
-                    </div>
-                    {% endif %}
-                    <div class="pos-absolute rounded text-white text-semibold" style="top: 8px; right: 8px; background: rgba(0,0,0,0.5); padding: 3px 10px; font-size: 0.55rem;">
-                        {{ book.category.name|default:_("Umumiy") }}
-                    </div>
-                    {% if book.borrow_count > 0 %}
-                    <div class="pos-absolute d-flex align-center gap-xs rounded" style="bottom: 8px; left: 8px; background: rgba(0,0,0,0.5); padding: 3px 8px; font-size: 0.55rem; color: #fbbf24;" title="{{ book.borrow_count }} marta o'qilgan">
-                        {% if book.borrow_count > 50 %}<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        {% elif book.borrow_count > 20 %}<i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        {% else %}<i class="fas fa-star"></i>{% endif %}
-                        <span>{{ book.borrow_count }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="p-md">
-                    <div class="text-semibold text-truncate mb-xs text-md" title="{{ book.title }}">{{ book.title }}</div>
-                    {% if book.author %}
-                    <div class="text-xs text-muted mb-sm"><i class="fas fa-user"></i> {{ book.author|truncatechars:25 }}</div>
-                    {% endif %}
-                    <div class="d-flex align-center gap-xs text-xs mb-sm">
-                        <span class="text-muted">{% trans "Jami" %}: <strong>{{ book.total_count }}</strong></span>
+                    <div class="list-row-sub">
+                        <span class="badge-soft badge-soft-muted">{{ book.category.name|default:_("Umumiy") }}</span>
+                        {% if book.is_textbook %}
+                        <span class="badge-soft badge-soft-warning"><i class="fas fa-book-open"></i> {% trans "Darslik" %}</span>
+                        {% endif %}
+                        <span>{% trans "Jami" %}: <strong>{{ book.total_count }}</strong></span>
                         <span class="text-success">· {% trans "Mavjud" %}: <strong>{{ book.available_count }}</strong></span>
-                        <span class="text-primary">· {% trans "Berilgan" %}: <strong>{{ book.currently_reading_count }}</strong></span>
+                        <span class="text-info">· {% trans "Berilgan" %}: <strong>{{ book.currently_reading_count }}</strong></span>
                     </div>
-                    <div class="overflow-hidden" style="height: 5px; background: var(--hover-bg); border-radius: 3px;">
-                        <div style="width: {% widthratio book.currently_reading_count book.total_count 100 %}%; height: 100%; background: var(--primary); border-radius: 3px;"></div>
-                    </div>
-                    <div class="d-flex mt-sm gap-xs" onclick="event.stopPropagation()">
-                        <a href="{% url 'frontend:book_qr_label' book.pk %}" target="_blank" aria-label="Yorliq" class="glass-card d-flex align-center justify-center rounded p-xs text-xs text-decoration-none" style="color: #10b981; border-color: rgba(16,185,129,0.3);" title="{% trans 'QR yorliq (print)' %}"><i class="fas fa-tag"></i></a>
-                        <a href="{% url 'frontend:book_qr_image' book.pk %}" target="_blank" aria-label="QR" class="glass-card d-flex align-center justify-center rounded p-xs text-xs gap-xs text-decoration-none" style="color: #10b981; border-color: rgba(16,185,129,0.3);" title="{% trans 'QR kod' %}"><i class="fas fa-qrcode"></i></a>
-                        <a href="{% url 'frontend:book_edit' book.pk %}" aria-label="Tahrirlash" class="glass-card flex-1 rounded text-center text-decoration-none p-xs text-xs" style="color: var(--accent);"><i class="fas fa-edit"></i> {% trans "Tahrirlash" %}</a>
-                        <a href="{% url 'frontend:book_delete' book.pk %}" aria-label="O'chirish" class="glass-card flex-1 rounded text-center text-decoration-none p-xs text-xs" style="color: #ef4444;"><i class="fas fa-trash"></i></a>
-                    </div>
+                </div>
+                <div class="row-actions" onclick="event.stopPropagation()">
+                    <a href="{% url 'frontend:book_qr_label' book.pk %}" target="_blank" aria-label="{% trans 'Yorliq' %}" class="icon-btn" title="{% trans 'QR yorliq (print)' %}"><i class="fas fa-tag"></i></a>
+                    <a href="{% url 'frontend:book_qr_image' book.pk %}" target="_blank" aria-label="{% trans 'QR' %}" class="icon-btn" title="{% trans 'QR kod' %}"><i class="fas fa-qrcode"></i></a>
+                    <a href="{% url 'frontend:book_edit' book.pk %}" aria-label="{% trans 'Tahrirlash' %}" class="icon-btn"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'frontend:book_delete' book.pk %}" aria-label="{% trans 'Ochirish' %}" class="icon-btn icon-btn-danger"><i class="fas fa-trash"></i></a>
                 </div>
             </div>
             {% empty %}
-
-    <div class="empty-state text-center p-3xl animate-fade">
-        <div class="empty-icon-wrapper mb-lg" style="opacity: 0.5;">
-            <i class="fas fa-book text-4xl text-primary"></i>
-        </div>
-        <h4 class="text-lg font-semibold mb-xs">{% trans "Kitoblar topilmadi" %}</h4>
-        <p class="text-muted text-sm">{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
-    </div>
-        {% endfor %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-book"></i></div>
+                <h4>{% trans "Kitoblar topilmadi" %}</h4>
+                <p>{% trans "Hozircha kitoblar ro'yxati bo'sh" %}</p>
+            </div>
+            {% endfor %}
             <div id="no-results" class="d-none full-width p-3xl text-center text-muted text-md">
                 <i class="fas fa-search text-3xl d-block mb-md" style="opacity: 0.3;"></i>
                 {% trans "Qidiruv bo'yicha hech narsa topilmadi" %}

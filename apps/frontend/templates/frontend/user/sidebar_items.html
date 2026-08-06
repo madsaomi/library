@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block sidebar_content %}
-<div class="sidebar-section-label" style="margin-top: 8px;">{% trans "Asosiy" %}</div>
+<div class="sidebar-section-label mt-sm">{% trans "Asosiy" %}</div>
 <a href="{% url 'frontend:library' %}" class="nav-link {% if request.resolver_match.url_name == 'library' %}active{% endif %}" data-name="kutubxona library" {% if request.resolver_match.url_name == 'library' %}aria-current="page"{% endif %}>
     <i class="fas fa-home"></i> <span>{% trans "Kutubxona" %}</span>
 </a>
@@ -11,7 +11,7 @@
 </a>
 <a href="{% url 'frontend:cart_list' %}" class="nav-link sidebar-cart-link {% if 'cart' in request.resolver_match.url_name %}active{% endif %}" data-name="savat cart books" {% if 'cart' in request.resolver_match.url_name %}aria-current="page"{% endif %}>
     <i class="fas fa-shopping-cart"></i> <span>{% trans "Savat" %}</span>
-    <span id="cartBadge" class="badge ms-auto" style="border-radius: 20px; padding: 2px 8px; font-size: 0.72rem;">0</span>
+    <span id="cartBadge" class="badge-soft badge-soft-primary ms-auto">0</span>
 </a>
 
 <div class="sidebar-section-label">{% trans "Faoliyat" %}</div>
