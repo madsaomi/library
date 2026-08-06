@@ -1,6 +1,6 @@
 # 02-CURRENT-STATE — What is true right now
 
-Last fully verified: 2026-08-06 (unified design system across all ~90 templates + 169 tests).
+Last fully verified: 2026-08-07 (unified QR system + design system across all ~90 templates + 169 tests).
 
 ## 2026-08-06 — design-system rollout complete
 - **All templates** in `apps/frontend/templates/frontend/{admin,school,user,shared}` (~90) redesigned to the
@@ -28,6 +28,7 @@ Last fully verified: 2026-08-06 (unified design system across all ~90 templates 
 - `python -m pytest e2e -q --tb=short` → **17 tests total** (14 old + 3 new QR-flow; all pass
   locally on Python 3.12; CI runs on Python 3.13 with Playwright + Postgres)
 - `python -m ruff check .` → all passed; `ruff format .` → clean
+- **Unified QR**: `/library/my-qr/` generates single STU_ token for student; accessible from my_books tab; `student_qr` view + `student_qr.html` template
 - Smoke render (test client, `HTTP_HOST='localhost'`): `/admin/schools/`, `/admin/schools/<id>/`,
   `/school/books/`, `/school/qr/`, `/profile/` (school_admin) all 200
 - **Automated QR flow E2E verified**: static BOOK_/STU_ token gen + QR PNGs (200 image/png),

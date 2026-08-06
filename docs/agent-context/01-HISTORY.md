@@ -400,38 +400,38 @@ ews_list: added early guard for
   without errors after removing last inline hex colors on 403 icons.
 - Ran full test suite: **169 passed**, ruff clean, collectstatic OK.
 - Updated docs/agent-context/ files to reflect current state.
-- No further template work needed — design-system applied uniformly.
+- No further template work needed ï¿½ design-system applied uniformly.
 
 ## Session: admin panel polish (2026-08-06)
-- **admin_edit.html** — rewritten with card-header, section titles with icons, password visibility toggle
+- **admin_edit.html** ï¿½ rewritten with card-header, section titles with icons, password visibility toggle
   (	ogglePassword() JS), cleaner form layout. Credentials section highlighted with warning border.
-- **admin_created.html** — improved success card with icon badge, password toggle on displayed password,
+- **admin_created.html** ï¿½ improved success card with icon badge, password toggle on displayed password,
   cleaner credentials card layout, improved visual hierarchy.
-- **all_users.html** — cleaned up action-bar (search with icon, proper filter-chips), removed inline
+- **all_users.html** ï¿½ cleaned up action-bar (search with icon, proper filter-chips), removed inline
   padding styles, consistent badge-soft usage.
-- **user_detail.html** — added row-actions (edit button for school_admin), stat-tiles with icons,
+- **user_detail.html** ï¿½ added row-actions (edit button for school_admin), stat-tiles with icons,
   info-grid with card-header, activity history as list-row instead of old activity-item.
-- **statistics.html** — cleaned action-bar (period select with proper label), consistent stat-tiles,
+- **statistics.html** ï¿½ cleaned action-bar (period select with proper label), consistent stat-tiles,
   card-headers on all panels.
 - Verified: 169 tests pass, ruff clean, all pages render 200.
 - Commit: 4e85c8f "refactor: improve admin pages - all_users, user_detail, statistics"
 
 ## Session: user panel polish (2026-08-06)
-- **achievements.html** — uses .progress-bar/.progress-fill for progress display, card-header for section titles
-- **challenges.html** — uses .progress-bar/.progress-fill, unified empty-state with description
-- **leaderboard.html** — card-header for ranking section, uses list-row for ranked students, improved podium layout
-- **library.html** — uses .password-wrapper for search input with icon, card-header for news link, consistent empty-states
-- **my_books.html** — improved empty-states with descriptions, consistent list-row usage
+- **achievements.html** ï¿½ uses .progress-bar/.progress-fill for progress display, card-header for section titles
+- **challenges.html** ï¿½ uses .progress-bar/.progress-fill, unified empty-state with description
+- **leaderboard.html** ï¿½ card-header for ranking section, uses list-row for ranked students, improved podium layout
+- **library.html** ï¿½ uses .password-wrapper for search input with icon, card-header for news link, consistent empty-states
+- **my_books.html** ï¿½ improved empty-states with descriptions, consistent list-row usage
 - Verified: all user pages render 200, 169 tests pass, ruff clean
 - Commit: 11ae0f5 "refactor: improve user panel templates with design system"
 
 ## Session: form improvements (2026-08-06)
-- **student_form.html** — card-header, counter badge, icon-btn-danger for delete, table with data-table
-- **teacher_form.html** — same improvements as student_form
-- **book_form.html** — icon-btn-danger for delete button, text-success for file label
-- **news_form.html** — card-header, switch toggle for is_published, improved file upload
-- **profile_edit.html** — card-header, improved icon selection with CSS transitions
-- **Fix**: grade_sort_key TypeError (admin_views.py:620 — grade was translation proxy)
+- **student_form.html** ï¿½ card-header, counter badge, icon-btn-danger for delete, table with data-table
+- **teacher_form.html** ï¿½ same improvements as student_form
+- **book_form.html** ï¿½ icon-btn-danger for delete button, text-success for file label
+- **news_form.html** ï¿½ card-header, switch toggle for is_published, improved file upload
+- **profile_edit.html** ï¿½ card-header, improved icon selection with CSS transitions
+- **Fix**: grade_sort_key TypeError (admin_views.py:620 ï¿½ grade was translation proxy)
 - Verified: all forms render 200, 169 tests pass, ruff clean
 - Commit: 7edae24 "refactor: improve all forms with design system components"
 
@@ -462,3 +462,13 @@ ews_list: added early guard for
 - Added missing Prefetch import at module level
 - Verified: both URLs return 200, 169 tests pass
 - Commit: 4232fbd "fix: add missing Prefetch import"
+
+## Session: unified QR system (2026-08-07)
+- **Unified student QR**: single STU_ static token shown on `/library/my-qr/` for all operations (issue, return, cart)
+- **New view**: `student_qr` in `apps/frontend/views/user_views.py` generates static token via `generate_static_token('STU', user.id)`
+- **New URL**: `path('library/my-qr/', user_views.student_qr, name='student_qr')`
+- **New template**: `apps/frontend/templates/frontend/user/student_qr.html` with QR code, token display, usage guide
+- **Updated `my_books.html`**: added "QR kod" tab button linking to `/library/my-qr/`, removed issue-specific QR links (no more `issue_qr`/`request_qr` per-book pages for students)
+- **Ruff F823 fix**: removed redundant local `from django.db.models import Prefetch` in `admin_views.py` (lines 715, 941, 1019) â€” ruff incorrectly flagged them as "referenced before assignment" inside nested `grade_sort_key` function; imports already at module level
+- Verified: 169 tests pass, ruff clean, pages render 200
+- Commits: `1739787` (unified QR), `0c9482a` (ruff Prefetch fix)

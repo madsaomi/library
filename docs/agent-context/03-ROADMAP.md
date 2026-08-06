@@ -36,6 +36,7 @@ Ordered by priority. Nothing here blocks the current green state; all items are 
 - ~~CSV export of schools~~
 - ~~Printable batch QR labels (books + students)~~
 - ~~Duplicate school (new name/admin, empty data)~~
+- ~~Unified student QR (`/library/my-qr/` with single STU_ token for all operations)~~
 
 ## Remaining (small, safe)
 1. **`docs/REQS.md`** is a historical spec and partly stale — consider rewriting or archiving.
