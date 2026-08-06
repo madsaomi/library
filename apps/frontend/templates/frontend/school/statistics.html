@@ -39,7 +39,7 @@
         <div class="d-flex flex-column gap-xs">
             {% for s in top_students %}
             <div class="list-row">
-                <span class="text-sm text-bold text-center" style="width: 22px; {% if forloop.counter == 1 %}color: #f59e0b;{% elif forloop.counter == 2 %}color: #94a3b8;{% elif forloop.counter == 3 %}color: #b45309;{% endif %}">{{ forloop.counter }}</span>
+                <span class="text-sm text-bold text-center" style="width: 22px; {% if forloop.counter == 1 %}text-warning{% elif forloop.counter == 2 %}text-muted{% else %}text-bronze{% endif %}">{{ forloop.counter }}</span>
                 <div class="list-row-avatar">{{ s.first_name|first|upper }}{{ s.last_name|first|upper }}</div>
                 <div class="list-row-main">
                     <div class="list-row-title">{{ s.first_name }} {{ s.last_name }}</div>

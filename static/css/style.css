@@ -2603,6 +2603,7 @@ header h1 {
   --warning: #f59e0b;
   --danger: #ef4444;
   --info: #6366f1;
+  --bronze: #b45309;
 }
 
 [data-theme="light"] {
@@ -2610,6 +2611,7 @@ header h1 {
   --warning: #d97706;
   --danger: #dc2626;
   --info: #4f46e5;
+  --bronze: #92400e;
 }
 
 /* Semantic text colors */
@@ -2617,6 +2619,7 @@ header h1 {
 .text-warning { color: var(--warning) !important; }
 .text-danger { color: var(--danger) !important; }
 .text-info { color: var(--info) !important; }
+.text-bronze { color: var(--bronze) !important; }
 
 /* Badge — flat, soft background, no glow */
 .badge-soft {
