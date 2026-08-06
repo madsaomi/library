@@ -424,3 +424,13 @@ ews_list: added early guard for
 - **my_books.html** — improved empty-states with descriptions, consistent list-row usage
 - Verified: all user pages render 200, 169 tests pass, ruff clean
 - Commit: 11ae0f5 "refactor: improve user panel templates with design system"
+
+## Session: form improvements (2026-08-06)
+- **student_form.html** — card-header, counter badge, icon-btn-danger for delete, table with data-table
+- **teacher_form.html** — same improvements as student_form
+- **book_form.html** — icon-btn-danger for delete button, text-success for file label
+- **news_form.html** — card-header, switch toggle for is_published, improved file upload
+- **profile_edit.html** — card-header, improved icon selection with CSS transitions
+- **Fix**: grade_sort_key TypeError (admin_views.py:620 — grade was translation proxy)
+- Verified: all forms render 200, 169 tests pass, ruff clean
+- Commit: 7edae24 "refactor: improve all forms with design system components"
