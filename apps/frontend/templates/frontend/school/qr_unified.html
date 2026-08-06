@@ -2,25 +2,26 @@
 {% load i18n %}
 
 {% block title %}{% trans "QR Skaner" %} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}{% trans "QR Skaner" %} | {% trans "Online Kutibxona" %}{% endblock %}
+{% block page_title %}{% trans "QR Skaner" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/school/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade mw-500 mx-auto">
-    <div class="glass-panel p-2xl text-center mb-xl">
-        <div class="flex-center rounded-full mx-auto mb-lg bg-primary" style="width: 56px; height: 56px;">
-            <i class="fas fa-qrcode text-xl text-white"></i>
+<div class="animate-fade mw-480 mx-auto">
+    <div class="glass-panel p-2xl mb-xl">
+        <div class="text-center mb-xl">
+            <div class="flex-center rounded-full mx-auto mb-md bg-primary" style="width: 48px; height: 48px;">
+                <i class="fas fa-qrcode text-lg text-white"></i>
+            </div>
+            <h2 class="m-0 mb-xs">{% trans "QR Skaner" %}</h2>
         </div>
-        <h2 class="m-0 mb-xs">{% trans "QR Skaner" %}</h2>
-        <p class="text-muted m-0 mb-2xl text-sm">{% trans "Kitob yoki o'quvchi QR kodini skanerlang" %}</p>
 
-        <!-- Pending indicator -->
+        <!-- Pending -->
         {% if pending_book or pending_student %}
         <div class="glass-card p-md rounded-lg mb-xl text-left" style="border-left: 3px solid var(--primary);">
-            <div class="d-flex align-center gap-sm mb-sm">
+            <div class="d-flex align-center gap-sm">
                 {% if pending_book %}
                 <div class="list-row-avatar" style="background: var(--primary);"><i class="fas fa-book text-white text-xs"></i></div>
                 <div class="flex-1">
@@ -36,62 +37,61 @@
                 </div>
                 {% endif %}
             </div>
-            <p class="text-xs text-muted m-0" id="pending-hint"></p>
+            <p class="text-xs text-muted m-0 mt-sm" id="pending-hint"></p>
         </div>
         {% endif %}
 
-        <!-- Scanner area -->
+        <!-- Scanner -->
         <div id="scanner-area" class="mb-xl">
             <div id="scanner-placeholder" class="glass-card d-flex align-center justify-center cursor-pointer"
-                 style="height: 180px; border: 2px dashed var(--border); border-radius: 12px;"
+                 style="height: 160px; border: 2px dashed var(--border); border-radius: 12px;"
                  onclick="startScanner()">
                 <div>
-                    <i class="fas fa-camera text-primary d-block mb-sm" style="font-size: 1.8rem; opacity: 0.6;"></i>
+                    <i class="fas fa-camera text-primary d-block mb-sm" style="font-size: 1.6rem; opacity: 0.5;"></i>
                     <p class="text-muted text-sm m-0">{% trans "Skanerlashni boshlash" %}</p>
                 </div>
             </div>
             <div id="reader-container" class="d-none mb-md rounded-lg overflow-hidden" style="border: 1px solid var(--border);"></div>
 
-            <!-- Result -->
             <div id="result-message" class="d-none glass-card p-md rounded-lg text-left" style="border-left: 3px solid var(--success);">
                 <div class="d-flex align-center gap-md">
-                    <div class="flex-center rounded-full" style="width: 32px; height: 32px; background: var(--success); min-width: 32px;">
+                    <div class="flex-center rounded-full" style="width: 28px; height: 28px; background: var(--success); min-width: 28px;">
                         <i id="res-icon" class="fas fa-check text-white text-xs"></i>
                     </div>
                     <div class="flex-1">
                         <div id="res-status" class="text-sm text-semibold" style="color: var(--success);">{% trans "Muvaffaqiyatli!" %}</div>
-                        <div id="res-text" class="text-xs text-muted" style="line-height: 1.4;"></div>
+                        <div id="res-text" class="text-xs text-muted"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Actions -->
-        <div class="d-flex gap-sm flex-wrap justify-center">
+        <!-- Buttons -->
+        <div class="d-flex gap-sm flex-wrap justify-center mb-lg">
             <button id="start-btn" class="btn-primary py-sm px-lg text-decoration-none" onclick="startScanner()">
                 <i class="fas fa-camera mr-xs"></i> {% trans "Skaner" %}
             </button>
             <button id="manual-btn" class="btn-outline py-sm px-lg text-decoration-none" onclick="showManual()">
                 <i class="fas fa-keyboard mr-xs"></i> {% trans "Kod" %}
             </button>
-            <button id="student-btn" class="btn-outline py-sm px-lg text-decoration-none" onclick="showStudentSearch()">
+            <button id="student-btn" class="btn-outline py-sm px-lg text-decoration-none" onclick="showStudent()">
                 <i class="fas fa-user-graduate mr-xs"></i> {% trans "O'quvchi" %}
             </button>
         </div>
 
         <!-- Quick links -->
-        <div class="d-flex gap-sm justify-center mt-xl flex-wrap">
+        <div class="d-flex gap-sm justify-center flex-wrap">
             <a href="{% url 'frontend:qr_labels_batch' %}?kind=books" class="filter-chip">
                 <i class="fas fa-book"></i> {% trans "Yorliqlar" %}
             </a>
             <a href="{% url 'frontend:qr_labels_batch' %}?kind=students" class="filter-chip">
-                <i class="fas fa-user-graduate"></i> {% trans "Kartalarni bosish" %}
+                <i class="fas fa-user-graduate"></i> {% trans "Kartalar" %}
             </a>
         </div>
     </div>
 </div>
 
-<!-- Modals -->
+<!-- Manual modal -->
 <div id="manual-modal" class="qr-modal-overlay">
     <div class="qr-modal-content">
         <div class="card-header mb-lg">
@@ -112,6 +112,7 @@
     </div>
 </div>
 
+<!-- Student modal -->
 <div id="student-modal" class="qr-modal-overlay">
     <div class="qr-modal-content" style="max-width: 400px;">
         <div class="card-header mb-lg">
@@ -161,7 +162,7 @@ function processToken(token) {
     .then(function(data) {
         if (data.status === 'success') {
             var extra = '';
-            if (data.student) extra += '<br><span class="text-xs" style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>';
+            if (data.student) extra += '<br><span class="text-xs" style="opacity:0.8"><strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>';
             if (data.xp_earned) extra += '<br><span class="text-xs" style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
             showResult('success', data.message, extra);
             refreshState();
@@ -183,11 +184,11 @@ function refreshState() {
         .then(function(data) {
             if (data.status === 'success') {
                 var hint = document.getElementById('pending-hint');
-                 var panel = document.querySelector('[style*="border-left: 3px solid"]');
-                 if (panel) panel.style.display = (data.book || data.student) ? 'block' : 'none';
-                 if (data.book && !data.student) hint.textContent = "Endi o'quvchi QR kodini skanerlang";
-                 else if (data.student && !data.book) hint.textContent = "Endi kitob QR kodini skanerlang";
-                 else hint.textContent = '';
+                var panel = document.querySelector('[style*="border-left: 3px solid"]');
+                if (panel) panel.style.display = (data.book || data.student) ? 'block' : 'none';
+                if (data.book && !data.student) hint.textContent = "Endi o'quvchi QR kodini skanerlang";
+                else if (data.student && !data.book) hint.textContent = "Endi kitob QR kodini skanerlang";
+                else hint.textContent = '';
             }
         })
         .catch(function() {});
@@ -232,7 +233,7 @@ function submitManual() {
     if (val) { closeManual(); processToken(QR_MODE + val); }
 }
 
-function showStudentSearch() {
+function showStudent() {
     document.getElementById('student-modal').classList.add('active');
     document.getElementById('student-search').value = '';
     document.getElementById('student-results').innerHTML = '';
@@ -273,7 +274,7 @@ function pickStudent(id) {
     .then(function(r) { return r.json(); })
     .then(function(data) {
         if (data.status === 'success') {
-            showResult('success', data.message, '<br><span class="text-xs" style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>');
+            showResult('success', data.message, '<br><span class="text-xs" style="opacity:0.8"><strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>');
             refreshState();
         } else {
             showResult(data.status === 'info' ? 'info' : 'error', data.message, '');
