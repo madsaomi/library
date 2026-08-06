@@ -57,12 +57,27 @@
                 <div class="text-md text-semibold">{{ school.address|default:"—" }}</div>
             </div>
             <div>
-                <div class="text-xs text-muted mb-xs">{% trans "Maktab Admini" %}</div>
-                {% if school_admin %}
-                <div class="text-md text-semibold">{{ school_admin.get_full_name|default:school_admin.username }}</div>
-                <div class="text-sm text-muted mt-xs">@{{ school_admin.username }}</div>
+                <div class="text-xs text-muted mb-md d-flex align-center gap-sm">
+                    <span>{% trans "Maktab Adminlari" %}</span>
+                    <span class="badge-soft badge-soft-primary text-xs">{{ school_admins|length }}</span>
+                </div>
+                {% if school_admins %}
+                <div class="d-flex flex-column gap-sm">
+                    {% for admin in school_admins %}
+                    <div class="list-row">
+                        <div class="list-row-avatar">{{ admin.first_name|first|upper }}{{ admin.last_name|first|upper }}</div>
+                        <div class="list-row-main">
+                            <div class="list-row-title">{{ admin.get_full_name|default:admin.username }}</div>
+                            <div class="list-row-sub">@{{ admin.username }}</div>
+                        </div>
+                        <a href="{% url 'frontend:admin_edit' admin.pk %}" class="icon-btn" title="{% trans "Tahrirlash" %}" aria-label="{% trans "Tahrirlash" %}">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
                 {% else %}
-                <div class="text-md text-muted">—</div>
+                <div class="text-md text-muted">{% trans "Admin yo'q" %}</div>
                 {% endif %}
             </div>
         </div>

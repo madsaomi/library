@@ -620,7 +620,7 @@ def school_detail(request, pk):
         m = re.match(r'(\d+)', g)
         return (0, int(m.group(1))) if m else (1, g)
 
-    school_admin = CustomUser.objects.filter(school=school, role='school_admin').first()
+    school_admins = CustomUser.objects.filter(school=school, role='school_admin').select_related('school').order_by('first_name', 'last_name')
 
     grade_counts = sorted([(g, len(ss)) for g, ss in grades.items()], key=grade_sort_key)
 
@@ -631,7 +631,7 @@ def school_detail(request, pk):
         'issued_count': BookIssue.objects.select_related('book', 'user')
         .filter(book__school=school, is_returned=False)
         .count(),
-        'school_admin': school_admin,
+        'school_admins': school_admins,
         'grades': grades,
         'grade_counts': grade_counts,
         'books': Book.objects.select_related('school', 'category').filter(school=school).order_by('-id')[:20],
