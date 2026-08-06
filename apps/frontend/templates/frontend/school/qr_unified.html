@@ -2,110 +2,121 @@
 {% load i18n %}
 
 {% block title %}{% trans "QR Skaner" %} | {% trans "Online Kutibxona" %}{% endblock %}
-{% block page_title %}{% trans "QR Skaner" %}{% endblock %}
+{% block page_title %}{% trans "QR Skaner" %} | {% trans "Online Kutibxona" %}{% endblock %}
 
 {% block sidebar_nav %}
 {% include 'frontend/school/sidebar_items.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="animate-fade">
-    <div class="grid-3 stat-grid mb-xl">
-        <div class="stat-tile">
-            <div class="stat-tile-value text-primary">{{ today_scans|default:"0" }}</div>
-            <div class="stat-tile-label">{% trans "Bugungi skaner" %}</div>
+<div class="animate-fade mw-600 mx-auto">
+    <div class="glass-panel p-xl mb-xl">
+        <div class="d-flex flex-between flex-wrap gap-md align-center mb-lg">
+            <h3 class="card-title"><i class="fas fa-qrcode text-primary"></i> {% trans "QR Skaner" %}</h3>
+            <div class="d-flex gap-sm align-center">
+                <a href="{% url 'frontend:qr_labels_batch' kind='books' %}" class="filter-chip {% if kind == 'books' or kind == None %}active{% endif %}">
+                    <i class="fas fa-book"></i> {% trans "Kitoblar" %}
+                </a>
+                <a href="{% url 'frontend:qr_labels_batch' kind='students' %}" class="filter-chip {% if kind == 'students' %}active{% endif %}">
+                    <i class="fas fa-user-graduate"></i> {% trans "O'quvchilar" %}
+                </a>
+            </div>
         </div>
-        <div class="stat-tile">
-            <div class="stat-tile-value text-info">{{ today_issues|default:"0" }}</div>
-            <div class="stat-tile-label">{% trans "Berilgan" %}</div>
-        </div>
-        <div class="stat-tile">
-            <div class="stat-tile-value text-success">{{ today_returns|default:"0" }}</div>
-            <div class="stat-tile-label">{% trans "Qaytarilgan" %}</div>
-        </div>
-    </div>
 
-    <div class="glass-panel p-2xl mw-500 mx-auto text-center">
-        <div class="rounded-full align-center justify-center mb-md" style="width: 56px; height: 56px; background: rgba(99,102,241,0.1); display: inline-flex;">
-            <i class="fas fa-camera text-2xl text-primary"></i>
-        </div>
-        <h3 class="mb-xs" style="font-size: 1.1rem;">{% trans "Kitob berish yoki qabul qilish" %}</h3>
-        <p class="text-muted text-sm mb-xl">{% trans "Kitob QR-kodini yoki o'quvchi QR-kodini skanerlang — hammasi avtomatik" %}</p>
+        <p class="text-muted text-sm m-0 mb-xl">{% trans "Kitob yoki o'quvchi QR-kodini skanerlang — avtomatik berish/qabul qilish" %}</p>
 
-        <!-- Pending pairing panel -->
-        <div id="pending-panel" class="d-none mb-xl text-left glass-card p-lg rounded-lg" style="border-left: 4px solid var(--primary);">
+        <!-- Pending panel -->
+        <div id="pending-panel" class="d-none mb-xl text-left glass-card p-lg rounded-lg" style="border-left: 3px solid var(--primary);">
             <div class="d-flex align-center justify-between mb-md">
                 <span class="text-sm text-bold text-primary d-flex align-center gap-xs">
                     <i class="fas fa-link"></i> {% trans "Jarayon" %}
                 </span>
-                <button id="clear-pending-btn" type="button" onclick="clearPending()" class="cursor-pointer text-sm text-danger" style="background:none;border:none;">
-                    <i class="fas fa-times-circle"></i> {% trans "Bekor qilish" %}
+                <button id="clear-pending-btn" type="button" onclick="clearPending()" class="icon-btn">
+                    <i class="fas fa-times-circle text-danger"></i>
                 </button>
             </div>
-            <div id="pending-book-box" class="d-none d-flex align-center gap-md p-sm rounded" style="background: rgba(99,102,241,0.08);">
-                <i class="fas fa-book text-primary"></i>
-                <div class="flex-1" style="min-width:0;">
-                    <div class="text-xs text-muted">{% trans "Kitob" %}</div>
-                    <div id="pending-book-title" class="text-sm text-bold text-truncate">—</div>
+            <div id="pending-book-box" class="d-none list-row mb-sm">
+                <div class="list-row-avatar"><i class="fas fa-book text-primary"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title text-truncate" id="pending-book-title">—</div>
+                    <div class="list-row-sub"><span id="pending-book-avail"></span></div>
                 </div>
-                <span id="pending-book-avail" class="text-xs text-success text-nowrap"></span>
+                <span class="badge-soft badge-soft-primary">{% trans "Kutmoqda" %}</span>
             </div>
-            <div id="pending-student-box" class="d-none d-flex align-center gap-md p-sm rounded mt-xs" style="background: rgba(16,185,129,0.08);">
-                <i class="fas fa-user-graduate text-success"></i>
-                <div class="flex-1" style="min-width:0;">
-                    <div class="text-xs text-muted">{% trans "O'quvchi" %}</div>
-                    <div id="pending-student-name" class="text-sm text-bold text-truncate">—</div>
+            <div id="pending-student-box" class="d-none list-row">
+                <div class="list-row-avatar"><i class="fas fa-user-graduate text-success"></i></div>
+                <div class="list-row-main">
+                    <div class="list-row-title text-truncate" id="pending-student-name">—</div>
+                    <div class="list-row-sub" id="pending-student-grade"></div>
                 </div>
-                <span id="pending-student-grade" class="text-xs text-muted text-nowrap"></span>
-            </div>
-            <div id="pending-hint" class="text-xs text-muted mt-sm">
-                <i class="fas fa-info-circle"></i> <span id="pending-hint-text"></span>
+                <span class="badge-soft badge-soft-success">{% trans "Tanlandi" %}</span>
             </div>
         </div>
 
-        <div id="reader-container" class="d-none mb-xl">
-            <div id="reader"></div>
-        </div>
-
-        <div id="scanner-placeholder" class="glass-card d-flex align-center justify-center mb-xl cursor-pointer transition pos-relative" style="height: 220px; border: 2px dashed rgba(255,255,255,0.1);" onclick="startScanner()" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
-            <div>
-                <i class="fas fa-qrcode text-primary d-block mb-md" style="font-size: 2.5rem; opacity: 0.4;"></i>
-                <p class="text-muted text-sm">{% trans "Skanerlashni boshlash uchun bosing" %}</p>
-            </div>
-            <div class="pos-absolute" style="top: 12px; left: 12px; width: 28px; height: 28px; border-top: 2px solid var(--primary); border-left: 2px solid var(--primary); border-top-left-radius: 8px;"></div>
-            <div class="pos-absolute" style="top: 12px; right: 12px; width: 28px; height: 28px; border-top: 2px solid var(--primary); border-right: 2px solid var(--primary); border-top-right-radius: 8px;"></div>
-            <div class="pos-absolute" style="bottom: 12px; left: 12px; width: 28px; height: 28px; border-bottom: 2px solid var(--primary); border-left: 2px solid var(--primary); border-bottom-left-radius: 8px;"></div>
-            <div class="pos-absolute" style="bottom: 12px; right: 12px; width: 28px; height: 28px; border-bottom: 2px solid var(--primary); border-right: 2px solid var(--primary); border-bottom-right-radius: 8px;"></div>
-        </div>
-
-        <div id="result-message" class="d-none p-lg mb-xl rounded-lg text-left" style="border-left: 4px solid var(--success); background: var(--input-bg);">
-            <div class="d-flex align-start gap-md">
-                <div class="rounded-full d-flex align-center justify-center flex-shrink-0" style="width: 36px; height: 36px; background: var(--success);">
-                    <i id="res-icon" class="fas fa-check text-white text-md"></i>
+        <!-- Scanner area -->
+        <div class="mb-xl text-center">
+            <div id="scanner-placeholder" class="glass-card d-flex align-center justify-center mb-md cursor-pointer transition"
+                 style="height: 200px; border: 2px dashed var(--border); border-radius: 12px;"
+                 onclick="startScanner()"
+                 onmouseover="this.style.borderColor='var(--hover-border)'"
+                 onmouseout="this.style.borderColor='var(--border)'">
+                <div>
+                    <i class="fas fa-qrcode text-primary d-block mb-md" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    <p class="text-muted text-sm m-0">{% trans "Skanerlashni boshlash" %}</p>
                 </div>
-                <div class="flex-1">
-                    <h4 id="res-status" class="text-success text-bold" style="margin: 0 0 2px 0; font-size: 0.9rem;">{% trans "Muvaffaqiyatli!" %}</h4>
-                    <p id="res-text" class="text-sm text-muted" style="margin: 0; line-height: 1.4;"></p>
+            </div>
+            <div id="reader-container" class="d-none mb-md rounded-lg overflow-hidden" style="border: 1px solid var(--border);"></div>
+
+            <!-- Result message -->
+            <div id="result-message" class="d-none list-row mb-md text-left" style="border-left: 3px solid var(--success); background: var(--glass);">
+                <div class="list-row-avatar" id="res-avatar" style="background: var(--success);">
+                    <i class="fas fa-check text-white"></i>
+                </div>
+                <div class="list-row-main">
+                    <div class="list-row-title" id="res-status" style="color: var(--success);">{% trans "Muvaffaqiyatli!" %}</div>
+                    <div class="list-row-sub" id="res-text"></div>
                 </div>
             </div>
         </div>
 
-        <div class="d-flex flex-column gap-sm align-center">
-            <button id="start-btn" class="btn-primary w-full mw-300 rounded-md" style="padding: 12px 0; font-size: 0.9rem;" onclick="startScanner()">
-                <i class="fas fa-camera"></i> {% trans "Skanerni yoqish" %}
+        <!-- Action buttons -->
+        <div class="d-flex gap-sm flex-wrap">
+            <button id="start-btn" class="btn-primary flex-1 py-md text-decoration-none" onclick="startScanner()">
+                <i class="fas fa-camera mr-xs"></i> {% trans "Skaner" %}
             </button>
-            <button id="manual-entry-btn" class="glass-card w-full mw-300 border d-flex align-center justify-center gap-sm rounded-md cursor-pointer text-md" style="padding: 10px 0;" onclick="showManualModal()">
-                <i class="fas fa-keyboard text-primary"></i> {% trans "Kod orqali kiritish" %}
+            <button id="manual-entry-btn" class="btn-outline flex-1 py-md text-decoration-none" onclick="showManualModal()">
+                <i class="fas fa-keyboard mr-xs"></i> {% trans "Kod kiritish" %}
             </button>
-            <button id="student-search-btn" class="glass-card w-full mw-300 border d-flex align-center justify-center gap-sm rounded-md cursor-pointer text-md" style="padding: 10px 0; border-color: rgba(16,185,129,0.3);" onclick="showStudentSearch()">
-                <i class="fas fa-user-graduate text-success"></i> {% trans "O'quvchini qidirish" %}
+            <button id="student-search-btn" class="btn-outline flex-1 py-md text-decoration-none" onclick="showStudentSearch()">
+                <i class="fas fa-user-graduate mr-xs"></i> {% trans "O'quvchi tanlash" %}
             </button>
         </div>
 
-        <div class="mt-2xl">
-            <a href="{% url 'frontend:school_dashboard' %}" class="text-muted text-decoration-none text-sm transition" style="opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
-                <i class="fas fa-arrow-left"></i> {% trans "Orqaga qaytish" %}
+        <div class="mt-xl">
+            <a href="{% url 'frontend:school_dashboard' %}" class="text-muted text-decoration-none text-sm" style="opacity: 0.7;">
+                <i class="fas fa-arrow-left"></i> {% trans "Orqaga" %}
             </a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="glass-panel p-xl">
+        <div class="card-header mb-lg">
+            <h3 class="card-title"><i class="fas fa-chart-bar text-info"></i> {% trans "Bugungi statistika" %}</h3>
+        </div>
+        <div class="grid-3 text-center">
+            <div class="stat-tile text-center">
+                <div class="stat-tile-value text-primary">{{ today_scans|default:"0" }}</div>
+                <div class="stat-tile-label">{% trans "Skaner" %}</div>
+            </div>
+            <div class="stat-tile text-center">
+                <div class="stat-tile-value text-success">{{ today_issues|default:"0" }}</div>
+                <div class="stat-tile-label">{% trans "Berilgan" %}</div>
+            </div>
+            <div class="stat-tile text-center">
+                <div class="stat-tile-value text-info">{{ today_returns|default:"0" }}</div>
+                <div class="stat-tile-label">{% trans "Qaytarilgan" %}</div>
+            </div>
         </div>
     </div>
 </div>
@@ -113,21 +124,20 @@
 <!-- Manual Entry Modal -->
 <div id="manual-modal" class="qr-modal-overlay">
     <div class="qr-modal-content">
-        <div class="text-center mb-xl">
-            <h4 class="mb-xs">{% trans "Kod orqali kiritish" %}</h4>
-            <p class="text-muted text-sm" style="margin: 0;">{% trans "Amal turini tanlang va tokenni kiriting" %}</p>
+        <div class="card-header mb-lg">
+            <h3 class="card-title"><i class="fas fa-keyboard text-primary"></i> {% trans "Kod kiritish" %}</h3>
         </div>
         <div class="d-flex gap-sm mb-lg">
-            <button id="type-req" class="btn-primary flex-1 rounded text-sm" style="padding: 8px; background: var(--primary);" onclick="setManualType('REQ_')">{% trans "Kitob berish" %}</button>
-            <button id="type-ret" class="flex-1 rounded text-sm" style="padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;" onclick="setManualType('RET_')">{% trans "Kitob qabul" %}</button>
+            <button id="type-req" class="btn-primary flex-1 py-sm rounded text-sm" onclick="setManualType('REQ_')">{% trans "Berish" %}</button>
+            <button id="type-ret" class="btn-outline flex-1 py-sm rounded text-sm" onclick="setManualType('RET_')">{% trans "Qabul" %}</button>
         </div>
         <div class="d-flex align-center" style="background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 0 12px;">
             <span id="prefix-display" class="text-primary text-bold" style="font-size: 0.95rem; border-right: 1px solid var(--border); padding-right: 12px; margin-right: 12px;">REQ_</span>
             <input type="text" id="manual-token" class="flex-1" style="background: transparent; border: none; color: var(--input-text); padding: 12px 0; font-size: 0.95rem; outline: none; text-transform: uppercase;" placeholder="1_A2B3C4D5">
         </div>
         <div class="d-flex gap-sm mt-xl">
-            <button id="modal-cancel-btn" class="glass-card flex-1 rounded cursor-pointer border text-sm" style="padding: 10px;" onclick="closeManualModal()">{% trans "Bekor qilish" %}</button>
-            <button id="modal-confirm-btn" class="btn-primary flex-1 rounded text-sm" style="padding: 10px;" onclick="submitManualToken()">{% trans "Tasdiqlash" %}</button>
+            <button id="modal-cancel-btn" class="btn-outline flex-1 py-sm" onclick="closeManualModal()">{% trans "Bekor qilish" %}</button>
+            <button id="modal-confirm-btn" class="btn-primary flex-1 py-sm" onclick="submitManualToken()">{% trans "Tasdiqlash" %}</button>
         </div>
     </div>
 </div>
@@ -135,17 +145,16 @@
 <!-- Student search modal -->
 <div id="student-search-modal" class="qr-modal-overlay">
     <div class="qr-modal-content" style="max-width: 420px;">
-        <div class="text-center mb-lg">
-            <h4 class="mb-xs">{% trans "O'quvchini qidirish" %}</h4>
-            <p class="text-muted text-sm" style="margin: 0;">{% trans "Ism yoki login kiriting" %}</p>
+        <div class="card-header mb-lg">
+            <h3 class="card-title"><i class="fas fa-user-graduate text-success"></i> {% trans "O'quvchi tanlash" %}</h3>
         </div>
         <div class="pos-relative mb-lg">
             <input type="text" id="student-search-input" class="w-full" style="background: var(--input-bg); border: 1px solid var(--border); color: var(--input-text); padding: 12px 12px 12px 38px; border-radius: 10px; font-size: 0.95rem; outline: none;" placeholder="{% trans 'Qidirish...' %}">
             <i class="fas fa-search pos-absolute text-muted" style="left: 14px; top: 50%; transform: translateY(-50%); font-size: 0.8rem;"></i>
         </div>
         <div id="student-search-results" class="d-flex flex-column gap-xs" style="max-height: 300px; overflow-y: auto;"></div>
-        <div class="d-flex gap-sm mt-lg">
-            <button class="glass-card flex-1 rounded cursor-pointer border text-sm" style="padding: 10px;" onclick="document.getElementById('student-search-modal').classList.remove('active')">{% trans "Bekor qilish" %}</button>
+        <div class="mt-lg">
+            <button class="btn-outline w-full py-sm" onclick="document.getElementById('student-search-modal').classList.remove('active')">{% trans "Bekor qilish" %}</button>
         </div>
     </div>
 </div>
@@ -162,7 +171,6 @@ function showManualModal() {
     setManualType('REQ_');
     setTimeout(function() { document.getElementById('manual-token').focus(); }, 300);
 }
-
 function closeManualModal() { document.getElementById('manual-modal').classList.remove('active'); }
 
 function setManualType(prefix) {
@@ -171,15 +179,11 @@ function setManualType(prefix) {
     var req = document.getElementById('type-req');
     var ret = document.getElementById('type-ret');
     if (prefix === 'REQ_') {
-        req.style.background = 'var(--primary)';
-        req.style.color = 'white';
-        ret.style.background = 'var(--input-bg)';
-        ret.style.color = 'var(--text-muted)';
+        req.className = 'btn-primary flex-1 py-sm rounded text-sm';
+        ret.className = 'btn-outline flex-1 py-sm rounded text-sm';
     } else {
-        ret.style.background = '#10b981';
-        ret.style.color = 'white';
-        req.style.background = 'var(--input-bg)';
-        req.style.color = 'var(--text-muted)';
+        ret.className = 'btn-primary flex-1 py-sm rounded text-sm';
+        req.className = 'btn-outline flex-1 py-sm rounded text-sm';
     }
 }
 
@@ -197,8 +201,6 @@ function showPendingPanel() {
 function updatePendingState(state) {
     var bookBox = document.getElementById('pending-book-box');
     var studentBox = document.getElementById('pending-student-box');
-    var hint = document.getElementById('pending-hint-text');
-    var panel = document.getElementById('pending-panel');
 
     if (state.book) {
         bookBox.classList.remove('d-none');
@@ -217,26 +219,19 @@ function updatePendingState(state) {
     }
 
     if (state.book && !state.student) {
-        hint.textContent = "{% trans 'Endi o\'quvchi QR-kodini skanerlang yoki qidiring' %}";
         showPendingPanel();
     } else if (state.student && !state.book) {
-        hint.textContent = "{% trans 'Endi kitob QR-kodini skanerlang' %}";
         showPendingPanel();
-    } else if (state.book && state.student) {
-        hint.textContent = "";
     }
 }
 
 function refreshState() {
-    fetch("{% url 'frontend:qr_state' %}", {
-        method: 'GET',
-        headers: { 'X-CSRFToken': CSRF }
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        if (data.status === 'success') updatePendingState(data);
-    })
-    .catch(function() {});
+    fetch("{% url 'frontend:qr_state' %}", { method: 'GET', headers: { 'X-CSRFToken': CSRF } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.status === 'success') updatePendingState(data);
+        })
+        .catch(function() {});
 }
 
 function clearPending() {
@@ -265,7 +260,7 @@ function processToken(token) {
     var resultMsg = document.getElementById('result-message');
     var resStatus = document.getElementById('res-status');
     var resText = document.getElementById('res-text');
-    var resIcon = document.getElementById('res-icon');
+    var resAvatar = document.getElementById('res-avatar');
 
     fetch("{% url 'frontend:process_qr_unified' %}", {
         method: 'POST',
@@ -274,39 +269,37 @@ function processToken(token) {
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
-        resultMsg.style.display = 'block';
+        resultMsg.style.display = 'flex';
         document.getElementById('start-btn').disabled = false;
         document.getElementById('start-btn').style.opacity = '1';
 
         if (data.status === 'info') {
-            resStatus.innerText = "{% trans 'Qo\'shimcha amal kerak' %}";
+            resStatus.innerText = "{% trans 'Qo\'shimcha amal' %}";
             resStatus.style.color = 'var(--primary)';
             resultMsg.style.borderLeftColor = 'var(--primary)';
-            resultMsg.querySelector('.rounded-full').style.background = 'var(--primary)';
-            resIcon.className = 'fas fa-arrow-right';
+            resAvatar.style.background = 'var(--primary)';
+            resAvatar.innerHTML = '<i class="fas fa-arrow-right text-white"></i>';
             resText.innerText = data.message || '';
             updatePendingState(data);
             refreshState();
         } else if (data.status === 'success') {
             var isReturn = data.action === 'return';
-            var themeColor = isReturn ? '#10b981' : 'var(--primary)';
+            var themeColor = isReturn ? 'var(--success)' : 'var(--primary)';
             resStatus.innerText = "{% trans 'Muvaffaqiyatli!' %}";
             resStatus.style.color = themeColor;
             resultMsg.style.borderLeftColor = themeColor;
-            resultMsg.querySelector('.rounded-full').style.background = themeColor;
-            resIcon.className = isReturn ? 'fas fa-undo-alt' : 'fas fa-book-reader';
+            resAvatar.style.background = themeColor;
+            resAvatar.innerHTML = isReturn ? '<i class="fas fa-undo text-white"></i>' : '<i class="fas fa-book-reader text-white"></i>';
             var extra = data.student ? ('<br><span style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>') : '';
-            if (data.xp_earned) {
-                extra += '<br><span style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
-            }
+            if (data.xp_earned) extra += '<br><span style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
             resText.innerHTML = (data.message || '') + extra;
             refreshState();
         } else {
             resStatus.innerText = "{% trans 'Xatolik!' %}";
-            resStatus.style.color = "#ef4444";
-            resultMsg.style.borderLeftColor = "#ef4444";
-            resultMsg.querySelector('.rounded-full').style.background = "#ef4444";
-            resIcon.className = 'fas fa-times';
+            resStatus.style.color = 'var(--danger)';
+            resultMsg.style.borderLeftColor = 'var(--danger)';
+            resAvatar.style.background = 'var(--danger)';
+            resAvatar.innerHTML = '<i class="fas fa-times text-white"></i>';
             resText.innerText = data.message;
         }
     })
@@ -314,7 +307,7 @@ function processToken(token) {
         console.error(err);
         document.getElementById('start-btn').disabled = false;
         document.getElementById('start-btn').style.opacity = '1';
-        alert("{% trans 'Tizimda xatolik yuz berdi' %}");
+        alert("{% trans 'Tizimda xatolik' %}");
     });
 }
 
@@ -332,26 +325,27 @@ function showStudentSearch() {
 function doStudentSearch() {
     var q = document.getElementById('student-search-input').value.trim();
     fetch("{% url 'frontend:qr_search_students' %}?q=" + encodeURIComponent(q))
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        var box = document.getElementById('student-search-results');
-        box.innerHTML = '';
-        if (!data.students || data.students.length === 0) {
-            box.innerHTML = '<div class="text-center text-muted text-sm p-3xl">{% trans "Topilmadi" %}</div>';
-            return;
-        }
-        data.students.forEach(function(s) {
-            var row = document.createElement('button');
-            row.type = 'button';
-            row.className = 'glass-card d-flex align-center gap-md text-left cursor-pointer p-md rounded-lg border transition';
-            row.onclick = function() { pickStudent(s.id); };
-            row.innerHTML = '<div class="flex-center rounded-full" style="width:32px;height:32px;background:var(--primary);color:#fff;font-weight:700;font-size:0.75rem;">' + (s.name.charAt(0) || '?').toUpperCase() + '</div>' +
-                '<div class="flex-1" style="min-width:0;"><div class="text-sm text-bold text-truncate">' + s.name + '</div><div class="text-xs text-muted">' + (s.grade || '') + ' · @' + s.username + '</div></div>' +
-                '<i class="fas fa-chevron-right text-muted" style="font-size:0.7rem;"></i>';
-            box.appendChild(row);
-        });
-    })
-    .catch(function() {});
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var box = document.getElementById('student-search-results');
+            box.innerHTML = '';
+            if (!data.students || data.students.length === 0) {
+                box.innerHTML = '<div class="text-center text-muted text-sm p-3xl">{% trans "Topilmadi" %}</div>';
+                return;
+            }
+            data.students.forEach(function(s) {
+                var row = document.createElement('button');
+                row.type = 'button';
+                row.className = 'list-row cursor-pointer';
+                row.style.cursor = 'pointer';
+                row.onclick = function() { pickStudent(s.id); };
+                row.innerHTML = '<div class="list-row-avatar">' + (s.name.charAt(0) || '?').toUpperCase() + '</div>' +
+                    '<div class="list-row-main"><div class="list-row-title text-truncate">' + s.name + '</div><div class="list-row-sub">' + (s.grade || '') + ' · @' + s.username + '</div></div>' +
+                    '<i class="fas fa-chevron-right text-muted text-xs"></i>';
+                box.appendChild(row);
+            });
+        })
+        .catch(function() {});
 }
 
 function pickStudent(studentId) {
@@ -364,75 +358,55 @@ function pickStudent(studentId) {
     .then(function(r) { return r.json(); })
     .then(function(data) {
         if (data.status === 'success') {
-            showResultAsSuccess(data);
+            var resultMsg = document.getElementById('result-message');
+            var resStatus = document.getElementById('res-status');
+            var resText = document.getElementById('res-text');
+            var resAvatar = document.getElementById('res-avatar');
+            resultMsg.style.display = 'flex';
+            var isReturn = data.action === 'return';
+            var themeColor = isReturn ? 'var(--success)' : 'var(--primary)';
+            resStatus.innerText = "{% trans 'Muvaffaqiyatli!' %}";
+            resStatus.style.color = themeColor;
+            resultMsg.style.borderLeftColor = themeColor;
+            resAvatar.style.background = themeColor;
+            resAvatar.innerHTML = isReturn ? '<i class="fas fa-undo text-white"></i>' : '<i class="fas fa-book-reader text-white"></i>';
+            var extra = data.student ? ('<br><span style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>') : '';
+            if (data.xp_earned) extra += '<br><span style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
+            resText.innerHTML = (data.message || '') + extra;
             refreshState();
         } else if (data.status === 'info') {
-            processTokenDisplay(data);
+            var resultMsg = document.getElementById('result-message');
+            resultMsg.style.display = 'flex';
+            document.getElementById('res-status').innerText = "{% trans 'Qo\'shimcha amal' %}";
+            document.getElementById('res-status').style.color = 'var(--primary)';
+            resultMsg.style.borderLeftColor = 'var(--primary)';
+            document.getElementById('res-avatar').style.background = 'var(--primary)';
+            document.getElementById('res-avatar').innerHTML = '<i class="fas fa-arrow-right text-white"></i>';
+            document.getElementById('res-text').innerText = data.message || '';
             updatePendingState(data);
             refreshState();
         } else {
-            showError(data.message);
+            var resultMsg = document.getElementById('result-message');
+            resultMsg.style.display = 'flex';
+            document.getElementById('res-status').innerText = "{% trans 'Xatolik!' %}";
+            document.getElementById('res-status').style.color = 'var(--danger)';
+            resultMsg.style.borderLeftColor = 'var(--danger)';
+            document.getElementById('res-avatar').style.background = 'var(--danger)';
+            document.getElementById('res-avatar').innerHTML = '<i class="fas fa-times text-white"></i>';
+            document.getElementById('res-text').innerText = data.message;
         }
     })
     .catch(function() {});
 }
 
-function processTokenDisplay(data) {
-    var resultMsg = document.getElementById('result-message');
-    var resStatus = document.getElementById('res-status');
-    var resText = document.getElementById('res-text');
-    var resIcon = document.getElementById('res-icon');
-    resultMsg.style.display = 'block';
-    resStatus.innerText = "{% trans 'Qo\'shimcha amal kerak' %}";
-    resStatus.style.color = 'var(--primary)';
-    resultMsg.style.borderLeftColor = 'var(--primary)';
-    resultMsg.querySelector('.rounded-full').style.background = 'var(--primary)';
-    resIcon.className = 'fas fa-arrow-right';
-    resText.innerText = data.message || '';
-}
-
-function showResultAsSuccess(data) {
-    var resultMsg = document.getElementById('result-message');
-    var resStatus = document.getElementById('res-status');
-    var resText = document.getElementById('res-text');
-    var resIcon = document.getElementById('res-icon');
-    resultMsg.style.display = 'block';
-    var isReturn = data.action === 'return';
-    var themeColor = isReturn ? '#10b981' : 'var(--primary)';
-    resStatus.innerText = "{% trans 'Muvaffaqiyatli!' %}";
-    resStatus.style.color = themeColor;
-    resultMsg.style.borderLeftColor = themeColor;
-    resultMsg.querySelector('.rounded-full').style.background = themeColor;
-    resIcon.className = isReturn ? 'fas fa-undo-alt' : 'fas fa-book-reader';
-    var extra = data.student ? ('<br><span style="opacity:0.8">{% trans "O\'quvchi" %}: <strong>' + data.student + '</strong>' + (data.grade ? ' · ' + data.grade : '') + '</span>') : '';
-    if (data.xp_earned) extra += '<br><span style="opacity:0.8"><i class="fas fa-star" style="color:#fbbf24"></i> +' + data.xp_earned + ' XP</span>';
-    resText.innerHTML = (data.message || '') + extra;
-}
-
-function showError(msg) {
-    var resultMsg = document.getElementById('result-message');
-    var resStatus = document.getElementById('res-status');
-    var resText = document.getElementById('res-text');
-    var resIcon = document.getElementById('res-icon');
-    resultMsg.style.display = 'block';
-    resStatus.innerText = "{% trans 'Xatolik!' %}";
-    resStatus.style.color = "#ef4444";
-    resultMsg.style.borderLeftColor = "#ef4444";
-    resultMsg.querySelector('.rounded-full').style.background = "#ef4444";
-    resIcon.className = 'fas fa-times';
-    resText.innerText = msg;
-}
-
 document.getElementById('manual-token').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') submitManualToken();
 });
-
 document.getElementById('student-search-input').addEventListener('input', function() {
     clearTimeout(searchTimer);
     var self = this;
     searchTimer = setTimeout(function() { doStudentSearch(); }, 300);
 });
-
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         var m = document.getElementById('manual-modal');
@@ -441,7 +415,6 @@ document.addEventListener('keydown', function(e) {
         if (sm.classList.contains('active')) sm.classList.remove('active');
     }
 });
-
 document.addEventListener('DOMContentLoaded', refreshState);
 </script>
 
@@ -455,7 +428,7 @@ function startScanner() {
     var sb = document.getElementById('start-btn');
 
     if (typeof Html5Qrcode === 'undefined') {
-        alert("{% trans 'QR kutubxonasi yuklanmadi. Sahifani yangilang.' %}");
+        alert("{% trans 'QR kutubxonasi yuklanmadi' %}");
         return;
     }
 
@@ -474,22 +447,15 @@ function startScanner() {
             throw new Error("No camera found");
         }
         var qrConfig = { fps: 20, qrbox: { width: 240, height: 240 } };
-        html5QrCode.start(
-            { facingMode: "environment" },
-            qrConfig,
-            onScanSuccess
-        ).catch(function(err) {
-            if (err.toString().indexOf("NotFoundError") !== -1) {
-                return html5QrCode.start(
-                    { facingMode: "user" },
-                    qrConfig,
-                    onScanSuccess
-                );
-            }
-            throw err;
-        }).catch(function(err) {
-            throw err;
-        });
+        html5QrCode.start({ facingMode: "environment" }, qrConfig, onScanSuccess)
+            .catch(function(err) {
+                if (err.toString().indexOf("NotFoundError") !== -1) {
+                    return html5QrCode.start({ facingMode: "user" }, qrConfig, onScanSuccess);
+                }
+                throw err;
+            }).catch(function(err) {
+                throw err;
+            });
     }).catch(function() {
         ph.style.display = 'flex';
         rc.style.display = 'none';
