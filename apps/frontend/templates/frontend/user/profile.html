@@ -99,6 +99,14 @@
             {% trans "Parol" %}
         </a>
     </div>
+
+    {% if user.role == 'student' %}
+    <div class="mt-lg text-center">
+        <a href="{% url 'frontend:student_qr' %}" target="_blank" class="btn-outline py-sm px-lg text-decoration-none d-inline-flex align-center gap-sm">
+            <i class="fas fa-qrcode"></i> {% trans "QR kartochkamni ko'rish" %}
+        </a>
+    </div>
+    {% endif %}
 </div>
 
 <script>
