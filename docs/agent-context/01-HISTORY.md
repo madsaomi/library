@@ -434,3 +434,12 @@ ews_list: added early guard for
 - **Fix**: grade_sort_key TypeError (admin_views.py:620 — grade was translation proxy)
 - Verified: all forms render 200, 169 tests pass, ruff clean
 - Commit: 7edae24 "refactor: improve all forms with design system components"
+
+## Session: school admin constraints (2026-08-06)
+- **ADMIN_MIN = 1, ADMIN_MAX = 10** constants added to admin_views.py
+- **admin_add**: validates max 10 admins per school, shows error message
+- **school_detail**: shows admin count (e.g., "1/10") with badge-soft
+- School auto-creates 1 admin on creation (already existed, now documented)
+- No admin delete endpoint exists (admins can only be edited, not deleted)
+- Verified: 169 tests pass, ruff clean, school_detail renders 200
+- Commit: f139465 "feat: enforce 1-10 admins per school with validation"
