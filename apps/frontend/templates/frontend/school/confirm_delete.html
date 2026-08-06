@@ -14,8 +14,8 @@
         <form method="post">
             {% csrf_token %}
             <div class="d-flex gap-xl">
-                <button type="submit" class="btn-primary flex-1" style="padding: 15px; background: #ef4444;">{% trans "O'chirish" %}</button>
-                <a href="javascript:history.back()" class="btn-primary flex-1 text-white text-center text-decoration-none" style="padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">{% trans "Bekor qilish" %}</a>
+                <button type="submit" class="btn-danger flex-1">{% trans "O'chirish" %}</button>
+                <a href="javascript:history.back()" class="btn-outline flex-1 text-center text-decoration-none">{% trans "Bekor qilish" %}</a>
             </div>
         </form>
     </div>
