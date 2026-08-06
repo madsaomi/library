@@ -100,7 +100,7 @@
                     <div class="text-sm text-semibold">{% trans "Savat QR kodi" %}</div>
                     <div class="text-xs text-muted">{% trans "O'quvchi savatdagi barcha kitoblarni bir QR da ko'rsatadi" %}</div>
                 </div>
-                <a href="{% url 'frontend:qr_labels_batch' kind='books' %}" class="btn-outline py-sm px-md text-sm text-decoration-none">
+                <a href="{% url 'frontend:qr_labels_batch' %}?kind=books" class="btn-outline py-sm px-md text-sm text-decoration-none">
                     {% trans "Yorliqlar" %}
                 </a>
             </div>
