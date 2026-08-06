@@ -415,3 +415,12 @@ ews_list: added early guard for
   card-headers on all panels.
 - Verified: 169 tests pass, ruff clean, all pages render 200.
 - Commit: 4e85c8f "refactor: improve admin pages - all_users, user_detail, statistics"
+
+## Session: user panel polish (2026-08-06)
+- **achievements.html** — uses .progress-bar/.progress-fill for progress display, card-header for section titles
+- **challenges.html** — uses .progress-bar/.progress-fill, unified empty-state with description
+- **leaderboard.html** — card-header for ranking section, uses list-row for ranked students, improved podium layout
+- **library.html** — uses .password-wrapper for search input with icon, card-header for news link, consistent empty-states
+- **my_books.html** — improved empty-states with descriptions, consistent list-row usage
+- Verified: all user pages render 200, 169 tests pass, ruff clean
+- Commit: 11ae0f5 "refactor: improve user panel templates with design system"
