@@ -20,21 +20,21 @@
     <div class="d-flex gap-md mb-xl justify-center">
         {% if students|length >= 2 %}
         <div class="glass-panel p-lg text-center" style="border-radius: 16px; width: 100px; border: 2px solid #94a3b8;">
-            <div class="text-2xl mb-xs">🥈</div>
+            <div class="text-2xl mb-xs" style="color: #94a3b8;"><i class="fas fa-medal"></i></div>
             <div class="text-sm text-semibold text-main text-truncate">{{ students.1.first_name }}</div>
             <div class="text-xs text-muted">{{ students.1.period_books }}</div>
         </div>
         {% endif %}
         {% if students|length >= 1 %}
         <div class="glass-panel p-lg text-center" style="border-radius: 16px; width: 110px; border: 2px solid #f59e0b;">
-            <div class="text-3xl mb-xs">🥇</div>
+            <div class="text-3xl mb-xs" style="color: #f59e0b;"><i class="fas fa-crown"></i></div>
             <div class="text-semibold text-main text-truncate">{{ students.0.first_name }}</div>
             <div class="text-muted">{{ students.0.period_books }} {% trans "kitob" %}</div>
         </div>
         {% endif %}
         {% if students|length >= 3 %}
         <div class="glass-panel p-lg text-center" style="border-radius: 16px; width: 100px; border: 2px solid #b45309;">
-            <div class="text-2xl mb-xs">🥉</div>
+            <div class="text-2xl mb-xs" style="color: #b45309;"><i class="fas fa-medal"></i></div>
             <div class="text-sm text-semibold text-main text-truncate">{{ students.2.first_name }}</div>
             <div class="text-xs text-muted">{{ students.2.period_books }}</div>
         </div>

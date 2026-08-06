@@ -13,7 +13,7 @@
 {% block content %}
 <div class="animate-fade mw-600 mx-auto">
     <div class="glass-panel p-2xl mb-xl text-center" style="border-radius: 20px;">
-        <div class="flex-center rounded-full mx-auto mb-lg" style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary), #a855f7);">
+        <div class="flex-center rounded-full mx-auto mb-lg" style="width: 100px; height: 100px; background: var(--primary);">
             <i class="fas {{ user.selected_icon|default:'fa-user' }} text-3xl text-white"></i>
         </div>
         <h2 class="m-0 mb-xs">{{ user.first_name }} {{ user.last_name }}</h2>

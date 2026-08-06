@@ -44,7 +44,7 @@
         function cycleTheme() {
             const html = document.documentElement;
             const current = html.getAttribute('data-theme') || 'dark';
-            const themes = ['dark', 'light', 'autumn', 'winter'];
+            const themes = ['dark', 'light'];
             const idx = themes.indexOf(current);
             const next = themes[(idx + 1) % themes.length];
             html.setAttribute('data-theme', next);
@@ -56,13 +56,13 @@
             const icon = document.getElementById('themeIcon');
             if (!icon) return;
             const theme = document.documentElement.getAttribute('data-theme') || 'dark';
-            const icons = { 'dark': 'fa-moon', 'light': 'fa-sun', 'autumn': 'fa-leaf', 'winter': 'fa-snowflake' };
+            const icons = { 'dark': 'fa-moon', 'light': 'fa-sun' };
             icon.className = 'fas ' + (icons[theme] || 'fa-moon');
         }
 
         (function() {
             const saved = localStorage.getItem('theme');
-            const themes = ['dark', 'light', 'autumn', 'winter'];
+            const themes = ['dark', 'light'];
             if (saved && themes.includes(saved)) {
                 document.documentElement.setAttribute('data-theme', saved);
             } else {

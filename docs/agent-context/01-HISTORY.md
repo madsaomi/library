@@ -360,5 +360,17 @@ ews_list: added early guard for
 - **Error pages** (`404.html`, `500.html`, `403.html`, `400.html`, `403_csrf.html`, `axes_lockout.html`): customized background orb colors, watermark text ("404", "500", "403", "CSRF", "400", "LOCKED"), error icon badges, particle background, theme switch button.
 - **Verified**: `python manage.py collectstatic --noinput` (691 static files post-processed), `python -m pytest -q -n auto --tb=short` (169 passed in ~35s), `python -m ruff check .` (clean).
 
+## Session: SaaS design cleanup — flat, calm, 2 themes (2026-08-06)
+- **Flat background**: removed radial-gradient orbs from `body`; now plain `--bg-dark` (Linear-style).
+- **Reduced themes 4 → 2**: removed `[data-theme="autumn"]` and `[data-theme="winter"]` blocks from
+  `style.css`; updated `cycleTheme()` in `base.html` + auth/error pages (`login.html`, `400.html`,
+  `403.html`, `403_csrf.html`, `404.html`, `500.html`, `axes_lockout.html`) to only cycle
+  `dark <-> light` with `fa-moon`/`fa-sun` icons.
+- **Flat avatars**: replaced all `linear-gradient(135deg, var(--primary), #a855f7)` avatar/icon
+  circles with plain `var(--primary)` (profile, achievements, sidebar).
+- **No emojis**: swapped leaderboard 🥇🥈🥉 for FA icons `fa-crown`/`fa-medal`; offline page 📚 → `fa-wifi`.
+- **Verified**: all 10 student pages render 200; 169 unit tests PASS; ruff clean.
+
+
 
 
