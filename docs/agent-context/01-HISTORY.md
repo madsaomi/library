@@ -401,3 +401,17 @@ ews_list: added early guard for
 - Ran full test suite: **169 passed**, ruff clean, collectstatic OK.
 - Updated docs/agent-context/ files to reflect current state.
 - No further template work needed — design-system applied uniformly.
+
+## Session: admin panel polish (2026-08-06)
+- **admin_edit.html** — rewritten with card-header, section titles with icons, password visibility toggle
+  (	ogglePassword() JS), cleaner form layout. Credentials section highlighted with warning border.
+- **admin_created.html** — improved success card with icon badge, password toggle on displayed password,
+  cleaner credentials card layout, improved visual hierarchy.
+- **all_users.html** — cleaned up action-bar (search with icon, proper filter-chips), removed inline
+  padding styles, consistent badge-soft usage.
+- **user_detail.html** — added row-actions (edit button for school_admin), stat-tiles with icons,
+  info-grid with card-header, activity history as list-row instead of old activity-item.
+- **statistics.html** — cleaned action-bar (period select with proper label), consistent stat-tiles,
+  card-headers on all panels.
+- Verified: 169 tests pass, ruff clean, all pages render 200.
+- Commit: 4e85c8f "refactor: improve admin pages - all_users, user_detail, statistics"
