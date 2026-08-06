@@ -402,7 +402,6 @@ def create_stats_news(request):
 def system_logs(request):
     from datetime import timedelta
 
-from django.db.models import Q, Prefetch
     from django.utils import timezone
     from stats.models import ActionLog
 
