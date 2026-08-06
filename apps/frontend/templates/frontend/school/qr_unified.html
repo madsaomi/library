@@ -185,7 +185,7 @@ function refreshState() {
                 var hint = document.getElementById('pending-hint');
                 var panel = document.querySelector('[style*="border-left: 3px solid"]');
                 if (panel) panel.style.display = (data.book || data.student) ? 'block' : 'none';
-                if (data.book && !data.student) hint.textContent = "{% trans 'Endi o'quvchi QR kodini skanerlang' %}";
+                if (data.book && !data.student) hint.textContent = "{% trans "Endi o&#39;quvchi QR kodini skanerlang" %}";
                 else if (data.student && !data.book) hint.textContent = "{% trans 'Endi kitob QR kodini skanerlang' %}";
                 else hint.textContent = '';
             }
