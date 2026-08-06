@@ -374,3 +374,23 @@ ews_list: added early guard for
 
 
 
+
+## Session: unified design system applied across all ~90 templates (2026-08-06)
+- **Design-system spec** written at `docs/design-system.md`: card containers (`glass-panel`/`glass-card`),
+  `stat-tile` grid, `btn-primary/btn-outline/btn-danger`, `icon-btn`, `badge-soft-*`, semantic text
+  colors (`text-success/warning/danger/info/muted`), `filter-chip`, unified `empty-state` + `empty-icon`,
+  `data-table` in `.table-responsive-wrap`, `list-row` family, `page-header`/`action-bar`/`card-header`.
+  Prohibited: linear-gradient, glow box-shadows, inline `style="color: #hex"`, old classes (`stat-card`,
+  `stat-value`, `stat-label`, `hover-glow`, `empty-icon-wrapper`, `text-4xl text-primary` in empties).
+- **New CSS** appended to `static/css/style.css` (~261 lines): `--success/--warning/--danger/--info` tokens
+  (dark + light overrides) and the component classes above.
+- **All admin templates** (24), **school templates** (32), **user templates** (18), **shared password_change**
+  converted to the new system: stat-tiles, badge-soft statuses, data-tables, list-rows, unified empty-states,
+  flat action buttons. Old `stat-card/stat-value/stat-label` eliminated everywhere.
+- **Spot fixes** after scan: `school/profile.html` rewritten (hero + 8 stat-tiles + quick actions + chart +
+  school info + recent issues as data-table, Chart.js via `json_script`), `school/qr_unified.html` stat-tiles,
+  `school/qr_labels_batch.html` empty-state, `student_form`/`teacher_form` label colors, `user/issue_qr` +
+  `user/request_qr` success headings/borders to tokens, `shared/password_change.html` gradient removed.
+- **Verified**: all panel pages render 200 (test client, HTTP_HOST=localhost); `pytest -q -n auto` = **169
+  passed in ~30s**; `ruff check` clean; `collectstatic` OK (691 post-processed).
+- Committed + pushed: `9675c74` "refactor: redesign all panel templates to unified design system".

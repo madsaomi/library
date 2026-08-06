@@ -1,6 +1,18 @@
 # 02-CURRENT-STATE — What is true right now
 
-Last fully verified: 2026-08-05 (auth/error pages dynamic backgrounds + 169 tests).
+Last fully verified: 2026-08-06 (unified design system across all ~90 templates + 169 tests).
+
+## 2026-08-06 — design-system rollout complete
+- **All templates** in `apps/frontend/templates/frontend/{admin,school,user,shared}` (~90) redesigned to the
+  unified system in `docs/design-system.md`. Old classes (`stat-card`, `stat-value`, `stat-label`,
+  `hover-glow`, `empty-icon-wrapper`) eliminated; no inline `style="color: #hex"` remains except acceptable
+  white-on-color icons / `#fbbf24` gold star in QR JS.
+- `static/css/style.css` gained ~261 lines of component classes (tokens + badge-soft/btn-outline/btn-danger/
+  icon-btn/stat-tile/filter-chip/data-table/list-row/card-header/page-header/action-bar/empty-state).
+- All three panels + shared templates render 200 via test client; `pytest -q -n auto` = **169 passed ~30s**;
+  `ruff check .` clean; `collectstatic` OK (691 post-processed, manifest storage).
+- Commits: `9675c74` (design-system redesign), `f4009de` (SaaS cleanup: flat gradients/glow removal),
+  `c8938de` (school_detail clean).
 
 
 ## Green (verified)
@@ -66,6 +78,14 @@ Last fully verified: 2026-08-05 (auth/error pages dynamic backgrounds + 169 test
 - Test client needs `HTTP_HOST='localhost'` for ALLOWED_HOSTS.
 
 ## Recently changed files (this is the "diff to trust")
+
+### 2026-08-06 unified design-system redesign (commit 9675c74)
+- `docs/design-system.md` (new — component spec + prohibited patterns)
+- `static/css/style.css` (+~261 lines component classes, semantic tokens)
+- ALL templates under `apps/frontend/templates/frontend/{admin,school,user,shared}/` (~90 files) — stat-tiles,
+  badge-soft, data-table, list-row, unified empty-state, flat buttons
+
+### 2026-08-05 (earlier sessions)
 - `requirements.txt` (now prod-only), `requirements-dev.txt` (new)
 - `core/settings.py`
 - `templates/base.html`, `templates/login.html`, `templates/404.html`, `templates/500.html`,
