@@ -394,3 +394,10 @@ ews_list: added early guard for
 - **Verified**: all panel pages render 200 (test client, HTTP_HOST=localhost); `pytest -q -n auto` = **169
   passed in ~30s**; `ruff check` clean; `collectstatic` OK (691 post-processed).
 - Committed + pushed: `9675c74` "refactor: redesign all panel templates to unified design system".
+
+## Session: final verification across all templates + root (2026-08-06)
+- Verified root auth/error templates (login, password_reset, 400/403/404/500/403_csrf) render
+  without errors after removing last inline hex colors on 403 icons.
+- Ran full test suite: **169 passed**, ruff clean, collectstatic OK.
+- Updated docs/agent-context/ files to reflect current state.
+- No further template work needed — design-system applied uniformly.
